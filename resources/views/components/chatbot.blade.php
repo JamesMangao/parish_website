@@ -110,6 +110,31 @@
                     <span x-show="agentTyping" x-cloak class="text-[10px] text-muted-foreground ml-1 italic">Agent is typing</span>
                 </div>
             </div>
+
+            <!-- Quick-reply chips (shown only before first user interaction) -->
+            <div x-show="showChips" x-cloak x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="flex flex-wrap gap-2 pt-1 pb-2">
+                <button @click="sendChip('What is the mass schedule?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    ⛪ Mass
+                </button>
+                <button @click="sendChip('I want to offer a mass intention')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    🕯️ Intentions
+                </button>
+                <button @click="sendChip('How do I submit an inquiry?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    📝 Inquiries
+                </button>
+                <button @click="sendChip('Are there any upcoming events?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    📅 Events
+                </button>
+                <button @click="sendChip('Can I see the photo gallery?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    🖼️ Gallery
+                </button>
+                <button @click="sendChip('Tell me about the parish and office hours')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    ℹ️ About
+                </button>
+                <button @click="sendChip('How can I donate?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    🙏 Donate
+                </button>
+            </div>
         </div>
 
         <!-- Input -->
@@ -165,6 +190,7 @@
                 waitTimer: null,
                 waitCounter: 0,
                 unreadCount: 0,
+                showChips: true,
                 _lastFailedMessage: null,
                 _sessionKey: 'srp_chatbot_state',
 
@@ -172,7 +198,9 @@
                     this.loadState();
                     // If no saved messages, show welcome
                     if (this.messages.length === 0) {
-                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! I am SRP Assistant, your AI assistant for Sto. Rosario Parish. How can I help you today?'));
+                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.'));
+                    } else {
+                        this.showChips = false;
                     }
                     // Resume polling if we were in a live agent state
                     if (this.liveAgentStatus === 'waiting' || this.liveAgentStatus === 'connected') {
@@ -221,8 +249,15 @@
                     return { _id: ++_msgId, role, content, type, time: Date.now(), handoverActioned: false };
                 },
 
+                sendChip(text) {
+                    this.showChips = false;
+                    this.userInput = text;
+                    this.sendMessage();
+                },
+
                 async sendMessage() {
                     if (!this.canSend) return;
+                    this.showChips = false;
                     const text = this.userInput.trim();
                     this.messages.push(this._makeMsg('user', text));
                     this.userInput = '';

@@ -49,13 +49,14 @@ class IntentionController extends Controller
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
-                'Content-Type' => 'application/json',
-            ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
-                'message' => $message,
-                'intentionType' => $intentionType,
-            ]);
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
+                    'Content-Type' => 'application/json',
+                ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
+                    'message' => $message,
+                    'intentionType' => $intentionType,
+                ]);
 
             if ($response->failed()) {
                 throw new \Exception('Supabase Edge Function failed');
@@ -70,12 +71,13 @@ class IntentionController extends Controller
     public function chatbot(Request $request)
     {
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
-                'Content-Type' => 'application/json',
-            ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
-                'message' => "Answer this as a Catholic Parish AI: " . $request->input('message'),
-            ]);
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
+                    'Content-Type' => 'application/json',
+                ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
+                    'message' => "Answer this as a Catholic Parish AI: " . $request->input('message'),
+                ]);
 
             if ($response->failed()) {
                 return response()->json(['reply' => 'I am currently in contemplative silence. Please try again later.']);
