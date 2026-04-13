@@ -59,7 +59,7 @@ class InquiryController extends Controller
             ]);
 
             // Email to the parish office
-            Mail::to('officestorosarioparish@gmail.com')->send(new InquiryAccepted($inquiry));
+            Mail::to(config('services.parish.office_email'))->send(new InquiryAccepted($inquiry));
         }
 
         return back()->with('success', 'Inquiry accepted and forwarded to the parish office.');

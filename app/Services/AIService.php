@@ -12,8 +12,8 @@ class AIService
 
     public function __construct()
     {
-        $this->groqKey = env('GROQ_API_KEY');
-        $this->openRouterKey = env('OPENROUTER_API_KEY');
+        $this->groqKey = config('services.groq.key');
+        $this->openRouterKey = config('services.openrouter.key');
     }
 
     /**

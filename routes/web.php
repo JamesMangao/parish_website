@@ -23,7 +23,7 @@ Route::get('/submit-intention', [IntentionController::class, 'create'])->name('s
 Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:5,1');
 
 Route::get('/inquiry', [InquiryController::class, 'create'])->name('inquiry');
-Route::post('/inquiry', [InquiryController::class, 'store'])->name('inquiry.store');
+Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('throttle:5,1')->name('inquiry.store');
 
 Route::get('/events', [EventsController::class, 'publicIndex'])->name('events');
 Route::get('/gallery', [GalleryController::class, 'publicIndex'])->name('gallery');
@@ -36,7 +36,7 @@ Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAge
 Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
 
 Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/admin/login', [LoginController::class, 'login']);
+Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
@@ -109,6 +109,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');
         Route::get('/admin/chats/{id}', [ChatbotController::class, 'adminShow'])->name('admin.chats.show');
         Route::post('/admin/chats/{id}/reply', [ChatbotController::class, 'adminReply'])->name('admin.chats.reply');
+        Route::post('/admin/chats/{id}/typing', [ChatbotController::class, 'adminTyping'])->name('admin.chats.typing');
     });
 
 

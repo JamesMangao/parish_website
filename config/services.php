@@ -35,4 +35,21 @@ return [
         ],
     ],
 
+    'supabase' => [
+        'url' => env('VITE_SUPABASE_URL'),
+        'anon_key' => env('VITE_SUPABASE_ANON_KEY'),
+    ],
+
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+    ],
+
+    'openrouter' => [
+        'key' => env('OPENROUTER_API_KEY'),
+    ],
+
+    'parish' => [
+        'office_email' => env('PARISH_OFFICE_EMAIL', 'officestorosarioparish@gmail.com'),
+    ],
+
 ];

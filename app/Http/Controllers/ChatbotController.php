@@ -6,6 +6,7 @@ use App\Models\ChatSession;
 use App\Models\ChatMessage;
 use App\Services\AIService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class ChatbotController extends Controller
@@ -23,7 +24,7 @@ class ChatbotController extends Controller
     public function chat(Request $request)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required|string|max:1000',
         ]);
 
         $session = $this->getOrCreateSession();
@@ -112,7 +113,7 @@ class ChatbotController extends Controller
         return response()->json([
             'messages' => $newMessages,
             'agent_connected' => $session->admin_id !== null,
-            'admin_name' => $session->admin_id ? $session->admin->name : null,
+            'agent_typing' => Cache::has('chat_typing_' . $session->id),
             'status' => $session->status,
         ]);
     }
@@ -147,6 +148,9 @@ class ChatbotController extends Controller
         $request->validate(['message' => 'required|string']);
         $chat = ChatSession::findOrFail($id);
 
+        // Clear typing indicator on send
+        Cache::forget('chat_typing_' . $chat->id);
+
         ChatMessage::create([
             'chat_session_id' => $chat->id,
             'sender' => 'admin',
@@ -154,6 +158,17 @@ class ChatbotController extends Controller
         ]);
 
         return back()->with('success', 'Reply sent!');
+    }
+
+    /**
+     * Signal that admin is typing (called via AJAX from admin chat view).
+     */
+    public function adminTyping($id)
+    {
+        $chat = ChatSession::findOrFail($id);
+        Cache::put('chat_typing_' . $chat->id, true, now()->addSeconds(5));
+
+        return response()->json(['status' => 'ok']);
     }
 
     protected function getOrCreateSession()

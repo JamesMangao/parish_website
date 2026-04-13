@@ -53,7 +53,9 @@
                     <form action="{{ route('admin.chats.reply', $chat->id) }}" method="POST">
                         @csrf
                         <div class="flex gap-4">
-                            <input name="message" required placeholder="Type your reply to the parishioner..." class="flex-1 bg-muted/20 border-none rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary font-medium">
+                            <input name="message" required placeholder="Type your reply to the parishioner..." 
+                                   id="adminReplyInput"
+                                   class="flex-1 bg-muted/20 border-none rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary font-medium">
                             <button type="submit" class="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal"><path d="m3 3 3 9-3 9 19-9Z"/><path d="M6 12h16"/></svg>
                                 Send Reply
@@ -64,4 +66,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function() {
+            let typingTimeout = null;
+            const input = document.getElementById('adminReplyInput');
+            const chatId = @json($chat->id);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+            if (input && csrfToken) {
+                input.addEventListener('input', function() {
+                    if (typingTimeout) clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        fetch(`/admin/chats/${chatId}/typing`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            }
+                        }).catch(() => {});
+                    }, 300);
+                });
+            }
+        })();
+    </script>
 </x-admin-layout>

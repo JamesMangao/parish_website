@@ -50,9 +50,9 @@ class IntentionController extends Controller
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . env('VITE_SUPABASE_ANON_KEY'),
+                'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
                 'Content-Type' => 'application/json',
-            ])->post(env('VITE_SUPABASE_URL') . '/functions/v1/ai-intention', [
+            ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
                 'message' => $message,
                 'intentionType' => $intentionType,
             ]);
@@ -71,9 +71,9 @@ class IntentionController extends Controller
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . env('VITE_SUPABASE_ANON_KEY'),
+                'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
                 'Content-Type' => 'application/json',
-            ])->post(env('VITE_SUPABASE_URL') . '/functions/v1/ai-intention', [
+            ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
                 'message' => "Answer this as a Catholic Parish AI: " . $request->input('message'),
             ]);
 

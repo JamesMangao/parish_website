@@ -101,7 +101,7 @@ class GalleryAlbumController extends Controller
         set_time_limit(300);
         
         foreach ($files as $file) {
-            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $filename = Str::uuid() . '.' . $file->extension();
             
             try {
                 // Save to local public storage instead of Supabase to avoid 42P01 errors
