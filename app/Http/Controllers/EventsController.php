@@ -7,12 +7,30 @@ use Illuminate\Http\Request;
 
 class EventsController extends Controller
 {
-    public function publicIndex()
+    public function publicIndex(Request $request)
     {
+        $view = $request->get('view', 'list');
+        
         $events = Event::where('is_published', true)
             ->whereDate('event_date', '>=', now())
             ->orderBy('event_date', 'asc')
             ->get();
+
+        if ($view === 'calendar') {
+            $month = $request->get('month', now()->month);
+            $year = $request->get('year', now()->year);
+            
+            $calendarEvents = Event::where('is_published', true)
+                ->whereMonth('event_date', $month)
+                ->whereYear('event_date', $year)
+                ->get();
+                
+            return view('events-calendar', [
+                'events' => $calendarEvents,
+                'month' => $month,
+                'year' => $year,
+            ]);
+        }
 
         return view('events', compact('events'));
     }

@@ -28,19 +28,19 @@
                     </div>
 
                     <div class="p-6 bg-white rounded-3xl border shadow-inner mb-8 transform group-hover:scale-[1.02] transition-transform">
-                        <img src="/qr-donation.png" 
+                        <img src="{{ env('GCASH_QR_PATH', '/qr-donation.png') }}" 
                              alt="Parish Donation QR" 
                              class="w-full h-auto rounded-xl">
                     </div>
 
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" 
-                            @click="navigator.clipboard.writeText('09123456789'); copiedG = true; setTimeout(() => copiedG = false, 2000)">
+                            @click="navigator.clipboard.writeText('{{ env('GCASH_NUMBER', '09123456789') }}'); copiedG = true; setTimeout(() => copiedG = false, 2000)">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs">G</div>
                                 <div>
                                     <p class="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">GCash Number</p>
-                                    <p class="font-bold text-sm">0912 345 6789</p>
+                                    <p class="font-bold text-sm">{{ env('GCASH_NUMBER', '0912 345 6789') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -49,12 +49,12 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" 
-                            @click="navigator.clipboard.writeText('Sto Rosario Parish'); copiedM = true; setTimeout(() => copiedM = false, 2000)">
+                            @click="navigator.clipboard.writeText('{{ env('MAYA_NAME', 'Sto Rosario Parish') }}'); copiedM = true; setTimeout(() => copiedM = false, 2000)">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xs">M</div>
                                 <div>
                                     <p class="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Maya Account</p>
-                                    <p class="font-bold text-sm">Sto Rosario Parish</p>
+                                    <p class="font-bold text-sm">{{ env('MAYA_NAME', 'Sto Rosario Parish') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">

@@ -20,11 +20,22 @@ class Announcement extends Model
         'content',
         'is_published',
         'published_at',
+        'expires_at',
         'created_by',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
         'published_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_published', true)
+                     ->where(function ($q) {
+                         $q->whereNull('expires_at')
+                           ->orWhere('expires_at', '>', now());
+                     });
+    }
 }

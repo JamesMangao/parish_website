@@ -19,6 +19,8 @@
                     ['url' => '/mass-schedule', 'label' => 'Mass', 'active' => request()->is('mass-schedule*')],
                     ['url' => '/submit-intention', 'label' => 'Intentions', 'active' => request()->is('submit-intention*')],
                     ['url' => '/inquiry', 'label' => 'Inquiry', 'active' => request()->is('inquiry*')],
+                    ['url' => '/track', 'label' => 'Tracker', 'active' => request()->is('track*')],
+                    ['url' => '/bulletins', 'label' => 'Bulletins', 'active' => request()->is('bulletins*')],
                     ['url' => '/events', 'label' => 'Events', 'active' => request()->is('events*')],
                     ['url' => '/gallery', 'label' => 'Gallery', 'active' => request()->is('gallery*')],
                     ['url' => '/about', 'label' => 'About', 'active' => request()->is('about*')],

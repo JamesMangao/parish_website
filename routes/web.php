@@ -13,11 +13,22 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\BulletinController;
+use App\Http\Controllers\TrackController;
+use App\Http\Controllers\Auth\TwoFactorController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () { return view('about'); })->name('about');
 Route::get('/mass-schedule', [MassScheduleController::class, 'index'])->name('mass-schedule');
 Route::get('/donate', function () { return view('donate'); })->name('donate');
+
+// Tracking Status
+Route::get('/track', [TrackController::class, 'index'])->name('track');
+Route::post('/track', [TrackController::class, 'track'])->name('track.post');
+
+// Bulletins
+Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
+Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
 
 Route::get('/submit-intention', [IntentionController::class, 'create'])->name('submit-intention');
 Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:5,1');
@@ -37,6 +48,10 @@ Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAge
 Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/admin/2fa', [TwoFactorController::class, 'index'])->name('admin.2fa.index');
+Route::post('/admin/2fa', [TwoFactorController::class, 'verify'])->name('admin.2fa.verify')->middleware('throttle:5,1');
+Route::post('/admin/2fa/resend', [TwoFactorController::class, 'resend'])->name('admin.2fa.resend')->middleware('throttle:3,1');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
@@ -103,6 +118,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/inquiries', [InquiryController::class, 'index'])->name('admin.inquiries.index');
         Route::get('/admin/inquiries/{id}', [InquiryController::class, 'show'])->name('admin.inquiries.show');
         Route::post('/admin/inquiries/{id}/accept', [InquiryController::class, 'accept'])->name('admin.inquiries.accept');
+
+        // Bulletins Admin
+        Route::get('/admin/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
+        Route::post('/admin/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
+        Route::delete('/admin/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
 
         // Live Chat Admin
         Route::get('/admin/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');

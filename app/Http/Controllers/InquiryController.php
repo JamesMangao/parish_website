@@ -31,7 +31,7 @@ class InquiryController extends Controller
             'message' => 'required|string',
         ]);
 
-        Inquiry::create([
+        $inquiry = Inquiry::create([
             'full_name' => $validated['fullName'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
@@ -44,11 +44,12 @@ class InquiryController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Your inquiry has been submitted. Our team will review it soon.'
+                'message' => 'Your inquiry has been submitted. Our team will review it soon.',
+                'refId' => $inquiry->reference_id
             ]);
         }
 
-        return back()->with('success', 'Your inquiry has been submitted. Our team will review it soon.');
+        return back()->with('success', 'Your inquiry has been submitted. Reference ID: ' . $inquiry->reference_id);
     }
 
     public function show($id)
@@ -69,6 +70,10 @@ class InquiryController extends Controller
 
             // Email to the parish office
             Mail::to(config('services.parish.office_email'))->send(new InquiryAccepted($inquiry));
+
+            // Notify User
+            \Illuminate\Support\Facades\Notification::route('mail', $inquiry->email)
+                ->notify(new \App\Notifications\InquiryStatusUpdated($inquiry));
         }
 
         return back()->with('success', 'Inquiry accepted and forwarded to the parish office.');

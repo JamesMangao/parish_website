@@ -45,13 +45,21 @@ class AdminController extends Controller
         $request->validate([
             'status' => 'required|in:pending,approved,rejected'
         ]);
-
+ 
         $intention = MassIntention::findOrFail($id);
+        $oldStatus = $intention->status;
+        $newStatus = $request->input('status');
+
         $intention->update([
-            'status' => $request->input('status'),
+            'status' => $newStatus,
             'reviewed_by' => auth()->id(),
         ]);
 
+        if ($oldStatus !== $newStatus && $intention->email) {
+            \Illuminate\Support\Facades\Notification::route('mail', $intention->email)
+                ->notify(new \App\Notifications\IntentionStatusUpdated($intention));
+        }
+ 
         return back()->with('success', 'Status updated.');
     }
 

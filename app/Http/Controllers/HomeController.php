@@ -11,7 +11,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::where('is_published', true)
+        $announcements = Announcement::active()
             ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();

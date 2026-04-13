@@ -7,148 +7,121 @@
             </p>
         </div>
 
-        <div x-data="{ search: '' }">
+        <div>
             @if($albums->isEmpty())
                 <div class="text-center py-20 bg-muted/20 border border-dashed rounded-3xl">
                     <p class="text-muted-foreground italic">No albums available yet. Check back soon for updates.</p>
                 </div>
             @else
-                <!-- Gallery Controls -->
-                <div class="max-w-xl mx-auto mb-16 relative">
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="11" cy="11" r="8" />
-                                <path d="m21 21-4.3-4.3" />
-                            </svg>
-                        </div>
-                        <input type="text" x-model="search" placeholder="Find a specific moment or event..."
-                            class="w-full bg-card/50 backdrop-blur-md border border-muted/60 rounded-full py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium">
-                    </div>
-                </div>
-
-                <!-- Featured Album Row (Only if no search) -->
+                <!-- Featured Album Row -->
                 @php 
-                                    $featured = $albums->first();
+                    $featured = $albums->first();
                     $otherAlbums = $albums->slice(1);
                 @endphp
 
-                    <div x-show="search === ''" class="mb-4 pl-2">
-                        <h2 class="font-heading text-xl font-bold text-primary/60 uppercase tracking-[0.2em]">Featured Album</h2>
-                    </div>
-                    <div x-show="search === ''" class="mb-20">
-                        <a href="{{ route('gallery.album', $featured) }}"
-                            class="group block relative h-[450px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/20 border border-white/10">
-                            @if($featured->images->count() > 0)
-                                <img src="{{ $featured->images->first()->url }}" alt="{{ $featured->title }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]">
-                            @else
-                                <div class="w-full h-full bg-muted"></div>
-                            @endif
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-10 flex flex-col justify-end">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <span
-                                        class="bg-accent text-accent-foreground text-xs font-black uppercase px-4 py-1.5 rounded-full shadow-xl">Featured</span>
-                                    <span
-                                        class="text-white/95 text-xs font-bold uppercase tracking-[0.3em] drop-shadow-md">{{ $featured->images_count }}
-                                        Photos</span>
-                                </div>
-                                <h2
-                                    class="text-4xl md:text-6xl font-heading font-black text-white leading-tight group-hover:text-accent transition-colors drop-shadow-2xl max-w-3xl">
-                                    {{ $featured->title }}
-                                </h2>
+                <div class="mb-4 pl-2">
+                    <h2 class="font-heading text-xl font-bold text-primary/60 uppercase tracking-[0.2em]">Featured Album</h2>
+                </div>
+                <div class="mb-20">
+                    <a href="{{ route('gallery.album', $featured) }}"
+                        class="group block relative h-[450px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/20 border border-white/10">
+                        @if($featured->images->count() > 0)
+                            <img src="{{ $featured->images->first()->url }}" alt="{{ $featured->title }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]">
+                        @else
+                            <div class="w-full h-full bg-muted"></div>
+                        @endif
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent p-10 flex flex-col justify-end">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span
+                                    class="bg-accent text-accent-foreground text-xs font-black uppercase px-4 py-1.5 rounded-full shadow-xl">Featured</span>
+                                <span
+                                    class="text-white/95 text-xs font-bold uppercase tracking-[0.3em] drop-shadow-md">{{ $featured->images_count }}
+                                    Photos</span>
                             </div>
-                        </a>
-                    </div>
-
-                    @if($otherAlbums->isNotEmpty())
-                        <div x-show="search === ''" class="mb-8 pl-2 mt-8">
-                            <h2 class="font-heading text-3xl font-black text-primary tracking-tight">More Galleries</h2>
+                            <h2
+                                class="text-4xl md:text-6xl font-heading font-black text-white leading-tight group-hover:text-accent transition-colors drop-shadow-2xl max-w-3xl">
+                                {{ $featured->title }}
+                            </h2>
                         </div>
-                    @endif
+                    </a>
+                </div>
 
-
-                    <!-- No results message -->
-                    <div
-                        x-show="search !== '' && {{ $albums->count() }} > 0 && !{{ collect($albums)->map(fn($a) => "'" . addslashes(strtolower($a->title . ' ' . $a->description)) . "'.includes(search.toLowerCase())")->join(' || ') }}"
-                        class="col-span-full text-center py-20 bg-muted/20 border border-dashed rounded-3xl"
-                        x-transition>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-muted-foreground/40 mb-4"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                        <p class="text-muted-foreground font-medium">No albums found for "<span x-text="search" class="italic text-primary"></span>"</p>
-                        <button @click="search = ''" class="mt-4 text-xs text-accent font-bold hover:underline">Clear search</button>
+                @if($otherAlbums->isNotEmpty())
+                    <div class="mb-8 pl-2 mt-8">
+                        <h2 class="font-heading text-3xl font-black text-primary tracking-tight">More Galleries</h2>
                     </div>
+                @endif
 
-                    <!-- Albums Grid -->
-                    <div class="grid gap-8"
-                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-                        @foreach($albums as $album)
-                            <div x-show="search === '' ? {{ $loop->first ? 'false' : 'true' }} : ('{{ addslashes(strtolower($album->title)) }}'.includes(search.toLowerCase()) || '{{ addslashes(strtolower($album->description ?? '')) }}'.includes(search.toLowerCase()))"
-                                x-transition>
-                                <a href="{{ route('gallery.album', $album) }}" class="group block h-full">
-                                    <div
-                                        class="bg-card rounded-[2rem] overflow-hidden shadow-lg border border-muted/40 h-full flex flex-col group-hover:shadow-2xl group-hover:border-accent/30 transition-all duration-500">
-                                        <!-- Image Container -->
-                                        <div class="relative aspect-[4/3] overflow-hidden bg-muted">
-                                            @if($album->images->count() > 0)
-                                                <img src="{{ $album->images->first()->url }}" alt="{{ $album->title }}"
-                                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                                                    loading="lazy" />
-                                            @else
-                                                <div class="w-full h-full bg-muted flex items-center justify-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="text-muted-foreground/30">
-                                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                                                        <circle cx="9" cy="9" r="2" />
-                                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                                                    </svg>
-                                                </div>
-                                            @endif
-                                            <div
-                                                class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity">
+                <!-- Albums Grid -->
+                <div class="grid gap-8"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    @foreach($albums as $album)
+                        @if(!$loop->first)
+                        <div>
+                            <a href="{{ route('gallery.album', $album) }}" class="group block h-full">
+                                <div
+                                    class="bg-card rounded-[2rem] overflow-hidden shadow-lg border border-muted/40 h-full flex flex-col group-hover:shadow-2xl group-hover:border-accent/30 transition-all duration-500">
+                                    <!-- Image Container -->
+                                    <div class="relative aspect-[4/3] overflow-hidden bg-muted">
+                                        @if($album->images->count() > 0)
+                                            <img src="{{ $album->images->first()->url }}" alt="{{ $album->title }}"
+                                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                                                loading="lazy" />
+                                        @else
+                                            <div class="w-full h-full bg-muted flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round" class="text-muted-foreground/30">
+                                                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                                    <circle cx="9" cy="9" r="2" />
+                                                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                                </svg>
                                             </div>
-                                            <div class="absolute bottom-6 left-6 right-6 text-white">
-                                                <p class="text-[10px] font-bold text-accent uppercase tracking-[0.2em] mb-1">
-                                                    {{ $album->images_count }} PHOTOS
-                                                </p>
-                                                <h3
-                                                    class="font-heading font-black text-xl leading-tight group-hover:text-accent transition-colors line-clamp-2">
-                                                    {{ $album->title }}
-                                                </h3>
-                                            </div>
+                                        @endif
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity">
+                                        </div>
+                                        <div class="absolute bottom-6 left-6 right-6 text-white">
+                                            <p class="text-[10px] font-bold text-accent uppercase tracking-[0.2em] mb-1">
+                                                {{ $album->images_count }} PHOTOS
+                                            </p>
+                                            <h3
+                                                class="font-heading font-black text-xl leading-tight group-hover:text-accent transition-colors line-clamp-2">
+                                                {{ $album->title }}
+                                            </h3>
                                         </div>
                                     </div>
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
-
-
-                    <!-- Latest Photos Grid -->
-                    @if($latestPhotos->isNotEmpty())
-                        <div x-show="search === ''" class="mt-24">
-                            <div class="mb-8 pl-2">
-                                <h2 class="font-heading text-3xl font-black text-primary tracking-tight">Latest Photos</h2>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                                @foreach($latestPhotos as $photo)
-                                    <a href="{{ route('gallery.album', $photo->album_id) }}"
-                                        class="group block relative aspect-square rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-all">
-                                        <img src="{{ $photo->url }}" alt="Latest photo"
-                                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                            loading="lazy" />
-                                        <div
-                                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                            <p class="text-white text-xs font-bold line-clamp-2">{{ $photo->album->title }}</p>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
+                                </div>
+                            </a>
                         </div>
-                    @endif
+                        @endif
+                    @endforeach
+                </div>
+
+                <!-- Latest Photos Grid -->
+                @if($latestPhotos->isNotEmpty())
+                    <div class="mt-24">
+                        <div class="mb-8 pl-2">
+                            <h2 class="font-heading text-3xl font-black text-primary tracking-tight">Latest Photos</h2>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                            @foreach($latestPhotos as $photo)
+                                <a href="{{ route('gallery.album', $photo->album_id) }}"
+                                    class="group block relative aspect-square rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-all">
+                                    <img src="{{ $photo->url }}" alt="Latest photo"
+                                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                        loading="lazy" />
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                        <p class="text-white text-xs font-bold line-clamp-2">{{ $photo->album->title }}</p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             @endif
 
             {{-- ===================== --}}
