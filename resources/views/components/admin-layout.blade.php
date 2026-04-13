@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Admin - Sto. Rosario Parish</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+
+<body class="bg-muted/30 font-sans antialiased text-foreground" 
+    x-data="{ 
+        sidebarOpen: true,
+        notification: { show: false, message: '', type: 'success' },
+        confirmModal: { show: false, title: '', message: '', onConfirm: null },
+        showNotification(msg, type = 'success') {
+            this.notification.message = msg;
+            this.notification.type = type;
+            this.notification.show = true;
+            setTimeout(() => this.notification.show = false, 5000);
+        },
+        triggerConfirm(title, message, action) {
+            this.confirmModal.title = title;
+            this.confirmModal.message = message;
+            this.confirmModal.onConfirm = action;
+            this.confirmModal.show = true;
+        }
+    }">
+    
+    <!-- Global Notification System -->
+    @if(session('success'))
+        <div x-init="showNotification('{{ session('success') }}', 'success')"></div>
+    @endif
+    @if(session('error'))
+        <div x-init="showNotification('{{ session('error') }}', 'error')"></div>
+    @endif
+
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <aside :class="sidebarOpen ? 'w-64' : 'w-20'"
+            class="bg-primary text-primary-foreground transition-all duration-300 flex flex-col fixed inset-y-0 z-50 shadow-xl">
+            <div class="h-16 flex items-center px-6 border-b border-primary-foreground/10 shrink-0">
+                <span x-show="sidebarOpen" class="font-heading font-bold text-xl tracking-tight transition-all">Sto Rosario Parish Admin</span>
+                <span x-show="!sidebarOpen" class="font-heading font-bold text-xl mx-auto">SRP</span>
+            </div>
+
+            <nav class="flex-1 py-6 space-y-1 overflow-y-auto">
+                @php $role = Auth::user()->role ?? 'super_admin'; @endphp
+
+                <x-admin-nav-link href="/admin/dashboard" icon="layout-dashboard" label="Dashboard"
+                    :active="request()->is('admin/dashboard')" />
+
+                @if($role === 'super_admin' || $role === 'staff')
+                    <x-admin-nav-link href="/admin/intentions" icon="heart" label="Mass Intentions"
+                        :active="request()->is('admin/intentions*')" />
+                @endif
+
+                @if($role === 'super_admin' || $role === 'soccom')
+                    <x-admin-nav-link href="/admin/inquiries" icon="message-square-quote" label="Inquiries"
+                        :active="request()->is('admin/inquiries*')" />
+                    <x-admin-nav-link href="/admin/schedules" icon="calendar" label="Schedules"
+                        :active="request()->is('admin/schedules*')" />
+                    <x-admin-nav-link href="/admin/announcements" icon="megaphone" label="Announcements"
+                        :active="request()->is('admin/announcements*')" />
+                    <x-admin-nav-link href="/admin/events" icon="sparkles" label="Events"
+                        :active="request()->is('admin/events*')" />
+                    <x-admin-nav-link href="/admin/gallery" icon="image" label="Gallery"
+                        :active="request()->is('admin/gallery*')" />
+                    <x-admin-nav-link href="/admin/chats" icon="messages-square" label="Live Chat"
+                        :active="request()->is('admin/chats*')" />
+                @endif
+
+                @if($role === 'super_admin')
+                    <div class="pt-4 pb-2 px-6">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-primary-foreground/40">System</p>
+                    </div>
+
+                    <x-admin-nav-link href="/admin/users" icon="users" label="Users"
+                        :active="request()->is('admin/users*')" />
+                    <x-admin-nav-link href="/admin/logs" icon="scroll-text" label="Logs"
+                        :active="request()->is('admin/logs*')" />
+                    <x-admin-nav-link href="/admin/settings" icon="settings" label="Settings"
+                        :active="request()->is('admin/settings*')" />
+                @endif
+            </nav>
+
+            <div class="p-4 border-t border-primary-foreground/10">
+                <form method="POST" action="/logout">
+                    @csrf
+                    <button type="submit"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-foreground/10 text-sm font-medium transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-log-out">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" x2="9" y1="12" y2="12" />
+                        </svg>
+                        <span x-show="sidebarOpen">Logout</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main :class="sidebarOpen ? 'ml-64' : 'ml-20'"
+            class="flex-1 flex flex-col transition-all duration-300 min-h-screen">
+            <header class="h-16 bg-white border-b flex items-center justify-between px-8 sticky top-0 z-40">
+                <button @click="sidebarOpen = !sidebarOpen"
+                    class="p-2 -ml-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-menu">
+                        <line x1="4" x2="20" y1="12" y2="12" />
+                        <line x1="4" x2="20" y1="6" y2="6" />
+                        <line x1="4" x2="20" y1="18" y2="18" />
+                    </svg>
+                </button>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-primary">{{ Auth::user()->name ?? 'Admin User' }}</p>
+                        <p class="text-xs text-muted-foreground">{{ Auth::user()->email ?? 'admin@storosario.ph' }}</p>
+                    </div>
+                    <div
+                        class="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold">
+                        {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8 flex-1">
+                {{ $slot }}
+            </div>
+        </main>
+    </div>
+
+    <!-- Global Professional Notification Toast -->
+    <template x-teleport="body">
+        <div 
+            x-show="notification.show" 
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+            x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+            class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white border border-border shadow-2xl rounded-xl p-4 flex items-center gap-4"
+            x-cloak
+        >
+            <div :class="notification.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'" 
+                 class="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full">
+                <template x-if="notification.type === 'success'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </template>
+                <template x-if="notification.type === 'error'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                </template>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-black uppercase tracking-widest text-muted-foreground" x-text="notification.type === 'success' ? 'Success' : 'Error'"></p>
+                <p class="text-sm font-bold text-primary truncate" x-text="notification.message"></p>
+            </div>
+            <button @click="notification.show = false" class="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+    </template>
+
+    <!-- Global Professional Confirmation Modal -->
+    <template x-teleport="body">
+        <div 
+            x-show="confirmModal.show" 
+            class="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm"
+            x-cloak
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+        >
+            <div 
+                @click.away="confirmModal.show = false"
+                class="bg-white max-w-md w-full rounded-2xl shadow-2xl border p-6 animate-in zoom-in-95 duration-200"
+            >
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="h-12 w-12 bg-red-100 text-red-600 flex-shrink-0 flex items-center justify-center rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-primary italic font-heading" x-text="confirmModal.title"></h3>
+                        <p class="text-sm text-muted-foreground mt-2 leading-relaxed" x-text="confirmModal.message"></p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-3">
+                    <button @click="confirmModal.show = false" class="px-5 py-2 rounded-md text-sm font-bold text-muted-foreground hover:bg-muted transition-colors">
+                        Cancel
+                    </button>
+                    <button @click="confirmModal.show = false; if(confirmModal.onConfirm) confirmModal.onConfirm()" class="px-5 py-2 bg-red-600 text-white rounded-md text-sm font-bold shadow-md hover:bg-red-700 transition-all">
+                        Delete Permanently
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+</body>
+
+</html>

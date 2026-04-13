@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+  /* Traditional Catholic Palette */
+  --color-background: oklch(0.96 0.01 40);
+  --color-foreground: oklch(0.15 0.03 20);
+
+  --color-card: oklch(0.98 0.01 40);
+  --color-card-foreground: oklch(0.15 0.03 20);
+
+  --color-popover: oklch(0.98 0.01 40);
+  --color-popover-foreground: oklch(0.15 0.03 20);
+
+  --color-primary: oklch(0.28 0.1 345);
+  --color-primary-foreground: oklch(0.96 0.01 40);
+
+  --color-secondary: oklch(0.88 0.02 40);
+  --color-secondary-foreground: oklch(0.2 0.03 20);
+
+  --color-muted: oklch(0.92 0.01 35);
+  --color-muted-foreground: oklch(0.45 0.02 20);
+
+  --color-accent: oklch(0.48 0.15 43);
+  --color-accent-foreground: oklch(0.12 0.03 20);
+
+  --color-destructive: oklch(0.5 0.2 0);
+  --color-destructive-foreground: oklch(1 0 0);
+
+  --color-border: oklch(0.85 0.01 35);
+  --color-input: oklch(0.88 0.01 35);
+  --color-ring: oklch(0.28 0.1 345);
+
+  --radius: 0.5rem;
+
+  /* Custom tokens */
+  --color-gold: oklch(0.48 0.15 43);
+  --color-gold-light: oklch(0.7 0.1 43);
+  --color-burgundy: oklch(0.28 0.1 345);
+  --color-burgundy-light: oklch(0.45 0.08 345);
+  --color-ivory: oklch(0.96 0.01 40);
+  --color-cream: oklch(0.88 0.02 40);
+  --color-warm-brown: oklch(0.25 0.03 20);
+
+  --font-heading: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+
+@utility section-divider {
+  width: 4rem;
+  height: 0.25rem;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--color-burgundy), var(--color-gold));
+}
+
+@utility glass-card {
+  border-radius: 0.5rem;
+  border-width: 1px;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  background-color: color-mix(in srgb, var(--color-card), transparent 15%);
+  backdrop-filter: blur(8px);
+}
+
+@utility gold-gradient-text {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+}
