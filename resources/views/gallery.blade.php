@@ -1,7 +1,4 @@
 <x-public-layout>
-    <x-slot name="meta">
-        <meta name="description" content="View photos of our parish community, celebrations, and sacred spaces at Sto. Rosario Parish.">
-    </x-slot>
     <div class="container py-12 mx-auto px-4">
         <div class="text-center mb-16">
             <h1 class="font-heading text-5xl font-bold mb-4 text-primary">Parish Gallery</h1>
@@ -74,19 +71,25 @@
                     @endif
 
 
-                <!-- Albums Grid -->
-                <div class="relative min-h-[400px]">
-                    <div class="grid gap-8" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    <!-- No results message -->
+                    <div
+                        x-show="search !== '' && {{ $albums->count() }} > 0 && !{{ collect($albums)->map(fn($a) => "'" . addslashes(strtolower($a->title . ' ' . $a->description)) . "'.includes(search.toLowerCase())")->join(' || ') }}"
+                        class="col-span-full text-center py-20 bg-muted/20 border border-dashed rounded-3xl"
+                        x-transition>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-muted-foreground/40 mb-4"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <p class="text-muted-foreground font-medium">No albums found for "<span x-text="search" class="italic text-primary"></span>"</p>
+                        <button @click="search = ''" class="mt-4 text-xs text-accent font-bold hover:underline">Clear search</button>
+                    </div>
+
+                    <!-- Albums Grid -->
+                    <div class="grid gap-8"
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
                         @foreach($albums as $album)
-                            <div 
-                                x-show="search.trim() === '' ? {{ $loop->first ? 'false' : 'true' }} : '{{ addslashes(strtolower($album->title)) }}'.includes(search.toLowerCase().trim())"
-                                x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 transform scale-95"
-                                x-transition:enter-end="opacity-100 transform scale-100"
-                                class="h-full"
-                            >
+                            <div x-show="search === '' ? {{ $loop->first ? 'false' : 'true' }} : ('{{ addslashes(strtolower($album->title)) }}'.includes(search.toLowerCase()) || '{{ addslashes(strtolower($album->description ?? '')) }}'.includes(search.toLowerCase()))"
+                                x-transition>
                                 <a href="{{ route('gallery.album', $album) }}" class="group block h-full">
-                                    <div class="bg-card rounded-[2rem] overflow-hidden shadow-lg border border-muted/40 h-full flex flex-col group-hover:shadow-2xl group-hover:border-accent/30 transition-all duration-500">
+                                    <div
+                                        class="bg-card rounded-[2rem] overflow-hidden shadow-lg border border-muted/40 h-full flex flex-col group-hover:shadow-2xl group-hover:border-accent/30 transition-all duration-500">
                                         <!-- Image Container -->
                                         <div class="relative aspect-[4/3] overflow-hidden bg-muted">
                                             @if($album->images->count() > 0)
@@ -94,16 +97,25 @@
                                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                                                     loading="lazy" />
                                             @else
-                                                <div class="w-full h-full bg-muted flex items-center justify-center text-muted-foreground/20">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg>
+                                                <div class="w-full h-full bg-muted flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round" class="text-muted-foreground/30">
+                                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                                        <circle cx="9" cy="9" r="2" />
+                                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                                    </svg>
                                                 </div>
                                             @endif
-                                            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity"></div>
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity">
+                                            </div>
                                             <div class="absolute bottom-6 left-6 right-6 text-white">
                                                 <p class="text-[10px] font-bold text-accent uppercase tracking-[0.2em] mb-1">
                                                     {{ $album->images_count }} PHOTOS
                                                 </p>
-                                                <h3 class="font-heading font-black text-xl leading-tight group-hover:text-accent transition-colors line-clamp-2">
+                                                <h3
+                                                    class="font-heading font-black text-xl leading-tight group-hover:text-accent transition-colors line-clamp-2">
                                                     {{ $album->title }}
                                                 </h3>
                                             </div>
@@ -114,48 +126,29 @@
                         @endforeach
                     </div>
 
-                    <!-- No Results State -->
-                    <template x-if="search.trim() !== ''">
-                        <div 
-                            x-cloak
-                            x-show="!Array.from($el.parentElement.querySelectorAll('.grid > div')).some(el => el.style.display !== 'none')"
-                            class="text-center py-20 animate-in fade-in zoom-in duration-300"
-                        >
-                            <div class="inline-flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 text-primary/20 mb-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+
+                    <!-- Latest Photos Grid -->
+                    @if($latestPhotos->isNotEmpty())
+                        <div x-show="search === ''" class="mt-24">
+                            <div class="mb-8 pl-2">
+                                <h2 class="font-heading text-3xl font-black text-primary tracking-tight">Latest Photos</h2>
                             </div>
-                            <h3 class="font-heading text-2xl font-bold text-primary mb-2">No matching moments</h3>
-                            <p class="text-muted-foreground italic">We couldn't find any albums matching "<span x-text="search" class="font-bold text-foreground"></span>"</p>
-                            <button @click="search = ''" class="mt-6 text-xs font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors underline underline-offset-4">
-                                Clear Search
-                            </button>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                @foreach($latestPhotos as $photo)
+                                    <a href="{{ route('gallery.album', $photo->album_id) }}"
+                                        class="group block relative aspect-square rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-all">
+                                        <img src="{{ $photo->url }}" alt="Latest photo"
+                                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            loading="lazy" />
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                            <p class="text-white text-xs font-bold line-clamp-2">{{ $photo->album->title }}</p>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
-                    </template>
-                </div>
-
-
-                <!-- Latest Photos Grid (Hidden during search) -->
-                @if($latestPhotos->isNotEmpty())
-                    <div x-show="search.trim() === ''" x-transition class="mt-24">
-                        <div class="mb-8 pl-2">
-                            <h2 class="font-heading text-3xl font-black text-primary tracking-tight">Latest Photos</h2>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                            @foreach($latestPhotos as $photo)
-                                <a href="{{ route('gallery.album', $photo->album_id) }}"
-                                    class="group block relative aspect-square rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-all">
-                                    <img src="{{ $photo->url }}" alt="Latest photo"
-                                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                        loading="lazy" />
-                                    <div
-                                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                        <p class="text-white text-xs font-bold line-clamp-2">{{ $photo->album->title }}</p>
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
+                    @endif
             @endif
 
             {{-- ===================== --}}
