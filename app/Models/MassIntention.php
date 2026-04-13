@@ -17,6 +17,7 @@ class MassIntention extends Model
 
     protected $fillable = [
         'full_name',
+        'email',
         'intention_type',
         'ai_suggested_type',
         'raw_message',

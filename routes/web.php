@@ -30,10 +30,9 @@ Route::get('/gallery', [GalleryController::class, 'publicIndex'])->name('gallery
 Route::get('/gallery/{album}', [GalleryController::class, 'publicAlbum'])->name('gallery.album');
 
 // API Proxies
-Route::post('/api/ai-intention', [IntentionController::class, 'aiFormat'])->middleware('throttle:10,1');
 Route::post('/api/chatbot', [ChatbotController::class, 'chat'])->middleware('throttle:10,1');
-Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
 Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
+Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
 
 Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');

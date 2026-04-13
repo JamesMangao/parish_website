@@ -17,78 +17,33 @@ class IntentionController extends Controller
     {
         $validated = $request->validate([
             'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'intentionType' => 'required|string',
-            'preferredDate' => 'nullable|date',
+            'preferredDate' => 'nullable|date|after_or_equal:today',
             'massTime' => 'nullable|string',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'paymentMethod' => 'nullable|string',
         ]);
 
-        MassIntention::create([
+        $intention = MassIntention::create([
             'full_name' => $validated['fullName'],
+            'email' => $validated['email'],
             'intention_type' => $validated['intentionType'],
-            'raw_message' => $validated['description'] ?? null,
-            'formatted_message' => null,
-            'ai_suggested_type' => null,
+            'raw_message' => $validated['description'],
             'preferred_date' => $validated['preferredDate'],
             'mass_time' => $validated['massTime'],
             'status' => 'pending',
             'payment_method' => $validated['paymentMethod'],
         ]);
 
-        return back()->with('success', 'Your mass intention has been submitted.');
-    }
-
-    public function aiFormat(Request $request)
-    {
-        $message = $request->input('message');
-        $intentionType = $request->input('intentionType');
-
-        if (!$message) {
-            return response()->json(['error' => 'No message provided'], 400);
-        }
-
-        try {
-            $response = Http::withoutVerifying()
-                ->withHeaders([
-                    'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
-                    'Content-Type' => 'application/json',
-                ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
-                    'message' => $message,
-                    'intentionType' => $intentionType,
-                ]);
-
-            if ($response->failed()) {
-                throw new \Exception('Supabase Edge Function failed');
-            }
-
-            return $response->json();
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'AI Unavailable'], 500);
-        }
-    }
-
-    public function chatbot(Request $request)
-    {
-        try {
-            $response = Http::withoutVerifying()
-                ->withHeaders([
-                    'Authorization' => 'Bearer ' . config('services.supabase.anon_key'),
-                    'Content-Type' => 'application/json',
-                ])->post(config('services.supabase.url') . '/functions/v1/ai-intention', [
-                    'message' => "Answer this as a Catholic Parish AI: " . $request->input('message'),
-                ]);
-
-            if ($response->failed()) {
-                return response()->json(['reply' => 'I am currently in contemplative silence. Please try again later.']);
-            }
-
-            $data = $response->json();
+        if ($request->expectsJson()) {
             return response()->json([
-                'reply' => $data['formatted'] ?? 'Thank you for your message. How else can I assist you with parish matters?'
+                'success' => true,
+                'message' => 'Your mass intention has been submitted.',
+                'refId' => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($intention->id, 0, 8))
             ]);
-        } catch (\Exception $e) {
-            return response()->json(['reply' => 'I am sorry, I am having trouble connecting to the parish servers.']);
         }
+
+        return back()->with('success', 'Your mass intention has been submitted. Reference ID: ' . \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($intention->id, 0, 8)));
     }
 }

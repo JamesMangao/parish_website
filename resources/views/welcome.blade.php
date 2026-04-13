@@ -4,7 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Sto. Rosario Parish') }}</title>
+        <meta name="description" content="Official website of Sto. Rosario Parish, Pacita. Join our community for mass, events, and spiritual service in San Pedro, Laguna.">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

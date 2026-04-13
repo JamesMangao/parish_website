@@ -46,14 +46,14 @@
                         </div>
                         <div class="flex items-center gap-3 text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h9"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M19 16v6"/><path d="M16 19h6"/></svg>
-                            <span class="break-all">officestorosarioparish@gmail.com</span>
+                            <span class="break-all">{{ config('services.parish.office_email') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Form Area -->
-                <div class="md:col-span-3 p-8 bg-background">
-                    <form action="{{ route('inquiry.store') }}" method="POST" class="space-y-6">
+                <div class="md:col-span-3 p-8 bg-background" x-data="{ loading: false }">
+                    <form action="{{ route('inquiry.store') }}" method="POST" class="space-y-6" @submit="loading = true">
                         @csrf
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-primary" for="fullName">Full Name</label>
@@ -71,38 +71,63 @@
                             </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <label class="text-sm font-bold text-primary" for="inquiryType">Inquiry Type</label>
-                            <select name="inquiryType" id="inquiryType" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none font-medium">
-                                <option value="" disabled selected>Select a service...</option>
-                                <optgroup label="Sacramental Rites">
-                                    <option value="Baptism">Baptism</option>
-                                    <option value="First Communion">First Communion</option>
-                                    <option value="Confirmation">Confirmation</option>
-                                    <option value="Wedding">Wedding</option>
-                                    <option value="Funeral Mass">Funeral Mass</option>
-                                </optgroup>
-                                <optgroup label="Document Requests">
-                                    <option value="Baptismal Certificate">Baptismal Certificate</option>
-                                    <option value="Confirmation Certificate">Confirmation Certificate</option>
-                                    <option value="Marriage Certificate">Marriage Certificate</option>
-                                </optgroup>
-                                <optgroup label="Blessings & Others">
-                                    <option value="Car Blessing">Car Blessing</option>
-                                    <option value="House Blessing">House Blessing</option>
-                                    <option value="Other">Others</option>
-                                </optgroup>
-                            </select>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-primary" for="inquiryType">Inquiry Type</label>
+                                <div class="relative">
+                                    <select name="inquiryType" id="inquiryType" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none font-medium">
+                                        <option value="" disabled selected>Select a service...</option>
+                                        <optgroup label="Sacramental Rites">
+                                            <option value="Baptism">Baptism</option>
+                                            <option value="First Communion">First Communion</option>
+                                            <option value="Confirmation">Confirmation</option>
+                                            <option value="Wedding">Wedding</option>
+                                            <option value="Funeral Mass">Funeral Mass</option>
+                                        </optgroup>
+                                        <optgroup label="Document Requests">
+                                            <option value="Baptismal Certificate">Baptismal Certificate</option>
+                                            <option value="Confirmation Certificate">Confirmation Certificate</option>
+                                            <option value="Marriage Certificate">Marriage Certificate</option>
+                                        </optgroup>
+                                        <optgroup label="Blessings & Others">
+                                            <option value="Car Blessing">Car Blessing</option>
+                                            <option value="House Blessing">House Blessing</option>
+                                            <option value="Other">Others</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-primary" for="preferredDate">Preferred Date</label>
+                                <input type="date" name="preferredDate" id="preferredDate" required min="{{ date('Y-m-d') }}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-medium">
+                            </div>
                         </div>
 
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-primary" for="message">Message / Details</label>
-                            <textarea name="message" id="message" rows="4" required class="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="Please provide details about your request (e.g. preferred dates, occasion details)"></textarea>
+                            <textarea name="message" id="message" rows="4" required class="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="Please provide details about your request (e.g. occasion details, names)"></textarea>
                         </div>
 
-                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                            Submit Inquiry
+                        <button 
+                            type="submit" 
+                            :disabled="loading"
+                            class="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-md disabled:opacity-70"
+                        >
+                            <template x-if="!loading">
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                                    Submit Inquiry
+                                </div>
+                            </template>
+                            <template x-if="loading">
+                                <div class="flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Submitting...
+                                </div>
+                            </template>
                         </button>
                     </form>
                 </div>

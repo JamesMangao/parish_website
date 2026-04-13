@@ -27,6 +27,7 @@ class InquiryController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
             'inquiryType' => 'required|string',
+            'preferredDate' => 'nullable|date|after_or_equal:today',
             'message' => 'required|string',
         ]);
 
@@ -35,9 +36,17 @@ class InquiryController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'inquiry_type' => $validated['inquiryType'],
+            'preferred_date' => $validated['preferredDate'],
             'message' => $validated['message'],
             'status' => 'pending',
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Your inquiry has been submitted. Our team will review it soon.'
+            ]);
+        }
 
         return back()->with('success', 'Your inquiry has been submitted. Our team will review it soon.');
     }

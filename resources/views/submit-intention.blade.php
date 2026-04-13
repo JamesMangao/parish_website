@@ -21,10 +21,16 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
                 <h2 class="font-heading text-3xl font-bold mb-2 text-primary">Thank You!</h2>
-                <p class="text-muted-foreground mb-8">Your mass intention has been submitted and is pending review.</p>
-                <button @click="reset()" class="px-6 py-2 rounded-md border border-primary text-primary font-bold hover:bg-primary hover:text-white transition-colors">
-                    Submit Another
-                </button>
+                <p class="text-muted-foreground mb-4">Your mass intention has been submitted successfully.</p>
+                <div x-show="refId" class="mb-8 p-3 bg-muted rounded-lg inline-block border border-dashed">
+                    <span class="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">Reference ID</span>
+                    <span class="font-mono font-bold text-primary" x-text="refId"></span>
+                </div>
+                <div>
+                    <button @click="reset()" class="px-6 py-2 rounded-md border border-primary text-primary font-bold hover:bg-primary hover:text-white transition-colors">
+                        Submit Another
+                    </button>
+                </div>
             </div>
 
             <!-- Form State -->
@@ -35,16 +41,31 @@
                 <div class="p-6">
                     <form @submit.prevent="submitForm()" class="space-y-6">
                         @csrf
-                        <div class="space-y-2">
-                            <label class="text-sm font-bold text-primary" for="fullName">Full Name</label>
-                            <input 
-                                x-model="formData.fullName"
-                                id="fullName" 
-                                name="fullName" 
-                                placeholder="Juan Dela Cruz" 
-                                required 
-                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-primary" for="fullName">Full Name</label>
+                                <input 
+                                    x-model="formData.fullName"
+                                    id="fullName" 
+                                    name="fullName" 
+                                    placeholder="Juan Dela Cruz" 
+                                    required 
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-bold text-primary" for="email">Email Address</label>
+                                <input 
+                                    x-model="formData.email"
+                                    id="email" 
+                                    name="email" 
+                                    type="email"
+                                    placeholder="juan@example.com" 
+                                    required 
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                />
+                                <p class="text-[10px] text-muted-foreground">For submission confirmation.</p>
+                            </div>
                         </div>
 
                         <div class="space-y-2">
@@ -76,6 +97,7 @@
                                     id="preferredDate" 
                                     name="preferredDate" 
                                     type="date" 
+                                    min="{{ date('Y-m-d') }}"
                                     class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
                                 />
                             </div>
@@ -109,6 +131,7 @@
                                  id="description" 
                                  name="description" 
                                  rows="3"
+                                 required
                                  placeholder="Enter names or specific intentions (e.g. For the healing of..., In memory of...)"
                                  class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
                              ></textarea>
@@ -139,9 +162,15 @@
                                 </button>
                             </div>
                             
-                            <div x-show="formData.paymentMethod" x-transition class="p-4 rounded-lg bg-muted/50 border border-dashed text-[11px] text-muted-foreground leading-relaxed">
+                            <div x-show="formData.paymentMethod" x-transition class="p-4 rounded-lg bg-muted/50 border border-dashed text-[11px] text-muted-foreground leading-relaxed relative">
                                 <template x-if="formData.paymentMethod === 'GCash'">
-                                    <p>Please send your donation to: <br> <strong class="text-primary">Juan Dela Cruz - 0912 345 6789</strong></p>
+                                    <div class="flex items-center justify-between">
+                                        <p>Please send your donation to: <br> <strong class="text-primary">Juan Dela Cruz - 0912 345 6789</strong></p>
+                                        <button @click="copyGCash()" type="button" class="p-2 hover:bg-white rounded transition-colors text-primary" title="Copy Number">
+                                            <svg x-show="!copied" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                            <span x-show="copied" x-cloak class="text-[9px] font-bold text-accent">COPIED!</span>
+                                        </button>
+                                    </div>
                                 </template>
                                 <template x-if="formData.paymentMethod === 'Bank'">
                                     <p>Sto. Rosario Parish <br> BPI: <strong class="text-primary">1234-5678-90</strong></p>
@@ -179,6 +208,8 @@
         return {
             loading: false,
             submitted: false,
+            copied: false,
+            refId: '',
             intentionTypes: [
                 "Thanksgiving", "Birthday", "Wedding Anniversary", "Healing", 
                 "Repose of the Soul", "Special Intention", "Other"
@@ -188,6 +219,7 @@
             ],
             formData: {
                 fullName: '',
+                email: '',
                 intentionType: '',
                 preferredDate: '',
                 massTime: '',
@@ -208,20 +240,30 @@
                         body: JSON.stringify(this.formData)
                     });
                     
+                    const data = await response.json();
+                    
                     if (!response.ok) throw new Error('Submission failed');
                     
+                    this.refId = data.refId || '';
                     this.submitted = true;
                 } catch (error) {
-                    alert('Something went wrong. Please try again.');
+                    alert('Submission failed. Please try again.');
                 } finally {
                     this.loading = false;
                 }
+            },
+
+            copyGCash() {
+                navigator.clipboard.writeText('09123456789');
+                this.copied = true;
+                setTimeout(() => this.copied = false, 2000);
             },
             
             reset() {
                 this.submitted = false;
                 this.formData = {
                     fullName: '',
+                    email: '',
                     intentionType: '',
                     preferredDate: '',
                     massTime: '',

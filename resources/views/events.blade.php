@@ -1,4 +1,7 @@
 <x-public-layout>
+    <x-slot name="meta">
+        <meta name="description" content="Stay updated with the latest events and celebrations at Sto. Rosario Parish. Join our community activities and spiritual gatherings.">
+    </x-slot>
     <div class="container py-12 mx-auto px-4">
         <div class="text-center mb-10">
             <h1 class="font-heading text-4xl font-bold mb-2 text-primary">Parish Events</h1>

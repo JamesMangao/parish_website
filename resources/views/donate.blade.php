@@ -1,5 +1,9 @@
 <x-public-layout>
-    <div class="container py-12 mx-auto px-4 max-w-4xl">
+    <x-slot name="meta">
+        <meta name="description" content="Support Sto. Rosario Parish. Give your tithes, digital offerings, and donations to help our church maintenance and community programs.">
+    </x-slot>
+
+    <div class="container py-12 mx-auto px-4 max-w-4xl" x-data="{ copiedG: false, copiedM: false }">
         <div class="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h1 class="font-heading text-5xl font-black mb-4 text-primary italic">Support Our Parish</h1>
             <div class="h-1 w-24 bg-accent mx-auto rounded-full mb-6 italic"></div>
@@ -24,13 +28,14 @@
                     </div>
 
                     <div class="p-6 bg-white rounded-3xl border shadow-inner mb-8 transform group-hover:scale-[1.02] transition-transform">
-                        <img src="file:///C:/Users/ciaxyn/.gemini/antigravity/brain/88a74e12-e6e4-4577-9d7a-9ca02aaf2818/parish_donation_qr_mockup_1775230423481.png" 
+                        <img src="/qr-donation.png" 
                              alt="Parish Donation QR" 
                              class="w-full h-auto rounded-xl">
                     </div>
 
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" onclick="navigator.clipboard.writeText('09123456789')">
+                        <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" 
+                            @click="navigator.clipboard.writeText('09123456789'); copiedG = true; setTimeout(() => copiedG = false, 2000)">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs">G</div>
                                 <div>
@@ -38,9 +43,13 @@
                                     <p class="font-bold text-sm">0912 345 6789</p>
                                 </div>
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            <div class="flex items-center gap-2">
+                                <span x-show="copiedG" x-cloak class="text-[10px] font-bold text-accent">COPIED!</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </div>
                         </div>
-                        <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" onclick="navigator.clipboard.writeText('1234 5678 9012')">
+                        <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" 
+                            @click="navigator.clipboard.writeText('Sto Rosario Parish'); copiedM = true; setTimeout(() => copiedM = false, 2000)">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xs">M</div>
                                 <div>
@@ -48,7 +57,10 @@
                                     <p class="font-bold text-sm">Sto Rosario Parish</p>
                                 </div>
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            <div class="flex items-center gap-2">
+                                <span x-show="copiedM" x-cloak class="text-[10px] font-bold text-accent">COPIED!</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </div>
                         </div>
                     </div>
                 </div>

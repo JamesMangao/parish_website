@@ -1,4 +1,8 @@
 <x-public-layout>
+    <x-slot name="meta">
+        <meta name="description" content="Learn about Sto. Rosario Parish in Pacita, San Pedro, Laguna. Discover our mission, history, office hours, and contact details.">
+    </x-slot>
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -82,7 +86,7 @@
                             <rect width="20" height="16" x="2" y="4" rx="2" />
                             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                         </svg>
-                        officestorosarioparish@gmail.com
+                        {{ config('services.parish.office_email') }}
                     </a>
                 </div>
             </div>

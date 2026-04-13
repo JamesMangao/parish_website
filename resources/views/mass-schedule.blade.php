@@ -1,4 +1,7 @@
 <x-public-layout>
+    <x-slot name="meta">
+        <meta name="description" content="Check the latest mass schedules for Sto. Rosario Parish. Sunday Masses, Antidipated Masses, and weekday schedules.">
+    </x-slot>
     <div class="container py-12 mx-auto px-4">
         <div class="text-center mb-10">
             <h1 class="font-heading text-4xl font-bold mb-2 text-primary">Mass Schedule</h1>
