@@ -2,7 +2,7 @@
     <div class="container py-12 mx-auto px-4 max-w-5xl">
         <div class="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <p class="text-[12px] font-black uppercase tracking-[0.3em] text-accent mb-4">Stay Informed</p>
-            <h1 class="font-heading text-6xl font-black mb-6 text-primary italic uppercase leading-tight">Weekly Bulletins</h1>
+            <h1 class="font-heading text-4xl md:text-6xl font-black mb-6 text-primary italic uppercase leading-tight">Weekly Bulletins</h1>
             <div class="h-1.5 w-32 bg-accent mx-auto rounded-full mb-8"></div>
             <p class="text-xl text-muted-foreground max-w-2xl mx-auto italic">
                 Download our weekly parish bulletins to keep up with the latest news, mass schedules, and community announcements.

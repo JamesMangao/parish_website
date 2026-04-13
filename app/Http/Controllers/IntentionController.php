@@ -36,14 +36,22 @@ class IntentionController extends Controller
             'payment_method' => $validated['paymentMethod'],
         ]);
 
+        // Send confirmation email
+        \Illuminate\Support\Facades\Notification::route('mail', $validated['email'])
+            ->notify(new \App\Notifications\IntentionSubmitted($intention));
+
+        $refId = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($intention->id, 0, 8));
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Your mass intention has been submitted.',
-                'refId' => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($intention->id, 0, 8))
+                'refId' => $refId
             ]);
         }
 
-        return back()->with('success', 'Your mass intention has been submitted. Reference ID: ' . \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($intention->id, 0, 8)));
+        return back()->with('success', 'Your mass intention has been submitted. Reference ID: ' . $refId);
+    }
+
     }
 }

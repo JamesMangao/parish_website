@@ -39,10 +39,10 @@
                     </div>
                 </div>
                 <div class="p-8 space-y-6">
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Name</p>
-                            <p class="font-bold">{{ $item->full_name }}</p>
+                            <p class="font-bold break-words">{{ $item->full_name }}</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Submitted On</p>

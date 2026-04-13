@@ -41,6 +41,10 @@ class InquiryController extends Controller
             'status' => 'pending',
         ]);
 
+        // Send confirmation email
+        \Illuminate\Support\Facades\Notification::route('mail', $validated['email'])
+            ->notify(new \App\Notifications\InquirySubmitted($inquiry));
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,

@@ -52,7 +52,7 @@
                 </div>
 
                 <!-- Form Area -->
-                <div class="md:col-span-3 p-8 bg-background" x-data="{ loading: false }">
+                <div class="md:col-span-3 p-8 bg-background" x-data="{ loading: false, inquiryType: '' }">
                     <form action="{{ route('inquiry.store') }}" method="POST" class="space-y-6" @submit="loading = true">
                         @csrf
                         <div class="space-y-2">
@@ -71,11 +71,11 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div :class="['Baptism', 'Wedding', 'Funeral Mass'].includes(inquiryType) ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''">
                             <div class="space-y-2">
                                 <label class="text-sm font-bold text-primary" for="inquiryType">Inquiry Type</label>
                                 <div class="relative">
-                                    <select name="inquiryType" id="inquiryType" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none font-medium">
+                                    <select name="inquiryType" id="inquiryType" required x-model="inquiryType" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none font-medium">
                                         <option value="" disabled selected>Select a service...</option>
                                         <optgroup label="Sacramental Rites">
                                             <option value="Baptism">Baptism</option>
@@ -100,9 +100,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="space-y-2">
+                            <div class="space-y-2" x-show="['Baptism', 'Wedding', 'Funeral Mass'].includes(inquiryType)" x-transition>
                                 <label class="text-sm font-bold text-primary" for="preferredDate">Preferred Date</label>
-                                <input type="date" name="preferredDate" id="preferredDate" required min="{{ date('Y-m-d') }}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-medium">
+                                <input type="date" name="preferredDate" id="preferredDate" :required="['Baptism', 'Wedding', 'Funeral Mass'].includes(inquiryType)" min="{{ date('Y-m-d') }}" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-medium">
                             </div>
                         </div>
 

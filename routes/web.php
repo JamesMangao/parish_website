@@ -20,6 +20,7 @@ use App\Http\Controllers\Auth\TwoFactorController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () { return view('about'); })->name('about');
 Route::get('/mass-schedule', [MassScheduleController::class, 'index'])->name('mass-schedule');
+Route::get('/mass-schedule/{id}/ical', [MassScheduleController::class, 'generateICal'])->name('mass-schedule.ical');
 Route::get('/donate', function () { return view('donate'); })->name('donate');
 
 // Tracking Status

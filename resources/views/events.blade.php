@@ -25,6 +25,20 @@
                         <div class="flex-1 flex flex-col h-full justify-between w-full">
                             <div>
                                 <h3 class="font-heading text-3xl font-black text-primary mb-3 leading-tight group-hover:text-accent transition-colors">{{ $event->title }}</h3>
+                                
+                                <div class="flex flex-wrap items-center gap-4 mb-4">
+                                    @php
+                                        $startTime = !empty($event->event_time[0]['time']) ? \Carbon\Carbon::parse($event->event_time[0]['time'])->format('Hi00') : '080000';
+                                        $endTime = !empty($event->event_time[0]['time']) ? \Carbon\Carbon::parse($event->event_time[0]['time'])->addHour()->format('Hi00') : '090000';
+                                        $dates = $event->event_date->format('Ymd') . 'T' . $startTime . '/' . $event->event_date->format('Ymd') . 'T' . $endTime;
+                                        $googleUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" . urlencode($event->title) . "&dates=" . $dates . "&details=" . urlencode($event->description) . "&location=" . urlencode($event->location ?? 'Sto. Rosario Parish');
+                                    @endphp
+                                    <a href="{{ $googleUrl }}" target="_blank" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-accent hover:text-primary transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14v4"/><path d="M10 16h4"/></svg>
+                                        Add to Google Calendar
+                                    </a>
+                                </div>
+
                                 <p class="text-muted-foreground leading-relaxed text-base mb-6">
                                     {{ $event->description }}
                                 </p>
