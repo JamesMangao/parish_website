@@ -39,6 +39,7 @@
         </div>
         
         <div class="flex items-center gap-4">
+            @include('admin.ppt-tools')
             <a href="{{ route('admin.intentions.create') }}" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold text-xs shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                 Create New Intention

@@ -19,10 +19,15 @@ class TrackController extends Controller
             'reference_id' => 'required|string',
         ]);
 
-        $refId = $validated['reference_id'];
+        return $this->showStatus($validated['reference_id']);
+    }
 
-        // Try searching in Mass Intentions (id starts with ...)
-        $intention = MassIntention::where('id', 'LIKE', $refId . '%')->first();
+    public function showStatus($refId)
+    {
+        // Try searching in Mass Intentions
+        $intention = MassIntention::where('id', 'LIKE', $refId . '%')
+            ->orWhere('reference_number', $refId)
+            ->first();
         
         if ($intention) {
             return view('track-status', [
@@ -30,6 +35,7 @@ class TrackController extends Controller
                 'item' => $intention,
                 'status' => $intention->status,
                 'date' => $intention->preferred_date,
+                'refId' => $refId
             ]);
         }
 
@@ -42,9 +48,10 @@ class TrackController extends Controller
                 'item' => $inquiry,
                 'status' => $inquiry->status,
                 'date' => $inquiry->preferred_date,
+                'refId' => $refId
             ]);
         }
 
-        return back()->withErrors(['reference_id' => 'Invalid Reference ID. Please check and try again.']);
+        return redirect()->route('track')->withErrors(['reference_id' => 'Invalid Reference ID. Please check and try again.']);
     }
 }

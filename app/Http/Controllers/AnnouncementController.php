@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
@@ -24,9 +25,11 @@ class AnnouncementController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'is_published' => 'boolean',
+            'expires_at' => 'nullable|date',
         ]);
 
-        Announcement::create($validated);
+        $announcement = Announcement::create($validated);
+        LogService::log('create_announcement', $announcement);
         return redirect()->route('admin.announcements.index')->with('success', 'Announcement created.');
     }
 
@@ -41,14 +44,17 @@ class AnnouncementController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'is_published' => 'boolean',
+            'expires_at' => 'nullable|date',
         ]);
 
         $announcement->update($validated);
+        LogService::log('update_announcement', $announcement);
         return redirect()->route('admin.announcements.index')->with('success', 'Announcement updated.');
     }
 
     public function destroy(Announcement $announcement)
     {
+        LogService::log('delete_announcement', $announcement, ['title' => $announcement->title]);
         $announcement->delete();
         return back()->with('success', 'Announcement deleted.');
     }

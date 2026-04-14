@@ -35,6 +35,15 @@ class EventsController extends Controller
         return view('events', compact('events'));
     }
 
+    public function publicShow(Event $event)
+    {
+        if (!$event->is_published) {
+            abort(404);
+        }
+
+        return view('events-show', compact('event'));
+    }
+
     public function index()
     {
         $events = Event::orderBy('event_date', 'desc')->get();

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mass_intentions', function (Blueprint $table) {
-            $table->string('email')->nullable()->after('full_name');
+        Schema::table('announcements', function (Blueprint $table) {
+            $table->dateTime('expires_at')->nullable()->after('is_active');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mass_intentions', function (Blueprint $table) {
-            $table->dropColumn('email');
+        Schema::table('announcements', function (Blueprint $table) {
+            //
         });
     }
 };

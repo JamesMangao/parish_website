@@ -121,7 +121,7 @@
                             <p class="text-sm text-muted-foreground line-clamp-2 mb-3">
                                 {{ $event->description }}
                             </p>
-                            <a href="/events"
+                            <a href="{{ route('events.show', $event) }}"
                                 class="text-xs font-bold uppercase tracking-widest text-accent hover:text-primary transition-colors flex items-center gap-1 group/btn">
                                 View Details
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"

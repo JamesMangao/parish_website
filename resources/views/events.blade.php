@@ -40,7 +40,7 @@
 
         <div class="max-w-4xl mx-auto space-y-6">
             @forelse($events as $event)
-                <div class="group relative bg-card hover:bg-accent/5 rounded-[2rem] border border-muted/60 p-8 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/5 hover:-translate-y-1">
+                <div id="event-{{ $event->id }}" class="scroll-mt-24 group relative bg-card hover:bg-accent/5 rounded-[2rem] border border-muted/60 p-8 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/5 hover:-translate-y-1">
                     <div class="flex flex-col md:flex-row gap-8 items-start">
                         
                         <!-- Elegant Date Badge -->
@@ -53,7 +53,9 @@
                         <!-- Content Section -->
                         <div class="flex-1 flex flex-col h-full justify-between w-full">
                             <div>
-                                <h3 class="font-heading text-3xl font-black text-primary mb-3 leading-tight group-hover:text-accent transition-colors">{{ $event->title }}</h3>
+                                <a href="{{ route('events.show', $event) }}" class="hover:underline">
+                                    <h3 class="font-heading text-3xl font-black text-primary mb-3 leading-tight group-hover:text-accent transition-colors">{{ $event->title }}</h3>
+                                </a>
                                 
                                 <div class="flex flex-wrap items-center gap-4 mb-4">
                                     @php

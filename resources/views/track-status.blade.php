@@ -26,12 +26,13 @@
         </div>
 
         @if(isset($status))
-            <div class="bg-card border rounded-[2rem] shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div class="bg-primary p-6 text-white">
+            <div class="bg-card border rounded-[2rem] shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 mt-8">
+                <div class="p-6 text-white {{ $status == 'pending' ? 'bg-amber-500' : ($status == 'approved' || $status == 'accepted' ? 'bg-emerald-600' : 'bg-red-600') }}">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Tracking Result</p>
+                            <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Tracking Result</p>
                             <h2 class="text-2xl font-black uppercase font-heading">{{ $type }}</h2>
+                            <p class="text-[10px] font-mono opacity-70">Ref: {{ $refId ?? $item->reference_id ?? substr($item->id, 0, 8) }}</p>
                         </div>
                         <div class="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-tighter">
                             {{ $status }}
@@ -42,7 +43,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Name</p>
-                            <p class="font-bold break-words">{{ $item->full_name }}</p>
+                            <p class="font-bold break-words">{{ $item->full_name ?? $item->name ?? 'N/A' }}</p>
                         </div>
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Submitted On</p>
@@ -57,21 +58,30 @@
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Current Status</p>
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full {{ $status == 'pending' ? 'bg-orange-500' : ($status == 'accepted' ? 'bg-green-500' : 'bg-primary') }} animate-pulse"></span>
-                                <p class="font-black uppercase text-sm {{ $status == 'pending' ? 'text-orange-500' : ($status == 'accepted' ? 'text-green-500' : 'text-primary') }}">
+                                <span class="h-2 w-2 rounded-full {{ $status == 'pending' ? 'bg-amber-500 animate-pulse' : ($status == 'approved' || $status == 'accepted' ? 'bg-emerald-500' : 'bg-red-500') }}"></span>
+                                <p class="font-black uppercase text-sm {{ $status == 'pending' ? 'text-amber-500' : ($status == 'approved' || $status == 'accepted' ? 'text-emerald-500' : 'text-red-500') }}">
                                     {{ $status }}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-6 border-t font-italic text-muted-foreground text-sm">
+                    @if($status == 'rejected' && !empty($item->rejection_reason))
+                        <div class="p-4 bg-red-50 border border-red-100 rounded-xl">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Rejection Reason</p>
+                            <p class="text-sm font-medium text-red-800 leading-relaxed italic">"{{ $item->rejection_reason }}"</p>
+                        </div>
+                    @endif
+
+                    <div class="pt-6 border-t font-italic text-sm">
                         @if($status == 'pending')
-                            Our team is currently reviewing your request. Please check back later or wait for our email/SMS notification.
-                        @elseif($status == 'accepted')
-                            Your request has been accepted! Please proceed as instructed in our latest communication.
+                            <p class="text-muted-foreground">Our team is currently reviewing your request. Please check back later or wait for our email/SMS notification.</p>
+                        @elseif($status == 'approved' || $status == 'accepted')
+                            <p class="text-emerald-700 font-bold">Your request has been approved! We look forward to seeing you. Please check your email for any final instructions.</p>
+                        @elseif($status == 'rejected')
+                            <p class="text-red-700 font-bold">Unfortunately, your request could not be approved at this time. Please see the reason above or contact the parish office for clarification.</p>
                         @else
-                            Status updated. Check your email for more details.
+                            <p class="text-muted-foreground">Status updated. Check your email for more details.</p>
                         @endif
                     </div>
                 </div>

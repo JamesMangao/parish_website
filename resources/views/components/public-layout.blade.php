@@ -49,15 +49,43 @@
         
         <x-chatbot />
 
-        <!-- Back to Top Button -->
+        <!-- Mobile Bottom Navigation -->
+        <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t pb-safe">
+            <div class="flex items-center justify-around p-3">
+                <a href="/" class="flex flex-col items-center gap-1 {{ request()->is('/') ? 'text-accent' : 'text-muted-foreground' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Home</span>
+                </a>
+                <a href="/mass-schedule" class="flex flex-col items-center gap-1 {{ request()->is('mass-schedule*') ? 'text-accent' : 'text-muted-foreground' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7 4 9v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 2h-4v3"/><path d="M18 7V5c0-1.1-.9-2-2-2h-3"/><path d="M11 5H8c-1.1 0-2 .9-2 2v2"/><path d="M12 22v-4"/></svg>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Mass</span>
+                </a>
+                <a href="/submit-intention" class="flex flex-col items-center gap-1 {{ request()->is('submit-intention*') ? 'text-accent' : 'text-muted-foreground' }}">
+                    <div class="h-10 w-10 -mt-6 bg-accent text-accent-foreground rounded-full flex items-center justify-center shadow-lg border-4 border-background">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.505 4.04 3 5.5L12 21l7-7Z"/></svg>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest -mt-1">Offer</span>
+                </a>
+                <a href="/track" class="flex flex-col items-center gap-1 {{ request()->is('track*') ? 'text-accent' : 'text-muted-foreground' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Track</span>
+                </a>
+                <button type="button" @click="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center gap-1 text-muted-foreground">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Top</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Back to Top Button (Hidden on Mobile due to Bottom Nav) -->
         <button 
             x-data="{ show: false }" 
             x-init="window.addEventListener('scroll', () => { show = window.scrollY > 500 })"
             x-show="show"
             x-transition 
             @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
-            style="position: fixed; bottom: 2rem; left: 2rem; z-index: 100;"
-            class="h-12 w-12 rounded-2xl bg-primary text-primary-foreground shadow-2xl flex items-center justify-center hover:-translate-y-2 transition-all active:scale-95"
+            style="position: fixed; bottom: 5rem; right: 2rem; z-index: 100;"
+            class="hidden md:flex h-12 w-12 rounded-2xl bg-primary text-primary-foreground shadow-2xl items-center justify-center hover:-translate-y-2 transition-all active:scale-95"
             title="Back to Top"
         >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>

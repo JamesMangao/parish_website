@@ -23,6 +23,14 @@
             @error('content') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
+        <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Expiry Date (Optional)</label>
+            <input type="datetime-local" name="expires_at" value="{{ old('expires_at', $announcement->expires_at ? $announcement->expires_at->format('Y-m-d\TH:i') : '') }}" 
+                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-primary">
+            <p class="text-xs text-muted-foreground mt-1">If set, the announcement will automatically be hidden after this date.</p>
+            @error('expires_at') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+        </div>
+
         <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="is_published" value="0">
             <input type="checkbox" name="is_published" id="is_published" value="1" {{ old('is_published', $announcement->is_published) ? 'checked' : '' }}

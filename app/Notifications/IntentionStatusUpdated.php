@@ -35,7 +35,7 @@ class IntentionStatusUpdated extends Notification
             $message->line('Reason for rejection: ' . $this->intention->rejection_reason);
         }
 
-        return $message->action('Track Status', route('track', ['reference_id' => $refId]))
+        return $message->action('Track Status', route('track.status', ['refId' => $refId]))
                     ->line('Thank you for your patience and faith.')
                     ->line('God bless!');
     }

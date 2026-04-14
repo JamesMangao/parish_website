@@ -7,6 +7,7 @@ use App\Models\MassSchedule;
 use App\Models\Announcement;
 use App\Models\Event;
 use App\Models\Setting;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use PhpOffice\PhpPresentation\PhpPresentation;
 use PhpOffice\PhpPresentation\IOFactory;
@@ -19,6 +20,8 @@ class AdminController extends Controller
         $stats = [
             'total_intentions' => MassIntention::count(),
             'pending_intentions' => MassIntention::where('status', 'pending')->count(),
+            'total_inquiries' => \App\Models\Inquiry::count(),
+            'pending_inquiries' => \App\Models\Inquiry::where('status', 'pending')->count(),
             'upcoming_events' => Event::where('event_date', '>=', now())->count(),
             'total_announcements' => Announcement::count(),
             'active_schedules' => MassSchedule::where('is_active', true)->count(),
@@ -69,11 +72,14 @@ class AdminController extends Controller
             'reviewed_by' => auth()->id(),
         ]);
 
-        if ($oldStatus !== $newStatus && $intention->email) {
-            // Use IntentionStatusUpdated notification or create a new one for rejection
             \Illuminate\Support\Facades\Notification::route('mail', $intention->email)
                 ->notify(new \App\Notifications\IntentionStatusUpdated($intention));
         }
+
+        LogService::log("status_update_{$newStatus}", $intention, [
+            'old_status' => $oldStatus,
+            'reason' => $intention->rejection_reason
+        ]);
  
         return back()->with('success', 'Status updated.');
     }
@@ -110,6 +116,11 @@ class AdminController extends Controller
                 }
             }
         }
+
+        LogService::log("batch_status_update_{$status}", null, [
+            'ids' => $ids,
+            'reason' => $reason
+        ]);
 
         return back()->with('success', count($ids) . ' intentions updated.');
     }

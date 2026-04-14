@@ -48,9 +48,14 @@
                 @foreach($album->images as $img)
                     <div class="aspect-[4/3] relative group rounded-2xl overflow-hidden shadow-lg border border-muted/30 hover:shadow-2xl transition-all duration-500 cursor-zoom-in"
                         @click="selected = { url: '{{ $img->url }}', title: '{{ addslashes($img->title) }}', caption: '{{ addslashes($img->caption) }}' }">
-                        <img src="{{ $img->url }}" alt="{{ $img->title }}"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                            loading="lazy" />
+                        <div x-data="{ loaded: false }" class="absolute inset-0">
+                            <div x-show="!loaded" class="absolute inset-0 bg-muted/20 animate-pulse"></div>
+                            <img src="{{ $img->url }}" alt="{{ $img->title }}"
+                                @load="loaded = true"
+                                class="w-full h-full object-cover transition-all duration-1000"
+                                :class="loaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0 scale-100'"
+                                loading="lazy" />
+                        </div>
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
                             <p class="text-white font-bold text-sm drop-shadow-md truncate">{{ $img->caption ?: $img->title }}

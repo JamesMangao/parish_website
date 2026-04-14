@@ -26,8 +26,13 @@
                     <a href="{{ route('gallery.album', $featured) }}"
                         class="group block relative h-[450px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/20 border border-white/10">
                         @if($featured->images->count() > 0)
-                            <img src="{{ $featured->images->first()->url }}" alt="{{ $featured->title }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]">
+                            <div x-data="{ loaded: false }" class="absolute inset-0">
+                                <div x-show="!loaded" class="absolute inset-0 bg-muted/20 animate-pulse"></div>
+                                <img src="{{ $featured->images->first()->url }}" alt="{{ $featured->title }}"
+                                    @load="loaded = true"
+                                    class="w-full h-full object-cover transition-all duration-[3000ms]"
+                                    :class="loaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0 scale-100'">
+                            </div>
                         @else
                             <div class="w-full h-full bg-muted"></div>
                         @endif
@@ -66,9 +71,14 @@
                                     <!-- Image Container -->
                                     <div class="relative aspect-[4/3] overflow-hidden bg-muted">
                                         @if($album->images->count() > 0)
-                                            <img src="{{ $album->images->first()->url }}" alt="{{ $album->title }}"
-                                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                                                loading="lazy" />
+                                            <div x-data="{ loaded: false }" class="absolute inset-0">
+                                                <div x-show="!loaded" class="absolute inset-0 bg-muted/20 animate-pulse"></div>
+                                                <img src="{{ $album->images->first()->url }}" alt="{{ $album->title }}"
+                                                    @load="loaded = true"
+                                                    class="w-full h-full object-cover transition-all duration-1000"
+                                                    :class="loaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0 scale-100'"
+                                                    loading="lazy" />
+                                            </div>
                                         @else
                                             <div class="w-full h-full bg-muted flex items-center justify-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
@@ -110,9 +120,14 @@
                             @foreach($latestPhotos as $photo)
                                 <a href="{{ route('gallery.album', $photo->album_id) }}"
                                     class="group block relative aspect-square rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-all">
-                                    <img src="{{ $photo->url }}" alt="Latest photo"
-                                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                        loading="lazy" />
+                                    <div x-data="{ loaded: false }" class="absolute inset-0">
+                                        <div x-show="!loaded" class="absolute inset-0 bg-muted/20 animate-pulse"></div>
+                                        <img src="{{ $photo->url }}" alt="Latest photo"
+                                            @load="loaded = true"
+                                            class="absolute inset-0 w-full h-full object-cover transition-all duration-700"
+                                            :class="loaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0 scale-100'"
+                                            loading="lazy" />
+                                    </div>
                                     <div
                                         class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                                         <p class="text-white text-xs font-bold line-clamp-2">{{ $photo->album->title }}</p>

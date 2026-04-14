@@ -26,6 +26,7 @@ Route::get('/donate', function () { return view('donate'); })->name('donate');
 // Tracking Status
 Route::get('/track', [TrackController::class, 'index'])->name('track');
 Route::post('/track', [TrackController::class, 'track'])->name('track.post');
+Route::get('/track-intention/{refId}', [TrackController::class, 'showStatus'])->name('track.status');
 
 // Bulletins
 Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
@@ -38,6 +39,7 @@ Route::get('/inquiry', [InquiryController::class, 'create'])->name('inquiry');
 Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('throttle:5,1')->name('inquiry.store');
 
 Route::get('/events', [EventsController::class, 'publicIndex'])->name('events');
+Route::get('/events/{event}', [EventsController::class, 'publicShow'])->name('events.show');
 Route::get('/gallery', [GalleryController::class, 'publicIndex'])->name('gallery');
 Route::get('/gallery/{album}', [GalleryController::class, 'publicAlbum'])->name('gallery.album');
 
