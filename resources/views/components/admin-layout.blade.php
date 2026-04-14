@@ -20,17 +20,19 @@
     x-data="{ 
         sidebarOpen: true,
         notification: { show: false, message: '', type: 'success' },
-        confirmModal: { show: false, title: '', message: '', onConfirm: null },
+        confirmModal: { show: false, title: '', message: '', onConfirm: null, confirmText: 'Confirm', type: 'danger' },
         showNotification(msg, type = 'success') {
             this.notification.message = msg;
             this.notification.type = type;
             this.notification.show = true;
             setTimeout(() => this.notification.show = false, 5000);
         },
-        triggerConfirm(title, message, action) {
+        triggerConfirm(title, message, action, confirmText = 'Delete Permanently', type = 'danger') {
             this.confirmModal.title = title;
             this.confirmModal.message = message;
             this.confirmModal.onConfirm = action;
+            this.confirmModal.confirmText = confirmText;
+            this.confirmModal.type = type;
             this.confirmModal.show = true;
         }
     }">
@@ -63,9 +65,12 @@
                         :active="request()->is('admin/intentions*')" />
                 @endif
 
-                @if($role === 'super_admin' || $role === 'soccom')
+                @if($role === 'super_admin' || $role === 'soccom' || $role === 'staff')
                     <x-admin-nav-link href="/admin/inquiries" icon="message-square-quote" label="Inquiries"
                         :active="request()->is('admin/inquiries*')" />
+                @endif
+
+                @if($role === 'super_admin' || $role === 'soccom')
                     <x-admin-nav-link href="/admin/schedules" icon="calendar" label="Schedules"
                         :active="request()->is('admin/schedules*')" />
                     <x-admin-nav-link href="/admin/announcements" icon="megaphone" label="Announcements"
@@ -93,9 +98,9 @@
             </nav>
 
             <div class="p-4 border-t border-primary-foreground/10">
-                <form method="POST" action="/logout">
+                <form method="POST" action="/logout" id="logout-form">
                     @csrf
-                    <button type="submit"
+                    <button type="button" @click="triggerConfirm('Confirm Logout', 'Are you sure you want to end your session?', () => document.getElementById('logout-form').submit(), 'Sign Out', 'primary')"
                         class="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-primary-foreground/10 text-sm font-medium transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -223,11 +228,12 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
             x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-            class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white border border-border shadow-2xl rounded-xl p-4 flex items-center gap-4"
+            class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white border-l-4 shadow-2xl rounded-xl p-5 flex items-start gap-4 animate-in slide-in-from-right-10"
+            :class="notification.type === 'success' ? 'border-green-500' : 'border-red-500'"
             x-cloak
         >
             <div :class="notification.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'" 
-                 class="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full">
+                 class="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full shadow-sm">
                 <template x-if="notification.type === 'success'">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </template>
@@ -235,11 +241,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
                 </template>
             </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-xs font-black uppercase tracking-widest text-muted-foreground" x-text="notification.type === 'success' ? 'Success' : 'Error'"></p>
-                <p class="text-sm font-bold text-primary truncate" x-text="notification.message"></p>
+            <div class="flex-1 pt-0.5">
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1" x-text="notification.type === 'success' ? 'Successful Action' : 'System Notice'"></p>
+                <p class="text-sm font-bold text-primary leading-tight" x-text="notification.message"></p>
             </div>
-            <button @click="notification.show = false" class="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground">
+            <button @click="notification.show = false" class="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground mt-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
         </div>
@@ -263,8 +269,13 @@
                 class="bg-white max-w-md w-full rounded-2xl shadow-2xl border p-6 animate-in zoom-in-95 duration-200"
             >
                 <div class="flex items-start gap-4 mb-6">
-                    <div class="h-12 w-12 bg-red-100 text-red-600 flex-shrink-0 flex items-center justify-center rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <div :class="confirmModal.type === 'danger' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'" class="h-12 w-12 flex-shrink-0 flex items-center justify-center rounded-full">
+                        <template x-if="confirmModal.type === 'danger'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </template>
+                        <template x-if="confirmModal.type !== 'danger'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        </template>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-primary italic font-heading" x-text="confirmModal.title"></h3>
@@ -275,8 +286,10 @@
                     <button @click="confirmModal.show = false" class="px-5 py-2 rounded-md text-sm font-bold text-muted-foreground hover:bg-muted transition-colors">
                         Cancel
                     </button>
-                    <button @click="confirmModal.show = false; if(confirmModal.onConfirm) confirmModal.onConfirm()" class="px-5 py-2 bg-red-600 text-white rounded-md text-sm font-bold shadow-md hover:bg-red-700 transition-all">
-                        Delete Permanently
+                    <button @click="confirmModal.show = false; if(confirmModal.onConfirm) confirmModal.onConfirm()" 
+                            :class="confirmModal.type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90'"
+                            class="px-5 py-2 text-white rounded-md text-sm font-bold shadow-md transition-all">
+                        <span x-text="confirmModal.confirmText"></span>
                     </button>
                 </div>
             </div>

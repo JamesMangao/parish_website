@@ -5,10 +5,11 @@
         rejectionReason: '', 
         singleRejectId: null,
         toggleAll() {
-            if (this.selected.length > 0 && this.selected.length === {{ count($intentions) }}) {
+            const allIds = {{ json_encode($intentions->pluck('id')->toArray()) }};
+            if (this.selected.length > 0 && this.selected.length === allIds.length) {
                 this.selected = [];
             } else {
-                this.selected = @json($intentions->pluck('id')->toArray());
+                this.selected = allIds;
             }
         },
         openReject(id = null) {
@@ -17,7 +18,6 @@
         },
         submitReject() {
             if (this.singleRejectId) {
-                // Submit single rejection
                 const form = document.getElementById('reject-form-' + this.singleRejectId);
                 const reasonInput = document.createElement('input');
                 reasonInput.type = 'hidden';
@@ -26,7 +26,6 @@
                 form.appendChild(reasonInput);
                 form.submit();
             } else if (this.selected.length > 0) {
-                // Submit batch rejection
                 document.getElementById('batch-action-type').value = 'rejected';
                 document.getElementById('batch-rejection-reason').value = this.rejectionReason;
                 document.getElementById('batch-form').submit();

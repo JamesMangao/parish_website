@@ -21,19 +21,6 @@
             </button>
         </div>
 
-        @if(session('success'))
-            <div class="mb-6 p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg text-sm font-bold flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mb-6 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm font-bold flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                {{ session('error') }}
-            </div>
-        @endif
 
         <div class="bg-card rounded-2xl border shadow-sm overflow-hidden">
             <table class="w-full text-left border-collapse">
@@ -80,10 +67,10 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                                     </button>
                                     @if($user->id !== auth()->id())
-                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                        <form id="delete-user-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="p-2 hover:bg-red-50 rounded-md text-red-500 transition-colors" title="Delete User">
+                                            <button type="button" @click="triggerConfirm('Delete User', 'Are you sure you want to permanently delete this user account? This action cannot be undone.', () => document.getElementById('delete-user-{{ $user->id }}').submit())" class="p-2 hover:bg-red-50 rounded-md text-red-500 transition-colors" title="Delete User">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                             </button>
                                         </form>

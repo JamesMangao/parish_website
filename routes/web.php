@@ -106,6 +106,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/intentions/{id}/status', [AdminController::class, 'updateStatus']);
     });
 
+    // Role: super_admin, staff, or soccom
+    Route::middleware('role:super_admin,staff,soccom')->group(function () {
+        // Inquiries
+        Route::get('/admin/inquiries', [InquiryController::class, 'index'])->name('admin.inquiries.index');
+        Route::get('/admin/inquiries/{id}', [InquiryController::class, 'show'])->name('admin.inquiries.show');
+        Route::post('/admin/inquiries/{id}/accept', [InquiryController::class, 'accept'])->name('admin.inquiries.accept');
+    });
+
     // Role: super_admin or soccom
     Route::middleware('role:super_admin,soccom')->group(function () {
         Route::resource('/admin/schedules', ScheduleController::class)->names('admin.schedules');
@@ -114,11 +122,6 @@ Route::middleware('auth')->group(function () {
         Route::resource('/admin/gallery', App\Http\Controllers\GalleryAlbumController::class)->names('admin.gallery');
         Route::post('/admin/gallery/{album}/add-images', [App\Http\Controllers\GalleryAlbumController::class, 'addImages'])->name('admin.gallery.add-images');
         Route::delete('/admin/gallery/image/{image}', [App\Http\Controllers\GalleryAlbumController::class, 'removeImage'])->name('admin.gallery.remove-image');
-
-        // Inquiries
-        Route::get('/admin/inquiries', [InquiryController::class, 'index'])->name('admin.inquiries.index');
-        Route::get('/admin/inquiries/{id}', [InquiryController::class, 'show'])->name('admin.inquiries.show');
-        Route::post('/admin/inquiries/{id}/accept', [InquiryController::class, 'accept'])->name('admin.inquiries.accept');
 
         // Bulletins Admin
         Route::get('/admin/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');

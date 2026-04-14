@@ -247,7 +247,11 @@
                     this.refId = data.refId || '';
                     this.submitted = true;
                 } catch (error) {
-                    alert('Submission failed. Please try again.');
+                    if (window.showToast) {
+                        window.showToast('Submission failed. Please try again.', 'error');
+                    } else {
+                        alert('Submission failed. Please try again.');
+                    }
                 } finally {
                     this.loading = false;
                 }

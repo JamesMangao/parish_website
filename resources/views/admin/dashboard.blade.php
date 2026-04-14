@@ -12,6 +12,12 @@
                         const response = await fetch('/admin/preview-ppt');
                         if (!response.ok) throw new Error('Failed to fetch');
                         const data = await response.json();
+                        
+                        if (!data.slides || data.slides.length === 0) {
+                            this.showNotification('No approved intentions found for ' + data.date + '. Please ensure you have approved pending intentions first.', 'error');
+                            return;
+                        }
+
                         this.previewData = data;
                         this.editMode = false;
                         this.currentSlide = 0;

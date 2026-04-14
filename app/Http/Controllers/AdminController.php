@@ -25,7 +25,7 @@ class AdminController extends Controller
         ];
 
         // Intentions Trend (Last 8 weeks)
-        $intentionsTrend = MassIntention::selectRaw('YEARWEEK(created_at) as week, count(*) as total')
+        $intentionsTrend = MassIntention::selectRaw("TO_CHAR(created_at, 'IYYYIW') as week, count(*) as total")
             ->where('created_at', '>=', now()->subWeeks(8))
             ->groupBy('week')
             ->orderBy('week')
@@ -660,12 +660,14 @@ class AdminController extends Controller
                 'error' => 'API Error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
     public function getNotifications()
     {
         return response()->json([
             'intentions' => MassIntention::where('status', 'pending')->count(),
             'inquiries' => \App\Models\Inquiry::where('status', 'pending')->count(),
-            'chats' => \App\Models\ChatSession::where('is_resolved', false)->count(),
+            'chats' => \App\Models\ChatSession::where('status', 'handover')->count(),
         ]);
     }
 

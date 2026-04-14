@@ -63,6 +63,4 @@ class IntentionController extends Controller
 
         return back()->with('success', 'Your mass intention has been submitted. Reference ID: ' . $refId);
     }
-
-    }
 }

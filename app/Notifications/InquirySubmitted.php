@@ -25,16 +25,18 @@ class InquirySubmitted extends Notification
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        $mail = (new MailMessage)
             ->subject('Parish Inquiry Received - ' . $this->inquiry->reference_id)
             ->greeting('Hello ' . $this->inquiry->full_name . '!')
             ->line('We have received your inquiry regarding ' . $this->inquiry->inquiry_type . '.')
             ->line('Reference ID: ' . $this->inquiry->reference_id)
-            ->line('Type: ' . $this->inquiry->inquiry_type)
-            @if($this->inquiry->preferred_date)
-            ->line('Preferred Date: ' . $this->inquiry->preferred_date->format('M d, Y'))
-            @endif
-            ->line('Our parish team is reviewing your request and will get back to you soon.')
+            ->line('Type: ' . $this->inquiry->inquiry_type);
+
+        if ($this->inquiry->preferred_date) {
+            $mail->line('Preferred Date: ' . $this->inquiry->preferred_date->format('M d, Y'));
+        }
+
+        return $mail->line('Our parish team is reviewing your request and will get back to you soon.')
             ->action('Track Status', url('/track?reference_id=' . $this->inquiry->reference_id))
             ->line('Thank you for contacting Sto. Rosario Parish.');
     }
