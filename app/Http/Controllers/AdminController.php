@@ -24,7 +24,19 @@ class AdminController extends Controller
             'active_schedules' => MassSchedule::where('is_active', true)->count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        // Intentions Trend (Last 8 weeks)
+        $intentionsTrend = MassIntention::selectRaw('YEARWEEK(created_at) as week, count(*) as total')
+            ->where('created_at', '>=', now()->subWeeks(8))
+            ->groupBy('week')
+            ->orderBy('week')
+            ->get();
+
+        // Inquiry Types Distribution
+        $inquiryTypes = \App\Models\Inquiry::selectRaw('inquiry_type as type, count(*) as total')
+            ->groupBy('type')
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'intentionsTrend', 'inquiryTypes'));
     }
 
     public function intentions(Request $request)
@@ -43,7 +55,8 @@ class AdminController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,approved,rejected'
+            'status' => 'required|in:pending,approved,rejected',
+            'rejection_reason' => 'nullable|string'
         ]);
  
         $intention = MassIntention::findOrFail($id);
@@ -52,15 +65,53 @@ class AdminController extends Controller
 
         $intention->update([
             'status' => $newStatus,
+            'rejection_reason' => $newStatus === 'rejected' ? $request->input('rejection_reason') : null,
             'reviewed_by' => auth()->id(),
         ]);
 
         if ($oldStatus !== $newStatus && $intention->email) {
+            // Use IntentionStatusUpdated notification or create a new one for rejection
             \Illuminate\Support\Facades\Notification::route('mail', $intention->email)
                 ->notify(new \App\Notifications\IntentionStatusUpdated($intention));
         }
  
         return back()->with('success', 'Status updated.');
+    }
+
+    public function batchUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:mass_intentions,id',
+            'status' => 'required|in:approved,rejected',
+            'rejection_reason' => 'nullable|string'
+        ]);
+
+        $ids = $request->input('ids');
+        $status = $request->input('status');
+        $reason = $request->input('rejection_reason');
+
+        MassIntention::whereIn('id', $ids)->update([
+            'status' => $status,
+            'rejection_reason' => $status === 'rejected' ? $reason : null,
+            'reviewed_by' => auth()->id(),
+            'updated_at' => now(),
+        ]);
+
+        // Optional: Send notifications for each (could be slow if many)
+        if ($status === 'approved' || $status === 'rejected') {
+            $intentions = MassIntention::whereIn('id', $ids)->whereNotNull('email')->get();
+            foreach ($intentions as $intention) {
+                try {
+                    \Illuminate\Support\Facades\Notification::route('mail', $intention->email)
+                        ->notify(new \App\Notifications\IntentionStatusUpdated($intention));
+                } catch (\Exception $e) {
+                    \Log::error('Batch notification failed for ' . $intention->id . ': ' . $e->getMessage());
+                }
+            }
+        }
+
+        return back()->with('success', count($ids) . ' intentions updated.');
     }
 
     public function generatePPT(Request $request)
@@ -609,5 +660,18 @@ class AdminController extends Controller
                 'error' => 'API Error: ' . $e->getMessage()
             ], 500);
         }
+    public function getNotifications()
+    {
+        return response()->json([
+            'intentions' => MassIntention::where('status', 'pending')->count(),
+            'inquiries' => \App\Models\Inquiry::where('status', 'pending')->count(),
+            'chats' => \App\Models\ChatSession::where('is_resolved', false)->count(),
+        ]);
+    }
+
+    public function logs()
+    {
+        $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
+        return view('admin.logs', compact('logs'));
     }
 }

@@ -125,14 +125,84 @@
                     </svg>
                 </button>
 
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-primary">{{ Auth::user()->name ?? 'Admin User' }}</p>
-                        <p class="text-xs text-muted-foreground">{{ Auth::user()->email ?? 'admin@storosario.ph' }}</p>
+                <div class="flex items-center gap-6">
+                    <!-- Notification Bell -->
+                    <div x-data="{ 
+                        open: false,
+                        counts: { intentions: 0, inquiries: 0, chats: 0 },
+                        get total() { return this.counts.intentions + this.counts.inquiries + this.counts.chats },
+                        async fetchCounts() {
+                            try {
+                                const response = await fetch('{{ route('admin.notifications.count') }}');
+                                this.counts = await response.json();
+                            } catch (e) {}
+                        }
+                    }" x-init="fetchCounts(); setInterval(() => fetchCounts(), 30000)" class="relative">
+                        <button @click="open = !open" class="p-2 rounded-lg hover:bg-muted text-muted-foreground transition-all relative group">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                            <template x-if="total > 0">
+                                <span class="absolute -top-1 -right-1 h-5 w-5 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse" x-text="total"></span>
+                            </template>
+                        </button>
+
+                        <div x-show="open" @click.away="open = false" x-cloak
+                             class="absolute right-0 mt-3 w-72 bg-white border border-border shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50">
+                            <div class="p-4 border-b bg-muted/30">
+                                <h4 class="text-xs font-black uppercase tracking-widest text-primary italic">Notifications</h4>
+                            </div>
+                            <div class="p-2">
+                                <template x-if="total === 0">
+                                    <div class="p-4 text-center text-xs text-muted-foreground italic">No new notifications</div>
+                                </template>
+                                <template x-if="counts.intentions > 0">
+                                    <a href="/admin/intentions?status=pending" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                                        <div class="h-8 w-8 rounded-full bg-accent/10 text-accent flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.505 4.04 3 5.5L12 21l7-7Z"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-xs font-bold text-primary"><span x-text="counts.intentions"></span> New Intentions</p>
+                                            <p class="text-[10px] text-muted-foreground">Pending review</p>
+                                        </div>
+                                    </a>
+                                </template>
+                                <template x-if="counts.inquiries > 0">
+                                    <a href="/admin/inquiries" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-xs font-bold text-primary"><span x-text="counts.inquiries"></span> New Inquiries</p>
+                                            <p class="text-[10px] text-muted-foreground">Recent submissions</p>
+                                        </div>
+                                    </a>
+                                </template>
+                                <template x-if="counts.chats > 0">
+                                    <a href="/admin/chats" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                                        <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6 6-6"/><path d="m5 12 6 6 6-6"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-xs font-bold text-primary"><span x-text="counts.chats"></span> Active Chats</p>
+                                            <p class="text-[10px] text-muted-foreground">Waiting for response</p>
+                                        </div>
+                                    </a>
+                                </template>
+                            </div>
+                            <div class="p-2 border-t bg-muted/10">
+                                <a href="/admin/dashboard" class="block w-full text-center py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">View All Activities</a>
+                            </div>
+                        </div>
                     </div>
-                    <div
-                        class="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold">
-                        {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+
+                    <div class="flex items-center gap-4 border-l pl-6">
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-primary">{{ Auth::user()->name ?? 'Admin User' }}</p>
+                            <p class="text-xs text-muted-foreground">{{ Auth::user()->email ?? 'admin@storosario.ph' }}</p>
+                        </div>
+                        <div
+                            class="h-10 w-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-black shadow-inner border-2 border-white">
+                            {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+                        </div>
                     </div>
                 </div>
             </header>

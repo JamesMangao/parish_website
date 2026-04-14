@@ -2,7 +2,36 @@
     <x-slot name="meta">
         <meta name="description" content="Check the latest mass schedules for Sto. Rosario Parish. Sunday Masses, Antidipated Masses, and weekday schedules.">
     </x-slot>
-    <div class="container py-12 mx-auto px-4">
+    <div class="container py-12 mx-auto px-4" x-data="{
+        downloadICS(title, desc, start, end, loc, rrule = '') {
+            let ics = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Parish Pal//EN',
+                'BEGIN:VEVENT',
+                'UID:' + Math.random().toString(36).substr(2, 9) + '@parish-pal',
+                'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
+                'DTSTART:' + start,
+                'DTEND:' + end,
+                'SUMMARY:' + title,
+                'DESCRIPTION:' + desc,
+                'LOCATION:' + loc
+            ];
+            
+            if (rrule) ics.push('RRULE:' + rrule);
+            
+            ics.push('END:VEVENT');
+            ics.push('END:VCALENDAR');
+            
+            const blob = new Blob([ics.join('\\r\\n')], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', title.replace(/\\s+/g, '_') + '.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }">
         <div class="text-center mb-10">
             <h1 class="font-heading text-4xl font-bold mb-2 text-primary">Mass Schedule</h1>
             <div class="section-divider"></div>
@@ -25,6 +54,11 @@
                     'weekday' => 'bg-primary/5 text-primary border border-primary/20',
                     'saturday' => 'bg-blue-100 text-blue-800 border border-blue-200',
                     'special' => 'bg-destructive/10 text-destructive border border-destructive/20'
+                ];
+
+                $dayMap = [
+                    'Sunday' => 'SU', 'Monday' => 'MO', 'Tuesday' => 'TU', 'Wednesday' => 'WE', 
+                    'Thursday' => 'TH', 'Friday' => 'FR', 'Saturday' => 'SA'
                 ];
             @endphp
 
@@ -55,10 +89,46 @@
                                             <h3 class="text-2xl font-heading font-black text-primary group-hover:text-accent transition-colors leading-tight pr-4">
                                                 {{ $s->title ?? 'Mass Schedule' }}
                                             </h3>
-                                            <a href="{{ route('mass-schedule.ical', $s) }}" class="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                                                iCal
-                                            </a>
+                                            <div class="flex items-center gap-2">
+                                                @php
+                                                    $times = is_array($s->time) ? array_filter($s->time) : [$s->time];
+                                                    $firstTime = !empty($times[0]) ? \Carbon\Carbon::parse($times[0])->format('Hi00') : '080000';
+                                                    $endTime = !empty($times[0]) ? \Carbon\Carbon::parse($times[0])->addHour()->format('Hi00') : '090000';
+                                                    
+                                                    $rrule = '';
+                                                    $dtStart = now()->format('Ymd') . 'T' . $firstTime;
+                                                    $dtEnd = now()->format('Ymd') . 'T' . $endTime;
+
+                                                    if ($s->day_of_week) {
+                                                        $days = is_array($s->day_of_week) ? $s->day_of_week : [$s->day_of_week];
+                                                        $rrule = 'FREQ=WEEKLY;BYDAY=' . implode(',', array_map(fn($d) => $dayMap[$d] ?? 'SU', $days));
+                                                        // Adjust DTSTART to the first occurrence
+                                                        $nextDate = now();
+                                                        while(!in_array($nextDate->format('l'), $days)) {
+                                                            $nextDate->addDay();
+                                                        }
+                                                        $dtStart = $nextDate->format('Ymd') . 'T' . $firstTime;
+                                                        $dtEnd = $nextDate->format('Ymd') . 'T' . $endTime;
+                                                    } elseif ($s->specific_date) {
+                                                        $dtStart = $s->specific_date->format('Ymd') . 'T' . $firstTime;
+                                                        $dtEnd = $s->specific_date->format('Ymd') . 'T' . $endTime;
+                                                    }
+                                                    
+                                                    $googleUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" . urlencode('Mass: ' . ($s->title ?? 'Sto Rosario')) . "&dates=" . $dtStart . "/" . $dtEnd . "&location=" . urlencode('Sto. Rosario Parish');
+                                                    if ($rrule) $googleUrl .= "&recur=RRULE:" . $rrule;
+                                                @endphp
+                                                
+                                                <a href="{{ $googleUrl }}" target="_blank" class="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-colors" title="Add to Google Calendar">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14v4"/><path d="M10 16h4"/></svg>
+                                                    Google
+                                                </a>
+
+                                                <button @click="downloadICS('Mass: {{ addslashes($s->title ?? 'Sto Rosario') }}', 'Regular mass schedule', '{{ $dtStart }}', '{{ $dtEnd }}', 'Sto. Rosario Parish', '{{ $rrule }}')" 
+                                                        class="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-colors" title="Download iCal">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                                    iCal
+                                                </button>
+                                            </div>
                                         </div>
                                         
                                         <div class="space-y-3 mb-8">

@@ -24,42 +24,39 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $admin = User::updateOrCreate(
+            ['email' => 'publicojamesmangao25@gmail.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
+                'role' => 'super_admin',
+            ]
+        );
+
         // 2. Sample Mass Schedules
         $schedules = [
             [
                 'id' => \Illuminate\Support\Str::uuid(),
-                'title' => 'Sunday Mass',
+                'title' => '',
                 'mass_type' => 'sunday',
                 'day_of_week' => ['Sunday'],
                 'time' => ['06:30', '08:30', '10:00', '15:00', '16:30', '18:00'],
-                'location' => 'Main Church',
                 'is_active' => true,
             ],
             [
                 'id' => \Illuminate\Support\Str::uuid(),
-                'title' => 'Anticipated Sunday Mass',
-                'mass_type' => 'anticipated',
-                'day_of_week' => ['Saturday'],
-                'time' => ['18:00'],
-                'location' => 'Main Church',
-                'is_active' => true,
-            ],
-            [
-                'id' => \Illuminate\Support\Str::uuid(),
-                'title' => 'Weekday Mass',
+                'title' => '',
                 'mass_type' => 'weekday',
                 'day_of_week' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                'time' => ['06:30'],
-                'location' => 'Chapel',
+                'time' => ['18:00'],
                 'is_active' => true,
             ],
             [
                 'id' => \Illuminate\Support\Str::uuid(),
-                'title' => 'Saturday Morning Mass',
+                'title' => '',
                 'mass_type' => 'saturday',
                 'day_of_week' => ['Saturday'],
-                'time' => ['06:30'],
-                'location' => 'Chapel',
+                'time' => ['06:30', '18:00'],
                 'is_active' => true,
             ],
         ];
@@ -111,67 +108,5 @@ class DatabaseSeeder extends Seeder
                 'role' => 'soccom',
             ]
         );
-
-        // 7. Sample Inquiries
-        $inquiries = [
-            [
-                'full_name' => 'John Doe',
-                'email' => 'john.doe@example.com',
-                'phone' => '09171234567',
-                'inquiry_type' => 'Baptism',
-                'message' => 'I would like to inquire about requirements for baptism next month.',
-                'status' => 'pending',
-                'created_at' => now()->subDays(2),
-            ],
-            [
-                'full_name' => 'Maria Santos',
-                'email' => 'maria.santos@example.com',
-                'phone' => '09187654321',
-                'inquiry_type' => 'Wedding',
-                'message' => 'Planning a wedding in December 2026. Is the chapel available?',
-                'status' => 'accepted',
-                'accepted_at' => now()->subDay(),
-                'created_at' => now()->subDays(5),
-            ],
-            [
-                'full_name' => 'Pedro Penduko',
-                'email' => 'pedro.p@example.com',
-                'phone' => '09223334444',
-                'inquiry_type' => 'Car Blessing',
-                'message' => 'Requesting a car blessing this Saturday after the morning mass.',
-                'status' => 'pending',
-                'created_at' => now()->subHours(5),
-            ],
-        ];
-
-        foreach ($inquiries as $i) {
-            \App\Models\Inquiry::create($i);
-        }
-
-        // 8. Sample Chat Sessions
-        $chat = \App\Models\ChatSession::create([
-            'session_id' => \Illuminate\Support\Str::random(40),
-            'user_ip' => '127.0.0.1',
-            'status' => 'handover', // Waiting for agent
-            'live_agent_requested_at' => now()->subMinutes(10),
-        ]);
-
-        \App\Models\ChatMessage::create([
-            'chat_session_id' => $chat->id,
-            'sender' => 'user',
-            'message' => 'Hello, is there anyone I can talk to about a lost confirmation certificate?',
-        ]);
-
-        \App\Models\ChatMessage::create([
-            'chat_session_id' => $chat->id,
-            'sender' => 'ai',
-            'message' => "I understand you'd like to speak with a person. Would you like to submit a formal Inquiry or wait for a Live Agent to connect?",
-        ]);
-
-        \App\Models\ChatMessage::create([
-            'chat_session_id' => $chat->id,
-            'sender' => 'user',
-            'message' => 'I will wait for a live agent.',
-        ]);
-    }
+    }   
 }

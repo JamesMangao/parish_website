@@ -440,6 +440,90 @@
             @endif
         </div>
 
+        <!-- Charts Section -->
+        <div class="grid gap-6 md:grid-cols-2 mt-8">
+            <div class="bg-card rounded-xl border p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-primary uppercase tracking-widest">Intentions Submission Trend</h3>
+                    <span class="text-[10px] font-bold text-muted-foreground uppercase">Last 8 Weeks</span>
+                </div>
+                <div class="h-[250px]">
+                    <canvas id="intentionsChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-card rounded-xl border p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-primary uppercase tracking-widest">Inquiry Distribution</h3>
+                    <span class="text-[10px] font-bold text-muted-foreground uppercase">By Category</span>
+                </div>
+                <div class="h-[250px]">
+                    <canvas id="inquiriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Intentions Chart
+                const intentionsCtx = document.getElementById('intentionsChart').getContext('2d');
+                new Chart(intentionsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: {!! json_encode($intentionsTrend->map(fn($t) => 'W' . substr($t->week, 4))) !!},
+                        datasets: [{
+                            label: 'Intentions',
+                            data: {!! json_encode($intentionsTrend->pluck('total')) !!},
+                            borderColor: '#1e3a8a',
+                            backgroundColor: 'rgba(30, 58, 138, 0.05)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#1e3a8a',
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { borderDash: [5, 5] } },
+                            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        }
+                    }
+                });
+
+                // Inquiries Chart
+                const inquiriesCtx = document.getElementById('inquiriesChart').getContext('2d');
+                new Chart(inquiriesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: {!! json_encode($inquiryTypes->pluck('type')) !!},
+                        datasets: [{
+                            label: 'Inquiries',
+                            data: {!! json_encode($inquiryTypes->pluck('total')) !!},
+                            backgroundColor: [
+                                '#1e3a8a', '#d946ef', '#10b981', '#f59e0b', '#ef4444'
+                            ],
+                            borderRadius: 6,
+                            barThickness: 20
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { borderDash: [5, 5] } },
+                            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        }
+                    }
+                });
+            });
+        </script>
+
         <!-- Quick Actions -->
         <div class="mt-12">
             <h2 class="font-heading text-xl font-bold text-primary mb-6">Quick Actions</h2>

@@ -25,13 +25,19 @@ class IntentionStatusUpdated extends Notification
 
     public function toMail($notifiable): MailMessage
     {
-        $refId = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($this->intention->id, 0, 8));
-        return (new MailMessage)
-                    ->subject('Mass Intention Update - ' . $this->intention->status)
-                    ->line('Your mass intention status has been updated.')
-                    ->line('Current Status: ' . strtoupper($this->intention->status))
-                    ->action('Track Status', route('track', ['reference_id' => $refId]))
-                    ->line('Thank you for using Parish Pal!');
+        $refId = $this->intention->reference_number ?? \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($this->intention->id, 0, 8));
+        $message = (new MailMessage)
+                    ->subject('Mass Intention Update: ' . strtoupper($this->intention->status))
+                    ->line('Dear ' . ($this->intention->full_name ?? 'Parishioner') . ',')
+                    ->line('Your mass intention submission (Ref: ' . $refId . ') has been ' . $this->intention->status . '.');
+        
+        if ($this->intention->status === 'rejected' && $this->intention->rejection_reason) {
+            $message->line('Reason for rejection: ' . $this->intention->rejection_reason);
+        }
+
+        return $message->action('Track Status', route('track', ['reference_id' => $refId]))
+                    ->line('Thank you for your patience and faith.')
+                    ->line('God bless!');
     }
 
     public function toArray($notifiable): array

@@ -1,16 +1,70 @@
 <x-admin-layout>
-    <div class="mb-8">
-        <h1 class="font-heading text-3xl font-bold text-primary italic italic text-primary">Parish Settings</h1>
-        <p class="text-sm text-muted-foreground mt-1">Configure global parish information and application settings.</p>
-    </div>
-
-    <div class="bg-card rounded-xl border border-dashed p-12 flex flex-col items-center justify-center text-center">
-        <div class="h-16 w-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+    <div class="max-w-4xl">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="font-heading text-3xl font-bold text-primary italic">General Settings</h1>
+                <p class="text-sm text-muted-foreground mt-1">Configure parish information and donation details.</p>
+            </div>
         </div>
-        <h2 class="text-xl font-bold text-primary mb-2">Coming Soon</h2>
-        <p class="text-muted-foreground max-w-sm">
-            This module will allow you to update the parish address, contact details, and social media links appearing on the public website.
-        </p>
+
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg text-sm font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <form action="{{ route('admin.settings.update') }}" method="POST" class="space-y-6">
+            @csrf
+            
+            <!-- Parish Information -->
+            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden">
+                <div class="p-6 border-b bg-muted/30">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Parish Information</h3>
+                </div>
+                <div class="p-6 grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Parish Name</label>
+                        <input type="text" name="parish_name" value="{{ $settings['parish_name'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contact Number</label>
+                        <input type="text" name="parish_contact" value="{{ $settings['parish_contact'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Full Address</label>
+                        <textarea name="parish_address" rows="2" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">{{ $settings['parish_address'] ?? '' }}</textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Official Email</label>
+                        <input type="email" name="parish_email" value="{{ $settings['parish_email'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation Settings -->
+            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden">
+                <div class="p-6 border-b bg-muted/30">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Donation & Payments (GCash)</h3>
+                </div>
+                <div class="p-6 grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">GCash Number</label>
+                        <input type="text" name="gcash_number" value="{{ $settings['gcash_number'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">GCash Account Name</label>
+                        <input type="text" name="gcash_name" value="{{ $settings['gcash_name'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="px-8 py-3 bg-accent text-accent-foreground rounded-xl font-black text-sm shadow-xl hover:scale-[1.02] transition-all flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Save Changes
+                </button>
+            </div>
+        </form>
     </div>
 </x-admin-layout>

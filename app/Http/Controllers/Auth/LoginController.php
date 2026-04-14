@@ -20,25 +20,10 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::validate($credentials)) {
-            $user = \App\Models\User::where('email', $credentials['email'])->first();
-            
-            // Generate 6-digit code
-            $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $user->update(['two_factor_secret' => $code]);
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
 
-            // Send Email
-            try {
-                \Illuminate\Support\Facades\Mail::raw("Your Parish Pal verification code is: $code", function ($message) use ($user) {
-                    $message->to($user->email)->subject('Login Verification Code');
-                });
-            } catch (\Exception $e) {
-                \Log::error("Failed to send 2FA email: " . $e->getMessage());
-            }
-
-            session(['2fa_user_id' => $user->id]);
-
-            return redirect()->route('admin.2fa.index');
+            return redirect()->intended('/admin/dashboard');
         }
 
         return back()->withErrors([

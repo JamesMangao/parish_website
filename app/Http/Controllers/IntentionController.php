@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\MassIntention;
+use App\Mail\IntentionReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class IntentionController extends Controller
 {
@@ -25,7 +28,12 @@ class IntentionController extends Controller
             'paymentMethod' => 'nullable|string',
         ]);
 
+        $year = date('Y');
+        $count = MassIntention::whereYear('created_at', $year)->count() + 1;
+        $refNumber = 'SRP-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+
         $intention = MassIntention::create([
+            'reference_number' => $refNumber,
             'full_name' => $validated['fullName'],
             'email' => $validated['email'],
             'intention_type' => $validated['intentionType'],
@@ -37,10 +45,13 @@ class IntentionController extends Controller
         ]);
 
         // Send confirmation email
-        \Illuminate\Support\Facades\Notification::route('mail', $validated['email'])
-            ->notify(new \App\Notifications\IntentionSubmitted($intention));
+        try {
+            Mail::to($validated['email'])->send(new IntentionReceived($intention));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send intention email: ' . $e->getMessage());
+        }
 
-        $refId = \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($intention->id, 0, 8));
+        $refId = $refNumber;
 
         if ($request->expectsJson()) {
             return response()->json([

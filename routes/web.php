@@ -15,7 +15,7 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\TrackController;
-use App\Http\Controllers\Auth\TwoFactorController;
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () { return view('about'); })->name('about');
@@ -50,12 +50,11 @@ Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('log
 Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/admin/2fa', [TwoFactorController::class, 'index'])->name('admin.2fa.index');
-Route::post('/admin/2fa', [TwoFactorController::class, 'verify'])->name('admin.2fa.verify')->middleware('throttle:5,1');
-Route::post('/admin/2fa/resend', [TwoFactorController::class, 'resend'])->name('admin.2fa.resend')->middleware('throttle:3,1');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/notifications/count', [AdminController::class, 'getNotifications'])->name('admin.notifications.count');
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
@@ -103,6 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/intentions', [AdminController::class, 'intentions'])->name('admin.intentions');
         Route::get('/admin/intentions/create', [AdminController::class, 'createIntention'])->name('admin.intentions.create');
         Route::post('/admin/intentions', [AdminController::class, 'storeIntention'])->name('admin.intentions.store');
+        Route::post('/admin/intentions/batch', [AdminController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
         Route::post('/admin/intentions/{id}/status', [AdminController::class, 'updateStatus']);
     });
 
@@ -135,15 +135,12 @@ Route::middleware('auth')->group(function () {
 
     // Role: super_admin only
     Route::middleware('role:super_admin')->group(function () {
-        // Placeholders for system management
-        Route::get('/admin/users', function () {
-            return view('admin.users');
-        })->name('admin.users');
-        Route::get('/admin/logs', function () {
-            return view('admin.logs');
-        })->name('admin.logs');
-        Route::get('/admin/settings', function () {
-            return view('admin.settings');
-        })->name('admin.settings');
+        Route::get('/admin/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users');
+        Route::post('/admin/users', [\App\Http\Controllers\UserController::class, 'store'])->name('admin.users.store');
+        Route::put('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::get('/admin/logs', [AdminController::class, 'logs'])->name('admin.logs');
+        Route::get('/admin/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings');
+        Route::post('/admin/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
     });
 });

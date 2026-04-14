@@ -16,6 +16,7 @@ class MassIntention extends Model
     public $incrementing = false;
 
     protected $fillable = [
+        'reference_number',
         'full_name',
         'email',
         'intention_type',
@@ -26,6 +27,7 @@ class MassIntention extends Model
         'mass_time',
         'mass_schedule_id',
         'status',
+        'rejection_reason',
         'payment_method',
         'reviewed_by',
     ];

@@ -2,7 +2,36 @@
     <x-slot name="meta">
         <meta name="description" content="Stay updated with the latest events and celebrations at Sto. Rosario Parish. Join our community activities and spiritual gatherings.">
     </x-slot>
-    <div class="container py-12 mx-auto px-4">
+    <div class="container py-12 mx-auto px-4" x-data="{
+        downloadICS(title, desc, start, end, loc, rrule = '') {
+            let ics = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Parish Pal//EN',
+                'BEGIN:VEVENT',
+                'UID:' + Math.random().toString(36).substr(2, 9) + '@parish-pal',
+                'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
+                'DTSTART:' + start,
+                'DTEND:' + end,
+                'SUMMARY:' + title,
+                'DESCRIPTION:' + desc,
+                'LOCATION:' + loc
+            ];
+            
+            if (rrule) ics.push('RRULE:' + rrule);
+            
+            ics.push('END:VEVENT');
+            ics.push('END:VCALENDAR');
+            
+            const blob = new Blob([ics.join('\\r\\n')], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', title.replace(/\\s+/g, '_') + '.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }">
         <div class="text-center mb-10">
             <h1 class="font-heading text-4xl font-bold mb-2 text-primary">Parish Events</h1>
             <div class="section-divider"></div>
@@ -34,9 +63,13 @@
                                         $googleUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" . urlencode($event->title) . "&dates=" . $dates . "&details=" . urlencode($event->description) . "&location=" . urlencode($event->location ?? 'Sto. Rosario Parish');
                                     @endphp
                                     <a href="{{ $googleUrl }}" target="_blank" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-accent hover:text-primary transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14v4"/><path d="M10 16h4"/></svg>
-                                        Add to Google Calendar
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                        Google Cal
                                     </a>
+                                    <button @click="downloadICS('{{ addslashes($event->title) }}', '{{ addslashes($event->description) }}', '{{ $event->event_date->format('Ymd') }}T{{ $startTime }}', '{{ $event->event_date->format('Ymd') }}T{{ $endTime }}', '{{ addslashes($event->location ?? 'Sto. Rosario Parish') }}')" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                        iCal (.ics)
+                                    </button>
                                 </div>
 
                                 <p class="text-muted-foreground leading-relaxed text-base mb-6">
