@@ -82,4 +82,27 @@ class InquiryController extends Controller
 
         return back()->with('success', 'Inquiry accepted and forwarded to the parish office.');
     }
+
+    public function decline(Request $request, $id)
+    {
+        $request->validate(['reason' => 'required|string|max:1000']);
+        $inquiry = Inquiry::findOrFail($id);
+        
+        $inquiry->update([
+            'status' => 'declined',
+            'rejection_reason' => $request->reason,
+        ]);
+
+        // Notify User
+        try {
+            if ($inquiry->email) {
+                \Illuminate\Support\Facades\Notification::route('mail', $inquiry->email)
+                    ->notify(new \App\Notifications\InquiryStatusUpdated($inquiry));
+            }
+        } catch (\Exception $e) {
+            // Log error but proceed
+        }
+
+        return back()->with('success', 'Inquiry has been declined with a reason.');
+    }
 }

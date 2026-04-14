@@ -39,7 +39,7 @@ class AIService
                 $response = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $this->groqKey,
                     'Content-Type' => 'application/json',
-                ])->post('https://api.groq.com/openai/v1/chat/completions', [
+                ])->withOptions(['verify' => true])->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model' => 'llama-3.1-8b-instant',
                     'messages' => $messages,
                     'temperature' => 0.7,
@@ -63,7 +63,7 @@ class AIService
                     'HTTP-Referer' => config('app.url'),
                     'X-Title' => config('app.name'),
                     'Content-Type' => 'application/json',
-                ])->post('https://openrouter.ai/api/v1/chat/completions', [
+                ])->withOptions(['verify' => true])->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => 'google/gemma-2-9b-it:free',
                     'messages' => $messages,
                 ]);
@@ -144,14 +144,16 @@ You are a warm, helpful, and knowledgeable 'Parish Concierge'. Your goal is to a
 4. **Inquiries**: Direct users to [Submit an Inquiry](/inquiry) for all sacramental requests (Baptism, Wedding, etc.).
 5. **Events**: Upcoming events from your database.
 6. **Gallery**: Direct users to view photos at the [Gallery](/gallery).
-7. **About**: Parish history, location (1 Sto. Rosario Drive), and office hours.
-8. **Donate**: Direct users to the [Donation Page](/donate).
+7. **Bulletins**: Direct users to view weekly announcements at [Bulletins](/bulletins).
+8. **Tracker**: Direct users to check their status at [Tracker](/track).
+9. **About**: Parish history, location (1 Sto. Rosario Drive), and office hours.
+10. **Donate**: Direct users to the [Donation Page](/donate).
 
 ### CONVERSATION GUIDELINES:
 1. **Stay Relevant**: While you can answer faith questions, always try to bring the conversation back to how it relates to parish life if possible.
 2. **No Reservations**: Sto. Rosario Parish DOES NOT have a mass reservation system.
 3. **Handover**: Only suggest a live representative if the user explicitly asks for a person or if you cannot answer a question.
-4. **Links**: Use only the following paths: [/], [/mass-schedule], [/submit-intention], [/inquiry], [/events], [/gallery], [/about], [/donate].
+4. **Links**: Use only the following paths: [/], [/mass-schedule], [/submit-intention], [/inquiry], [/events], [/gallery], [/bulletins], [/track], [/about], [/donate].
 
 ### TONE:
 Vibrant, polite, and faith-filled. Maintain a respectful Catholic tone. Use [Link Name](/url) for links.";

@@ -118,14 +118,27 @@ class ChatbotController extends Controller
         ]);
     }
 
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
+        $status = $request->input('status', 'handover');
+        $search = $request->input('search');
+        
         $sessions = ChatSession::withCount('messages')
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->when($search, fn($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
             ->orderBy('live_agent_requested_at', 'desc')
             ->orderBy('updated_at', 'desc')
             ->paginate(15);
             
-        return view('admin.chats.index', compact('sessions'));
+        return view('admin.chats.index', compact('sessions', 'status', 'search'));
+    }
+
+    public function resolve($id)
+    {
+        $chat = ChatSession::findOrFail($id);
+        $chat->update(['status' => 'resolved']);
+        
+        return redirect()->route('admin.chats.index')->with('success', 'Conversation marked as resolved.');
     }
 
     public function adminShow($id)

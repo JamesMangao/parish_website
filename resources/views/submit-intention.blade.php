@@ -165,7 +165,7 @@
                             <div x-show="formData.paymentMethod" x-transition class="p-4 rounded-lg bg-muted/50 border border-dashed text-[11px] text-muted-foreground leading-relaxed relative">
                                 <template x-if="formData.paymentMethod === 'GCash'">
                                     <div class="flex items-center justify-between">
-                                        <p>Please send your donation to: <br> <strong class="text-primary">{{ env('GCASH_NAME', 'Sto Rosario Parish') }} - {{ env('GCASH_NUMBER', '0912 345 6789') }}</strong></p>
+                                        <p>Please send your donation to: <br> <strong class="text-primary">{{ $global_settings['gcash_name'] ?? 'Sto Rosario Parish' }} - {{ $global_settings['gcash_number'] ?? '0912 345 6789' }}</strong></p>
                                         <button @click="copyGCash()" type="button" class="p-2 hover:bg-white rounded transition-colors text-primary" title="Copy Number">
                                             <svg x-show="!copied" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                             <span x-show="copied" x-cloak class="text-[9px] font-bold text-accent">COPIED!</span>
@@ -173,7 +173,7 @@
                                     </div>
                                 </template>
                                 <template x-if="formData.paymentMethod === 'Bank'">
-                                    <p>{{ env('BANK_DETAILS', 'Sto. Rosario Parish - BPI: 1234-5678-90') }}</p>
+                                    <p>{{ $global_settings['bank_details'] ?? 'Sto. Rosario Parish - Bank Transfer available' }}</p>
                                 </template>
                                 <p class="mt-2 italic">* Please keep a screenshot of your transaction for verification if necessary.</p>
                             </div>
@@ -258,7 +258,7 @@
             },
 
             copyGCash() {
-                navigator.clipboard.writeText('{{ env('GCASH_NUMBER', '09123456789') }}');
+                navigator.clipboard.writeText('{{ $global_settings['gcash_number'] ?? '09123456789' }}');
                 this.copied = true;
                 setTimeout(() => this.copied = false, 2000);
             },

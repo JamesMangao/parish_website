@@ -114,6 +114,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/inquiries', [InquiryController::class, 'index'])->name('admin.inquiries.index');
         Route::get('/admin/inquiries/{id}', [InquiryController::class, 'show'])->name('admin.inquiries.show');
         Route::post('/admin/inquiries/{id}/accept', [InquiryController::class, 'accept'])->name('admin.inquiries.accept');
+        Route::post('/admin/inquiries/{id}/decline', [InquiryController::class, 'decline'])->name('admin.inquiries.decline');
     });
 
     // Role: super_admin or soccom
@@ -134,6 +135,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');
         Route::get('/admin/chats/{id}', [ChatbotController::class, 'adminShow'])->name('admin.chats.show');
         Route::post('/admin/chats/{id}/reply', [ChatbotController::class, 'adminReply'])->name('admin.chats.reply');
+        Route::post('/admin/chats/{id}/resolve', [ChatbotController::class, 'resolve'])->name('admin.chats.resolve');
         Route::post('/admin/chats/{id}/typing', [ChatbotController::class, 'adminTyping'])->name('admin.chats.typing');
     });
 
