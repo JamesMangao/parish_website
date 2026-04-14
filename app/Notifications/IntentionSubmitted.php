@@ -21,12 +21,12 @@ class IntentionSubmitted extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     public function toMail($notifiable)
     {
-        $refId = Str::upper(Str::substr($this->intention->id, 0, 8));
+        $refId = $this->intention->reference_number;
         
         return (new MailMessage)
             ->subject('Mass Intention Received - ' . $refId)
@@ -34,11 +34,11 @@ class IntentionSubmitted extends Notification
             ->line('We have received your request for a Mass Intention.')
             ->line('Reference ID: ' . $refId)
             ->line('Type: ' . $this->intention->intention_type)
-            ->line('Date: ' . $this->intention->preferred_date)
+            ->line('Date: ' . \Carbon\Carbon::parse($this->intention->preferred_date)->format('M d, Y'))
             ->line('Time: ' . $this->intention->mass_time)
             ->line('Message: ' . $this->intention->raw_message)
             ->line('Our parish staff will review your request shortly.')
-            ->action('Track Status', url('/track?reference_id=' . $refId))
+            ->action('Track Status', route('track.status', ['refId' => $refId]))
             ->line('Thank you for being part of our community.');
     }
 

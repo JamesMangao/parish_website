@@ -22,10 +22,18 @@ class SettingController extends Controller
             'parish_email' => 'nullable|email|max:255',
             'gcash_number' => 'nullable|string|max:255',
             'gcash_name' => 'nullable|string|max:255',
+            'qr_code' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        if ($request->hasFile('qr_code')) {
+            $path = $request->file('qr_code')->store('settings', 'public');
+            Setting::updateOrCreate(['key' => 'qr_code'], ['value' => $path]);
+        }
+
         foreach ($validated as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            if ($key !== 'qr_code') {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            }
         }
 
         return back()->with('success', 'Settings updated successfully!');

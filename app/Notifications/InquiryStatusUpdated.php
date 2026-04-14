@@ -20,7 +20,7 @@ class InquiryStatusUpdated extends Notification
 
     public function via($notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     public function toMail($notifiable): MailMessage
@@ -29,7 +29,7 @@ class InquiryStatusUpdated extends Notification
                     ->subject('Sacramental Inquiry Update - ' . $this->inquiry->status)
                     ->line('Your sacramental inquiry status has been updated.')
                     ->line('Current Status: ' . strtoupper($this->inquiry->status))
-                    ->action('Track Status', route('track', ['reference_id' => $this->inquiry->reference_id]))
+                    ->action('Track Status', route('track.status', ['refId' => $this->inquiry->reference_id]))
                     ->line('Thank you for using Parish Pal!');
     }
 

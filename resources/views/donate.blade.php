@@ -28,19 +28,26 @@
                     </div>
 
                     <div class="p-6 bg-white rounded-3xl border shadow-inner mb-8 transform group-hover:scale-[1.02] transition-transform">
-                        <img src="{{ env('GCASH_QR_PATH', '/qr-donation.png') }}" 
-                             alt="Parish Donation QR" 
-                             class="w-full h-auto rounded-xl">
+                        @if(isset($global_settings['qr_code']))
+                            <img src="{{ asset('storage/' . $global_settings['qr_code']) }}" 
+                                 alt="Parish Donation QR" 
+                                 class="w-full h-auto rounded-xl">
+                        @else
+                            <div class="aspect-square flex flex-col items-center justify-center border-2 border-dashed rounded-xl text-muted-foreground p-8 text-center italic">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-20"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3"/><path d="M7 12h3"/><path d="M12 20v-5"/><path d="M17 12h.01"/><path d="M7 12v.01"/><path d="M12 12v.01"/><path d="M16 7h5"/><path d="M21 12h-3a2 2 0 0 0-2 2v3"/><path d="M21 16v.01"/><path d="M16 21h.01"/><path d="M12 17v.01"/><path d="M17 17v.01"/><path d="M16 12v5"/><path d="M7 7h.01"/></svg>
+                                <p class="text-sm">Parish QR code not yet available. Please use the account details below.</p>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" 
-                            @click="navigator.clipboard.writeText('{{ env('GCASH_NUMBER', '09123456789') }}'); copiedG = true; setTimeout(() => copiedG = false, 2000)">
+                            @click="navigator.clipboard.writeText('{{ $global_settings['gcash_number'] ?? 'Not set' }}'); copiedG = true; setTimeout(() => copiedG = false, 2000)">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs">G</div>
                                 <div>
                                     <p class="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">GCash Number</p>
-                                    <p class="font-bold text-sm">{{ env('GCASH_NUMBER', '0912 345 6789') }}</p>
+                                    <p class="font-bold text-sm">{{ $global_settings['gcash_number'] ?? 'Not set' }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -49,12 +56,12 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between p-4 bg-muted/40 rounded-2xl border border-dashed hover:border-accent hover:bg-muted transition-all cursor-pointer" 
-                            @click="navigator.clipboard.writeText('{{ env('MAYA_NAME', 'Sto Rosario Parish') }}'); copiedM = true; setTimeout(() => copiedM = false, 2000)">
+                            @click="navigator.clipboard.writeText('{{ $global_settings['gcash_name'] ?? 'Not set' }}'); copiedM = true; setTimeout(() => copiedM = false, 2000)">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xs">M</div>
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xs">A</div>
                                 <div>
-                                    <p class="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Maya Account</p>
-                                    <p class="font-bold text-sm">{{ env('MAYA_NAME', 'Sto Rosario Parish') }}</p>
+                                    <p class="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Account Name</p>
+                                    <p class="font-bold text-sm">{{ $global_settings['gcash_name'] ?? 'Not set' }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">

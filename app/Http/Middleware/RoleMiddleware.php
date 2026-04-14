@@ -22,6 +22,11 @@ class RoleMiddleware
             return redirect('/admin/login');
         }
 
+        if (!auth()->user()->is_active) {
+            auth()->logout();
+            return redirect('/admin/login')->withErrors(['email' => 'Your account has been deactivated.']);
+        }
+
         if (!in_array(auth()->user()->role, $roles)) {
             abort(403, 'Unauthorized action.');
         }

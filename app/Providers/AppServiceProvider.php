@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                $settings = \App\Models\Setting::all()->pluck('value', 'key');
+                view()->share('global_settings', $settings);
+            }
+        } catch (\Exception $e) {
+            // Silently fail if table doesn't exist yet
+        }
     }
 }

@@ -71,9 +71,13 @@ class AdminController extends Controller
             'rejection_reason' => $newStatus === 'rejected' ? $request->input('rejection_reason') : null,
             'reviewed_by' => auth()->id(),
         ]);
-
-            \Illuminate\Support\Facades\Notification::route('mail', $intention->email)
-                ->notify(new \App\Notifications\IntentionStatusUpdated($intention));
+        try {
+            if ($intention->email) {
+                \Illuminate\Support\Facades\Notification::route('mail', $intention->email)
+                    ->notify(new \App\Notifications\IntentionStatusUpdated($intention));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Status update notification failed: ' . $e->getMessage());
         }
 
         LogService::log("status_update_{$newStatus}", $intention, [

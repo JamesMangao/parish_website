@@ -25,9 +25,7 @@ class TrackController extends Controller
     public function showStatus($refId)
     {
         // Try searching in Mass Intentions
-        $intention = MassIntention::where('id', 'LIKE', $refId . '%')
-            ->orWhere('reference_number', $refId)
-            ->first();
+        $intention = MassIntention::where('reference_number', $refId)->first();
         
         if ($intention) {
             return view('track-status', [
@@ -40,7 +38,7 @@ class TrackController extends Controller
         }
 
         // Try searching in Inquiries
-        $inquiry = Inquiry::where('reference_id', 'LIKE', $refId . '%')->first();
+        $inquiry = Inquiry::where('reference_id', $refId)->first();
 
         if ($inquiry) {
             return view('track-status', [

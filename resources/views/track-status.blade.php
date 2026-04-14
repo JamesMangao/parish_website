@@ -13,7 +13,7 @@
                     <label for="reference_id" class="block text-sm font-bold text-primary uppercase tracking-widest mb-2">Reference ID</label>
                     <input type="text" name="reference_id" id="reference_id" required 
                         class="w-full px-6 py-4 rounded-2xl border-2 border-muted bg-muted/30 focus:border-accent focus:ring-0 transition-all font-mono text-lg"
-                        placeholder="e.g. 550E8400..."
+                        placeholder="e.g. SRP-2026-0001 or INQ-2026-0001"
                         value="{{ old('reference_id') }}">
                     @error('reference_id')
                         <p class="text-destructive text-xs mt-2 font-bold">{{ $message }}</p>

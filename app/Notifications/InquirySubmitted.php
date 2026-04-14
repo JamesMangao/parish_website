@@ -20,7 +20,7 @@ class InquirySubmitted extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     public function toMail($notifiable)
@@ -37,7 +37,7 @@ class InquirySubmitted extends Notification
         }
 
         return $mail->line('Our parish team is reviewing your request and will get back to you soon.')
-            ->action('Track Status', url('/track?reference_id=' . $this->inquiry->reference_id))
+            ->action('Track Status', route('track.status', ['refId' => $this->inquiry->reference_id]))
             ->line('Thank you for contacting Sto. Rosario Parish.');
     }
 

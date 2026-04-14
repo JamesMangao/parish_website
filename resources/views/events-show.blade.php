@@ -5,36 +5,7 @@
         <meta property="og:description" content="{{ Str::limit($event->description, 160) }}">
     </x-slot>
 
-    <div class="container py-12 mx-auto px-4 max-w-4xl" x-data="{
-        downloadICS(title, desc, start, end, loc, rrule = '') {
-            let ics = [
-                'BEGIN:VCALENDAR',
-                'VERSION:2.0',
-                'PRODID:-//Parish Pal//EN',
-                'BEGIN:VEVENT',
-                'UID:' + Math.random().toString(36).substr(2, 9) + '@parish-pal',
-                'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
-                'DTSTART:' + start,
-                'DTEND:' + end,
-                'SUMMARY:' + title,
-                'DESCRIPTION:' + desc,
-                'LOCATION:' + loc
-            ];
-            
-            if (rrule) ics.push('RRULE:' + rrule);
-            
-            ics.push('END:VEVENT');
-            ics.push('END:VCALENDAR');
-            
-            const blob = new Blob([ics.join('\\r\\n')], { type: 'text/calendar;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.setAttribute('download', title.replace(/\\s+/g, '_') + '.ics');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    }">
+    <div class="container py-12 mx-auto px-4 max-w-4xl" x-data="{}">
         <nav class="flex mb-8 text-sm font-medium text-muted-foreground" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
@@ -129,11 +100,6 @@
                                     Add to Google Calendar
                                 </a>
                                 
-                                <button @click="downloadICS('{{ addslashes($event->title) }}', '{{ addslashes(Str::limit($event->description, 200)) }}', '{{ $event->event_date->format('Ymd') }}T{{ $startTime }}', '{{ $event->event_date->format('Ymd') }}T{{ $endTime }}', '{{ addslashes($event->location ?? 'Sto. Rosario Parish') }}')" 
-                                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-primary/10 bg-white text-primary font-bold text-sm hover:bg-muted/50 transition-all">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                                    Download iCal File
-                                </button>
                             </div>
                         </div>
 

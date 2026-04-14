@@ -64,7 +64,7 @@ class UserController extends Controller
             return back()->with('error', 'You cannot delete your own account!');
         }
         
-        $user->delete();
-        return back()->with('success', 'User deleted successfully!');
+        $user->update(['is_active' => false]);
+        return back()->with('success', 'User deactivated successfully!');
     }
 }

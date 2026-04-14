@@ -8,7 +8,7 @@
         </div>
 
 
-        <form action="{{ route('admin.settings.update') }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             
             <!-- Parish Information -->
@@ -49,6 +49,20 @@
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">GCash Account Name</label>
                         <input type="text" name="gcash_name" value="{{ $settings['gcash_name'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payment QR Code</label>
+                        <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
+                            @if(isset($settings['qr_code']))
+                                <img src="{{ asset('storage/' . $settings['qr_code']) }}" class="h-32 w-32 object-contain border rounded bg-white shadow-sm" />
+                            @else
+                                <div class="h-32 w-32 flex items-center justify-center bg-white border rounded text-muted-foreground text-[10px] uppercase font-black text-center px-4">No QR Uploaded</div>
+                            @endif
+                            <div class="flex-1">
+                                <input type="file" name="qr_code" class="text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
+                                <p class="mt-2 text-[10px] text-muted-foreground">Upload your GCash QR code for easier donations. Max 2MB (JPG/PNG).</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

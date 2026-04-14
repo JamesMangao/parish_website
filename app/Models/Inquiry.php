@@ -18,7 +18,9 @@ class Inquiry extends Model
     protected static function booted()
     {
         static::creating(function ($inquiry) {
-            $inquiry->reference_id = (string) \Illuminate\Support\Str::uuid();
+            $year = date('Y');
+            $count = Inquiry::whereYear('created_at', $year)->count() + 1;
+            $inquiry->reference_id = 'INQ-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
         });
     }
 }
