@@ -137,39 +137,93 @@
     </script>
     <div x-data="pptAutomation()" @keydown.window="handleKeyDown($event)" @mousemove.window="onDrag($event)"
         @mouseup.window="stopDrag()">
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h1 class="font-heading text-3xl font-bold text-primary italic">Dashboard</h1>
-                <p class="text-sm text-muted-foreground mt-1">Overview of parish activities and social communications
-                    automation.</p>
-            </div>
+        <div class="mb-8">
+            <h1 class="font-heading text-3xl font-bold text-primary italic">Dashboard</h1>
+            <p class="text-sm text-muted-foreground mt-1">Overview of parish activities and statistics.</p>
+        </div>
 
-            <div class="flex gap-3">
-                <button @click="fetchPreview()"
-                    class="inline-flex items-center gap-2 bg-muted border border-border px-4 py-2 rounded-md font-bold text-sm hover:bg-muted/80 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-eye">
-                        <path
-                            d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z" />
-                        <circle cx="12" cy="12" r="3" />
-                    </svg>
-                    Preview Content
-                </button>
-                <form action="/admin/generate-ppt" method="POST">
-                    @csrf
-                    <button type="submit"
-                        class="inline-flex items-center gap-2 bg-accent text-accent-foreground px-4 py-2 rounded-md font-bold text-sm shadow-md hover:opacity-90 transition-opacity">
+        @php $role = Auth::user()->role; @endphp
+
+        <!-- Stats Grid -->
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-10">
+            @if($role === 'super_admin' || $role === 'staff')
+                <!-- Total Intentions -->
+                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-primary">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Intentions</span>
+                        <div class="p-2 bg-primary/10 rounded text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-black text-primary tracking-tighter">{{ $stats['total_intentions'] ?? 0 }}</p>
+                </div>
+
+                <!-- Pending Review -->
+                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-accent">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Pending Intentions</span>
+                        <div class="p-2 bg-accent/10 rounded text-accent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-black text-accent tracking-tighter">{{ $stats['pending_intentions'] ?? 0 }}</p>
+                </div>
+
+                <!-- Pending Inquiries -->
+                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-blue-600">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Inquiry Requests</span>
+                        <div class="p-2 bg-blue-100 rounded text-blue-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-black text-blue-700 tracking-tighter">{{ $stats['pending_inquiries'] ?? 0 }}</p>
+                </div>
+            @endif
+
+            @if($role === 'super_admin' || $role === 'soccom')
+                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-purple-600">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Active Schedules</span>
+                        <div class="p-2 bg-purple-100 rounded text-purple-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-black text-purple-700 tracking-tighter">{{ $stats['active_schedules'] ?? 0 }}</p>
+                </div>
+            @endif
+        </div>
+
+        <div class="bg-card rounded-3xl border shadow-xl p-8 mb-10 overflow-hidden relative">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full -translate-y-1/2 translate-x-1/2 -z-10"></div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative">
+                <div>
+                    <h3 class="font-heading text-xl font-bold text-primary italic">Mass Presentation Automation</h3>
+                    <p class="text-sm text-muted-foreground mt-1">Generate PowerPoint or Google Slides for the upcoming mass intentions.</p>
+                </div>
+
+                <div class="flex gap-3 shrink-0">
+                    <button @click="fetchPreview()"
+                        class="inline-flex items-center gap-2 bg-muted border border-border px-6 py-3 rounded-xl font-bold text-sm hover:bg-muted/80 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-presentation">
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        Quick Preview
+                    </button>
+                    <button @click="generateFinal()"
+                        class="inline-flex items-center gap-2 bg-accent text-accent-foreground px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-accent/20 hover:scale-105 active:scale-95 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 3h20" />
                             <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" />
                             <path d="m7 21 5-5 5 5" />
                         </svg>
                         Generate PPT
                     </button>
-                </form>
+                </div>
             </div>
 
             <!-- Interactive Slide Preview Modal -->
@@ -365,116 +419,6 @@
             </div>
         </div>
 
-        @php $role = Auth::user()->role; @endphp
-
-        <!-- Stats Grid -->
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-            @if($role === 'super_admin' || $role === 'staff')
-                <!-- Total Intentions -->
-                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total
-                            Intentions</span>
-                        <div class="p-2 bg-primary/10 rounded text-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-file-text">
-                                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-                                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-                                <path d="M10 9H8" />
-                                <path d="M16 13H8" />
-                                <path d="M16 17H8" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-3xl font-black text-primary">{{ $stats['total_intentions'] ?? 0 }}</p>
-                </div>
-
-                <!-- Pending Review -->
-                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pending
-                            Review</span>
-                        <div class="p-2 bg-accent/10 rounded text-accent">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-clock">
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-3xl font-black text-accent">{{ $stats['pending_intentions'] ?? 0 }}</p>
-                </div>
-
-                <!-- Total Inquiries -->
-                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total Inquiries</span>
-                        <div class="p-2 bg-blue-100 rounded text-blue-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-message-circle">
-                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-3xl font-black text-blue-700">{{ $stats['total_inquiries'] ?? 0 }}</p>
-                </div>
-
-                <!-- Pending Inquiries -->
-                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pending Inquiries</span>
-                        <div class="p-2 bg-yellow-100 rounded text-yellow-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-message-square">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-3xl font-black text-yellow-700">{{ $stats['pending_inquiries'] ?? 0 }}</p>
-                </div>
-            @endif
-
-            @if($role === 'super_admin' || $role === 'soccom')
-                <!-- Active Schedules -->
-                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Active
-                            Schedules</span>
-                        <div class="p-2 bg-purple-100 rounded text-purple-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-calendar">
-                                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                                <line x1="16" x2="16" y1="2" y2="6" />
-                                <line x1="8" x2="8" y1="2" y2="6" />
-                                <line x1="3" x2="21" y1="10" y2="10" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-3xl font-black text-purple-700">{{ $stats['active_schedules'] ?? 0 }}</p>
-                </div>
-
-                <!-- Announcements -->
-                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Announcements</span>
-                        <div class="p-2 bg-blue-100 rounded text-blue-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-megaphone">
-                                <path d="m3 11 18-5v12L3 14v-3z" />
-                                <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-3xl font-black text-blue-700">{{ $stats['total_announcements'] ?? 0 }}</p>
-                </div>
-            @endif
-        </div>
 
         <!-- Charts Section -->
         <div class="grid gap-6 md:grid-cols-2 mt-8">

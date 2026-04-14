@@ -20,19 +20,115 @@
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
-            <div>
-                <img src="/bg.png" alt="Sto. Rosario Parish Church"
-                    class="rounded-xl shadow-lg w-full h-auto object-cover" style="max-height: 400px;">
+        <div class="grid md:grid-cols-2 gap-16 items-center mb-24">
+            <div class="relative group">
+                <div class="absolute -inset-4 bg-primary/5 rounded-[3rem] blur-2xl group-hover:bg-primary/10 transition-all duration-700"></div>
+                <img src="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}" alt="Sto. Rosario Parish Church"
+                    class="relative rounded-[2.5rem] shadow-2xl w-full aspect-[4/5] object-cover border-4 border-white transform group-hover:-rotate-1 transition-transform duration-700">
+                <div class="absolute -bottom-6 -right-6 h-32 w-32 bg-accent rounded-3xl flex flex-col items-center justify-center text-accent-foreground shadow-2xl transform group-hover:rotate-6 transition-transform duration-700">
+                    <span class="text-4xl font-black font-heading">40+</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest opacity-80">Years</span>
+                </div>
             </div>
-            <div>
-                <h2 class="font-heading text-2xl md:text-3xl font-bold text-primary mb-4">Our Mission & Vision</h2>
-                <p class="text-muted-foreground mb-4 leading-relaxed">
-                    Our mission is to build a deeply prayerful and actively serving community. We strive to be a welcoming home where everyone can encounter Christ through the sacraments, fellowship, and acts of charity.
-                </p>
-                <p class="text-muted-foreground leading-relaxed">
-                    As a parish under the patronage of Our Lady of the Most Holy Rosary, we are inspired by her obedience and profound trust in God's plan.
-                </p>
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-[10px] font-black uppercase tracking-[0.5em] text-accent mb-4">Our Calling</h2>
+                    <h3 class="font-heading text-4xl font-black text-primary leading-tight mb-6">Building a Sanctuary of Faith & Service</h3>
+                    <p class="text-muted-foreground leading-relaxed text-lg">
+                        Sto. Rosario Parish is more than just a building; it is a vibrant community of believers dedicated to the Queen of the Most Holy Rosary. For over four decades, we have been a beacon of hope in Pacita, San Pedro.
+                    </p>
+                </div>
+                
+                <div class="grid gap-6">
+                    <div class="flex gap-4 p-6 bg-primary/5 rounded-3xl border border-primary/10 hover:bg-primary/10 transition-colors">
+                        <div class="h-12 w-12 shrink-0 bg-white rounded-2xl shadow-sm flex items-center justify-center text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary mb-1">Our Mission</h4>
+                            <p class="text-sm text-muted-foreground leading-relaxed">To build a deeply prayerful and actively serving community reaching out to the margins.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 p-6 bg-accent/5 rounded-3xl border border-accent/10 hover:bg-accent/10 transition-colors">
+                        <div class="h-12 w-12 shrink-0 bg-white rounded-2xl shadow-sm flex items-center justify-center text-accent">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary mb-1">Our Vision</h4>
+                            <p class="text-sm text-muted-foreground leading-relaxed">A Christ-centered parish family, transformed by the Holy Spirit, living the Gospel values.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Timeline -->
+        <div class="mb-24">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] text-accent text-center mb-4">The Journey</h2>
+            <h3 class="font-heading text-4xl font-black text-primary text-center mb-16 italic">Our Sacred History</h3>
+            
+            <div class="relative space-y-12">
+                <div class="absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-primary/20 to-transparent hidden md:block"></div>
+                
+                <!-- 1983 -->
+                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start group">
+                    <div class="md:w-1/2 md:text-right">
+                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">1983</span>
+                        <h4 class="text-xl font-black text-primary mt-2">The Foundation</h4>
+                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed md:ml-auto max-w-sm">Sto. Rosario Parish was canonically established on November 7, 1983, to serve the growing spiritual needs of Pacita Complex.</p>
+                    </div>
+                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
+                    <div class="md:w-1/2"></div>
+                </div>
+
+                <!-- 1990s -->
+                <div class="flex flex-col md:flex-row-reverse gap-8 items-center md:items-start group">
+                    <div class="md:w-1/2">
+                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">1990s</span>
+                        <h4 class="text-xl font-black text-primary mt-2">Expansion</h4>
+                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed max-w-sm">Development of the main parish temple and establishment of various ministries and organizations.</p>
+                    </div>
+                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
+                    <div class="md:w-1/2"></div>
+                </div>
+
+                <!-- Today -->
+                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start group">
+                    <div class="md:w-1/2 md:text-right">
+                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">Today</span>
+                        <h4 class="text-xl font-black text-primary mt-2">A Digital Horizon</h4>
+                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed md:ml-auto max-w-sm">Embracing technology with Parish Pal to connect more parishioners and modernize our services while staying true to our core mission.</p>
+                    </div>
+                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
+                    <div class="md:w-1/2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Leadership -->
+        <div class="mb-24">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-accent text-center mb-4">Our Leadership</h2>
+            <h3 class="font-heading text-4xl font-black text-primary text-center mb-16 italic">Shepherds of the Flock</h3>
+
+            <div class="max-w-md mx-auto">
+                <div class="group relative">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-primary to-accent rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-700"></div>
+                    <div class="relative bg-white rounded-[2rem] border p-8 text-center shadow-xl">
+                        <div class="h-40 w-40 rounded-full bg-muted mx-auto mb-6 border-4 border-primary/10 overflow-hidden">
+                            <img src="{{ asset('storage/priest.png') }}" onerror="this.src='https://ui-avatars.com/api/?name=FR+Vicar&background=0D1B2A&color=fff&size=512'" alt="Parish Priest" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="font-heading text-2xl font-black text-primary italic">Rev. Fr. Parish Priest</h4>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-accent mt-1">Parish Priest</p>
+                        <p class="text-sm text-muted-foreground mt-4 leading-relaxed italic">"Feeding the sheep and tending the flock of the Lord with love and devotion."</p>
+                        
+                        <div class="mt-8 pt-8 border-t flex justify-center gap-6">
+                            <div class="text-center">
+                                <p class="text-[10px] font-black uppercase tracking-tighter text-muted-foreground mb-1">Assigned</p>
+                                <p class="text-xs font-bold text-primary">2021 - Present</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -127,78 +223,16 @@
             </div>
         </div>
 
-        <!-- Connect With Us -->
-        <div class="mt-16">
-            <h2 class="font-heading text-3xl font-bold text-primary mb-2 text-center">
-                <br>Connect With Us
-            </h2>
-            <p class="text-center text-muted-foreground mb-8 text-sm">Follow us on our social media channels and stay updated.</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-                <!-- Facebook -->
-                <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank"
-                    class="group flex flex-col items-center gap-3 bg-card border rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: #1877F2;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
-                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                        </svg>
-                    </div>
-                    <div class="text-center">
-                        <p class="font-semibold text-sm">Facebook</p>
-                        <p class="text-xs text-muted-foreground">@storosarioparishpacita1</p>
-                    </div>
-                </a>
-
-                <!-- Instagram -->
-                <a href="https://www.instagram.com/storosarioparish_pacita" target="_blank"
-                    class="group flex flex-col items-center gap-3 bg-card border rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center"
-                        style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                        </svg>
-                    </div>
-                    <div class="text-center">
-                        <p class="font-semibold text-sm">Instagram</p>
-                        <p class="text-xs text-muted-foreground">@storosarioparish_pacita</p>
-                    </div>
-                </a>
-
-                <!-- YouTube -->
-                <a href="https://www.youtube.com/@sto.rosarioparishpacita1983" target="_blank"
-                    class="group flex flex-col items-center gap-3 bg-card border rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: #FF0000;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
-                            <path
-                                d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-                            <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FF0000" />
-                        </svg>
-                    </div>
-                    <div class="text-center">
-                        <p class="font-semibold text-sm">YouTube</p>
-                        <p class="text-xs text-muted-foreground">@sto.rosarioparishpacita</p>
-                    </div>
-                </a>
-
-                <!-- Spotify -->
-                <a href="https://open.spotify.com/user/Sto.%20Rosario%20Parish%20-%20Pacita" target="_blank"
-                    class="group flex flex-col items-center gap-3 bg-card border rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: #1DB954;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
-                            <circle cx="12" cy="12" r="10" fill="#1DB954" />
-                            <path
-                                d="M16.5 16.3c-.2.3-.6.4-.9.2-2.5-1.5-5.6-1.9-9.3-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 4-1 7.5-.5 10.3 1.2.4.2.5.5.2.9zm1.1-2.6c-.2.4-.7.5-1 .3-2.9-1.8-7.2-2.3-10.6-1.2-.4.1-.9-.1-1-.5-.1-.4.1-.9.5-1 3.8-1.2 8.6-.6 11.8 1.4.4.2.5.6.3 1zm.1-2.6c-3.4-2-8.9-2.2-12.1-1.2-.5.1-1-.2-1.1-.7-.1-.5.2-1 .7-1.1 3.7-1.1 9.8-.9 13.6 1.4.4.3.6.8.3 1.2-.2.5-.9.7-1.4.4z" />
-                        </svg>
-                    </div>
-                    <div class="text-center">
-                        <p class="font-semibold text-sm">Spotify</p>
-                        <p class="text-xs text-muted-foreground">Sto. Rosario Parish</p>
-                    </div>
-                </a>
-
+        <!-- Contact CTA -->
+        <div class="bg-primary rounded-[3rem] p-12 text-center text-primary-foreground relative overflow-hidden group">
+            <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-accent/20 rounded-full blur-3xl"></div>
+            <div class="relative z-10">
+                <h3 class="font-heading text-3xl font-black italic mb-4">Visit Us Today</h3>
+                <p class="max-w-xl mx-auto opacity-80 mb-8 font-medium">We are located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our doors and hearts are always open to you.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="/mass-schedule" class="px-8 py-3 bg-accent text-accent-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl shadow-accent/20">View Schedule</a>
+                    <a href="/inquiry" class="px-8 py-3 bg-white text-primary rounded-xl font-black uppercase tracking-widest text-xs hover:bg-muted transition-all">Contact Office</a>
+                </div>
             </div>
         </div>
     </div>

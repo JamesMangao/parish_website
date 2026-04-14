@@ -1,4 +1,4 @@
-<div x-data="chatbot()" x-init="init()" class="fixed bottom-6 right-6 z-[100]">
+<div x-data="chatbot()" x-init="init()" class="fixed bottom-6 right-6 z-[100]" @keydown.escape.window="open = false">
     <!-- Trigger Button -->
     <button 
         @click="toggle()" 
@@ -56,6 +56,9 @@
                 <div :class="msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
                     <div class="max-w-[85%] space-y-1">
                         <div 
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                             :class="msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-none ml-auto' : (msg.type === 'system' ? 'bg-muted text-muted-foreground text-[10px] text-center italic border-none shadow-none mx-auto py-1' : 'bg-white border text-primary rounded-tl-none font-medium')"
                             class="p-3 rounded-2xl text-sm shadow-sm leading-relaxed"
                             x-html="formatMessage(msg.content, msg.role)"
@@ -121,6 +124,12 @@
                 </button>
                 <button @click="sendChip('How do I submit an inquiry?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
                     📝 Inquiries
+                </button>
+                <button @click="sendChip('Check my submission status')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    🔍 Status Tracker
+                </button>
+                <button @click="sendChip('Show me the latest bulletins')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
+                    📄 Bulletins
                 </button>
                 <button @click="sendChip('Are there any upcoming events?')" class="px-3 py-1.5 bg-white border border-primary/20 text-primary rounded-full text-[10px] font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
                     📅 Events
@@ -219,7 +228,10 @@
                     this.open = !this.open;
                     if (this.open) {
                         this.unreadCount = 0;
-                        this.$nextTick(() => this.scrollToBottom());
+                        this.$nextTick(() => {
+                            this.scrollToBottom();
+                            this.$refs.chatInput.focus();
+                        });
                     }
                 },
 

@@ -8,7 +8,10 @@
             <td class="px-6 py-4 font-bold text-primary">{{ $i->full_name }}</td>
             <td class="px-6 py-4 capitalize">{{ $i->inquiry_type }}</td>
             <td class="px-6 py-4">
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $i->status === 'accepted' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-amber-100 text-amber-700 border-amber-200' }}">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border 
+                    {{ $i->status === 'accepted' ? 'bg-green-100 text-green-700 border-green-200' : '' }}
+                    {{ $i->status === 'declined' ? 'bg-red-100 text-red-700 border-red-200' : '' }}
+                    {{ $i->status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' : '' }}">
                     {{ $i->status }}
                 </span>
             </td>

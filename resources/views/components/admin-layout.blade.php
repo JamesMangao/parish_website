@@ -13,6 +13,13 @@
         rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .page-animate {
+            animation: pageFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
 
@@ -212,7 +219,7 @@
                 </div>
             </header>
 
-            <div class="p-8 flex-1">
+            <div class="p-8 flex-1 page-animate">
                 {{ $slot }}
             </div>
         </main>

@@ -14,8 +14,10 @@
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    {{ $meta ?? '' }}
-    @if(!isset($meta))
+    <!-- SEO and Meta Tags -->
+    @if(isset($meta))
+        {{ $meta }}
+    @else
         <meta name="description" content="Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.">
     @endif
     
@@ -23,25 +25,40 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="{{ config('app.name', 'Sto. Rosario Parish') }}">
-    <meta property="og:description" content="Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.">
-    <meta property="og:image" content="{{ asset('bg.png') }}">
+    <meta property="og:description" content="{{ $meta_description ?? 'Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
+    <meta property="og:image" content="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="{{ config('app.name', 'Sto. Rosario Parish') }}">
-    <meta property="twitter:description" content="Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.">
-    <meta property="twitter:image" content="{{ asset('bg.png') }}">
+    <meta property="twitter:description" content="{{ $meta_description ?? 'Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
+    <meta property="twitter:image" content="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}">
     
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>[x-cloak] { display: none !important; }</style>
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page-animate {
+            animation: pageFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        ::view-transition-group(root) {
+            animation-duration: 0.5s;
+        }
+    </style>
 </head>
 <body class="antialiased">
     <div class="flex min-h-screen flex-col bg-background text-foreground">
         <x-navbar />
 
-        <main class="flex-1">
+        <main class="flex-1 page-animate">
             {{ $slot }}
         </main>
 

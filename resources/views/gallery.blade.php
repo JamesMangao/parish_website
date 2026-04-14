@@ -9,8 +9,12 @@
 
         <div>
             @if($albums->isEmpty())
-                <div class="text-center py-20 bg-muted/20 border border-dashed rounded-3xl">
-                    <p class="text-muted-foreground italic">No albums available yet. Check back soon for updates.</p>
+                <div class="text-center py-24 bg-card rounded-[3rem] border border-dashed border-primary/20 shadow-inner">
+                    <div class="h-20 w-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6 text-primary/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-primary uppercase tracking-tighter italic font-heading mb-2">No Photo Albums Yet</h3>
+                    <p class="text-muted-foreground italic text-sm max-w-xs mx-auto">Our gallery is currently empty. We'll be uploading photos of our community celebrations soon!</p>
                 </div>
             @else
                 <!-- Featured Album Row -->
