@@ -3,300 +3,871 @@
         <meta name="description" content="Learn about Sto. Rosario Parish in Pacita, San Pedro, Laguna. Discover our history, the Queen of the Most Holy Rosary, office hours, and contact details.">
     </x-slot>
 
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    {{-- ───────────── STYLES + ANIMATIONS ───────────── --}}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    <div class="container mx-auto px-4 py-12 max-w-5xl">
+        /* ── Reset ── */
+        *, *::before, *::after { box-sizing: border-box; }
 
-        <!-- Hero Header -->
-        <div class="mb-16 text-center">
-            <h1 class="font-heading text-4xl md:text-5xl font-bold text-primary mb-6">About Our Parish</h1>
-            <div class="section-divider mx-auto mb-6"></div>
-            <p class="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-                Welcome to Sto. Rosario Parish located in the heart of Pacita, City of San Pedro, Laguna, Philippines 4023.
-            </p>
-            <p class="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-3">
-                It is home to the iconic image, Queen of The Most Holy Rosary &mdash; The Queen of the City of San Pedro.
-            </p>
+        /* ── Tokens ── */
+        :root {
+            --maroon: #3B1A22;
+            --gold:   #C9A96E;
+            --cream:  #F5F0E8;
+            --border: #E0D9CE;
+            --text:   #555;
+            --muted:  #888;
+        }
+
+        .font-heading { font-family: 'Playfair Display', Georgia, serif; font-style: italic; }
+
+        /* ════════════════════════════════════════
+           KEYFRAMES
+        ════════════════════════════════════════ */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-32px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(32px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position:  200% center; }
+        }
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,.6); }
+            50%       { box-shadow: 0 0 0 7px rgba(201,169,110,0); }
+        }
+        @keyframes lineGrow {
+            from { transform: scaleY(0); transform-origin: top center; }
+            to   { transform: scaleY(1); transform-origin: top center; }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-8px); }
+        }
+
+        /* Respect reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
+        /* ════════════════════════════════════════
+           SCROLL-REVEAL BASE
+        ════════════════════════════════════════ */
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .65s ease, transform .65s ease;
+        }
+        [data-reveal="left"]  { transform: translateX(-32px); }
+        [data-reveal="right"] { transform: translateX(32px); }
+        [data-reveal="scale"] { transform: scale(.93); }
+        [data-reveal].revealed {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* ════════════════════════════════════════
+           HERO
+        ════════════════════════════════════════ */
+        .about-hero {
+            background: var(--maroon);
+            color: #fff;
+            text-align: center;
+            padding: 96px 24px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* decorative radial glow */
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(201,169,110,.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        /* animated faint rose window ring */
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            width: 520px; height: 520px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,169,110,.07);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin-slow 60s linear infinite;
+        }
+        .hero-eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .35em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 18px;
+            animation: fadeIn .6s ease both;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(2.6rem, 7vw, 5rem);
+            line-height: 1.05;
+            margin-bottom: 20px;
+            animation: fadeUp .8s .1s ease both;
+        }
+        .hero-divider {
+            width: 48px; height: 1px;
+            background: var(--gold);
+            margin: 0 auto 20px;
+            animation: scaleIn .6s .3s ease both;
+        }
+        .hero-sub {
+            color: rgba(255,255,255,.65);
+            font-size: .97rem;
+            line-height: 1.75;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: fadeUp .8s .25s ease both;
+        }
+
+        /* ════════════════════════════════════════
+           STATS BAR
+        ════════════════════════════════════════ */
+        .stats-bar {
+            background: var(--cream);
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .stat-cell {
+            padding: 40px 0;
+            text-align: center;
+            border-right: 1px solid var(--border);
+        }
+        .stat-cell:last-child { border-right: none; }
+        .stat-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 3.4rem;
+            color: var(--maroon);
+            line-height: 1;
+            /* JS adds .counted class to trigger */
+        }
+        .stat-number.counted { animation: countUp .7s ease both; }
+        .stat-label {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        /* ════════════════════════════════════════
+           OUR CALLING
+        ════════════════════════════════════════ */
+        .calling-section {
+            padding: 88px 24px;
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            align-items: center;
+        }
+        @media (min-width: 700px) {
+            .calling-section { flex-direction: row; gap: 72px; }
+        }
+        .calling-img-wrap {
+            width: 100%;
+            max-width: 380px;
+            flex-shrink: 0;
+            aspect-ratio: 4/3;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+            background: var(--border);
+            /* hover lift */
+            transition: transform .4s ease, box-shadow .4s ease;
+        }
+        .calling-img-wrap:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 48px rgba(59,26,34,.18);
+        }
+        .calling-img-wrap img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform .6s ease;
+        }
+        .calling-img-wrap:hover img { transform: scale(1.04); }
+        .calling-badge {
+            position: absolute;
+            bottom: 14px; left: 14px;
+            background: var(--maroon);
+            color: var(--gold);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 4px;
+        }
+        .calling-eyebrow {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+        .calling-title {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            color: var(--maroon);
+            line-height: 1.2;
+            margin-bottom: 18px;
+        }
+        .calling-rule { width: 36px; height: 2px; background: var(--gold); margin-bottom: 22px; }
+        .calling-body { color: var(--text); line-height: 1.8; font-size: .95rem; margin-bottom: 14px; }
+
+        /* ════════════════════════════════════════
+           TIMELINE
+        ════════════════════════════════════════ */
+        .timeline-section {
+            background: var(--cream);
+            padding: 88px 24px;
+        }
+        .section-eyebrow {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            color: var(--maroon);
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        /* vertical track */
+        .tl-wrapper {
+            max-width: 720px;
+            margin: 56px auto 0;
+            position: relative;
+            padding-left: 36px;
+        }
+        /* the golden spine */
+        .tl-spine {
+            position: absolute;
+            left: 7px; top: 8px; bottom: 8px;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--gold) 6%, var(--gold) 94%, transparent);
+            transform-origin: top center;
+            /* animated when section scrolls in */
+            transform: scaleY(0);
+            transition: transform 1.4s cubic-bezier(.16,1,.3,1);
+        }
+        .tl-spine.revealed { transform: scaleY(1); }
+
+        /* individual items — staggered via JS */
+        .tl-item {
+            position: relative;
+            margin-bottom: 52px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity .55s ease, transform .55s ease;
+        }
+        .tl-item:last-child { margin-bottom: 0; }
+        .tl-item.visible { opacity: 1; transform: none; }
+
+        /* dot */
+        .tl-dot {
+            position: absolute;
+            left: -43px; top: 6px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 3px solid var(--cream);
+            box-shadow: 0 0 0 2px var(--gold);
+            transition: transform .3s ease;
+        }
+        .tl-item.visible .tl-dot { animation: pulse-dot 2.4s 1s ease infinite; }
+        .tl-item:hover .tl-dot { transform: scale(1.3); }
+
+        /* content */
+        .tl-badge {
+            display: inline-block;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            background: var(--maroon);
+            color: var(--gold);
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .tl-year {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.4rem;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .tl-title {
+            font-weight: 700;
+            font-size: .97rem;
+            color: var(--maroon);
+            margin-bottom: 8px;
+        }
+        .tl-body {
+            font-size: .875rem;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 580px;
+        }
+
+        /* expand / collapse on click */
+        .tl-body-full { display: none; }
+        .tl-item.expanded .tl-body-full { display: block; }
+        .tl-toggle {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--gold);
+            cursor: pointer;
+            letter-spacing: .05em;
+            user-select: none;
+            transition: opacity .2s;
+        }
+        .tl-toggle:hover { opacity: .7; }
+
+        /* ════════════════════════════════════════
+           LEADERSHIP
+        ════════════════════════════════════════ */
+        .leadership-section {
+            background: var(--maroon);
+            padding: 88px 24px;
+            text-align: center;
+        }
+        .leadership-section .section-eyebrow { color: var(--gold); }
+        .leadership-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            color: #fff;
+            margin-bottom: 44px;
+        }
+        .leader-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 36px 32px;
+            max-width: 380px;
+            margin: 0 auto;
+            transition: transform .4s ease, box-shadow .4s ease;
+        }
+        .leader-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 56px rgba(0,0,0,.22);
+        }
+        .leader-avatar {
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            background: var(--maroon);
+            color: var(--gold);
+            font-size: 3.5rem;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+            animation: float 4s ease-in-out infinite;
+        }
+        .leader-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.2rem;
+            color: var(--maroon);
+        }
+        .leader-role {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin: 6px 0 18px;
+        }
+        .leader-rule { width: 28px; height: 1px; background: var(--border); margin: 0 auto 18px; }
+        .leader-quote { font-size: .87rem; font-style: italic; color: var(--muted); line-height: 1.7; }
+
+        /* ════════════════════════════════════════
+           FIND US
+        ════════════════════════════════════════ */
+        .findus-section { background: var(--cream); padding: 88px 24px; }
+        .findus-inner { max-width: 960px; margin: 0 auto; }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin: 48px 0 28px;
+        }
+        @media (min-width: 600px) { .info-grid { grid-template-columns: repeat(3,1fr); } }
+
+        .info-card {
+            background: #fff;
+            border: 0.5px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 22px;
+            text-align: center;
+            transition: transform .35s ease, box-shadow .35s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 36px rgba(59,26,34,.1);
+        }
+        .info-icon {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--cream);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+        }
+        .info-card-label {
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: #bbb;
+            margin-bottom: 10px;
+        }
+        .info-card p  { font-size: .88rem; font-weight: 600; color: var(--maroon); line-height: 1.6; }
+        .info-card small { font-size: .78rem; color: var(--muted); }
+
+        .map-wrap {
+            border-radius: 18px;
+            overflow: hidden;
+            border: 0.5px solid var(--border);
+            box-shadow: 0 4px 28px rgba(59,26,34,.09);
+        }
+        .map-credit { text-align: center; font-size: .72rem; color: #bbb; margin-top: 10px; }
+        .map-credit a { color: var(--gold); }
+
+        /* ════════════════════════════════════════
+           CTA
+        ════════════════════════════════════════ */
+        .cta-section {
+            background: var(--maroon);
+            padding: 88px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 50% at 50% 100%, rgba(201,169,110,.14) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .cta-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            color: #fff;
+            margin-bottom: 14px;
+        }
+        .cta-rule { width: 40px; height: 1px; background: var(--gold); margin: 0 auto 20px; }
+        .cta-sub { font-size: .87rem; color: rgba(255,255,255,.45); margin-bottom: 40px; }
+        .cta-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+        .btn-gold {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--maroon);
+            font-size: .87rem;
+            font-weight: 700;
+            padding: 13px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity .2s, transform .2s;
+        }
+        .btn-gold:hover { opacity: .88; transform: translateY(-2px); }
+
+        .btn-ghost {
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,.28);
+            color: #fff;
+            font-size: .87rem;
+            font-weight: 700;
+            padding: 13px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background .2s, transform .2s;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,.08); transform: translateY(-2px); }
+
+        /* ── shimmer on gold rule hover ── */
+        .hero-divider:hover {
+            background: linear-gradient(90deg, var(--gold), #fff, var(--gold));
+            background-size: 200% auto;
+            animation: shimmer 1.2s linear infinite;
+        }
+    </style>
+
+    {{-- ═══════════════ HERO ═══════════════ --}}
+    <section class="about-hero">
+        <p class="hero-eyebrow">Pacita, San Pedro, Laguna</p>
+        <h1 class="hero-title font-heading">About Our Parish</h1>
+        <div class="hero-divider"></div>
+        <p class="hero-sub">
+            Home to the Queen of the Most Holy Rosary — a beacon of faith,<br class="hidden md:block">
+            community, and service for over four decades.
+        </p>
+    </section>
+
+    {{-- ═══════════════ STATS ═══════════════ --}}
+    <section class="stats-bar">
+        <div class="stat-cell">
+            <p class="stat-number" data-target="40" data-suffix="+">40+</p>
+            <p class="stat-label">Years of Service</p>
         </div>
+        <div class="stat-cell">
+            <p class="stat-number" data-target="1983" data-suffix="">1983</p>
+            <p class="stat-label">Year Founded</p>
+        </div>
+    </section>
 
-        <!-- Parish Intro -->
-        <div class="grid md:grid-cols-2 gap-12 items-start mb-24">
-            <div>
-                <img src="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}" alt="Sto. Rosario Parish Church"
-                    class="rounded-2xl shadow-xl w-full object-cover aspect-[4/3]">
-                <div class="mt-4 inline-flex items-center gap-3 bg-accent text-accent-foreground px-6 py-3 rounded-xl shadow-lg">
-                    <span class="text-3xl font-black font-heading">40+</span>
-                    <span class="text-xs font-black uppercase tracking-widest opacity-80">Years of<br>Service</span>
-                </div>
+    {{-- ═══════════════ OUR CALLING ═══════════════ --}}
+    <section style="background:#fff;">
+        <div class="calling-section">
+            <div class="calling-img-wrap" data-reveal="scale">
+                <img
+                    src="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}"
+                    alt="Sto. Rosario Parish Church"
+                >
+                <div class="calling-badge">Est. 1983</div>
             </div>
-            <div class="space-y-6">
-                <h2 class="text-lg font-black uppercase tracking-widest text-accent">Our Calling</h2>
-                <h3 class="font-heading text-3xl md:text-4xl font-black text-primary leading-tight">Building a Sanctuary of Faith &amp; Service</h3>
-                <p class="text-muted-foreground leading-relaxed text-base md:text-lg">
-                    Sto. Rosario Parish is more than just a building; it is a vibrant community of believers dedicated to the Queen of the Most Holy Rosary. For over four decades, we have been a beacon of hope in Pacita, San Pedro.
+            <div data-reveal="right">
+                <p class="calling-eyebrow">Our Calling</p>
+                <h2 class="font-heading calling-title">Building a sanctuary<br>of faith &amp; service</h2>
+                <div class="calling-rule"></div>
+                <p class="calling-body">
+                    Sto. Rosario Parish is home to the venerable image of the Queen of the Most Holy Rosary of Pacita — a European-inspired wooden sculpture enshrined at the retablo mayor of our church. Carved in Paete, Laguna in 1982, she is the titular patroness of Brgy. Pacita 1 and the beloved protectress of the faithful of San Pedro.
+                </p>
+                <p class="calling-body">
+                    In 2024, the image was declared an <strong style="color:var(--maroon)">Important Cultural Property</strong> of the City of San Pedro. In 2025, Our Lady was accorded the honorific title <strong style="color:var(--maroon)">"Queen of the City of San Pedro."</strong>
                 </p>
             </div>
         </div>
+    </section>
 
-        <!-- The Queen of Pacita -->
-        <div class="mb-24">
-            <div class="text-center mb-12">
-                <h2 class="text-lg font-black uppercase tracking-widest text-accent mb-4">Our Titular Patroness</h2>
-                <h3 class="font-heading text-3xl md:text-4xl font-black text-primary italic">The Queen of the Most Holy Rosary of Pacita</h3>
+    {{-- ═══════════════ TIMELINE ═══════════════ --}}
+    <section class="timeline-section">
+        <p class="section-eyebrow" data-reveal>The Journey</p>
+        <h2 class="section-title" data-reveal>Our sacred history</h2>
+
+        <div class="tl-wrapper">
+            <div class="tl-spine" id="tl-spine"></div>
+
+            @php
+            $timeline = [
+                [
+                    'year'  => '1982',
+                    'badge' => null,
+                    'title' => 'The image is carved',
+                    'short' => 'Carved in Paete, Laguna through funds gathered by Mrs. Delia Sanchez and Mrs. Fely Canta.',
+                    'full'  => 'Blessed by Rev. Fr. Rey Amante, the image was first housed at the Canta residence, then transferred in procession to the make-shift chapel.',
+                ],
+                [
+                    'year'  => '1983',
+                    'badge' => null,
+                    'title' => 'Canonical erection',
+                    'short' => 'The parish was canonically erected on October 16, 1983.',
+                    'full'  => 'On the same day, the Queen of the Most Holy Rosary of Pacita was officially declared patroness of the parish community.',
+                ],
+                [
+                    'year'  => '1986',
+                    'badge' => null,
+                    'title' => 'Church dedication',
+                    'short' => 'The Sto. Rosario Parish Church was blessed and dedicated on December 6.',
+                    'full'  => 'Jointly officiated by Msgr. Bruno Torpigliani (Papal Nuncio), Bishop Pedro Bantigue, and Auxiliary Bishop Gabriel Reyes.',
+                ],
+                [
+                    'year'  => '2009',
+                    'badge' => null,
+                    'title' => 'Our Lady of Pacita',
+                    'short' => "Rev. Fr. Mario P. Rivera began promoting the endearing title 'Our Lady of Pacita.'",
+                    'full'  => "This title integrated the community's deep sense of belonging with the Blessed Mother.",
+                ],
+                [
+                    'year'  => '2021',
+                    'badge' => null,
+                    'title' => 'Hermandad established',
+                    'short' => 'The Hermandad del Santo Rosario — the Rosary Confraternity of Pacita — was formally established.',
+                    'full'  => 'Established to propagate devotion to Our Lady. The Perpetual Novena is held every Saturday.',
+                ],
+                [
+                    'year'  => '2024',
+                    'badge' => 'Cultural Heritage',
+                    'title' => 'Important Cultural Property',
+                    'short' => 'The image was declared an Important Cultural Property of the City of San Pedro.',
+                    'full'  => 'Via Sangguniang Panlungsod Resolution No. 2024-198, adopted October 1, 2024.',
+                ],
+                [
+                    'year'  => '2025',
+                    'badge' => 'Royal Honor',
+                    'title' => 'Queen of the City',
+                    'short' => "Our Lady was accorded the honorific title 'Queen of the City of San Pedro.'",
+                    'full'  => 'Via Sangguniang Panlungsod Resolution No. 2025-93, adopted June 10, 2025.',
+                ],
+            ];
+            @endphp
+
+            @foreach($timeline as $i => $e)
+            <div class="tl-item" data-index="{{ $i }}">
+                <div class="tl-dot"></div>
+                @if($e['badge'])
+                    <span class="tl-badge">{{ $e['badge'] }}</span>
+                @endif
+                <div class="tl-year">{{ $e['year'] }}</div>
+                <div class="tl-title">{{ $e['title'] }}</div>
+                <p class="tl-body">
+                    {{ $e['short'] }}
+                    <span class="tl-body-full"> {{ $e['full'] }}</span>
+                </p>
+                <span class="tl-toggle" onclick="toggleItem(this)">Read more ↓</span>
             </div>
-
-            <div class="bg-card rounded-2xl border shadow-lg p-6 md:p-10">
-                <div class="prose prose-lg max-w-none text-muted-foreground leading-relaxed space-y-5 text-sm md:text-base">
-                    <p>The Queen of the Most Holy Rosary of Pacita is the titular patroness of Brgy. Pacita 1, City of San Pedro, Laguna.</p>
-
-                    <p>The image of Our Lady is a European-inspired wooden sculpture of the Blessed Virgin Mary with the Infant Jesus in her left arm. Similar to the other depictions of Our Lady of the Most Holy Rosary, the Lady of Pacita is also garbed in beautiful regalia and is adorned with the aureola, rostrillo, cetro, baston and corona imperial. The infant Jesus holds an orb and the Virgin's Peaña dela Nubes (oval cloud base) has three cherubim. Her image is enshrined and venerated at the retablo mayor of the Church of Santo Rosario in Pacita Complex, San Pedro, Laguna.</p>
-
-                    <p>The image was carved in Paete, Laguna in the year 1982. It was Mrs. Delia Sanchez and Mrs. Fely Canta &ndash; both workers in the academe, who took efforts in gathering funds (after they have approached the Interim Pastoral Council and have its approval) for the carving of the said image and the creation of its vestment and other embellishments.</p>
-
-                    <p>A separate incident closely prior to the carving of the image was the sending of the request letter by the Campos Family &ndash; the Church prime land donor, addressing the council leaders to consider the Blessed Mother in the selection of the parish patron saint.</p>
-
-                    <p>It is as if it was by divine providence that these two incidents took place at the time when the Interim-Pastoral Council headed by Bro. Pedro Guillen Jr. is in the process of discerning as to who will be the patron saint of the newly established and growing community. It was then that the people of Pacita started invoking the Queen of Most Holy Rosary as their patroness and protectress.</p>
-
-                    <p>Upon its arrival in Pacita, the image was temporarily housed at the residence of the Cantas. It was later transferred through a procession to the make-shift chapel located at the site of the present church. The image was blessed by Rev. Fr. Rey Amante, the administrator of the would-be parish.</p>
-
-                    <p>Coinciding with the canonical erection of the parish on October 16, 1983 is the official declaration of the Queen of the Most Holy Rosary of Pacita as the patroness of the parish community.</p>
-
-                    <p>The Sto. Rosario Parish Church was then blessed and dedicated on December 6, 1986. It was jointly officiated by his Excellency, Msgr. Bruno Torpigliani, Papal Nuncio to the Philippines, Most Rev. Pedro Bantigue, Bishop of the Diocese of San Pablo and Most Rev. Gabriel Reyes, Auxiliary Bishop of Manila.</p>
-
-                    <p>In the year 2009, the then Parish Priest, Rev. Fr. Mario P. Rivera started to promote the endearing title <strong>&lsquo;Our Lady of Pacita&rsquo;</strong>.</p>
-
-                    <p>Our Lady of Pacita is an endearing title used by the local community to address Mary, the locality's titular patroness. Our Lady of Pacita is a sobriquet interchangeably used with Our Lady of the Most Holy Rosary to integrate a sense of belongingness of the community into the Blessed Mother and vice versa.</p>
-
-                    <p>Over the years, devotion to the Queen of the Most Holy Rosary prospered. Devotees from nearby towns started to grow in numbers. Miracles of healing, answers to problems, provision of offspring to those with childbearing difficulties, successes in studies, professions and vocations are attributed to her by her devotees.</p>
-
-                    <p>The Hermandad del Santo Rosario &ndash; the Rosary Confraternity of Pacita was formally established in 2021 to continuously propagate the devotion to Our Lady. The Perpetual Novena in her honor is being held in the parish every Saturday.</p>
-                </div>
-
-                <!-- Key Milestones -->
-                <div class="mt-10 pt-8 border-t border-border">
-                    <h4 class="text-sm font-black uppercase tracking-widest text-accent mb-6">Key Recognitions</h4>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div class="bg-muted/50 rounded-xl p-5 border">
-                            <span class="text-2xl font-black text-primary/30 font-heading">2024</span>
-                            <p class="text-sm text-muted-foreground mt-2 leading-relaxed">Declared as one of the <strong class="text-primary">Important Cultural Properties</strong> of the City of San Pedro by Sangguniang Panlungsod Resolution No. 2024-198.</p>
-                        </div>
-                        <div class="bg-muted/50 rounded-xl p-5 border">
-                            <span class="text-2xl font-black text-primary/30 font-heading">2025</span>
-                            <p class="text-sm text-muted-foreground mt-2 leading-relaxed">Accorded the honorific title <strong class="text-primary">&lsquo;Queen of the City of San Pedro&rsquo;</strong> by Sangguniang Panlungsod Resolution No. 2025-93.</p>
-                        </div>
-                    </div>
-                    <p class="text-sm text-muted-foreground mt-6 leading-relaxed">The image of Our Lady also joins the roll of venerated Marian images in the famed Intramuros Grand Marian Procession every December during the pre-pandemic years.</p>
-                    <p class="text-sm font-semibold text-primary mt-4">The feast of the Queen of the Most Holy Rosary of Pacita is celebrated every <span class="text-accent">Third Sunday of October</span>.</p>
-                </div>
-            </div>
+            @endforeach
         </div>
+    </section>
 
-        <!-- History Timeline -->
-        <div class="mb-24">
-            <div class="text-center mb-12">
-                <h2 class="text-lg font-black uppercase tracking-widest text-accent mb-4">The Journey</h2>
-                <h3 class="font-heading text-3xl md:text-4xl font-black text-primary italic">Our Sacred History</h3>
-            </div>
-
-            <div class="relative space-y-12">
-                <div class="absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-primary/20 to-transparent hidden md:block"></div>
-
-                <!-- 1982 -->
-                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start group">
-                    <div class="md:w-1/2 md:text-right">
-                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">1982</span>
-                        <h4 class="text-xl font-black text-primary mt-2">The Image</h4>
-                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed md:ml-auto max-w-sm">The image of the Queen of the Most Holy Rosary was carved in Paete, Laguna through the efforts of Mrs. Delia Sanchez and Mrs. Fely Canta.</p>
-                    </div>
-                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
-                    <div class="md:w-1/2"></div>
-                </div>
-
-                <!-- 1983 -->
-                <div class="flex flex-col md:flex-row-reverse gap-8 items-center md:items-start group">
-                    <div class="md:w-1/2">
-                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">1983</span>
-                        <h4 class="text-xl font-black text-primary mt-2">Canonical Erection</h4>
-                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed max-w-sm">Sto. Rosario Parish was canonically established on October 16, 1983. Our Lady was officially declared as patroness of the parish community.</p>
-                    </div>
-                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
-                    <div class="md:w-1/2"></div>
-                </div>
-
-                <!-- 1986 -->
-                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start group">
-                    <div class="md:w-1/2 md:text-right">
-                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">1986</span>
-                        <h4 class="text-xl font-black text-primary mt-2">Church Dedication</h4>
-                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed md:ml-auto max-w-sm">The parish church was blessed and dedicated on December 6, 1986, jointly officiated by Msgr. Bruno Torpigliani (Papal Nuncio), Bishop Pedro Bantigue, and Auxiliary Bishop Gabriel Reyes.</p>
-                    </div>
-                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
-                    <div class="md:w-1/2"></div>
-                </div>
-
-                <!-- 2009 -->
-                <div class="flex flex-col md:flex-row-reverse gap-8 items-center md:items-start group">
-                    <div class="md:w-1/2">
-                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">2009</span>
-                        <h4 class="text-xl font-black text-primary mt-2">Our Lady of Pacita</h4>
-                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed max-w-sm">Rev. Fr. Mario P. Rivera promoted the endearing title &lsquo;Our Lady of Pacita&rsquo; to deepen the community's bond with the Blessed Mother.</p>
-                    </div>
-                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
-                    <div class="md:w-1/2"></div>
-                </div>
-
-                <!-- 2021 -->
-                <div class="flex flex-col md:flex-row gap-8 items-center md:items-start group">
-                    <div class="md:w-1/2 md:text-right">
-                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">2021</span>
-                        <h4 class="text-xl font-black text-primary mt-2">Hermandad del Santo Rosario</h4>
-                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed md:ml-auto max-w-sm">The Rosary Confraternity of Pacita was formally established to propagate devotion to Our Lady. The Perpetual Novena is held every Saturday.</p>
-                    </div>
-                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
-                    <div class="md:w-1/2"></div>
-                </div>
-
-                <!-- Today -->
-                <div class="flex flex-col md:flex-row-reverse gap-8 items-center md:items-start group">
-                    <div class="md:w-1/2">
-                        <span class="text-3xl font-black text-primary/20 group-hover:text-accent transition-colors">Today</span>
-                        <h4 class="text-xl font-black text-primary mt-2">A Digital Horizon</h4>
-                        <p class="text-muted-foreground text-sm mt-3 leading-relaxed max-w-sm">Embracing technology with Parish Pal to connect more parishioners and modernize our services while staying true to our core mission.</p>
-                    </div>
-                    <div class="h-4 w-4 rounded-full border-4 border-accent bg-white z-10 hidden md:block mt-8"></div>
-                    <div class="md:w-1/2"></div>
-                </div>
-            </div>
+    {{-- ═══════════════ LEADERSHIP ═══════════════ --}}
+    <section class="leadership-section">
+        <p class="section-eyebrow" data-reveal>Our Leadership</p>
+        <h2 class="leadership-title" data-reveal>Shepherds of<br>the flock</h2>
+        <div class="leader-card" data-reveal="scale">
+            @if(isset($global_settings['priest_image']))
+                <div class="leader-avatar" style="background-image: url('{{ asset('storage/' . $global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
+            @else
+                <div class="leader-avatar">FV</div>
+            @endif
+            <h3 class="leader-name">{{ $global_settings['priest_name'] ?? 'Rev. Fr. Parish Priest' }}</h3>
+            <p class="leader-role">Parish Priest · 2021–Present</p>
+            <div class="leader-rule"></div>
+            <p class="leader-quote">"Feeding the sheep and tending the flock of the Lord with love and devotion."</p>
         </div>
+    </section>
 
-        <!-- Our Leadership -->
-        <div class="mb-24">
-            <div class="text-center mb-12">
-                <h2 class="text-lg font-black uppercase tracking-widest text-accent mb-4">Our Leadership</h2>
-                <h3 class="font-heading text-3xl md:text-4xl font-black text-primary italic">Shepherds of the Flock</h3>
-            </div>
+    {{-- ═══════════════ FIND US ═══════════════ --}}
+    <section class="findus-section">
+        <div class="findus-inner">
+            <p class="section-eyebrow" data-reveal>Find Us</p>
+            <h2 class="section-title" data-reveal>We're here for you</h2>
 
-            <div class="max-w-md mx-auto">
-                <div class="bg-white rounded-2xl border p-8 text-center shadow-xl">
-                    <div class="h-40 w-40 rounded-full bg-muted mx-auto mb-6 border-4 border-primary/10 overflow-hidden">
-                        <img src="{{ asset('storage/priest.png') }}" onerror="this.src='https://ui-avatars.com/api/?name=FR+Vicar&background=0D1B2A&color=fff&size=512'" alt="Parish Priest" class="w-full h-full object-cover">
+            <div class="info-grid">
+                <div class="info-card" data-reveal>
+                    <div class="info-icon">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#C9A96E"/></svg>
                     </div>
-                    <h4 class="font-heading text-2xl font-black text-primary">Rev. Fr. Parish Priest</h4>
-                    <p class="text-xs font-black uppercase tracking-widest text-accent mt-1">Parish Priest</p>
-                    <p class="text-sm text-muted-foreground mt-4 leading-relaxed italic">"Feeding the sheep and tending the flock of the Lord with love and devotion."</p>
-                    <div class="mt-6 pt-6 border-t">
-                        <p class="text-xs text-muted-foreground">Assigned: <span class="font-bold text-primary">2021 - Present</span></p>
+                    <p class="info-card-label">Address</p>
+                    <p>1 Sto. Rosario Drive, Pacita,<br>San Pedro, Laguna</p>
+                </div>
+
+                <div class="info-card" data-reveal style="transition-delay:.1s">
+                    <div class="info-icon">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C9.39 21 3 14.61 3 7a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.01l-2.2 2.21z" fill="#C9A96E"/></svg>
                     </div>
+                    <p class="info-card-label">Contact</p>
+                    <p>(02) 8869 2742</p>
+                    <p>0906 099 2324</p>
+                    <small>{{ config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}</small>
                 </div>
-            </div>
-        </div>
 
-        <!-- Location Section -->
-        <div class="mb-16">
-            <div class="text-center mb-12">
-                <h2 class="text-lg font-black uppercase tracking-widest text-accent mb-4">Our Location</h2>
-                <h3 class="font-heading text-3xl md:text-4xl font-black text-primary">Find Us Here</h3>
-            </div>
-
-            <div class="rounded-2xl overflow-hidden shadow-lg border">
-                <div id="map" class="z-0" style="width: 100%; height: 400px;"></div>
-            </div>
-        </div>
-
-        <!-- Contact Info Cards -->
-        <div class="grid md:grid-cols-3 gap-6 text-center mb-16">
-            <div class="bg-card p-6 rounded-xl border shadow-sm">
-                <div class="mb-3 text-accent flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-                </div>
-                <h3 class="font-bold text-lg mb-2">Address</h3>
-                <p class="text-muted-foreground text-sm">1 Sto. Rosario Drive,<br>Pacita, San Pedro, Laguna</p>
-            </div>
-            <div class="bg-card p-6 rounded-xl border shadow-sm">
-                <div class="mb-3 text-accent flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                </div>
-                <h3 class="font-bold text-lg mb-3">Contact</h3>
-                <div class="text-left space-y-2 text-sm">
-                    <a href="tel:+6328869 2742" class="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        +63 2 8869 2742
-                    </a>
-                    <a href="mailto:officestorosarioparish@gmail.com" class="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors break-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        {{ config('services.parish.office_email') }}
-                    </a>
-                </div>
-            </div>
-            <div class="bg-card p-6 rounded-xl border shadow-sm">
-                <div class="mb-3 text-accent flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-                <h3 class="font-bold text-lg mb-4">Office Hours</h3>
-                <div class="text-left space-y-3 text-sm">
-                    <div>
-                        <p class="font-semibold text-primary mb-1.5">Tuesday &ndash; Saturday</p>
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="inline-block bg-accent/10 text-accent border border-accent/20 rounded-full px-3 py-0.5 text-xs font-medium">6:00 AM &ndash; 12:00 NN</span>
-                            <span class="inline-block bg-accent/10 text-accent border border-accent/20 rounded-full px-3 py-0.5 text-xs font-medium">1:30 PM &ndash; 6:00 PM</span>
-                        </div>
+                <div class="info-card" data-reveal style="transition-delay:.2s">
+                    <div class="info-icon">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#C9A96E" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#C9A96E" stroke-width="2" stroke-linecap="round"/></svg>
                     </div>
-                    <div class="border-t border-muted pt-3">
-                        <p class="font-semibold text-primary mb-1.5">Sunday</p>
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="inline-block bg-accent/10 text-accent border border-accent/20 rounded-full px-3 py-0.5 text-xs font-medium">6:00 AM &ndash; 12:00 NN</span>
-                            <span class="inline-block bg-accent/10 text-accent border border-accent/20 rounded-full px-3 py-0.5 text-xs font-medium">3:00 PM &ndash; 6:00 PM</span>
-                        </div>
-                    </div>
+                    <p class="info-card-label">Office Hours</p>
+                    <p>Tue–Sat</p>
+                    <small>6:00 AM – 12:00 NN · 1:30 PM – 6:00 PM</small>
+                    <p style="margin-top:8px">Sunday</p>
+                    <small>6:00 AM – 12:00 NN · 3:00 PM – 6:00 PM</small>
                 </div>
             </div>
-        </div>
 
-        <!-- Contact CTA -->
-        <div class="bg-primary rounded-2xl p-12 text-center text-primary-foreground relative overflow-hidden">
-            <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-accent/20 rounded-full blur-3xl"></div>
-            <div class="relative z-10">
-                <h3 class="font-heading text-3xl font-black italic mb-4">Visit Us Today</h3>
-                <p class="max-w-xl mx-auto opacity-80 mb-8 font-medium">We are located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our doors and hearts are always open to you.</p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="/mass-schedule" class="px-8 py-3 bg-accent text-accent-foreground rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl shadow-accent/20">View Schedule</a>
-                    <a href="/inquiry" class="px-8 py-3 bg-white text-primary rounded-xl font-black uppercase tracking-widest text-xs hover:bg-muted transition-all">Contact Office</a>
-                </div>
+            {{-- MAP --}}
+            <div class="map-wrap" data-reveal>
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <div id="parish-map" style="width:100%;height:400px;"></div>
             </div>
+            <p class="map-credit">
+                Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
+            </p>
         </div>
-    </div>
+    </section>
 
-    <!-- Leaflet JS -->
+    {{-- ═══════════════ CTA ═══════════════ --}}
+    <section class="cta-section">
+        <h2 class="cta-title" data-reveal>Visit us today</h2>
+        <div class="cta-rule" data-reveal></div>
+        <p class="cta-sub" data-reveal>Our doors and hearts are always open to you.</p>
+        <div class="cta-btns" data-reveal>
+            <a href="/mass-schedule" class="btn-gold">View schedule</a>
+            <a href="/inquiry"       class="btn-ghost">Contact office</a>
+        </div>
+    </section>
+
+    {{-- ═══════════════ SCRIPTS ═══════════════ --}}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const map = L.map('map', { scrollWheelZoom: false }).setView([14.345435, 121.061630], 17);
+    /* ── Leaflet map ── */
+    document.addEventListener('DOMContentLoaded', function () {
+        const lat = 14.345435, lng = 121.061630;
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+        const map = L.map('parish-map', {
+            scrollWheelZoom: false,
+            zoomControl: true
+        }).setView([lat, lng], 17);
 
-            const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=14.345435,121.061630";
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: false
+        }).addTo(map);
 
-            const marker = L.marker([14.345435, 121.061630]).addTo(map);
-
-            marker.bindPopup(`
-                <div style="font-family: sans-serif; text-align: left;">
-                    <b style="font-size: 1.1em;">Sto. Rosario Parish</b><br>
-                    1 Sto. Rosario Drive,<br>
-                    Pacita, San Pedro, Laguna<br>
-                    📞 +63 2 8869 2742<br>
-                    <div style="margin-top: 8px;">
-                        <a href="${directionsUrl}" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: bold; border-bottom: 1px solid #2563eb;">Get Directions ↗</a>
-                    </div>
-                </div>
-            `).openPopup();
-
-            setTimeout(function () {
-                map.invalidateSize();
-            }, 500);
+        const icon = L.divIcon({
+            className: '',
+            html: `<div style="
+                width:36px;height:36px;
+                background:#3B1A22;
+                border:3px solid #C9A96E;
+                border-radius:50% 50% 50% 0;
+                transform:rotate(-45deg);
+                box-shadow:0 2px 8px rgba(0,0,0,.3);
+            "></div>`,
+            iconSize:    [36, 36],
+            iconAnchor:  [18, 36],
+            popupAnchor: [0, -36]
         });
+
+        const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+        L.marker([lat, lng], { icon }).addTo(map)
+            .bindPopup(`
+                <div style="font-family:sans-serif;padding:4px 2px;min-width:200px;">
+                    <p style="font-weight:700;font-size:14px;color:#3B1A22;margin:0 0 4px;">Sto. Rosario Parish</p>
+                    <p style="font-size:12px;color:#777;margin:0 0 10px;line-height:1.5;">
+                        1 Sto. Rosario Drive,<br>Pacita, San Pedro, Laguna
+                    </p>
+                    <a href="${directionsUrl}" target="_blank"
+                       style="display:inline-block;background:#C9A96E;color:#3B1A22;font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;">
+                        Get Directions ↗
+                    </a>
+                </div>
+            `, { maxWidth: 260 }).openPopup();
+
+        setTimeout(() => map.invalidateSize(), 300);
+    });
+
+    /* ── Scroll-reveal (IntersectionObserver) ── */
+    const revealEls = document.querySelectorAll('[data-reveal]');
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    /* ── Timeline: spine + staggered items ── */
+    const spine  = document.getElementById('tl-spine');
+    const tlItems = document.querySelectorAll('.tl-item');
+
+    const spineObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                spine.classList.add('revealed');
+                spineObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    spineObserver.observe(spine);
+
+    const itemObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const idx = parseInt(entry.target.dataset.index, 10);
+                setTimeout(() => entry.target.classList.add('visible'), idx * 90);
+                itemObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    tlItems.forEach(el => itemObserver.observe(el));
+
+    /* ── Timeline expand/collapse ── */
+    function toggleItem(toggle) {
+        const item = toggle.closest('.tl-item');
+        const expanded = item.classList.toggle('expanded');
+        toggle.textContent = expanded ? 'Read less ↑' : 'Read more ↓';
+    }
+
+    /* ── Stat counter animation ── */
+    const statObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el     = entry.target;
+            const target = parseInt(el.dataset.target, 10);
+            const suffix = el.dataset.suffix || '';
+            const start  = Date.now();
+            const dur    = 1200;
+
+            el.classList.add('counted');
+
+            (function tick() {
+                const elapsed = Date.now() - start;
+                const progress = Math.min(elapsed / dur, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out-cubic
+                const current = Math.round(eased * target);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(tick);
+            })();
+
+            statObserver.unobserve(el);
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-number[data-target]').forEach(el => {
+        statObserver.observe(el);
+    });
     </script>
+
 </x-public-layout>
