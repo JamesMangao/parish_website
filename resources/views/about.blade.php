@@ -796,17 +796,7 @@
         setTimeout(() => map.invalidateSize(), 300);
     });
 
-    /* ── Scroll-reveal (IntersectionObserver) ── */
-    const revealEls = document.querySelectorAll('[data-reveal]');
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.15 });
-    revealEls.forEach(el => revealObserver.observe(el));
+
 
     /* ── Timeline: spine + staggered items ── */
     const spine  = document.getElementById('tl-spine');

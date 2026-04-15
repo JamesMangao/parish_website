@@ -52,9 +52,58 @@
         ::view-transition-group(root) {
             animation-duration: 0.5s;
         }
+
+        /* ════════════════════════════════════════
+           GLOBAL SCROLL REVEAL
+        ════════════════════════════════════════ */
+        .reveal-global,
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        [data-reveal="left"]  { transform: translateX(-32px) translateY(0); }
+        [data-reveal="right"] { transform: translateX(32px) translateY(0); }
+        [data-reveal="scale"] { transform: scale(.93) translateY(0); }
+        
+        .reveal-global.revealed,
+        [data-reveal].revealed {
+            opacity: 1;
+            transform: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal-global, [data-reveal] {
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased" x-data="{
+    initGlobalReveal() {
+        // Auto-apply reveal class to common elements if they don't have it
+        const autoTargets = document.querySelectorAll('main section > h1, main section > h2, main section > p:not(.no-reveal), .card, .bg-card, .bg-white');
+        autoTargets.forEach(el => {
+            if (!el.hasAttribute('data-reveal') && !el.classList.contains('reveal-global')) {
+                el.classList.add('reveal-global');
+            }
+        });
+
+        const revealEls = document.querySelectorAll('.reveal-global, [data-reveal]');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        revealEls.forEach(el => revealObserver.observe(el));
+    }
+}" x-init="initGlobalReveal()">
     <div class="flex min-h-screen flex-col bg-background text-foreground">
         <x-navbar />
 
