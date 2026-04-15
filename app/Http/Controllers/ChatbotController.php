@@ -49,7 +49,7 @@ class ChatbotController extends Controller
         if (Str::contains(strtolower($userMessage), ['live agent', 'human', 'talk to person', 'speak with someone', 'admin'])) {
             return response()->json([
                 'status' => 'suggest_handover',
-                'message' => "I understand you'd like to speak with a person. Would you like to submit a formal Inquiry or wait for a Live Agent to connect? (Wait time is approx. 2 mins)",
+                'message' => "I understand you'd like to speak with a person. For formal requests (Baptism, Wedding, etc.), please [Submit an Inquiry](/inquiry). You can also message us directly on [Facebook Messenger](https://m.me/storosarioparishpacita1) or wait for a Live Agent here.",
             ]);
         }
 

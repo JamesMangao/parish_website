@@ -259,8 +259,34 @@
                     disableMobile: "true",
                     onChange: (selectedDates, dateStr) => {
                         this.formData.preferredDate = dateStr;
+                        this.updateMassTimes(selectedDates[0]);
                     }
                 });
+            },
+
+            updateMassTimes(date) {
+                if (!date) return;
+                
+                const day = date.getDay(); // 0: Sunday, 6: Saturday
+                
+                if (day === 0) {
+                    // Sunday
+                    this.massTimes = ["6:30 AM", "8:30 AM", "10:00 AM", "3:00 PM", "4:30 PM", "6:00 PM"];
+                } else if (day === 6) {
+                    // Saturday
+                    this.massTimes = ["6:30 AM", "6:00 PM"];
+                } else {
+                    // Mon-Fri
+                    this.massTimes = ["6:00 PM"];
+                }
+
+                // Automatically select the time if only one option exists, 
+                // or if current selection is not in the new list
+                if (this.massTimes.length === 1) {
+                    this.formData.massTime = this.massTimes[0];
+                } else if (!this.massTimes.includes(this.formData.massTime)) {
+                    this.formData.massTime = "";
+                }
             },
 
             async submitForm() {

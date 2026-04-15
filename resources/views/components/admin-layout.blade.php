@@ -80,8 +80,7 @@
                 @if($role === 'super_admin' || $role === 'soccom')
                     <x-admin-nav-link href="/admin/schedules" icon="calendar" label="Schedules"
                         :active="request()->is('admin/schedules*')" />
-                    <x-admin-nav-link href="/admin/bulletins" icon="book-open" label="Weekly Bulletins"
-                        :active="request()->is('admin/bulletins*')" />
+
                     <x-admin-nav-link href="/admin/announcements" icon="megaphone" label="Announcements"
                         :active="request()->is('admin/announcements*')" />
                     <x-admin-nav-link href="/admin/events" icon="sparkles" label="Events"

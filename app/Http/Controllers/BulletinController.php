@@ -16,7 +16,8 @@ class BulletinController extends Controller
 
     public function download(Bulletin $bulletin)
     {
-        return Storage::disk('public')->download($bulletin->file_path, $bulletin->title . '.pdf');
+        $ext = pathinfo($bulletin->file_path, PATHINFO_EXTENSION);
+        return Storage::disk('public')->download($bulletin->file_path, $bulletin->title . '.' . $ext);
     }
 
     // Admin Methods
@@ -30,7 +31,7 @@ class BulletinController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'file' => 'required|mimes:pdf|max:10240', // 10MB limit
+            'file' => 'required|mimes:pdf,jpg,jpeg,png,webp|max:10240', // 10MB limit
             'published_date' => 'required|date',
         ]);
 

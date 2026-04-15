@@ -29,8 +29,8 @@
                             value="{{ date('Y-m-d') }}">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">PDF File</label>
-                        <input type="file" name="file" accept="application/pdf" required 
+                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">PDF or Image File</label>
+                        <input type="file" name="file" accept="application/pdf,image/*" required 
                             class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer">
                     </div>
                     <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-black py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95 uppercase text-xs tracking-widest">
@@ -44,12 +44,19 @@
                 @foreach($bulletins as $bulletin)
                     <div class="bg-card border rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent transition-colors">
                         <div class="flex items-center gap-4">
-                            <div class="h-12 w-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            @php
+                                $isPdf = str_ends_with($bulletin->file_path, '.pdf');
+                            @endphp
+                            <div class="h-16 w-12 rounded-lg overflow-hidden border border-muted bg-muted/20 flex items-center justify-center text-primary shrink-0">
+                                @if($isPdf)
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                @else
+                                    <img src="{{ Storage::url($bulletin->file_path) }}" class="w-full h-full object-cover">
+                                @endif
                             </div>
                             <div>
-                                <h3 class="font-black text-primary uppercase text-sm">{{ $bulletin->title }}</h3>
-                                <p class="text-xs text-muted-foreground font-bold tracking-widest">{{ $bulletin->published_date->format('M d, Y') }}</p>
+                                <h3 class="font-black text-primary uppercase text-xs">{{ $bulletin->title }}</h3>
+                                <p class="text-[10px] text-muted-foreground font-bold tracking-widest">{{ $bulletin->published_date->format('M d, Y') }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">

@@ -29,8 +29,8 @@ Route::post('/track', [TrackController::class, 'track'])->name('track.post');
 Route::get('/track-intention/{refId}', [TrackController::class, 'showStatus'])->name('track.status');
 
 // Bulletins
-Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
-Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
+// Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
+// Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
 
 Route::get('/submit-intention', [IntentionController::class, 'create'])->name('submit-intention');
 Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:5,1');
@@ -126,10 +126,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/gallery/{album}/add-images', [App\Http\Controllers\GalleryAlbumController::class, 'addImages'])->name('admin.gallery.add-images');
         Route::delete('/admin/gallery/image/{image}', [App\Http\Controllers\GalleryAlbumController::class, 'removeImage'])->name('admin.gallery.remove-image');
 
-        // Bulletins Admin
-        Route::get('/admin/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
-        Route::post('/admin/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
-        Route::delete('/admin/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
+        // Route::get('/admin/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
+        // Route::post('/admin/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
+        // Route::delete('/admin/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
 
         // Live Chat Admin
         Route::get('/admin/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');

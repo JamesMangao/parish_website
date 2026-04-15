@@ -18,7 +18,7 @@
                     <a href="/inquiry" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">Sacramental Inquiry</a>
                     <a href="/events" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">Parish Events</a>
                     <a href="/gallery" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">Photo Gallery</a>
-                    <a href="/bulletins" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">Parish Bulletins</a>
+
                     <a href="/track" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">Track Submission</a>
                     <a href="/about" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">About Us</a>
                     <a href="/donate" class="text-xs text-primary-foreground/70 hover:text-primary-foreground transition-colors">Donate</a>

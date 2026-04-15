@@ -8,10 +8,10 @@
         </div>
 
         <div class="container relative z-10 mx-auto px-4 text-center">
-            <div
-                class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 text-accent backdrop-blur-sm">
-                <span class="text-2xl font-bold">✝</span>
-            </div>
+                <div
+                    class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 text-accent">
+                    <span class="text-2xl font-bold">✝</span>
+                </div>
             <h1 class="font-heading text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
                 Sto. Rosario Parish
             </h1>

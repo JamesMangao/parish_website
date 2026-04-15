@@ -45,20 +45,20 @@ class AIService
                     'temperature' => 0.7,
                 ]);
 
-            if ($response->successful()) {
-                return $response->json()['choices'][0]['message']['content'];
+                if ($response->successful()) {
+                    return $response->json()['choices'][0]['message']['content'];
+                }
+                
+                Log::warning('Groq API failed: ' . $response->body());
+            } catch (\Exception $e) {
+                Log::error('Groq connection error: ' . $e->getMessage());
             }
-            
-            Log::warning('Groq API failed: ' . $response->body());
-        } catch (\Exception $e) {
-            Log::error('Groq connection error: ' . $e->getMessage());
         }
-    }
 
-    // Fallback to OpenRouter
-    if ($this->openRouterKey) {
-        try {
-            $response = Http::withHeaders([
+        // Fallback to OpenRouter
+        if ($this->openRouterKey) {
+            try {
+                $response = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $this->openRouterKey,
                     'HTTP-Referer' => config('app.url'),
                     'X-Title' => config('app.name'),
@@ -68,18 +68,18 @@ class AIService
                     'messages' => $messages,
                 ]);
 
-            if ($response->successful()) {
-                return $response->json()['choices'][0]['message']['content'];
+                if ($response->successful()) {
+                    return $response->json()['choices'][0]['message']['content'];
+                }
+                
+                Log::warning('OpenRouter API failed: ' . $response->body());
+            } catch (\Exception $e) {
+                Log::error('OpenRouter connection error: ' . $e->getMessage());
             }
-            
-            Log::warning('OpenRouter API failed: ' . $response->body());
-        } catch (\Exception $e) {
-            Log::error('OpenRouter connection error: ' . $e->getMessage());
         }
-    }
 
-    return "I am sorry, my contemplative silence is being interrupted by technical connectivity. Please try again or contact the parish office directly.";
-}
+        return "I am sorry, my contemplative silence is being interrupted by technical connectivity. Please try again or contact the parish office directly.";
+    }
 
 /**
  * Fetch dynamic knowledge from the database.
@@ -118,7 +118,7 @@ protected function getParishContext()
 
 protected function getSystemPrompt($context = '')
 {
-    return "You are the official digital assistant of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines). 
+        return "You are the official digital assistant of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines). 
 You are a warm, helpful, and knowledgeable 'Parish Concierge'. Your goal is to assist parishioners and visitors with accurate information about parish life and basic Catholic teachings.
 
 ### PARISH KNOWLEDGE BASE:
@@ -154,9 +154,6 @@ You are a warm, helpful, and knowledgeable 'Parish Concierge'. Your goal is to a
 2. **No Reservations**: Sto. Rosario Parish DOES NOT have a mass reservation system.
 3. **Handover**: Only suggest a live representative if the user explicitly asks for a person or if you cannot answer a question.
 4. **Links**: Use only the following paths: [/], [/mass-schedule], [/submit-intention], [/inquiry], [/events], [/gallery], [/bulletins], [/track], [/about], [/donate].
-
-### TONE:
-Vibrant, polite, and faith-filled. Maintain a respectful Catholic tone. Use [Link Name](/url) for links.";
 
 ### TONE:
 Vibrant, polite, and faith-filled. Maintain a respectful Catholic tone. Use [Link Name](/url) for links.";
