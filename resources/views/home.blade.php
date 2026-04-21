@@ -3,70 +3,44 @@
         <meta name="description" content="Welcome to Sto. Rosario Parish – Pacita, San Pedro, Laguna. Mass schedules, intentions, events, and community news.">
     </x-slot>
 
-    {{-- ═══════════════════════════════════════════
-         HERO
-    ═══════════════════════════════════════════ --}}
+    {{-- HERO --}}
     <section class="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden">
-
-        {{-- Background --}}
         <div class="absolute inset-0 z-0">
             <img src="/bg.png" alt="Sto. Rosario Parish" class="w-full h-full object-cover">
             <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(20,6,12,0.70) 0%, rgba(20,6,12,0.82) 50%, rgba(20,6,12,0.97) 100%);"></div>
         </div>
-
-        {{-- Content --}}
         <div class="container relative z-10 mx-auto px-4 text-center flex flex-col items-center">
-
-            {{-- Pre-heading --}}
             <div class="flex items-center gap-3 mb-8">
                 <div class="h-px w-12 bg-accent/60"></div>
-                <p class="text-accent text-[11px] font-black uppercase tracking-[0.45em]">Pacita, San Pedro, Laguna</p>
                 <div class="h-px w-12 bg-accent/60"></div>
             </div>
-
-            {{-- Cross icon --}}
             <div class="mb-6 text-accent text-4xl font-serif">✝</div>
-
-            {{-- Main heading --}}
             <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-[0.95] tracking-tight">
                 Sto. Rosario<br><em class="text-accent not-italic">Parish</em>
             </h1>
-
+            <p class="text-accent text-[11px] font-black uppercase tracking-[0.45em]">Pacita, San Pedro, Laguna</p>
             <p class="max-w-xl mx-auto text-base md:text-lg text-white/80 mb-12 leading-relaxed font-light tracking-wide">
                 Home to the Queen of the Most Holy Rosary — a beacon of faith, community, and service for over four decades.
             </p>
-
-            {{-- CTA buttons --}}
             <div class="flex flex-col sm:flex-row items-center gap-3">
-                <a href="/mass-schedule" class="px-8 py-3.5 rounded-full bg-accent text-[#1a0a0e] font-black text-sm uppercase tracking-widest hover:brightness-110 transition-all shadow-xl">
-                    Mass Schedule
-                </a>
-                <a href="/submit-intention" class="px-8 py-3.5 rounded-full border-2 border-white/50 text-white font-bold text-sm uppercase tracking-widest hover:bg-white/15 hover:border-white/70 transition-all">
-                    Offer an Intention
-                </a>
-                <a href="/inquiry" class="px-8 py-3.5 rounded-full border-2 border-white/50 text-white font-bold text-sm uppercase tracking-widest hover:bg-white/15 hover:border-white/70 transition-all">
-                    Parish Inquiry
-                </a>
+                <a href="/mass-schedule" class="px-8 py-3.5 rounded-full bg-accent text-[#1a0a0e] font-black text-sm uppercase tracking-widest border-2 border-accent hover:bg-[#e0bb7e] hover:border-[#e0bb7e] hover:-translate-y-0.5 transition-all shadow-xl">Mass Schedule</a>
+<a href="/submit-intention" class="px-8 py-3.5 rounded-full border-2 border-white/40 text-white font-bold text-sm uppercase tracking-widest hover:bg-accent/15 hover:border-accent hover:text-accent hover:-translate-y-0.5 transition-all">Offer an Intention</a>
+<a href="/inquiry" class="px-8 py-3.5 rounded-full border-2 border-white/40 text-white font-bold text-sm uppercase tracking-widest hover:bg-accent/15 hover:border-accent hover:text-accent hover:-translate-y-0.5 transition-all">Parish Inquiry</a>
             </div>
         </div>
-
-        {{-- Scroll cue — pinned to very bottom, below content --}}
         <div class="relative z-10 mt-16 flex flex-col items-center gap-2 opacity-50">
             <p class="text-white text-[9px] uppercase tracking-[0.4em]">Scroll</p>
             <div class="h-8 w-px bg-white/60"></div>
         </div>
-
-        {{-- Bottom fade --}}
         <div class="absolute bottom-0 left-0 right-0 h-28 z-10" style="background: linear-gradient(to top, oklch(0.96 0.01 40), transparent);"></div>
     </section>
 
-    {{-- ═══════════════════════════════════════════
-         NEXT MASS BANNER
-    ═══════════════════════════════════════════ --}}
+    {{-- NEXT MASS BANNER --}}
     <section class="relative z-20 -mt-1 py-0">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto rounded-2xl border border-border bg-card shadow-xl shadow-primary/5 overflow-hidden">
                 <div class="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
+
                     {{-- Next mass --}}
                     <div class="p-6 flex items-center gap-4">
                         <div class="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
@@ -89,18 +63,38 @@
                             @endif
                         </div>
                     </div>
-                    {{-- Office hours --}}
-                    <div class="p-6 flex items-center gap-4">
-                        <div class="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-0.5">Office Hours</p>
-                            <p class="font-bold text-primary text-sm">Tue–Sat · 6AM–12NN, 1:30–6PM</p>
-                            <p class="text-xs text-muted-foreground">Sunday · 6AM–12NN, 3–6PM</p>
-                        </div>
-                    </div>
-                    {{-- Full schedule link --}}
+
+                    {{-- Office hours — improved layout: both rows equally weighted --}}
+                    <div class="p-6 flex items-start gap-4">
+    <div class="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div class="flex-1 min-w-0">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2.5">Office Hours</p>
+        <div class="flex items-start justify-between gap-2 py-1.5">
+            <span class="text-xs font-black text-primary shrink-0 w-16">Tue – Sat</span>
+            <div class="text-right">
+                <div class="text-xs font-medium text-primary leading-5">6:00 AM – 12:00 NN</div>
+                <div class="text-xs font-medium text-primary leading-5">1:30 PM – 6:00 PM</div>
+            </div>
+        </div>
+        <div class="border-t border-border/60"></div>
+        <div class="flex items-start justify-between gap-2 py-1.5">
+            <span class="text-xs font-black text-primary shrink-0 w-16">Sunday</span>
+            <div class="text-right">
+                <div class="text-xs font-medium text-primary leading-5">6:00 AM – 12:00 NN</div>
+                <div class="text-xs font-medium text-primary leading-5">3:00 PM – 6:00 PM</div>
+            </div>
+        </div>
+        <div class="border-t border-border/60"></div>
+        <div class="flex items-center justify-between gap-2 py-1.5">
+            <span class="text-xs font-black text-muted-foreground shrink-0 w-16">Monday</span>
+            <span class="text-[11px] font-medium text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">Closed</span>
+        </div>
+    </div>
+</div>
+
+                    {{-- Full schedule --}}
                     <div class="p-6 flex items-center justify-center md:justify-end">
                         <a href="/mass-schedule" class="group inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
                             Full Schedule
@@ -112,9 +106,7 @@
         </div>
     </section>
 
-    {{-- ═══════════════════════════════════════════
-         QUICK ACTIONS
-    ═══════════════════════════════════════════ --}}
+    {{-- QUICK ACTIONS --}}
     <section class="py-20 container mx-auto px-4">
         <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
             @php
@@ -139,9 +131,7 @@
         </div>
     </section>
 
-    {{-- ═══════════════════════════════════════════
-         UPCOMING EVENTS
-    ═══════════════════════════════════════════ --}}
+    {{-- UPCOMING EVENTS --}}
     @if(isset($upcomingEvents) && $upcomingEvents->count() > 0)
     <section class="py-20" style="background: linear-gradient(180deg, var(--color-background) 0%, oklch(0.93 0.015 40) 100%);">
         <div class="container mx-auto px-4">
@@ -155,11 +145,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="m9 18 6-6-6-6"/></svg>
                 </a>
             </div>
-
             <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                 @foreach($upcomingEvents as $event)
                 <a href="{{ route('events.show', $event) }}" class="group flex items-start gap-5 p-6 rounded-2xl bg-card border border-border hover:border-accent/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    {{-- Date badge --}}
                     <div class="flex flex-col items-center justify-center shrink-0 w-16 h-16 rounded-xl bg-primary text-primary-foreground group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
                         <span class="text-[9px] font-black uppercase tracking-wider opacity-70">{{ $event->event_date->format('M') }}</span>
                         <span class="font-heading text-2xl font-black leading-none">{{ $event->event_date->format('d') }}</span>
@@ -179,9 +167,7 @@
     </section>
     @endif
 
-    {{-- ═══════════════════════════════════════════
-         ANNOUNCEMENTS
-    ═══════════════════════════════════════════ --}}
+    {{-- ANNOUNCEMENTS --}}
     <section class="py-24 bg-background">
         <div class="container mx-auto px-4">
             <div class="max-w-5xl mx-auto">
@@ -191,11 +177,9 @@
                         <h2 class="font-heading text-4xl font-bold text-primary italic">Latest Announcements</h2>
                     </div>
                 </div>
-
                 <div class="grid md:grid-cols-3 gap-6">
                     @forelse($announcements as $item)
                     <div class="group flex flex-col bg-card rounded-2xl border border-border hover:border-accent/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                        {{-- Top accent bar --}}
                         <div class="h-1 bg-gradient-to-r from-primary to-accent"></div>
                         <div class="p-6 flex flex-col flex-1">
                             <div class="flex items-center gap-2 mb-4">
@@ -213,41 +197,37 @@
                         </div>
                     </div>
                     @empty
-                    <div class="col-span-3 py-16 text-center text-muted-foreground italic">
-                        No recent announcements at this time.
-                    </div>
+                    <div class="col-span-3 py-16 text-center text-muted-foreground italic">No recent announcements at this time.</div>
                     @endforelse
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- ═══════════════════════════════════════════
-         SERVICES STRIP
-    ═══════════════════════════════════════════ --}}
+    {{-- HOW WE SERVE — icons white/70 at rest, gold on hover --}}
     <section style="background:#1a0a0e;" class="py-20 px-4">
         <div class="container mx-auto max-w-5xl">
             <div class="text-center mb-14">
                 <p class="text-[11px] font-black uppercase tracking-[0.35em] text-accent mb-3">Sacramental Services</p>
-                <h2 class="font-heading text-4xl font-bold text-white italic">How We Serve</h2>
+                <h2 class="font-heading text-4xl font-bold text-white italic">How We Serve</h2><br>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            @php
+                @php
                 $services = [
                     ['label'=>'Baptism','href'=>'/inquiry','svg'=>'<path d="M12 22a10 10 0 0 1-10-10c0-5.52 4.48-10 10-10s10 4.48 10 10"/><path d="M12 8v8"/><path d="M8 12h8"/>'],
                     ['label'=>'Wedding','href'=>'/inquiry','svg'=>'<circle cx="12" cy="6" r="3"/><path d="M8.5 9.5 5 15h14l-3.5-5.5"/><path d="M12 9v12"/><path d="M9 21h6"/>'],
                     ['label'=>'Confirmation','href'=>'/inquiry','svg'=>'<path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>'],
-                    ['label'=>'Funeral Mass','href'=>'/inquiry','svg'=>'<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"/>'],
+                    ['label'=>'Funeral Mass','href'=>'/inquiry','svg'=>'<path d="M9 2h6l3 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V6l3-4z"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="12" x2="15" y2="12"/>'],
                     ['label'=>'House Blessing','href'=>'/inquiry','svg'=>'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'],
                     ['label'=>'Car Blessing','href'=>'/inquiry','svg'=>'<path d="M19 17H5v-5l2-6h10l2 6v5Z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M5 12h14"/>'],
                 ];
                 @endphp
                 @foreach($services as $s)
-                <a href="{{ $s['href'] }}" class="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/10 hover:border-accent/50 hover:bg-white/5 transition-all text-center">
-                    <div class="h-12 w-12 rounded-xl border border-white/15 flex items-center justify-center text-white/50 group-hover:border-accent/50 group-hover:text-accent transition-all">
+                <a href="{{ $s['href'] }}" class="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/20 hover:border-accent/60 hover:bg-white/5 transition-all text-center">
+                    <div class="h-12 w-12 rounded-xl border border-white/25 flex items-center justify-center text-white/70 group-hover:border-accent group-hover:text-accent transition-all duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">{!! $s['svg'] !!}</svg>
                     </div>
-                    <span class="text-white/60 group-hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">{{ $s['label'] }}</span>
+                    <span class="text-white/70 group-hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">{{ $s['label'] }}</span>
                 </a>
                 @endforeach
             </div>
@@ -255,9 +235,7 @@
         </div>
     </section>
 
-    {{-- ═══════════════════════════════════════════
-         INTENTION CTA
-    ═══════════════════════════════════════════ --}}
+    {{-- INTENTION CTA --}}
     <section class="py-24 px-4 bg-background">
         <div class="container mx-auto max-w-3xl text-center">
             <div class="text-5xl mb-6">🙏</div>
@@ -268,13 +246,23 @@
                 Unite your prayers with the Holy Sacrifice of the Mass. Submit your intention online and our staff will include it in the upcoming liturgy.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
-                <a href="/submit-intention" class="px-10 py-4 rounded-full bg-accent text-[#1a0a0e] font-black text-sm uppercase tracking-widest hover:bg-accent/90 transition-all shadow-xl shadow-accent/20 hover:-translate-y-0.5">
-                    Submit Intention
-                </a>
-                <a href="/track" class="px-10 py-4 rounded-full border border-border text-primary font-bold text-sm uppercase tracking-widest hover:border-accent/50 hover:text-accent transition-all">
-                    Track Status
-                </a>
-            </div>
+    <a href="/submit-intention"
+       class="inline-flex items-center gap-2 px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest border-2 transition-all hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
+       style="background:#C9A96E;color:#1a0a0e;border-color:#C9A96E;"
+       onmouseover="this.style.background='#e0bb7e';this.style.borderColor='#e0bb7e'"
+       onmouseout="this.style.background='#C9A96E';this.style.borderColor='#C9A96E'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a0a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+        Submit Intention
+    </a>
+    <a href="/track"
+       class="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest border-2 transition-all hover:-translate-y-0.5"
+       style="background:transparent;color:#3B1A22;border-color:#3B1A22;"
+       onmouseover="this.style.background='#3B1A22';this.style.color='#f5ede8'"
+       onmouseout="this.style.background='transparent';this.style.color='#3B1A22'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Track Status
+    </a>
+</div>
         </div>
     </section>
 
