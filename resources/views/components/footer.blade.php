@@ -1,3 +1,11 @@
+<style>
+    :root {
+        --primary:            rgba(13,42,82,0.35);
+        --primary-foreground: #EBF2FF;
+        --accent:             #F5C518;
+    }
+</style>
+
 <footer class="border-t bg-primary text-primary-foreground">
     <div class="container py-12 mx-auto px-4">
         <div class="grid md:grid-cols-3 gap-8">
