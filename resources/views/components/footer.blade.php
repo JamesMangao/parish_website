@@ -1,6 +1,6 @@
 <style>
     :root {
-        --primary:            rgba(13,42,82,0.35);
+        --primary:            #0d2a52;
         --primary-foreground: #EBF2FF;
         --accent:             #F5C518;
     }
