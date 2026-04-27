@@ -19,9 +19,9 @@
             <div>
                 <div class="text-[14px] font-bold tracking-[0.12em] leading-none transition-colors duration-500"
                      :class="scrolled ? 'text-stone-800' : 'text-white'"
-                     style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic;">Sto. Rosario</div>
+                     style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic;">Sto. Rosario Parish</div>
                 <div class="text-[8.5px] tracking-[0.35em] font-medium uppercase mt-0.5 transition-colors duration-500"
-                     :class="scrolled ? 'text-stone-400' : 'text-white/50'">Parish · Pacita</div>
+                     :class="scrolled ? 'text-stone-400' : 'text-white/50'">Pacita 1</div>
             </div>
         </a>
 

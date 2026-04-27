@@ -56,6 +56,7 @@
             100% { transform: scaleY(0); transform-origin: bottom; }
         }
 
+        html { scroll-behavior: smooth; }
         .animate-fade-up { animation: fadeUp 0.9s ease both; }
         .animate-fade-in { animation: fadeIn 1.2s ease both; }
         .delay-1 { animation-delay: 0.15s; }
@@ -64,6 +65,36 @@
         .delay-4 { animation-delay: 0.60s; }
         .delay-5 { animation-delay: 0.80s; }
         .scroll-line { animation: scrollLine 2s ease infinite; }
+
+        /* ── Scroll Reveal ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform, opacity;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
         /* ── Buttons ── */
         .gold-btn {
@@ -269,7 +300,7 @@
            style="font-style:italic; color:rgba(255,215,64,0.82); margin-bottom:14px;
                   font-size:clamp(0.9rem, 1.8vw, 1.15rem); font-weight:300;
                   text-shadow:0 2px 12px rgba(0,0,0,0.4);">
-            Pacita, San Pedro, Laguna
+            Pacita Complex 1, San Pedro, Laguna
         </p>
 
         {{-- Thin gold rule --}}
@@ -338,136 +369,142 @@
 
 
 {{-- ═══════════════════════════════════════════════════ --}}
-{{-- NEXT MASS BANNER — Premium Layout (Image 1)        --}}
+{{-- NEXT MASS + OFFICE HOURS                           --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="relative z-20 bg-[var(--cream)]" style="padding-top:0;">
-    <div class="max-w-[1200px] mx-auto px-6">
-        <div class="max-w-4xl mx-auto -mt-12 rounded-[32px] overflow-hidden"
-             style="background:#FFFFFF;
-                    border:1px solid rgba(26,64,128,0.1);
-                    box-shadow:0 32px 80px rgba(13,42,82,0.12);">
+<section class="max-w-5xl mx-auto px-6 mt-10 reveal">
+    <div class="rounded-3xl overflow-hidden"
+         style="background:#FFFFFF; border:1px solid rgba(201,162,0,0.22); box-shadow:0 12px 50px rgba(13,42,82,0.09);">
 
-            {{-- ── ROW 1: Next Mass Display ── --}}
-            <div class="relative grid grid-cols-1 md:grid-cols-2 min-h-[220px]">
-                
-                {{-- Left: Status & Chalice --}}
-                <div class="flex items-center justify-center p-10 border-b md:border-b-0 md:border-r border-muted/40 bg-white">
-                    <div class="relative">
-                        {{-- Chalice Frame --}}
-                        <div class="w-32 h-32 rounded-full flex items-center justify-center relative z-10"
-                             style="background:radial-gradient(circle, #FFFBF0 0%, #FFFFFF 100%);
-                                    border:1.5px solid rgba(245,197,24,0.3);
-                                    box-shadow: 0 0 40px rgba(245,197,24,0.1);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-                                 fill="none" stroke="#C9A200" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M8 2h8l2 7H6L8 2z"/><path d="M6 9c0 3.314 2.686 6 6 6s6-2.686 6-6"/><line x1="12" y1="15" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/><path d="M12 6v3"/>
-                            </svg>
-                        </div>
-                        {{-- Soft Rays Watermark --}}
-                        <div class="absolute inset-0 scale-150 opacity-20 pointer-events-none" style="background: radial-gradient(circle, var(--gold) 0%, transparent 70%);"></div>
-                    </div>
-                </div>
-
-                {{-- Right: Time & Details --}}
-                <div class="relative flex flex-col justify-center px-12 py-10 overflow-hidden">
-                    {{-- Church Interior Watermark BG --}}
-                    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
-                        <img src="/bg-interior.png" alt="" class="w-full h-full object-cover">
-                        <div class="absolute inset-0" style="background:linear-gradient(90deg, #FFFFFF 0%, transparent 100%);"></div>
-                    </div>
-
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="h-px w-8 bg-muted"></div>
-                            <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground">Next Mass</span>
-                            <div class="h-px w-8 bg-muted"></div>
-                        </div>
-
-                        @if($nextMass)
-                            <h3 class="font-heading font-bold text-6xl italic leading-none mb-2" style="color:var(--blue-deep);">
-                                {{ $nextMass->calculated_day }}
-                            </h3>
-                            <p class="font-heading font-bold text-5xl italic leading-none mb-6" style="color:var(--gold);">
-                                {{ $nextMass->calculated_time }}
-                            </p>
-                            @if(isset($nextMass->mass_type))
-                            <span class="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground/60">
-                                {{ $nextMass->mass_type }} Mass
-                            </span>
-                            @endif
-                        @else
-                            <h3 class="font-heading font-bold text-5xl italic leading-none" style="color:var(--blue-deep);">See Schedule</h3>
-                        @endif
-                    </div>
-                </div>
+        {{-- ── Next Mass ── --}}
+        <div class="relative flex items-center overflow-hidden" style="min-height:215px; background:#0d2a52;">
+            {{-- Background Image --}}
+            <div class="absolute inset-0">
+                <img src="{{ asset('assets/img/mass.jpg') }}" 
+                     alt="Mass" 
+                     style="width:100%; height:100%; object-fit:cover; opacity:0.35;">
+                <div class="absolute inset-0" 
+                     style="background:linear-gradient(90deg, #0d2a52 0%, rgba(13,42,82,0.4) 50%, #0d2a52 100%);"></div>
             </div>
 
-            {{-- ── ROW 2: Office Hours ── --}}
-            <div class="bg-[#FCFDFF] border-t border-muted/50">
-                {{-- Eyebrow --}}
-                <div class="flex flex-col items-center pt-8 pb-4">
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="h-px w-12 bg-gradient-to-r from-transparent to-muted"></div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            </div>
-                            <span class="text-[11px] font-bold uppercase tracking-[0.35em] text-primary">Office Hours</span>
-                        </div>
-                        <div class="h-px w-12 bg-gradient-to-l from-transparent to-muted"></div>
-                    </div>
-                    <span class="text-accent text-[8px]">◆</span>
-                </div>
-
-                {{-- Hours Grid --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-muted/30 pb-12 px-6">
-                    {{-- Weekdays --}}
-                    <div class="py-8 md:py-4 flex flex-col items-center text-center">
-                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
-                        </div>
-                        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-3">· Tue – Sat ·</span>
-                        <p class="text-sm font-medium text-muted-foreground leading-relaxed">
-                            6:00 AM – 12:00 NN<br>1:30 PM – 6:00 PM
-                        </p>
-                    </div>
-                    {{-- Sunday --}}
-                    <div class="py-8 md:py-4 flex flex-col items-center text-center">
-                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                        </div>
-                        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-3">· Sunday ·</span>
-                        <p class="text-sm font-medium text-muted-foreground leading-relaxed">
-                            6:00 AM – 12:00 NN<br>3:00 PM – 6:00 PM
-                        </p>
-                    </div>
-                    {{-- Monday --}}
-                    <div class="py-8 md:py-4 flex flex-col items-center text-center">
-                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="m15 11-6 6"/><path d="m9 11 6 6"/></svg>
-                        </div>
-                        <span class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-3">· Monday ·</span>
-                        <p class="text-lg font-black text-accent uppercase tracking-widest">Closed</p>
+            {{-- Left content --}}
+            <div class="relative z-10 flex items-center gap-8 px-10 py-8 flex-1">
+                {{-- Chalice icon with SVG rays --}}
+                <div class="relative shrink-0 flex items-center justify-center" style="width:82px; height:82px;">
+                    <svg width="82" height="82" viewBox="0 0 82 82" style="position:absolute;inset:0;" fill="none" aria-hidden="true">
+                        <line x1="41" y1="3"  x2="41" y2="13" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="41" y1="69" x2="41" y2="79" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="3"  y1="41" x2="13" y2="41" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="69" y1="41" x2="79" y2="41" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="11" y1="11" x2="18" y2="18" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="64" y1="64" x2="71" y2="71" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="71" y1="11" x2="64" y2="18" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="11" y1="71" x2="18" y2="64" stroke="rgba(245,197,24,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <div class="rounded-full flex items-center justify-center"
+                         style="width:62px; height:62px; background:rgba(245,197,24,0.1); border:1.5px solid rgba(245,197,24,0.4);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M8 22h8"/><path d="M12 11v11"/>
+                            <path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/>
+                        </svg>
                     </div>
                 </div>
 
-                {{-- Full Schedule Bar --}}
-                <a href="/mass-schedule"
-                   class="group block relative py-8 bg-primary text-center overflow-hidden transition-all duration-500 hover:bg-[#0a2044]"
-                   style="text-decoration:none;">
-                    {{-- Watermark --}}
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-start pl-8 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="0.5"><path d="M3 21h18M3 10l9-8 9 8v11H3V10z"/><path d="M9 21v-8a3 3 0 0 1 6 0v8"/></svg>
+                {{-- Text --}}
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span style="display:inline-block; height:1px; width:32px; background:linear-gradient(90deg,transparent,rgba(245,197,24,0.6));"></span>
+                        <span class="eyebrow" style="color:rgba(235,242,255,0.7);">NEXT MASS</span>
+                        <span style="display:inline-block; height:1px; width:32px; background:linear-gradient(90deg,rgba(245,197,24,0.6),transparent);"></span>
                     </div>
-                    
-                    <div class="relative z-10 flex flex-col items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/><rect x="8" y="14" width="2" height="2"/><rect x="14" y="14" width="2" height="2"/></svg>
-                        <span class="text-[11px] font-bold uppercase tracking-[0.4em] text-white">Full Schedule</span>
-                        <span class="text-accent text-sm group-hover:translate-y-1 transition-transform">↓</span>
-                    </div>
-                </a>
+                    @if($nextMass)
+                    <h2 class="font-heading font-bold italic leading-none"
+                        style="font-size:clamp(2.2rem,4vw,3.6rem); color:#FFFFFF; letter-spacing:-0.01em;">{{ $nextMass->calculated_day }}</h2>
+                    <p class="font-heading font-bold italic"
+                       style="font-size:clamp(1.8rem,3.5vw,3rem); color:#F5C518; line-height:1.1;">{{ $nextMass->calculated_time }}</p>
+                    <p style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:rgba(235,242,255,0.5); margin-top:6px;">
+                        {{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}
+                    </p>
+                    @else
+                    <h2 class="font-heading font-bold italic leading-none" style="font-size:3.6rem; color:#FFFFFF;">Sunday</h2>
+                    <p class="font-heading font-bold italic" style="font-size:3rem; color:#F5C518; line-height:1.1;">6:00 AM</p>
+                    <p style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:rgba(235,242,255,0.5); margin-top:6px;">SUNDAY MASS</p>
+                    @endif
+                </div>
             </div>
         </div>
+
+        {{-- Thin gold divider --}}
+        <div style="height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,0,0.2),transparent);"></div>
+
+        {{-- ── Office Hours ── --}}
+        <div class="px-8 pt-7 pb-0">
+            {{-- Header --}}
+            <div class="flex items-center gap-3 mb-2">
+                <span style="flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,0,0.3));"></span>
+                <div class="flex items-center gap-2">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.3em; color:var(--blue-deep); font-weight:600;">OFFICE HOURS</span>
+                </div>
+                <span style="flex:1; height:1px; background:linear-gradient(90deg,rgba(201,162,0,0.3),transparent);"></span>
+            </div>
+            <div class="flex justify-center mb-5">
+                <div style="width:6px; height:6px; background:rgba(201,162,0,0.4); transform:rotate(45deg);"></div>
+            </div>
+
+            {{-- Three columns --}}
+            <div class="grid grid-cols-3 overflow-hidden"
+                 style="border:1px solid rgba(26,64,128,0.07); border-radius:16px;">
+                @foreach([
+                    ['icon'=>'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>', 'day'=>'· TUE – SAT ·', 'hours'=>['6:00 AM – 12:00 NN','1:30 PM – 6:00 PM'], 'closed'=>false],
+                    ['icon'=>'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>', 'day'=>'· SUNDAY ·', 'hours'=>['6:00 AM – 12:00 NN','3:00 PM – 6:00 PM'], 'closed'=>false],
+                    ['icon'=>'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'day'=>'· MONDAY ·', 'hours'=>[], 'closed'=>true],
+                ] as $ohIdx => $ohCol)
+                <div class="flex flex-col items-center py-7 px-4 text-center"
+                     style="{{ $ohIdx > 0 ? 'border-left:1px solid rgba(26,64,128,0.07);' : '' }}">
+                    <div class="w-11 h-11 rounded-full flex items-center justify-center mb-4"
+                         style="background:var(--blue-deep);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ohCol['icon'] !!}</svg>
+                    </div>
+                    <p style="font-size:9.5px; letter-spacing:0.2em; color:rgba(13,42,82,0.45); font-weight:500; margin-bottom:10px;">{{ $ohCol['day'] }}</p>
+                    @if($ohCol['closed'])
+                    <p class="font-cinzel font-semibold" style="color:#C9A200; font-size:0.8rem; letter-spacing:0.08em;">CLOSED</p>
+                    @else
+                    @foreach($ohCol['hours'] as $ohHour)
+                    <p style="font-size:12.5px; color:var(--blue-deep); line-height:1.9;">{{ $ohHour }}</p>
+                    @endforeach
+                    @endif
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Full Schedule CTA --}}
+        <a href="/mass-schedule"
+           class="group relative flex flex-col items-center justify-center overflow-hidden mt-6"
+           style="background:var(--blue-deep); text-decoration:none; padding:22px 24px; border-radius:0 0 24px 24px; display:flex; min-height:82px;"
+           aria-label="View Full Mass Schedule">
+            <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" style="opacity:0.1;" aria-hidden="true">
+                <svg width="92" height="66" viewBox="0 0 92 66" fill="none" stroke="#FFFFFF" stroke-width="1.2">
+                    <line x1="46" y1="9" x2="46" y2="1"/><line x1="42" y1="5" x2="50" y2="5"/>
+                    <rect x="31" y="9" width="30" height="34" rx="1"/>
+                    <path d="M21 43 L71 43 L71 63 L21 63 Z"/>
+                    <rect x="37" y="48" width="8" height="12"/>
+                    <rect x="47" y="48" width="8" height="12"/>
+                    <rect x="28" y="18" width="8" height="9" rx="4"/>
+                    <rect x="56" y="18" width="8" height="9" rx="4"/>
+                </svg>
+            </div>
+            <div class="flex items-center gap-2.5 mb-1.5">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect width="18" height="18" x="3" y="4" rx="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                    <!-- Enhanced cross -->
+                    <path d="M11 2v3M9 3h4"/>
+                </svg>
+                <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.32em; color:#FFFFFF; font-weight:600;">FULL SCHEDULE</span>
+            </div>
+            <span class="transition-transform duration-300 group-hover:translate-x-1 block" style="color:#C9A200; font-size:16px; line-height:1;" aria-hidden="true">→</span>
+        </a>
     </div>
 </section>
 
@@ -475,8 +512,8 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- QUICK ACTIONS                                      --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-32 bg-[var(--cream)]">
-    <div class="max-w-[1200px] mx-auto px-6">
+<section class="py-32 bg-[var(--cream)] reveal">
+    <div class="max-w-[1200px] mx-auto px-6"><br><br><br>
         <div class="text-center mb-16">
             <div class="divider-ornament mb-4"><span class="eyebrow">Quick Access</span></div>
             <h2 class="font-heading text-4xl md:text-5xl font-bold italic" style="color:var(--blue-deep);">How Can We Serve You?</h2>
@@ -507,188 +544,304 @@
             </a>
             @endforeach
         </div>
-    </div>
+    </div><br><br>
 </section>
 
 
 {{-- ═══════════════════════════════════════════════════ --}}
-{{-- UPCOMING EVENTS — Premium Layout (Image 2)         --}}
+{{-- UPCOMING EVENTS                                    --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-@if(isset($upcomingEvents) && $upcomingEvents->count() > 0)
-<section class="py-32 section-ruled relative overflow-hidden" style="background:#FAFBFF;">
-    
-    {{-- Church Interior Watermark BG --}}
-    <div class="absolute inset-0 z-0 opacity-[0.04] pointer-events-none">
-        <img src="/bg-interior.png" alt="" class="w-full h-full object-cover">
+<section class="relative py-24 overflow-hidden reveal">
+    {{-- Faded background --}}
+    <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        <img src="https://images.pexels.com/photos/17702529/pexels-photo-17702529.jpeg?auto=compress&w=1400"
+             alt=""
+             class="w-full h-full object-cover"
+             style="filter:saturate(0.2) brightness(1.2) blur(4px); transform:scale(1.06);">
+        <div style="position:absolute; inset:0; background:rgba(247,249,255,0.89);"></div>
     </div>
 
-    <div class="max-w-[1200px] mx-auto px-6 relative z-10">
-
-        {{-- Section Header --}}
-        <div class="text-center mb-16">
-            <div class="flex flex-col items-center mb-6">
-                <div class="cross-container">
-                    <div class="cross-ray ray-1"></div>
-                    <div class="cross-ray ray-2"></div>
-                    <div class="cross-ray ray-3"></div>
-                    <span class="font-cinzel text-3xl" style="color:var(--gold); opacity:0.8;">✝</span>
+    <div class="relative z-10 max-w-5xl mx-auto px-6">
+        {{-- Section header --}}
+        <div class="text-center mb-14">
+            {{-- Gold cross with radiating rays --}}
+            <div class="flex justify-center mb-5">
+                <div class="relative flex items-center justify-center" style="width:50px; height:50px;">
+                    <svg width="50" height="50" viewBox="0 0 50 50" style="position:absolute;inset:0;" fill="none" aria-hidden="true">
+                        <line x1="25" y1="2"  x2="25" y2="9"  stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="25" y1="41" x2="25" y2="48" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="2"  y1="25" x2="9"  y2="25" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="41" y1="25" x2="48" y2="25" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="7"  y1="7"  x2="12" y2="12" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="38" y1="38" x2="43" y2="43" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="43" y1="7"  x2="38" y2="12" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="7"  y1="43" x2="12" y2="38" stroke="rgba(201,162,0,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <span class="font-cinzel relative z-10" style="color:#C9A200; font-size:1.35rem; line-height:1;" aria-hidden="true">✝</span>
                 </div>
             </div>
-            <div class="eyebrow mb-4" style="color:var(--gold);">Upcoming Events</div>
-            <h2 class="font-heading text-6xl italic font-bold mb-6" style="color:var(--blue-deep);">
-                What's Happening
-            </h2>
-            <div class="divider-ornament opacity-40 mb-6"></div>
-            <p class="text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            <div class="eyebrow mb-3">UPCOMING EVENTS</div>
+            <h2 class="font-heading font-bold italic"
+                style="font-size:clamp(2.4rem,5vw,4rem); color:var(--blue-deep); line-height:1.1; margin-bottom:12px;">What's Happening</h2>
+            <div class="flex justify-center mb-4">
+                <div style="width:7px; height:7px; background:rgba(201,162,0,0.42); transform:rotate(45deg);"></div>
+            </div>
+            <p style="color:rgba(13,42,82,0.45); font-size:14px; max-width:480px; margin:0 auto; line-height:1.7;">
                 Stay connected. Join us in our liturgical celebrations and events.
             </p>
         </div>
 
-        {{-- Grid --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            @foreach($upcomingEvents->take(3) as $i => $event)
-                @php 
-                    $isFeatured = $i === 0; 
-                    $titleLower = strtolower($event->title);
-                    $icon = '<path d="M8 2h8l2 7H6L8 2z"/><path d="M6 9c0 3.314 2.686 6 6 6s6-2.686 6-6"/><line x1="12" y1="15" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/>'; // Default: Chalice
+        {{-- Event cards grid --}}
+        <div class="grid md:grid-cols-3 gap-5 mb-8">
 
-                    if(str_contains($titleLower, 'adoration') || str_contains($titleLower, 'eucharist')) {
-                        $icon = '<circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>';
-                    } elseif(str_contains($titleLower, 'pentecost') || str_contains($titleLower, 'spirit')) {
-                        $icon = '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M15 9.354a4 4 0 1 0-3 6.569"/><path d="M9 12h.01"/>';
-                    } elseif(str_contains($titleLower, 'mass')) {
-                        $icon = '<path d="M8 2h8l2 7H6L8 2z"/><path d="M6 9c0 3.314 2.686 6 6 6s6-2.686 6-6"/><line x1="12" y1="15" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/>';
-                    }
-                @endphp
-
-                <a href="{{ route('events.show', $event) }}" 
-                   class="card-event {{ $isFeatured ? 'card-event-featured' : '' }} group"
-                   style="text-decoration:none;">
-                    
-                    {{-- Today Badge for Featured --}}
-                    @if($isFeatured)
-                    <div class="event-badge-today">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
-                        <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-primary">Today</span>
+            {{-- Card 1: Today's Mass (always shown if available) --}}
+            @if($nextMass)
+            <div class="card-event card-event-featured relative">
+                <div class="event-badge-today">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <span style="font-size:9px; font-weight:700; letter-spacing:0.18em; color:#C9A200; text-transform:uppercase;">TODAY</span>
+                </div>
+                <div class="flex flex-col items-center text-center pt-14 pb-5 px-6" style="flex:1;">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                         style="background:rgba(245,197,24,0.07); border:1.5px solid rgba(201,162,0,0.28);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M8 22h8"/><path d="M12 11v11"/><path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/>
+                        </svg>
                     </div>
-                    @else
-                    <div class="pt-8 px-6 text-left">
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{{ $event->event_date->format('F j, Y') }}</span>
-                        </div>
+                    <p style="font-size:10px; letter-spacing:0.22em; color:rgba(13,42,82,0.5); text-transform:uppercase; font-weight:600; margin-bottom:10px;">
+                        {{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}
+                    </p>
+                    <div class="flex justify-center mb-3">
+                        <div style="width:5px; height:5px; background:rgba(201,162,0,0.45); transform:rotate(45deg);"></div>
+                    </div>
+                    <p class="font-heading font-bold"
+                       style="font-size:clamp(1.8rem,3vw,2.5rem); color:var(--blue-deep); line-height:1.05;">{{ $nextMass->calculated_time }}</p>
+                </div>
+
+            </div>
+            @endif
+
+            {{-- Upcoming events from DB --}}
+            @php
+            $evtIcons = [
+                '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/>',
+                '<path d="M12 22V12"/><path d="M12 12C9 12 4 10 4 6a4 4 0 0 1 8 0"/><path d="M12 12c3 0 8-2 8-6a4 4 0 0 0-8 0"/><path d="M8 22h8"/>',
+            ];
+            @endphp
+            @foreach($upcomingEvents as $evt)
+            <div class="card-event">
+                <div class="flex flex-col items-center text-center pt-5 pb-5 px-6" style="flex:1;">
+                    <div class="flex items-center gap-1.5 mb-4" style="align-self:flex-start;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        <span style="font-size:10px; letter-spacing:0.14em; color:rgba(13,42,82,0.4); text-transform:uppercase; font-weight:500;">
+                            {{ $evt->event_date->format('M d, Y') }}
+                        </span>
+                    </div>
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                         style="background:rgba(245,197,24,0.07); border:1.5px solid rgba(201,162,0,0.28);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $evtIcons[$loop->index % 2] !!}</svg>
+                    </div>
+                    <p style="font-size:10px; letter-spacing:0.22em; color:rgba(13,42,82,0.5); text-transform:uppercase; font-weight:600; margin-bottom:10px;">
+                        {{ strtoupper($evt->title) }}
+                    </p>
+                    <div class="flex justify-center mb-3">
+                        <div style="width:5px; height:5px; background:rgba(201,162,0,0.45); transform:rotate(45deg);"></div>
+                    </div>
+                    <p style="font-size:13px; color:var(--blue-deep); line-height:1.8;">
+                        @php
+                            $times = is_array($evt->event_time) ? $evt->event_time : [$evt->event_time];
+                            $formattedTimes = array_map(function($t) {
+                                if (is_array($t)) {
+                                    $timeStr = $t['time'] ?? '';
+                                    if (!empty($t['title'])) {
+                                        $timeStr .= " ({$t['title']})";
+                                    }
+                                    return $timeStr;
+                                }
+                                return (string) $t;
+                            }, $times);
+                        @endphp
+                        @if(!empty($formattedTimes))
+                            {{ implode(' · ', array_slice($formattedTimes, 0, 3)) }}
+                            @if(count($formattedTimes) > 3)<br>{{ implode(' · ', array_slice($formattedTimes, 3)) }}@endif
+                        @endif
+                    </p>
+                </div>
+
+            </div>
+            @endforeach
+
+            {{-- Placeholder cards if fewer than 2 upcoming events --}}
+            @for($evtFill = 0; $evtFill < (2 - $upcomingEvents->count()); $evtFill++)
+            <div class="card-event" style="opacity:0.38;">
+                <div class="flex flex-col items-center text-center px-6 py-10" style="flex:1; justify-content:center;">
+                    <div class="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+                         style="background:rgba(26,64,128,0.04); border:1px solid rgba(26,64,128,0.08);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </div>
+                    <p style="font-size:11px; color:rgba(13,42,82,0.3);">No upcoming event</p>
+                </div>
+                <div class="event-location-bar"></div>
+            </div>
+            @endfor
+        </div>
+
+        {{-- CTA banner --}}
+        <a href="/events"
+           class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl"
+           style="background:var(--blue-deep); text-decoration:none; padding:22px 24px; min-height:88px; display:flex;"
+           aria-label="View full events schedule">
+            <div class="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none" style="opacity:0.1;" aria-hidden="true">
+                <svg width="100" height="72" viewBox="0 0 92 66" fill="none" stroke="#FFFFFF" stroke-width="1.2">
+                    <line x1="46" y1="9" x2="46" y2="1"/><line x1="42" y1="5" x2="50" y2="5"/>
+                    <rect x="31" y="9" width="30" height="34" rx="1"/>
+                    <path d="M21 43 L71 43 L71 63 L21 63 Z"/>
+                    <rect x="37" y="48" width="8" height="12"/>
+                    <rect x="47" y="48" width="8" height="12"/>
+                </svg>
+            </div>
+            <div class="flex items-center gap-2.5 mb-1.5">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+                <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.32em; color:#FFFFFF; font-weight:600;">VIEW FULL SCHEDULE</span>
+            </div>
+            <span class="transition-transform duration-300 group-hover:translate-x-1 block" style="color:#C9A200; font-size:16px; line-height:1;" aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════ --}}
+{{-- LATEST ANNOUNCEMENTS                               --}}
+{{-- ═══════════════════════════════════════════════════ --}}
+<section class="relative py-24 overflow-hidden reveal">
+    {{-- Faded background --}}
+    <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        <img src="https://images.pexels.com/photos/5875357/pexels-photo-5875357.jpeg?auto=compress&w=1400"
+             alt=""
+             class="w-full h-full object-cover"
+             style="filter:saturate(0.18) brightness(1.15) blur(4px); transform:scale(1.06);">
+        <div style="position:absolute; inset:0; background:rgba(246,243,238,0.91);"></div>
+    </div>
+
+    @php
+    $annImgs = [
+        'https://images.pexels.com/photos/1652302/pexels-photo-1652302.jpeg?auto=compress&w=800',
+        'https://images.pexels.com/photos/6756378/pexels-photo-6756378.jpeg?auto=compress&w=800',
+        'https://images.pexels.com/photos/5735003/pexels-photo-5735003.jpeg?auto=compress&w=800',
+    ];
+    $annCats = ['Liturgical', 'Parish Life', 'Parish Event'];
+    @endphp
+
+    <div class="relative z-10 max-w-6xl mx-auto px-6">
+        {{-- Header row --}}
+        <div class="relative flex items-start justify-between mb-14">
+            <div class="w-24 shrink-0 hidden sm:block"></div>
+            {{-- Center heading --}}
+            <div class="flex-1 text-center">
+                <div class="flex items-center justify-center gap-4 mb-5">
+                    <span style="display:block; flex:1; max-width:60px; height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,0,0.4));"></span>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                        <line x1="12" y1="2" x2="12" y2="0"/><line x1="10" y1="1" x2="14" y2="1"/>
+                    </svg>
+                    <span style="display:block; flex:1; max-width:60px; height:1px; background:linear-gradient(90deg,rgba(201,162,0,0.4),transparent);"></span>
+                </div>
+                <h2 class="font-cinzel font-semibold"
+                    style="font-size:clamp(1.25rem,3vw,2.15rem); color:var(--blue-deep); letter-spacing:0.16em; margin-bottom:8px;">LATEST ANNOUNCEMENTS</h2>
+                <p style="color:rgba(13,42,82,0.4); font-size:13.5px; max-width:480px; margin:0 auto 14px;">Stay informed. Be involved. Grow in faith together.</p>
+                <div class="flex justify-center">
+                    <div style="width:6px; height:6px; background:rgba(201,162,0,0.42); transform:rotate(45deg);"></div>
+                </div>
+            </div>
+            {{-- Prev / Next buttons --}}
+            <div class="hidden sm:flex items-center gap-2 shrink-0 pt-1">
+                <button onclick="document.getElementById('ann-grid').scrollBy({left:-340,behavior:'smooth'})"
+                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200"
+                        style="border:1.5px solid rgba(13,42,82,0.16); color:rgba(13,42,82,0.4); background:#FFFFFF;"
+                        aria-label="Previous announcements">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <button onclick="document.getElementById('ann-grid').scrollBy({left:340,behavior:'smooth'})"
+                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200"
+                        style="border:1.5px solid rgba(13,42,82,0.16); color:rgba(13,42,82,0.4); background:#FFFFFF;"
+                        aria-label="Next announcements">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </div>
+        </div>
+
+        {{-- Announcement cards --}}
+        @if($announcements->isEmpty())
+        <div class="text-center py-16">
+            <p style="color:rgba(13,42,82,0.3); font-size:14px;">No announcements at this time.</p>
+        </div>
+        @else
+        <div id="ann-grid" class="grid md:grid-cols-3 gap-5 mb-10">
+            @foreach($announcements as $ann)
+            @php $aIdx = $loop->index; $aIsFirst = $loop->first; @endphp
+            <article class="card-sacred overflow-hidden flex flex-col group/ann">
+                {{-- Photo --}}
+                <div class="relative overflow-hidden shrink-0" style="height:196px;">
+                    <img src="{{ $annImgs[$aIdx % 3] }}"
+                         alt="{{ $ann->title }}"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover/ann:scale-105">
+                    @if($aIsFirst)
+                    <div class="absolute top-0 left-0 flex items-center gap-1.5 px-3 py-2"
+                         style="background:rgba(162,118,0,0.92); border-bottom-right-radius:14px;">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="#FFFFFF" stroke="none" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span style="font-size:8.5px; font-weight:700; letter-spacing:0.18em; color:#FFFFFF; text-transform:uppercase;">FEATURED</span>
                     </div>
                     @endif
-
-                    <div class="flex-1 px-8 py-10 flex flex-col items-center justify-center">
-                        {{-- Icon --}}
-                        <div class="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-                             style="background:radial-gradient(circle, #FFFBF0 0%, #FFFFFF 100%);
-                                    border:1px solid rgba(245,197,24,0.3);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                {!! $icon !!}
-                            </svg>
-                        </div>
-
-                        <h3 class="font-cinzel font-bold text-sm tracking-[0.2em] uppercase mb-4 group-hover:text-accent transition-colors" style="color:var(--blue-deep);">
-                            {{ $event->title }}
-                        </h3>
-
-                        <div class="h-px w-8 bg-muted/40 mb-6"></div>
-
-                        @if(!empty($event->event_time) && count($event->event_time) > 0)
-                            <div class="flex flex-col gap-1">
-                                @foreach($event->event_time as $t)
-                                    <p class="font-heading font-bold text-3xl italic" style="color:var(--blue-deep);">
-                                        {{ \Carbon\Carbon::parse($t['time'] ?? '')->format('g:i A') }}
-                                    </p>
-                                @endforeach
+                </div>
+                {{-- Card body --}}
+                <div class="p-5 flex-1 flex flex-col">
+                    <div class="flex items-start gap-3 mb-3">
+                        {{-- Date badge --}}
+                        <div class="shrink-0 text-center rounded-lg overflow-hidden" style="border:1px solid rgba(201,162,0,0.3); min-width:44px;">
+                            <div style="background:rgba(201,162,0,0.09); padding:2px 6px; font-size:8px; font-weight:700; letter-spacing:0.1em; color:#C9A200; text-transform:uppercase;">
+                                {{ ($ann->published_at ?? $ann->created_at)->format('M') }}
                             </div>
-                        @else
-                            <p class="font-heading font-bold text-2xl italic" style="color:var(--blue-deep);">Schedule TBD</p>
-                        @endif
+                            <div class="font-heading font-bold"
+                                 style="font-size:1.1rem; color:var(--blue-deep); padding:2px 6px; line-height:1.15;">
+                                {{ ($ann->published_at ?? $ann->created_at)->format('d') }}
+                            </div>
+                        </div>
+                        {{-- Category + Title --}}
+                        <div class="flex-1 min-w-0">
+                            <p class="eyebrow mb-1" style="font-size:8.5px;">{{ strtoupper($annCats[$aIdx % 3]) }}</p>
+                            <h3 class="font-heading font-bold italic leading-snug"
+                                style="font-size:1.08rem; color:var(--blue-deep);">{{ $ann->title }}</h3>
+                        </div>
                     </div>
+                    @if($ann->content)
+                    <p class="text-sm leading-relaxed flex-1"
+                       style="color:rgba(13,42,82,0.48); overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
+                        {{ mb_substr(strip_tags($ann->content), 0, 130) }}
+                    </p>
+                    @endif
+                </div>
+                {{-- Card footer --}}
+                <div class="flex items-center justify-between px-5 py-3.5"
+                     style="border-top:1px solid rgba(26,64,128,0.06);">
 
-                    {{-- Location Bar --}}
-                    <div class="event-location-bar">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span class="text-xs font-medium text-muted-foreground">{{ $event->location ?? 'Main Church' }}</span>
-                    </div>
-                </a>
+                    <a href="#"
+                       style="font-size:9.5px; font-weight:700; letter-spacing:0.15em; color:#C9A200; text-decoration:none; text-transform:uppercase;"
+                       class="hover:opacity-60 transition-opacity"
+                       aria-label="Read more about {{ $ann->title }}">READ MORE →</a>
+                </div>
+            </article>
             @endforeach
         </div>
-
-        {{-- View Full Schedule Bar --}}
-        <div class="max-w-6xl mx-auto mt-16">
-            <a href="/events"
-               class="group block relative py-10 bg-primary rounded-[24px] text-center overflow-hidden transition-all duration-500 hover:bg-[#0a2044]"
-               style="text-decoration:none;">
-                {{-- Watermark --}}
-                <div class="absolute inset-0 opacity-10 flex items-center justify-start pl-12 pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="0.4"><path d="M3 21h18M3 10l9-8 9 8v11H3V10z"/><path d="M9 21v-8a3 3 0 0 1 6 0v8"/></svg>
-                </div>
-                
-                <div class="relative z-10 flex flex-col items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/><circle cx="12" cy="16" r="1"/></svg>
-                    <span class="text-xs font-bold uppercase tracking-[0.4em] text-white">View Full Schedule</span>
-                    <span class="text-accent text-lg group-hover:translate-x-2 transition-transform">→</span>
-                </div>
-            </a>
-        </div>
+        @endif
     </div>
 </section>
-@endif
-
-
-{{-- ═══════════════════════════════════════════════════ --}}
-{{-- ANNOUNCEMENTS                                      --}}
-{{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-36 bg-[var(--cream)]">
-    <div class="max-w-[1200px] mx-auto px-6">
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 max-w-5xl mx-auto mb-16">
-            <div>
-                <div class="divider-ornament justify-start mb-4">
-                    <span class="eyebrow">From the Parish</span>
-                </div>
-                <h2 class="font-heading text-4xl md:text-5xl font-bold italic" style="color:var(--blue-deep);">Latest Announcements</h2>
-            </div>
-        </div>
-        <div class="grid gap-7 max-w-5xl mx-auto" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
-            @forelse($announcements as $item)
-            <div class="card-sacred flex flex-col group">
-                <div class="h-[2px] mx-7 mt-8 rounded-full mb-7"
-                     style="background:linear-gradient(90deg,var(--gold),rgba(245,197,24,0.25));"></div>
-                <div class="px-8 pb-8 flex flex-col flex-1">
-                    <div class="flex items-center gap-2.5 mb-6">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center"
-                             style="background:rgba(245,197,24,0.10); border:1px solid rgba(245,197,24,0.25);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
-                        </div>
-                        <span class="text-[9px] font-bold uppercase tracking-[0.3em]" style="color:rgba(13,42,82,0.4);">Announcement</span>
-                    </div>
-                    <h3 class="font-heading font-bold text-xl italic leading-tight mb-4 line-clamp-2" style="color:var(--blue-deep);">{{ $item->title }}</h3>
-                    <p class="text-sm leading-relaxed line-clamp-3 flex-1" style="color:rgba(13,42,82,0.55);">{{ $item->content }}</p>
-                    <div class="flex items-center gap-1.5 mt-8 pt-6 text-[11px]"
-                         style="border-top:1px solid rgba(26,64,128,0.08); color:rgba(13,42,82,0.35);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-                        {{ $item->created_at->format('M d, Y') }}
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div class="col-span-3 py-20 text-center">
-                <p class="font-heading italic text-lg" style="color:rgba(13,42,82,0.3);">No recent announcements at this time.</p>
-            </div>
-            @endforelse
-        </div>
-    </div>
-</section>
-
 
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- SACRAMENTAL SERVICES                               --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-28 relative overflow-hidden" style="background:var(--blue-deep);">
+<section class="py-28 relative overflow-hidden reveal" style="background:var(--blue-deep);">
 
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none font-cinzel leading-none"
          style="font-size:420px; color:rgba(255,255,255,0.018);">✝</div>
@@ -699,7 +852,7 @@
     <div class="absolute top-0 left-0 right-0 h-px"
          style="background:linear-gradient(90deg,transparent,rgba(245,197,24,0.4),transparent);"></div>
 
-    <div class="max-w-[1200px] mx-auto px-6 relative z-10">
+    <div class="max-w-[1200px] mx-auto px-6 relative z-10"><br><br>
         <div class="text-center mb-16">
             <div class="divider-ornament mb-4">
                 <span style="font-size:10px; font-weight:600; letter-spacing:0.35em; text-transform:uppercase; color:rgba(245,197,24,0.65);">Sacramental Services</span>
@@ -736,7 +889,7 @@
             </a>
             @endforeach
         </div>
-    </div>
+    </div><br><br>
 
     <div class="absolute bottom-0 left-0 right-0 h-px"
          style="background:linear-gradient(90deg,transparent,rgba(245,197,24,0.25),transparent);"></div>
@@ -746,7 +899,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- INTENTION CTA                                      --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-28 relative overflow-hidden bg-[var(--cream)]">
+<section class="py-28 relative overflow-hidden bg-[var(--cream)] reveal">
 
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
          style="background:radial-gradient(circle,rgba(26,64,128,0.05) 0%,transparent 70%);"></div>
@@ -789,5 +942,28 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observerOptions = {
+            threshold: 0.12,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Once animated, no need to observe anymore
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>
 
 </x-public-layout>
