@@ -261,6 +261,7 @@
     <div style="position:absolute; inset:0; z-index:2; pointer-events:none; opacity:0.03;
                 background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 stitchTiles=%22stitch%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>');"></div>
 
+
     {{-- Content wrapper — pushed down by nav height, centered vertically --}}
     <div style="position:relative; z-index:10; text-align:center; display:flex; flex-direction:column;
                 align-items:center; padding: 0 24px; width:100%; max-width:960px;
@@ -274,11 +275,6 @@
             </span>
         </div>
 
-        {{-- Cross --}}
-        <div class="font-cinzel animate-fade-in delay-1"
-             style="color:var(--gold); font-size:1.35rem; opacity:0.75; margin-bottom:18px;
-                    text-shadow:0 0 20px rgba(245,197,24,0.5);">✝</div>
-
         {{-- ══ SINGLE-LINE TITLE ══
              "Sto. Rosario" in white, " Parish" shimmering gold — forced nowrap,
              clamp keeps it one line from ~360px upward.
@@ -291,8 +287,9 @@
                    margin-bottom: 20px;
                    text-shadow: 0 4px 48px rgba(0,0,0,0.55);
                    font-size: clamp(2.4rem, 6.5vw, 6.4rem);">
-            <span style="color:#FFFFFF;">Sto. Rosario</span>
-            <em class="hero-title-accent" style="font-style:italic;"> Parish</em>
+            
+            <em class="hero-title-accent" style="font-style:italic;">Sto. Rosario</em>
+            <span style="color:#FFFFFF;">Parish</span>
         </h1>
 
         {{-- Location --}}
@@ -321,14 +318,14 @@
         <div class="animate-fade-up delay-4"
              style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px; margin-bottom:40px;">
             <a href="/mass-schedule"
-               class="gold-btn inline-flex items-center gap-2 rounded-full"
-               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none;">
+               class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
+               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 Mass Schedule
             </a>
             <a href="/submit-intention"
-               class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
-               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-decoration:none;">
+               class="gold-btn inline-flex items-center gap-2 rounded-full"
+               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                 Offer an Intention
             </a>
@@ -437,7 +434,7 @@
         <div style="height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,0,0.2),transparent);"></div>
 
         {{-- ── Office Hours ── --}}
-        <div class="px-8 pt-7 pb-0">
+        <div class="px-8 pt-7 pb-0"><br>
             {{-- Header --}}
             <div class="flex items-center gap-3 mb-2">
                 <span style="flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,0,0.3));"></span>
@@ -483,22 +480,15 @@
            class="group relative flex flex-col items-center justify-center overflow-hidden mt-6"
            style="background:var(--blue-deep); text-decoration:none; padding:22px 24px; border-radius:0 0 24px 24px; display:flex; min-height:82px;"
            aria-label="View Full Mass Schedule">
-            <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" style="opacity:0.1;" aria-hidden="true">
-                <svg width="92" height="66" viewBox="0 0 92 66" fill="none" stroke="#FFFFFF" stroke-width="1.2">
-                    <line x1="46" y1="9" x2="46" y2="1"/><line x1="42" y1="5" x2="50" y2="5"/>
-                    <rect x="31" y="9" width="30" height="34" rx="1"/>
-                    <path d="M21 43 L71 43 L71 63 L21 63 Z"/>
-                    <rect x="37" y="48" width="8" height="12"/>
-                    <rect x="47" y="48" width="8" height="12"/>
-                    <rect x="28" y="18" width="8" height="9" rx="4"/>
-                    <rect x="56" y="18" width="8" height="9" rx="4"/>
-                </svg>
+            <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:0.50; height:180%; width:auto;" aria-hidden="true">
+                <img src="{{ asset('assets/img/parish-illustration.svg') }}" 
+                     alt="Parish Illustration" 
+                     style="height:90%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
             </div>
             <div class="flex items-center gap-2.5 mb-1.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect width="18" height="18" x="3" y="4" rx="2"/>
                     <path d="M16 2v4M8 2v4M3 10h18"/>
-                    <!-- Enhanced cross -->
                     <path d="M11 2v3M9 3h4"/>
                 </svg>
                 <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.32em; color:#FFFFFF; font-weight:600;">FULL SCHEDULE</span>
@@ -530,7 +520,7 @@
             @foreach($actions as $a)
             <a href="{{ $a['href'] }}"
                class="card-sacred group flex flex-col items-center gap-5 p-9 text-center"
-               style="text-decoration:none;">
+               style="text-decoration:none;"><br><br>
                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                      style="background:linear-gradient(135deg,rgba(245,197,24,0.14),rgba(245,197,24,0.04));
                             border:1px solid rgba(245,197,24,0.32);">
@@ -540,7 +530,7 @@
                     <p class="font-heading font-bold text-lg italic transition-colors duration-200 group-hover:text-[#C9A200]"
                        style="color:var(--blue-deep);">{{ $a['label'] }}</p>
                     <p class="text-[11px] mt-1 tracking-wide" style="color:rgba(13,42,82,0.4);">{{ $a['sub'] }}</p>
-                </div>
+                </div><br><br>
             </a>
             @endforeach
         </div>
@@ -687,27 +677,39 @@
         </div>
 
         {{-- CTA banner --}}
-        <a href="/events"
-           class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl"
-           style="background:var(--blue-deep); text-decoration:none; padding:22px 24px; min-height:88px; display:flex;"
-           aria-label="View full events schedule">
-            <div class="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none" style="opacity:0.1;" aria-hidden="true">
-                <svg width="100" height="72" viewBox="0 0 92 66" fill="none" stroke="#FFFFFF" stroke-width="1.2">
-                    <line x1="46" y1="9" x2="46" y2="1"/><line x1="42" y1="5" x2="50" y2="5"/>
-                    <rect x="31" y="9" width="30" height="34" rx="1"/>
-                    <path d="M21 43 L71 43 L71 63 L21 63 Z"/>
-                    <rect x="37" y="48" width="8" height="12"/>
-                    <rect x="47" y="48" width="8" height="12"/>
-                </svg>
-            </div>
-            <div class="flex items-center gap-2.5 mb-1.5">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-                </svg>
-                <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.32em; color:#FFFFFF; font-weight:600;">VIEW FULL SCHEDULE</span>
-            </div>
-            <span class="transition-transform duration-300 group-hover:translate-x-1 block" style="color:#C9A200; font-size:16px; line-height:1;" aria-hidden="true">→</span>
-        </a>
+<a href="/events"
+   class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl"
+   style="background:#0A2342; text-decoration:none; padding:24px; min-height:100px; transition:all 0.35s ease;"
+   aria-label="View full events schedule">
+
+    <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110"
+         style="opacity:0.50; height:150%; width:auto;"
+         aria-hidden="true">
+        <img src="{{ asset('assets/img/parish-illustration.svg') }}" 
+             alt="Parish Illustration" 
+             style="height:90%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
+    </div>
+
+    <div class="relative z-10 flex flex-col items-center gap-2">
+        <div class="flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="4" rx="2"/>
+                <path d="M16 2v4M8 2v4M3 10h18"/>
+            </svg>
+
+            <span class="font-cinzel"
+                  style="font-size:11px; letter-spacing:0.35em; color:#FFFFFF; font-weight:700; text-transform:uppercase;">
+                View Full Schedule
+            </span>
+        </div>
+
+        <span class="transition-all duration-300 group-hover:translate-x-2"
+              style="color:#C9A200; font-size:18px; line-height:1;"
+              aria-hidden="true">
+            →
+        </span>
+    </div>
+</a>
     </div>
 </section>
 
@@ -717,7 +719,7 @@
 <section class="relative py-24 overflow-hidden reveal">
     {{-- Faded background --}}
     <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <img src="https://images.pexels.com/photos/5875357/pexels-photo-5875357.jpeg?auto=compress&w=1400"
+        <img src="{{ asset('assets/img/church1.jpg') }}"
              alt=""
              class="w-full h-full object-cover"
              style="filter:saturate(0.18) brightness(1.15) blur(4px); transform:scale(1.06);">
@@ -726,7 +728,7 @@
 
     @php
     $annImgs = [
-        'https://images.pexels.com/photos/1652302/pexels-photo-1652302.jpeg?auto=compress&w=800',
+        asset('assets/img/church1.jpg'),
         'https://images.pexels.com/photos/6756378/pexels-photo-6756378.jpeg?auto=compress&w=800',
         'https://images.pexels.com/photos/5735003/pexels-photo-5735003.jpeg?auto=compress&w=800',
     ];

@@ -6,7 +6,7 @@
     }
 </style>
 
-<footer class="border-t bg-primary text-primary-foreground">
+<footer class="border-t bg-primary text-primary-foreground" style="background-color:#0d2a52;">
     <div class="container py-12 mx-auto px-4">
         <div class="grid md:grid-cols-3 gap-8">
             <div>
