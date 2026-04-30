@@ -42,8 +42,12 @@ class InquiryController extends Controller
         ]);
 
         // Send confirmation email
-        \Illuminate\Support\Facades\Notification::route('mail', $validated['email'])
-            ->notify(new \App\Notifications\InquirySubmitted($inquiry));
+        try {
+            \Illuminate\Support\Facades\Notification::route('mail', $validated['email'])
+                ->notify(new \App\Notifications\InquirySubmitted($inquiry));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Mail Error: " . $e->getMessage());
+        }
 
         if ($request->expectsJson()) {
             return response()->json([

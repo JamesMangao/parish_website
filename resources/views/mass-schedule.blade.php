@@ -12,11 +12,13 @@
             --blue-mid:   #1A4080;
             --blue-soft:  #2255A4;
             --blue-pale:  #EBF2FF;
-            --cream:      #F7F9FF;
+            --cream:      #F5F5DC;
             --cream-deep: #EDF2FC;
             --stone-text: #1E3254;
+            --yellowish:  #fdf8acff; 
         }
-        body { background: var(--cream); font-family: 'Jost', sans-serif; }
+        body, .bg-background { background-color: #FFFFFF !important; }
+        body { font-family: 'Jost', sans-serif; }
         .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
         .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
 
@@ -72,11 +74,12 @@
         .card-sacred {
             background: #FFFFFF;
             border: 1px solid rgba(26,64,128,0.12);
-            border-radius: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             transition: all 0.3s ease;
         }
         .card-sacred:hover {
-            border-color: rgba(245,197,24,0.55);
+            border-color: rgba(245, 197, 24, 0.55);
             box-shadow: 0 10px 40px rgba(13,42,82,0.12);
             transform: translateY(-3px);
         }
@@ -84,8 +87,8 @@
         /* ── Time pill ── */
         .time-pill {
             display: inline-flex; align-items: center; gap: 6px;
-            background: var(--blue-pale);
-            border: 1px solid rgba(26,64,128,0.14);
+            background: #FFFFFF;
+            border: 1px solid rgba(245,197,24,0.5);
             border-radius: 100px;
             padding: 7px 18px;
             font-family: 'Cormorant Garamond', Georgia, serif;
@@ -94,9 +97,9 @@
             transition: all 0.2s ease;
         }
         .card-sacred:hover .time-pill {
-            background: rgba(245,197,24,0.10);
-            border-color: rgba(245,197,24,0.45);
-            color: #8a6800;
+            background: var(--blue-pale);
+            border-color: rgba(34,85,164,0.3);
+            color: var(--blue-deep);
         }
 
         /* ── Type badge ── */
@@ -106,11 +109,11 @@
             letter-spacing: 0.28em; text-transform: uppercase;
             padding: 4px 14px; border-radius: 100px;
         }
-        .badge-sunday      { background: rgba(245,197,24,0.12); color: #8a6800;  border: 1px solid rgba(245,197,24,0.35); }
-        .badge-anticipated { background: rgba(245,197,24,0.08); color: #7a5e00;  border: 1px solid rgba(245,197,24,0.22); }
-        .badge-weekday     { background: var(--blue-pale);       color: var(--blue-mid); border: 1px solid rgba(26,64,128,0.18); }
-        .badge-saturday    { background: rgba(34,85,164,0.08);   color: var(--blue-soft); border: 1px solid rgba(34,85,164,0.20); }
-        .badge-special     { background: rgba(13,42,82,0.06);    color: var(--blue-deep); border: 1px solid rgba(13,42,82,0.16); }
+        .badge-sunday      { background: #FFFFFF; color: #8a6800;  border: 1px solid rgba(245,197,24,0.6); }
+        .badge-anticipated { background: #FFFFFF; color: #7a5e00;  border: 1px solid rgba(245,197,24,0.4); }
+        .badge-weekday     { background: #FFFFFF; color: var(--blue-mid); border: 1px solid rgba(26,64,128,0.3); }
+        .badge-saturday    { background: #FFFFFF; color: var(--blue-soft); border: 1px solid rgba(34,85,164,0.3); }
+        .badge-special     { background: #FFFFFF; color: var(--blue-deep); border: 1px solid rgba(13,42,82,0.3); }
 
         /* ── Section rule ── */
         .section-title-rule {
@@ -125,16 +128,16 @@
         .cal-link {
             display: inline-flex; align-items: center; gap: 5px;
             font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(13,42,82,0.38); text-decoration: none;
+            color: rgba(13,42,82,0.65); text-decoration: none;
             padding: 5px 12px; border-radius: 100px;
-            border: 1px solid rgba(13,42,82,0.10);
-            background: transparent;
+            border: 1px solid rgba(13,42,82,0.25);
+            background: #FFFFFF;
             transition: all 0.2s ease; cursor: pointer;
         }
         .cal-link:hover {
-            border-color: rgba(245,197,24,0.55);
-            color: #8a6800;
-            background: rgba(245,197,24,0.06);
+            border-color: rgba(34,85,164,0.3);
+            color: var(--blue-deep);
+            background: var(--blue-pale);
         }
 
         /* ── Gold btn (reused from home) ── */
@@ -172,21 +175,21 @@
         <div class="flex justify-center mb-6 animate-fade-in">
             <div class="relative flex items-center justify-center" style="width:52px; height:52px;">
                 <svg width="52" height="52" viewBox="0 0 52 52" style="position:absolute;inset:0;" fill="none" aria-hidden="true">
-                    <line x1="26" y1="2"  x2="26" y2="10" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="26" y1="42" x2="26" y2="50" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="2"  y1="26" x2="10" y2="26" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="42" y1="26" x2="50" y2="26" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="8"  y1="8"  x2="13" y2="13" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="39" y1="39" x2="44" y2="44" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="44" y1="8"  x2="39" y2="13" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
-                    <line x1="8"  y1="44" x2="13" y2="39" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="26" y1="2"  x2="26" y2="10" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="26" y1="42" x2="26" y2="50" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="2"  y1="26" x2="10" y2="26" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="42" y1="26" x2="50" y2="26" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="8"  y1="8"  x2="13" y2="13" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="39" y1="39" x2="44" y2="44" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="44" y1="8"  x2="39" y2="13" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="8"  y1="44" x2="13" y2="39" stroke="rgba(253, 248, 172, 1)" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
-                <span class="font-cinzel relative z-10" style="color:var(--gold); font-size:1.5rem;" aria-hidden="true">✝</span>
+                <span class="font-cinzel relative z-10" style="color:var(--yellowish); font-size:1.5rem;" aria-hidden="true">✝</span>
             </div>
         </div>
 
         <div class="divider-ornament mb-4 animate-fade-in delay-1">
-            <span class="eyebrow" style="color:rgba(245,197,24,0.70);">Holy Eucharist</span>
+            <span class="eyebrow" style="color:rgba(253, 248, 172, 1);">Holy Eucharist</span>
         </div>
 
         <h1 class="font-heading animate-fade-up delay-1"
@@ -197,7 +200,7 @@
         </h1>
 
         <p class="animate-fade-up delay-2 font-heading"
-           style="font-style:italic; color:rgba(245,197,24,0.75); font-size:clamp(0.95rem,1.8vw,1.15rem);
+           style="font-style:italic; color:rgba(253, 248, 172, 1); font-size:clamp(0.95rem,1.8vw,1.15rem);
                   font-weight:300; margin-bottom:0;">
             Pacita Complex 1, San Pedro, Laguna
         </p>
@@ -278,7 +281,7 @@
         </div>
 
         {{-- Cards --}}
-        <div class="space-y-5">
+        <div class="space-y-5 p-6 md:p-8 rounded-2xl" style="background: #FDFBF5; border: 1px solid rgba(245, 197, 24, 0.25);">
         @foreach($schedules[$type] as $s)
         @php
             $times      = is_array($s->time) ? array_filter($s->time) : array_filter([$s->time]);
@@ -312,16 +315,15 @@
 
                 {{-- Left: info --}}
                 <div class="flex-1 min-w-0">
-                    {{-- Badge + title row --}}
+                    {{-- Title row --}}
+                    @if($s->title)
                     <div class="flex flex-wrap items-center gap-3 mb-3">
-                        <span class="type-badge badge-{{ $type }}">{{ $type }}</span>
-                        @if($s->title)
                         <h3 class="font-heading font-bold italic"
                             style="font-size:1.45rem; color:var(--blue-deep); line-height:1.2;">
                             {{ $s->title }}
                         </h3>
-                        @endif
                     </div>
+                    @endif
 
                     {{-- Day / date --}}
                     @if($s->day_of_week || $s->specific_date)

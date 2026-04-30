@@ -12,12 +12,12 @@
 
         /* ── Tokens ── */
         :root {
-            --maroon: #3B1A22;
-            --gold:   #C9A96E;
-            --cream:  #F5F0E8;
-            --border: #E0D9CE;
-            --text:   #555;
-            --muted:  #888;
+            --maroon: #0D2A52;
+            --gold:   #F5C518;
+            --cream:  #F7F9FF;
+            --border: rgba(26,64,128,0.12);
+            --text:   #4A5568;
+            --muted:  rgba(13,42,82,0.45);
         }
 
         .font-heading { font-family: 'Playfair Display', Georgia, serif; font-style: italic; }
@@ -50,8 +50,8 @@
             100% { background-position:  200% center; }
         }
         @keyframes pulse-dot {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,.6); }
-            50%       { box-shadow: 0 0 0 7px rgba(201,169,110,0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245,197,24,.6); }
+            50%       { box-shadow: 0 0 0 7px rgba(245,197,24,0); }
         }
         @keyframes lineGrow {
             from { transform: scaleY(0); transform-origin: top center; }
@@ -105,21 +105,19 @@
             position: relative;
             overflow: hidden;
         }
-        /* decorative radial glow */
         .about-hero::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(201,169,110,.18) 0%, transparent 70%);
+            background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(245,197,24,.18) 0%, transparent 70%);
             pointer-events: none;
         }
-        /* animated faint rose window ring */
         .about-hero::after {
             content: '';
             position: absolute;
             width: 520px; height: 520px;
             border-radius: 50%;
-            border: 1px solid rgba(201,169,110,.07);
+            border: 1px solid rgba(245,197,24,.07);
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             animation: spin-slow 60s linear infinite;
@@ -176,7 +174,6 @@
             font-size: 3.4rem;
             color: var(--maroon);
             line-height: 1;
-            /* JS adds .counted class to trigger */
         }
         .stat-number.counted { animation: countUp .7s ease both; }
         .stat-label {
@@ -212,12 +209,11 @@
             overflow: hidden;
             position: relative;
             background: var(--border);
-            /* hover lift */
             transition: transform .4s ease, box-shadow .4s ease;
         }
         .calling-img-wrap:hover {
             transform: translateY(-6px);
-            box-shadow: 0 20px 48px rgba(59,26,34,.18);
+            box-shadow: 0 20px 48px rgba(13,42,82,.18);
         }
         .calling-img-wrap img {
             width: 100%; height: 100%;
@@ -259,7 +255,12 @@
         ════════════════════════════════════════ */
         .timeline-section {
             background: var(--cream);
-            padding: 88px 24px;
+            padding: 88px 0; /* Bleed to edges */
+            overflow: hidden;
+        }
+        .timeline-section .section-eyebrow,
+        .timeline-section .section-title {
+            padding: 0 24px;
         }
         .section-eyebrow {
             font-size: 9px;
@@ -279,52 +280,104 @@
             margin-bottom: 0;
         }
 
-        /* vertical track */
-        .tl-wrapper {
-            max-width: 720px;
-            margin: 56px auto 0;
-            position: relative;
-            padding-left: 36px;
+        .tl-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; /* Firefox */
+            padding-bottom: 20px;
+            margin-top: 56px;
+            cursor: grab;
         }
-        /* the golden spine */
+        .tl-scroll-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+ 
+        .tl-wrapper {
+            display: flex;
+            position: relative;
+            width: max-content;
+            padding: 20px 48px; /* 48px side padding so it doesn't stick to edge */
+            margin: 0 auto;
+            gap: 56px; /* Space between timeline items */
+        }
+ 
+        /* ── Timeline Navigation ── */
+        .tl-nav-wrapper {
+            position: relative;
+            padding: 0 40px; /* Space for arrows */
+        }
+        .tl-btn {
+            position: absolute;
+            top: 40px; /* Center with the dots */
+            width: 44px; height: 44px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--maroon);
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(13,42,82,0.08);
+        }
+        .tl-btn:hover {
+            background: var(--gold);
+            color: var(--maroon);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245,197,24,0.3);
+        }
+        .tl-btn-left { left: 10px; }
+        .tl-btn-right { right: 10px; }
+        .tl-btn svg { width: 20px; height: 20px; }
+
         .tl-spine {
             position: absolute;
-            left: 7px; top: 8px; bottom: 8px;
-            width: 2px;
-            background: linear-gradient(to bottom, transparent, var(--gold) 6%, var(--gold) 94%, transparent);
-            transform-origin: top center;
-            /* animated when section scrolls in */
-            transform: scaleY(0);
-            transition: transform 1.4s cubic-bezier(.16,1,.3,1);
+            top: 29px; /* 20px top padding + 9px (center of 18px dot) */
+            left: 57px; /* 48px left padding + 9px */
+            right: 57px; /* 48px right padding + 9px */
+            height: 1px;
+            background: var(--maroon);
+            transform-origin: left center;
+            transform: scaleX(0);
+            transition: transform 1.5s cubic-bezier(.16,1,.3,1);
+            z-index: 0;
         }
-        .tl-spine.revealed { transform: scaleY(1); }
+        .tl-spine.revealed { transform: scaleX(1); }
 
-        /* individual items — staggered via JS */
         .tl-item {
             position: relative;
-            margin-bottom: 52px;
+            flex: 0 0 280px; /* Fixed width per item */
+            scroll-snap-align: center;
             opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity .55s ease, transform .55s ease;
+            transform: translateY(20px);
+            transition: opacity .5s ease, transform .5s ease, scale .4s cubic-bezier(.175, .885, .32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            z-index: 1;
+            will-change: transform;
         }
-        .tl-item:last-child { margin-bottom: 0; }
         .tl-item.visible { opacity: 1; transform: none; }
+        .tl-item.dragging { transform: scale(0.96) translateY(2px); transition: transform 0.2s ease; }
 
-        /* dot */
         .tl-dot {
-            position: absolute;
-            left: -43px; top: 6px;
-            width: 16px; height: 16px;
+            width: 18px; height: 18px;
             border-radius: 50%;
-            background: var(--gold);
-            border: 3px solid var(--cream);
-            box-shadow: 0 0 0 2px var(--gold);
-            transition: transform .3s ease;
+            background: var(--maroon);
+            border: 4px solid var(--cream);
+            box-shadow: 0 0 0 1px var(--maroon);
+            transition: transform .3s ease, background .3s, box-shadow .3s;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
         }
-        .tl-item.visible .tl-dot { animation: pulse-dot 2.4s 1s ease infinite; }
-        .tl-item:hover .tl-dot { transform: scale(1.3); }
+        .tl-item:hover .tl-dot {
+            transform: scale(1.3);
+            background: var(--gold);
+            box-shadow: 0 0 0 1px var(--gold);
+        }
 
-        /* content */
         .tl-badge {
             display: inline-block;
             font-size: 8px;
@@ -332,40 +385,43 @@
             letter-spacing: .12em;
             text-transform: uppercase;
             background: var(--maroon);
-            color: var(--gold);
+            color: #fff;
             padding: 3px 10px;
             border-radius: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 14px;
         }
         .tl-year {
             font-family: 'Playfair Display', Georgia, serif;
-            font-size: 2.4rem;
-            color: var(--gold);
+            font-size: 2.2rem;
+            color: var(--maroon);
             line-height: 1;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
         .tl-title {
             font-weight: 700;
-            font-size: .97rem;
+            font-size: 1.05rem;
             color: var(--maroon);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
         .tl-body {
-            font-size: .875rem;
-            color: var(--muted);
-            line-height: 1.75;
-            max-width: 580px;
+            font-size: .85rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .tl-content {
+            display: block;
+            text-align: left;
         }
 
-        /* expand / collapse on click */
         .tl-body-full { display: none; }
-        .tl-item.expanded .tl-body-full { display: block; }
+        .tl-item.expanded .tl-body-full { display: inline; }
         .tl-toggle {
             display: inline-block;
-            margin-top: 8px;
-            font-size: .78rem;
+            margin-top: 12px;
+            font-size: .8rem;
             font-weight: 700;
-            color: var(--gold);
+            color: var(--maroon);
             cursor: pointer;
             letter-spacing: .05em;
             user-select: none;
@@ -451,7 +507,7 @@
         }
         .info-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 14px 36px rgba(59,26,34,.1);
+            box-shadow: 0 14px 36px rgba(13,42,82,.1);
         }
         .info-icon {
             width: 40px; height: 40px;
@@ -475,7 +531,7 @@
             border-radius: 18px;
             overflow: hidden;
             border: 0.5px solid var(--border);
-            box-shadow: 0 4px 28px rgba(59,26,34,.09);
+            box-shadow: 0 4px 28px rgba(13,42,82,.09);
         }
         .map-credit { text-align: center; font-size: .72rem; color: #bbb; margin-top: 10px; }
         .map-credit a { color: var(--gold); }
@@ -494,7 +550,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse 70% 50% at 50% 100%, rgba(201,169,110,.14) 0%, transparent 70%);
+            background: radial-gradient(ellipse 70% 50% at 50% 100%, rgba(245,197,24,.14) 0%, transparent 70%);
             pointer-events: none;
         }
         .cta-title {
@@ -534,12 +590,12 @@
         }
         .btn-ghost:hover { background: rgba(255,255,255,.08); transform: translateY(-2px); }
 
-        /* ── shimmer on gold rule hover ── */
         .hero-divider:hover {
             background: linear-gradient(90deg, var(--gold), #fff, var(--gold));
             background-size: 200% auto;
             animation: shimmer 1.2s linear infinite;
         }
+
     </style>
 
     {{-- ═══════════════ HERO ═══════════════ --}}
@@ -594,78 +650,91 @@
         <p class="section-eyebrow" data-reveal>The Journey</p>
         <h2 class="section-title" data-reveal>Our sacred history</h2>
 
-        <div class="tl-wrapper">
-            <div class="tl-spine" id="tl-spine"></div>
+        <div class="tl-nav-wrapper">
+            <button class="tl-btn tl-btn-left" id="tl-left" aria-label="Scroll Left">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="tl-btn tl-btn-right" id="tl-right" aria-label="Scroll Right">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-9-6"/></svg>
+            </button>
 
-            @php
-            $timeline = [
-                [
-                    'year'  => '1982',
-                    'badge' => null,
-                    'title' => 'The image is carved',
-                    'short' => 'Carved in Paete, Laguna through funds gathered by Mrs. Delia Sanchez and Mrs. Fely Canta.',
-                    'full'  => 'Blessed by Rev. Fr. Rey Amante, the image was first housed at the Canta residence, then transferred in procession to the make-shift chapel.',
-                ],
-                [
-                    'year'  => '1983',
-                    'badge' => null,
-                    'title' => 'Canonical erection',
-                    'short' => 'The parish was canonically erected on October 16, 1983.',
-                    'full'  => 'On the same day, the Queen of the Most Holy Rosary of Pacita was officially declared patroness of the parish community.',
-                ],
-                [
-                    'year'  => '1986',
-                    'badge' => null,
-                    'title' => 'Church dedication',
-                    'short' => 'The Sto. Rosario Parish Church was blessed and dedicated on December 6.',
-                    'full'  => 'Jointly officiated by Msgr. Bruno Torpigliani (Papal Nuncio), Bishop Pedro Bantigue, and Auxiliary Bishop Gabriel Reyes.',
-                ],
-                [
-                    'year'  => '2009',
-                    'badge' => null,
-                    'title' => 'Our Lady of Pacita',
-                    'short' => "Rev. Fr. Mario P. Rivera began promoting the endearing title 'Our Lady of Pacita.'",
-                    'full'  => "This title integrated the community's deep sense of belonging with the Blessed Mother.",
-                ],
-                [
-                    'year'  => '2021',
-                    'badge' => null,
-                    'title' => 'Hermandad established',
-                    'short' => 'The Hermandad del Santo Rosario — the Rosary Confraternity of Pacita — was formally established.',
-                    'full'  => 'Established to propagate devotion to Our Lady. The Perpetual Novena is held every Saturday.',
-                ],
-                [
-                    'year'  => '2024',
-                    'badge' => 'Cultural Heritage',
-                    'title' => 'Important Cultural Property',
-                    'short' => 'The image was declared an Important Cultural Property of the City of San Pedro.',
-                    'full'  => 'Via Sangguniang Panlungsod Resolution No. 2024-198, adopted October 1, 2024.',
-                ],
-                [
-                    'year'  => '2025',
-                    'badge' => 'Royal Honor',
-                    'title' => 'Queen of the City',
-                    'short' => "Our Lady was accorded the honorific title 'Queen of the City of San Pedro.'",
-                    'full'  => 'Via Sangguniang Panlungsod Resolution No. 2025-93, adopted June 10, 2025.',
-                ],
-            ];
-            @endphp
+            <div class="tl-scroll-container">
+                <div class="tl-wrapper">
+                    <div class="tl-spine" id="tl-spine"></div>
 
-            @foreach($timeline as $i => $e)
-            <div class="tl-item" data-index="{{ $i }}">
-                <div class="tl-dot"></div>
-                @if($e['badge'])
-                    <span class="tl-badge">{{ $e['badge'] }}</span>
-                @endif
-                <div class="tl-year">{{ $e['year'] }}</div>
-                <div class="tl-title">{{ $e['title'] }}</div>
-                <p class="tl-body">
-                    {{ $e['short'] }}
-                    <span class="tl-body-full"> {{ $e['full'] }}</span>
-                </p>
-                <span class="tl-toggle" onclick="toggleItem(this)">Read more ↓</span>
+                    @php
+                    $timeline = [
+                        [
+                            'year'  => '1982',
+                            'badge' => null,
+                            'title' => 'The image is carved',
+                            'short' => 'Carved in Paete, Laguna through funds gathered by Mrs. Delia Sanchez and Mrs. Fely Canta.',
+                            'full'  => 'Blessed by Rev. Fr. Rey Amante, the image was first housed at the Canta residence, then transferred in procession to the make-shift chapel.',
+                        ],
+                        [
+                            'year'  => '1983',
+                            'badge' => null,
+                            'title' => 'Canonical erection',
+                            'short' => 'The parish was canonically erected on October 16, 1983.',
+                            'full'  => 'On the same day, the Queen of the Most Holy Rosary of Pacita was officially declared patroness of the parish community.',
+                        ],
+                        [
+                            'year'  => '1986',
+                            'badge' => null,
+                            'title' => 'Church dedication',
+                            'short' => 'The Sto. Rosario Parish Church was blessed and dedicated on December 6.',
+                            'full'  => 'Jointly officiated by Msgr. Bruno Torpigliani (Papal Nuncio), Bishop Pedro Bantigue, and Auxiliary Bishop Gabriel Reyes.',
+                        ],
+                        [
+                            'year'  => '2009',
+                            'badge' => null,
+                            'title' => 'Our Lady of Pacita',
+                            'short' => "Rev. Fr. Mario P. Rivera began promoting the endearing title 'Our Lady of Pacita.'",
+                            'full'  => "This title integrated the community's deep sense of belonging with the Blessed Mother.",
+                        ],
+                        [
+                            'year'  => '2021',
+                            'badge' => null,
+                            'title' => 'Hermandad established',
+                            'short' => 'The Hermandad del Santo Rosario — the Rosary Confraternity of Pacita — was formally established.',
+                            'full'  => 'Established to propagate devotion to Our Lady. The Perpetual Novena is held every Saturday.',
+                        ],
+                        [
+                            'year'  => '2024',
+                            'badge' => 'Cultural Heritage',
+                            'title' => 'Important Cultural Property',
+                            'short' => 'The image was declared an Important Cultural Property of the City of San Pedro.',
+                            'full'  => 'Via Sangguniang Panlungsod Resolution No. 2024-198, adopted October 1, 2024.',
+                        ],
+                        [
+                            'year'  => '2025',
+                            'badge' => 'Royal Honor',
+                            'title' => 'Queen of the City',
+                            'short' => "Our Lady was accorded the honorific title 'Queen of the City of San Pedro.'",
+                            'full'  => 'Via Sangguniang Panlungsod Resolution No. 2025-93, adopted June 10, 2025.',
+                        ],
+                    ];
+                    @endphp
+
+                    @foreach($timeline as $i => $e)
+                    <div class="tl-item" data-index="{{ $i }}">
+                        <div class="tl-dot"></div>
+                        <div class="tl-content">
+                            @if($e['badge'])
+                                <span class="tl-badge">{{ $e['badge'] }}</span>
+                            @endif
+                            <div class="tl-year">{{ $e['year'] }}</div>
+                            <div class="tl-title">{{ $e['title'] }}</div>
+                            <p class="tl-body">
+                                {{ $e['short'] }}
+                                <span class="tl-body-full"> {{ $e['full'] }}</span>
+                            </p>
+                            <span class="tl-toggle" onclick="toggleItem(this)">Read more ↓</span>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             </div>
-            @endforeach
         </div>
     </section>
 
@@ -680,7 +749,7 @@
                 <div class="leader-avatar">FV</div>
             @endif
             <h3 class="leader-name">{{ $global_settings['priest_name'] ?? 'Rev. Fr. Parish Priest' }}</h3>
-            <p class="leader-role">Parish Priest · 2021–Present</p>
+            <p class="leader-role">Parish Priest · 2019–Present</p>
             <div class="leader-rule"></div>
             <p class="leader-quote">"Feeding the sheep and tending the flock of the Lord with love and devotion."</p>
         </div>
@@ -695,7 +764,7 @@
             <div class="info-grid">
                 <div class="info-card" data-reveal>
                     <div class="info-icon">
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#C9A96E"/></svg>
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#F5C518"/></svg>
                     </div>
                     <p class="info-card-label">Address</p>
                     <p>1 Sto. Rosario Drive, Pacita,<br>San Pedro, Laguna</p>
@@ -703,7 +772,7 @@
 
                 <div class="info-card" data-reveal style="transition-delay:.1s">
                     <div class="info-icon">
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C9.39 21 3 14.61 3 7a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.01l-2.2 2.21z" fill="#C9A96E"/></svg>
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C9.39 21 3 14.61 3 7a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.01l-2.2 2.21z" fill="#F5C518"/></svg>
                     </div>
                     <p class="info-card-label">Contact</p>
                     <p>(02) 8869 2742</p>
@@ -713,7 +782,7 @@
 
                 <div class="info-card" data-reveal style="transition-delay:.2s">
                     <div class="info-icon">
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#C9A96E" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#C9A96E" stroke-width="2" stroke-linecap="round"/></svg>
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#F5C518" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#F5C518" stroke-width="2" stroke-linecap="round"/></svg>
                     </div>
                     <p class="info-card-label">Office Hours</p>
                     <p>Tue–Sat</p>
@@ -766,8 +835,8 @@
             className: '',
             html: `<div style="
                 width:36px;height:36px;
-                background:#3B1A22;
-                border:3px solid #C9A96E;
+                background:#0D2A52;
+                border:3px solid #F5C518;
                 border-radius:50% 50% 50% 0;
                 transform:rotate(-45deg);
                 box-shadow:0 2px 8px rgba(0,0,0,.3);
@@ -782,12 +851,12 @@
         L.marker([lat, lng], { icon }).addTo(map)
             .bindPopup(`
                 <div style="font-family:sans-serif;padding:4px 2px;min-width:200px;">
-                    <p style="font-weight:700;font-size:14px;color:#3B1A22;margin:0 0 4px;">Sto. Rosario Parish</p>
+                    <p style="font-weight:700;font-size:14px;color:#0D2A52;margin:0 0 4px;">Sto. Rosario Parish</p>
                     <p style="font-size:12px;color:#777;margin:0 0 10px;line-height:1.5;">
                         1 Sto. Rosario Drive,<br>Pacita, San Pedro, Laguna
                     </p>
                     <a href="${directionsUrl}" target="_blank"
-                       style="display:inline-block;background:#C9A96E;color:#3B1A22;font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;">
+                       style="display:inline-block;background:#F5C518;color:#0D2A52;font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;text-decoration:none;">
                         Get Directions ↗
                     </a>
                 </div>
@@ -796,11 +865,11 @@
         setTimeout(() => map.invalidateSize(), 300);
     });
 
-
-
     /* ── Timeline: spine + staggered items ── */
     const spine  = document.getElementById('tl-spine');
     const tlItems = document.querySelectorAll('.tl-item');
+    const slider = document.querySelector('.tl-scroll-container');
+    const timelineSection = document.querySelector('.timeline-section');
 
     const spineObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -822,6 +891,26 @@
         });
     }, { threshold: 0.1 });
     tlItems.forEach(el => itemObserver.observe(el));
+
+    /* ── Scroll-Driven Horizontal Animation ── */
+    window.addEventListener('scroll', () => {
+        if (!slider || !timelineSection || isDown) return; // Don't fight manual dragging
+        
+        const rect = timelineSection.getBoundingClientRect();
+        const viewHeight = window.innerHeight;
+        
+        if (rect.top < viewHeight && rect.bottom > 0) {
+            const progress = 1 - (rect.bottom / (viewHeight + rect.height));
+            const scrollRange = slider.scrollWidth - slider.clientWidth;
+            const targetScroll = scrollRange * progress;
+            
+            // Smoother programmatic scroll
+            slider.scrollTo({
+                left: targetScroll,
+                behavior: 'auto'
+            });
+        }
+    });
 
     /* ── Timeline expand/collapse ── */
     function toggleItem(toggle) {
@@ -858,6 +947,40 @@
     document.querySelectorAll('.stat-number[data-target]').forEach(el => {
         statObserver.observe(el);
     });
+
+    /* ── Timeline Navigation Buttons ── */
+    const btnLeft  = document.getElementById('tl-left');
+    const btnRight = document.getElementById('tl-right');
+
+    if (slider) {
+        btnLeft.addEventListener('click', () => {
+            slider.scrollBy({ left: -320, behavior: 'smooth' });
+        });
+        btnRight.addEventListener('click', () => {
+            slider.scrollBy({ left: 320, behavior: 'smooth' });
+        });
+
+        /* ── Wheel-to-Horizontal ── */
+        slider.addEventListener('wheel', (e) => {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                slider.scrollLeft += e.deltaY;
+            }
+        });
+
+        // Hide/Show buttons based on scroll position
+        const updateBtns = () => {
+            btnLeft.style.opacity  = slider.scrollLeft <= 0 ? '0.3' : '1';
+            btnLeft.style.pointerEvents = slider.scrollLeft <= 0 ? 'none' : 'auto';
+            
+            const max = slider.scrollWidth - slider.clientWidth;
+            btnRight.style.opacity = slider.scrollLeft >= max - 1 ? '0.3' : '1';
+            btnRight.style.pointerEvents = slider.scrollLeft >= max - 1 ? 'none' : 'auto';
+        };
+        slider.addEventListener('scroll', updateBtns);
+        window.addEventListener('resize', updateBtns);
+        updateBtns();
+    }
     </script>
 
 </x-public-layout>

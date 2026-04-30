@@ -1,62 +1,94 @@
-<nav x-data="{ open: false, scrolled: false }"
-     x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 80 }, { passive: true })"
-     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+<nav
+    x-data="nav()"
+    x-init="init()"
+    @keydown.escape.window="closeAll()"
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
 
-    {{-- Background layer — transparent on hero, cream when scrolled --}}
+    {{-- Scrolled background --}}
     <div class="absolute inset-0 transition-all duration-500 pointer-events-none"
          :class="scrolled ? 'opacity-100' : 'opacity-0'"
-         style="background: rgba(253,250,244,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(180,150,80,0.15);"></div>
+         style="background:rgba(8,20,45,0.96); backdrop-filter:blur(20px);
+                -webkit-backdrop-filter:blur(20px);
+                border-bottom:1px solid rgba(245,197,24,0.15);"></div>
 
-    <div class="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-10 h-[72px] flex items-center justify-between">
+    {{-- ── Top bar ── --}}
+    <div class="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10
+                h-[64px] flex items-center justify-between gap-2">
 
-        {{-- Brand --}}
-        <a href="/" class="flex items-center gap-3 group">
-            <div class="relative w-9 h-9 flex items-center justify-center">
-                <div class="absolute inset-0 rounded-full transition-all duration-500 border"
-                     :class="scrolled ? 'border-[rgba(201,168,76,0.5)]' : 'border-[rgba(201,168,76,0.6)]'"></div>
-                <span class="text-[#C9A84C] text-lg leading-none" style="font-family: 'Cinzel', Georgia, serif;">✝</span>
+        {{-- Logo --}}
+        <a href="/" class="flex items-center gap-2.5 group flex-shrink-0">
+            <div class="relative w-8 h-8 flex items-center justify-center flex-shrink-0">
+                <div class="absolute inset-0 rounded-full border transition-colors duration-500"
+                     style="border-color:rgba(245,197,24,0.5);"></div>
+                <span class="text-base leading-none transition-colors duration-300 text-white"
+                      style="font-family:'Cinzel',Georgia,serif;">✝</span>
             </div>
             <div>
-                <div class="text-[14px] font-bold tracking-[0.12em] leading-none transition-colors duration-500"
-                     :class="scrolled ? 'text-stone-800' : 'text-white'"
-                     style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic;">Sto. Rosario Parish</div>
-                <div class="text-[8.5px] tracking-[0.35em] font-medium uppercase mt-0.5 transition-colors duration-500"
-                     :class="scrolled ? 'text-stone-400' : 'text-white/50'">Pacita 1</div>
+                <div class="text-[13px] font-bold tracking-[0.1em] leading-none text-white"
+                     style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;">
+                    Sto. Rosario Parish
+                </div>
+                <div class="text-[7.5px] tracking-[0.3em] font-medium uppercase mt-0.5 text-white/60">
+                    Pacita 1
+                </div>
             </div>
         </a>
 
-        {{-- Desktop Nav --}}
+        {{-- Desktop links --}}
         <div class="hidden md:flex items-center gap-1">
 
-            {{-- Worship Dropdown --}}
-            <div class="relative" x-data="{ sub: false }" @mouseenter="sub = true" @mouseleave="sub = false">
-                <button class="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300"
-                        :class="scrolled
-                            ? 'text-stone-500 hover:text-stone-800 hover:bg-[rgba(245,237,216,0.6)]'
-                            : 'text-white/75 hover:text-white hover:bg-[rgba(255,255,255,0.1)]'">
-                    Worship
-                    <svg :class="sub ? 'rotate-180' : ''" class="transition-transform duration-200 opacity-60" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            {{-- Parish Services --}}
+            <div class="relative"
+                 x-data="dropdown('parish-services')"
+                 @click.outside="close()"
+                 @keydown.arrow-down.prevent="openAndFocus()"
+                 @keydown.enter.prevent="toggle()">
+
+                <button x-ref="trigger" @click="toggle()"
+                        :aria-expanded="isOpen" aria-haspopup="menu"
+                        class="h-10 px-4 rounded-full flex items-center gap-1.5
+                               text-[11px] font-semibold uppercase tracking-widest
+                               text-white/80 hover:text-white hover:bg-white/10
+                               transition-all duration-150 outline-none">
+                    Parish Services
+                    <svg class="w-3 h-3 transition-transform duration-150"
+                         :class="isOpen ? 'rotate-180' : ''"
+                         viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m5 7.5 5 5 5-5"/>
+                    </svg>
                 </button>
-                <div x-show="sub"
-                     x-transition:enter="transition ease-out duration-200"
+
+                <div x-show="isOpen" x-cloak x-ref="panel"
+                     x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
                      x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave="transition ease-in duration-100"
                      x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                      x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                     class="absolute top-full left-0 pt-3 w-56" x-cloak>
-                    <div class="rounded-2xl border border-[#E8DFC4] bg-[#FEFCF6] p-1.5"
-                         style="box-shadow: 0 12px 40px rgba(120,90,20,0.14), 0 1px 0 rgba(255,255,255,0.9) inset;">
+                     class="absolute top-full pt-2 z-50"
+                     :class="edgeFlip ? 'right-0' : 'left-0'">
+                    <div class="w-56 rounded-2xl border border-white/10 bg-[rgba(8,20,45,0.97)]
+                                backdrop-blur-xl p-1.5
+                                shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
                         @foreach([
-                            ['Mass Schedule',     '/mass-schedule',     'View all Mass times'],
-                            ['Submit Intention',   '/submit-intention',  'Offer a prayer intention'],
-                            ['Sacramental Inquiry','/inquiry',           'Baptism, wedding & more'],
-                        ] as [$label, $url, $sub])
-                        <a href="{{ $url }}" class="flex items-start gap-3 px-4 py-3 rounded-xl hover:bg-[#FDF6E8] transition-colors group/item">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#C9A84C] mt-1.5 shrink-0 opacity-50 group-hover/item:opacity-100 transition-opacity"></span>
+                            ['Mass Schedule',      '/mass-schedule',    'View all Mass times'],
+                            ['Submit Intention',   '/submit-intention', 'Offer a prayer intention'],
+                            ['Sacramental Inquiry','/inquiry',          'Baptism, wedding & more'],
+                        ] as [$label,$url,$sub])
+                        <a href="{{ $url }}" role="menuitem" tabindex="-1"
+                           @keydown.arrow-down.prevent="focusNext($event)"
+                           @keydown.arrow-up.prevent="focusPrev($event)"
+                           @keydown.escape.prevent="closeAndReturn()"
+                           class="flex items-start gap-3 px-4 py-3 rounded-xl
+                                  hover:bg-white/8 focus:bg-white/8
+                                  transition-colors duration-150 group/item outline-none">
+                            <span class="w-1 h-1 rounded-full mt-2 shrink-0 bg-[#F5C518]/40
+                                         group-hover/item:bg-[#F5C518] transition-colors"></span>
                             <div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider text-stone-700 group-hover/item:text-stone-900 transition-colors">{{ $label }}</div>
-                                <div class="text-[10px] text-stone-400 mt-0.5">{{ $sub }}</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-white/90
+                                            group-hover/item:text-white">{{ $label }}</div>
+                                <div class="text-[10px] mt-0.5 text-white/45">{{ $sub }}</div>
                             </div>
                         </a>
                         @endforeach
@@ -64,35 +96,58 @@
                 </div>
             </div>
 
-            {{-- Community Dropdown --}}
-            <div class="relative" x-data="{ sub: false }" @mouseenter="sub = true" @mouseleave="sub = false">
-                <button class="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300"
-                        :class="scrolled
-                            ? 'text-stone-500 hover:text-stone-800 hover:bg-[rgba(245,237,216,0.6)]'
-                            : 'text-white/75 hover:text-white hover:bg-[rgba(255,255,255,0.1)]'">
+            {{-- Community --}}
+            <div class="relative"
+                 x-data="dropdown('community')"
+                 @click.outside="close()"
+                 @keydown.arrow-down.prevent="openAndFocus()"
+                 @keydown.enter.prevent="toggle()">
+
+                <button x-ref="trigger" @click="toggle()"
+                        :aria-expanded="isOpen" aria-haspopup="menu"
+                        class="h-10 px-4 rounded-full flex items-center gap-1.5
+                               text-[11px] font-semibold uppercase tracking-widest
+                               text-white/80 hover:text-white hover:bg-white/10
+                               transition-all duration-150 outline-none">
                     Community
-                    <svg :class="sub ? 'rotate-180' : ''" class="transition-transform duration-200 opacity-60" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    <svg class="w-3 h-3 transition-transform duration-150"
+                         :class="isOpen ? 'rotate-180' : ''"
+                         viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m5 7.5 5 5 5-5"/>
+                    </svg>
                 </button>
-                <div x-show="sub"
-                     x-transition:enter="transition ease-out duration-200"
+
+                <div x-show="isOpen" x-cloak x-ref="panel"
+                     x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
                      x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave="transition ease-in duration-100"
                      x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                      x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                     class="absolute top-full left-0 pt-3 w-56" x-cloak>
-                    <div class="rounded-2xl border border-[#E8DFC4] bg-[#FEFCF6] p-1.5"
-                         style="box-shadow: 0 12px 40px rgba(120,90,20,0.14), 0 1px 0 rgba(255,255,255,0.9) inset;">
+                     class="absolute top-full pt-2 z-50"
+                     :class="edgeFlip ? 'right-0' : 'left-0'">
+                    <div class="w-56 rounded-2xl border border-white/10 bg-[rgba(8,20,45,0.97)]
+                                backdrop-blur-xl p-1.5
+                                shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
                         @foreach([
-                            ['Parish Events',    '/events',  'Liturgical & community events'],
-                            ['Photo Gallery',    '/gallery', 'Memories & celebrations'],
-                            ['About Our Parish', '/about',   'History & our mission'],
-                        ] as [$label, $url, $sub])
-                        <a href="{{ $url }}" class="flex items-start gap-3 px-4 py-3 rounded-xl hover:bg-[#FDF6E8] transition-colors group/item">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#C9A84C] mt-1.5 shrink-0 opacity-50 group-hover/item:opacity-100 transition-opacity"></span>
+                            ['Parish Events',   '/events',  'Liturgical & community events'],
+                            ['Photo Gallery',   '/gallery', 'Memories & celebrations'],
+                            ['About Our Parish','/about',   'History & our mission'],
+                        ] as [$label,$url,$sub])
+                        <a href="{{ $url }}" role="menuitem" tabindex="-1"
+                           @keydown.arrow-down.prevent="focusNext($event)"
+                           @keydown.arrow-up.prevent="focusPrev($event)"
+                           @keydown.escape.prevent="closeAndReturn()"
+                           class="flex items-start gap-3 px-4 py-3 rounded-xl
+                                  hover:bg-white/8 focus:bg-white/8
+                                  transition-colors duration-150 group/item outline-none">
+                            <span class="w-1 h-1 rounded-full mt-2 shrink-0 bg-[#F5C518]/40
+                                         group-hover/item:bg-[#F5C518] transition-colors"></span>
                             <div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider text-stone-700 group-hover/item:text-stone-900 transition-colors">{{ $label }}</div>
-                                <div class="text-[10px] text-stone-400 mt-0.5">{{ $sub }}</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-white/90
+                                            group-hover/item:text-white">{{ $label }}</div>
+                                <div class="text-[10px] mt-0.5 text-white/45">{{ $sub }}</div>
                             </div>
                         </a>
                         @endforeach
@@ -101,65 +156,283 @@
             </div>
 
             <a href="/track"
-               class="px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest transition-all duration-300"
-               :class="scrolled
-                   ? 'text-stone-500 hover:text-stone-800 hover:bg-[rgba(245,237,216,0.6)]'
-                   : 'text-white/75 hover:text-white hover:bg-[rgba(255,255,255,0.1)]'">
-                Track Intention
+               class="h-10 px-4 rounded-full flex items-center text-[11px] font-semibold uppercase tracking-widest
+                      text-white/80 hover:text-white hover:bg-white/10 transition-all duration-150">
+                Track
             </a>
 
-            <div class="w-px h-5 mx-2 transition-colors duration-500"
-                 :class="scrolled ? 'bg-stone-200' : 'bg-white/20'"></div>
+            <div class="w-px h-5 mx-1 bg-white/15"></div>
 
             <a href="/donate"
-               class="relative overflow-hidden px-6 py-2.5 rounded-full text-[10.5px] font-bold uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-95 group"
-               style="background: linear-gradient(135deg, #D4A843 0%, #C9913A 60%, #BF8532 100%); color: #2C1A06; box-shadow: 0 2px 14px rgba(201,168,76,0.40);">
+               class="relative overflow-hidden h-10 px-5 rounded-full text-[10px] font-bold
+                      uppercase tracking-widest text-[#1A0E00] hover:scale-[1.03]
+                      active:scale-95 transition-all duration-150 flex items-center"
+               style="background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
+                      box-shadow:0 2px 16px rgba(245,197,24,0.4);">
                 Donate
-                <div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200 rounded-full"></div>
             </a>
         </div>
 
-        {{-- Mobile Toggle --}}
-        <button class="md:hidden w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300"
-                :class="scrolled ? 'text-stone-700 hover:bg-[rgba(245,237,216,0.6)]' : 'text-white hover:bg-[rgba(255,255,255,0.12)]'"
-                @click="open = !open">
-            <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="15" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
-            <svg x-show="open" x-cloak xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        {{-- Hamburger --}}
+        <button class="md:hidden w-10 h-10 flex items-center justify-center
+                       rounded-full text-white hover:bg-white/10
+                       transition-all duration-200 flex-shrink-0"
+                @click="open = !open"
+                :aria-expanded="open"
+                aria-label="Toggle menu">
+            <svg x-show="!open" width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round">
+                <line x1="3" y1="6"  x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="16" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+            <svg x-show="open" x-cloak width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round">
+                <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
         </button>
     </div>
 
-    {{-- Mobile Menu --}}
-    <div x-show="open"
+    {{-- ══════════════════════════════════════
+         MOBILE FULL-SCREEN DRAWER
+         Slides down from top, covers full viewport
+    ══════════════════════════════════════ --}}
+    <div x-show="open" x-cloak
          x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-start="opacity-0 -translate-y-3"
          x-transition:enter-end="opacity-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 -translate-y-2"
-         class="md:hidden overflow-y-auto max-h-[80vh] relative z-10"
-         style="background: #FEFCF6; border-top: 1px solid rgba(210,190,140,0.4);"
-         x-cloak>
-        <div class="max-w-[1200px] mx-auto px-6 py-8 flex flex-col gap-8">
-            <div>
-                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-[#C9A84C] mb-4">Worship</p>
-                <div class="flex flex-col gap-1.5">
-                    @foreach([['Mass Schedule','/mass-schedule'],['Submit Intention','/submit-intention'],['Sacramental Inquiry','/inquiry']] as [$label,$url])
-                    <a href="{{ $url }}" class="px-5 py-3.5 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-[#FDF6E8] hover:text-stone-900 border border-[rgba(210,190,140,0.35)] transition-colors">{{ $label }}</a>
-                    @endforeach
+         x-transition:leave-end="opacity-0 -translate-y-3"
+         class="md:hidden fixed inset-0 z-40 flex flex-col"
+         style="top:64px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
+                -webkit-backdrop-filter:blur(24px);">
+
+        {{-- Gold top rule --}}
+        <div style="height:1px; background:linear-gradient(90deg,transparent,rgba(245,197,24,0.4),transparent);"></div>
+
+        {{-- Scrollable content --}}
+        <div class="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-2">
+
+            {{-- Section: Parish Services --}}
+            <p style="font-size:9px; font-weight:700; letter-spacing:0.35em;
+                      text-transform:uppercase; color:rgba(245,197,24,0.6);
+                      padding:0 4px; margin-bottom:4px;">Parish Services</p>
+
+            @foreach([
+                [
+                    'label' => 'Mass Schedule',
+                    'url'   => '/mass-schedule',
+                    'sub'   => 'View all Mass times',
+                    'icon'  => '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+                ],
+                [
+                    'label' => 'Submit Intention',
+                    'url'   => '/submit-intention',
+                    'sub'   => 'Offer a prayer intention',
+                    'icon'  => '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>',
+                ],
+                [
+                    'label' => 'Sacramental Inquiry',
+                    'url'   => '/inquiry',
+                    'sub'   => 'Baptism, wedding & more',
+                    'icon'  => '<path d="M8 22h8"/><path d="M12 11v11"/><path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/>',
+                ],
+            ] as $item)
+            <a href="{{ $item['url'] }}"
+               @click="open = false"
+               class="flex items-center gap-4 px-4 py-3.5 rounded-2xl
+                      transition-all duration-200 group"
+               style="border:1px solid rgba(255,255,255,0.06);"
+               onmouseover="this.style.background='rgba(245,197,24,0.07)'; this.style.borderColor='rgba(245,197,24,0.25)';"
+               onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.06)';">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                     style="background:rgba(245,197,24,0.08); border:1px solid rgba(245,197,24,0.2);">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                         stroke="rgba(245,197,24,0.8)" stroke-width="1.75"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        {!! $item['icon'] !!}
+                    </svg>
                 </div>
-            </div>
-            <div>
-                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-[#C9A84C] mb-4">Community</p>
-                <div class="flex flex-col gap-1.5">
-                    @foreach([['Parish Events','/events'],['Photo Gallery','/gallery'],['About Our Parish','/about']] as [$label,$url])
-                    <a href="{{ $url }}" class="px-5 py-3.5 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-[#FDF6E8] hover:text-stone-900 border border-[rgba(210,190,140,0.35)] transition-colors">{{ $label }}</a>
-                    @endforeach
+                <div class="min-w-0">
+                    <div style="font-size:13px; font-weight:700; color:#EBF2FF; line-height:1.2;">
+                        {{ $item['label'] }}
+                    </div>
+                    <div style="font-size:10px; color:rgba(235,242,255,0.38); margin-top:2px;">
+                        {{ $item['sub'] }}
+                    </div>
                 </div>
-            </div>
-            <div class="flex flex-col gap-3 pt-2 border-t border-[rgba(210,190,140,0.3)]">
-                <a href="/track" class="text-center px-6 py-3.5 rounded-2xl font-semibold text-sm text-stone-800 border border-[rgba(201,168,76,0.4)] bg-[rgba(201,168,76,0.06)] transition-colors">Track Intention</a>
-                <a href="/donate" class="text-center px-6 py-3.5 rounded-full font-bold text-sm uppercase tracking-widest" style="background: linear-gradient(135deg, #D4A843, #C9913A); color: #2C1A06;">Donate Now</a>
-            </div>
+                <svg class="ml-auto flex-shrink-0" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </a>
+            @endforeach
+
+            {{-- Divider --}}
+            <div style="height:1px; margin:8px 0;
+                        background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);"></div>
+
+            {{-- Section: Community --}}
+            <p style="font-size:9px; font-weight:700; letter-spacing:0.35em;
+                      text-transform:uppercase; color:rgba(245,197,24,0.6);
+                      padding:0 4px; margin-bottom:4px;">Community</p>
+
+            @foreach([
+                [
+                    'label' => 'Parish Events',
+                    'url'   => '/events',
+                    'sub'   => 'Liturgical & community events',
+                    'icon'  => '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/>',
+                ],
+                [
+                    'label' => 'Photo Gallery',
+                    'url'   => '/gallery',
+                    'sub'   => 'Memories & celebrations',
+                    'icon'  => '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+                ],
+                [
+                    'label' => 'About Our Parish',
+                    'url'   => '/about',
+                    'sub'   => 'History & our mission',
+                    'icon'  => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+                ],
+            ] as $item)
+            <a href="{{ $item['url'] }}"
+               @click="open = false"
+               class="flex items-center gap-4 px-4 py-3.5 rounded-2xl
+                      transition-all duration-200 group"
+               style="border:1px solid rgba(255,255,255,0.06);"
+               onmouseover="this.style.background='rgba(245,197,24,0.07)'; this.style.borderColor='rgba(245,197,24,0.25)';"
+               onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.06)';">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                     style="background:rgba(245,197,24,0.08); border:1px solid rgba(245,197,24,0.2);">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                         stroke="rgba(245,197,24,0.8)" stroke-width="1.75"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        {!! $item['icon'] !!}
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <div style="font-size:13px; font-weight:700; color:#EBF2FF; line-height:1.2;">
+                        {{ $item['label'] }}
+                    </div>
+                    <div style="font-size:10px; color:rgba(235,242,255,0.38); margin-top:2px;">
+                        {{ $item['sub'] }}
+                    </div>
+                </div>
+                <svg class="ml-auto flex-shrink-0" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </a>
+            @endforeach
+
+            {{-- Divider --}}
+            <div style="height:1px; margin:8px 0;
+                        background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);"></div>
+
+            {{-- Track row --}}
+            <a href="/track" @click="open = false"
+               class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200"
+               style="border:1px solid rgba(255,255,255,0.06);"
+               onmouseover="this.style.background='rgba(245,197,24,0.07)'; this.style.borderColor='rgba(245,197,24,0.25)';"
+               onmouseout="this.style.background=''; this.style.borderColor='rgba(255,255,255,0.06)';">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                     style="background:rgba(245,197,24,0.08); border:1px solid rgba(245,197,24,0.2);">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                         stroke="rgba(245,197,24,0.8)" stroke-width="1.75"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <div style="font-size:13px; font-weight:700; color:#EBF2FF;">Track Submission</div>
+                    <div style="font-size:10px; color:rgba(235,242,255,0.38); margin-top:2px;">Check your intention status</div>
+                </div>
+                <svg class="ml-auto flex-shrink-0" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </a>
+        </div>
+
+        {{-- Sticky donate button at bottom --}}
+        <div class="px-5 py-4"
+             style="border-top:1px solid rgba(255,255,255,0.06);">
+            <a href="/donate" @click="open = false"
+               class="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
+                      font-bold uppercase tracking-widest active:scale-95
+                      transition-transform duration-150"
+               style="font-size:11px; color:#1A0E00;
+                      background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
+                      box-shadow:0 4px 24px rgba(245,197,24,0.35);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.04 3 5.5L12 21l7-7Z"/>
+                </svg>
+                Support Our Parish
+            </a>
         </div>
     </div>
 </nav>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('nav', () => ({
+        open: false,
+        scrolled: false,
+        init() {
+            window.addEventListener('scroll', () => {
+                this.scrolled = window.scrollY > 80
+            }, { passive: true })
+            // Close drawer on resize to desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) this.open = false
+            }, { passive: true })
+        },
+        closeAll() {
+            window.dispatchEvent(new CustomEvent('dropdown-close-all'))
+        }
+    }))
+
+    Alpine.data('dropdown', id => ({
+        id, isOpen: false, edgeFlip: false,
+        init() {
+            window.addEventListener('dropdown-close-all', () => this.close())
+        },
+        toggle() { this.isOpen ? this.close() : this.open() },
+        open() {
+            window.dispatchEvent(new CustomEvent('dropdown-close-all'))
+            this.isOpen = true
+            this.$nextTick(() => this.setEdge())
+        },
+        close()        { this.isOpen = false },
+        openAndFocus() {
+            if (!this.isOpen) this.open()
+            this.$nextTick(() => this.items()[0]?.focus())
+        },
+        closeAndReturn() { this.close(); this.$refs.trigger?.focus() },
+        items()   { return [...this.$refs.panel.querySelectorAll('[role="menuitem"]')] },
+        focusNext(e) {
+            const items = this.items(), i = items.indexOf(e.target)
+            items[(i + 1) % items.length]?.focus()
+        },
+        focusPrev(e) {
+            const items = this.items(), i = items.indexOf(e.target)
+            items[(i - 1 + items.length) % items.length]?.focus()
+        },
+        setEdge() {
+            const r = this.$refs.panel?.getBoundingClientRect()
+            this.edgeFlip = r && r.right > window.innerWidth - 16
+        }
+    }))
+})
+</script>

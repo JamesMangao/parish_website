@@ -37,11 +37,11 @@ class ChatbotController extends Controller
             'message' => $userMessage,
         ]);
 
-        // 2. If in Live Agent mode, don't trigger AI
-        if ($session->status === 'handover' || $session->admin_id) {
+        // 2. If in Live Agent mode, don't trigger AI (unless paused)
+        if (($session->status === 'handover' || $session->admin_id) && $session->status !== 'paused') {
             return response()->json([
                 'status' => 'waiting_for_agent',
-                'message' => 'Your message has been sent to the live agent.',
+                'message' => '',
             ]);
         }
 
@@ -68,15 +68,16 @@ class ChatbotController extends Controller
         $aiResponse = $this->aiService->getResponse($history);
 
         // 5. Store AI Response
-        ChatMessage::create([
+        $aiMsg = ChatMessage::create([
             'chat_session_id' => $session->id,
             'sender' => 'ai',
             'message' => $aiResponse,
         ]);
-
+ 
         return response()->json([
             'status' => 'success',
             'message' => $aiResponse,
+            'id' => $aiMsg->id,
         ]);
     }
 
@@ -141,12 +142,28 @@ class ChatbotController extends Controller
         return redirect()->route('admin.chats.index')->with('success', 'Conversation marked as resolved.');
     }
 
+    public function pause($id)
+    {
+        $chat = ChatSession::findOrFail($id);
+        $chat->update(['status' => 'paused']);
+        
+        return back()->with('success', 'Conversation paused. AI will now handle responses.');
+    }
+
+    public function resume($id)
+    {
+        $chat = ChatSession::findOrFail($id);
+        $chat->update(['status' => 'active']);
+        
+        return back()->with('success', 'Conversation resumed. AI is now disabled.');
+    }
+
     public function adminShow($id)
     {
         $chat = ChatSession::with('messages', 'admin')->findOrFail($id);
         
-        // Mark as connected if not already
-        if (!$chat->admin_id && auth()->check()) {
+        // Mark as connected if not already (only if not already resolved/paused)
+        if (!$chat->admin_id && auth()->check() && !in_array($chat->status, ['resolved', 'paused'])) {
             $chat->update([
                 'admin_id' => auth()->id(),
                 'status' => 'active'
@@ -182,6 +199,21 @@ class ChatbotController extends Controller
         Cache::put('chat_typing_' . $chat->id, true, now()->addSeconds(5));
 
         return response()->json(['status' => 'ok']);
+    }
+
+    public function adminPoll(Request $request, $id)
+    {
+        $chat = ChatSession::findOrFail($id);
+        $lastId = $request->input('last_id', 0);
+
+        $newMessages = $chat->messages()
+            ->where('id', '>', $lastId)
+            ->get();
+
+        return response()->json([
+            'messages' => $newMessages,
+            'status' => $chat->status,
+        ]);
     }
 
     protected function getOrCreateSession()

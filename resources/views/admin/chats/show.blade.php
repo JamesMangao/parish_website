@@ -26,15 +26,51 @@
                         <span class="text-primary font-bold">{{ $chat->messages->count() }}</span>
                     </div>
                 </div>
+
+                <div class="w-full mt-6 space-y-2 pt-6 border-t">
+                    @if($chat->status === 'paused')
+                        <form action="{{ route('admin.chats.resume', $chat->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg hover:opacity-90 transition-all"
+                                    style="background-color: #059669; color: white;">
+                                🟢 Resume Chat
+                            </button>
+                        </form>
+                    @elseif($chat->status !== 'resolved')
+                        <form action="{{ route('admin.chats.pause', $chat->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg hover:opacity-90 transition-all"
+                                    style="background-color: #EA580C; color: white;">
+                                ⏸ Pause (AI Takeover)
+                            </button>
+                        </form>
+                    @endif
+                    
+                    @if($chat->status !== 'resolved')
+                        <form action="{{ route('admin.chats.resolve', $chat->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg hover:opacity-90 transition-all"
+                                    style="background-color: #DC2626; color: white;">
+                                ✅ Resolve & Close
+                            </button>
+                        </form>
+                    @else
+                        <div class="p-3 bg-muted rounded-xl text-[10px] font-bold uppercase text-muted-foreground text-center">
+                            Conversation Resolved
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <!-- Chat Area -->
             <div class="md:col-span-3 bg-card border rounded-2xl flex flex-col overflow-hidden shadow-sm">
                 <!-- Chat Messages -->
-                <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/5 flex flex-col-reverse">
-                    <div class="space-y-4">
-                    @foreach($chat->messages->reverse() as $m)
-                        <div class="flex {{ $m->sender === 'admin' ? 'justify-end' : 'justify-start' }}">
+                <div class="flex-1 overflow-y-auto p-6 bg-muted/5 flex flex-col-reverse" id="chatContainer">
+                    <div class="space-y-4" id="chatMessages">
+                    @php $lastId = 0; @endphp
+                    @foreach($chat->messages as $m)
+                        @php $lastId = max($lastId, $m->id); @endphp
+                        <div class="flex {{ $m->sender === 'admin' ? 'justify-end' : 'justify-start' }}" data-id="{{ $m->id }}">
                             <div class="max-w-[80%]">
                                 <div class="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 {{ $m->sender === 'admin' ? 'text-right' : '' }}">
                                     {{ $m->sender }} • {{ $m->created_at->format('h:i A') }}
@@ -48,15 +84,14 @@
                     </div>
                 </div>
 
-                <!-- Admin Reply Input -->
                 <div class="p-6 bg-white border-t">
-                    <form action="{{ route('admin.chats.reply', $chat->id) }}" method="POST">
+                    <form action="{{ route('admin.chats.reply', $chat->id) }}" method="POST" onsubmit="this.querySelector('button[type=submit]').disabled = true; this.querySelector('button[type=submit]').innerHTML = 'Sending...';">
                         @csrf
                         <div class="flex gap-4">
                             <input name="message" required placeholder="Type your reply to the parishioner..." 
-                                   id="adminReplyInput"
+                                   id="adminReplyInput" autocomplete="off"
                                    class="flex-1 bg-muted/20 border-none rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary font-medium">
-                            <button type="submit" class="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center gap-2">
+                            <button type="submit" class="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal"><path d="m3 3 3 9-3 9 19-9Z"/><path d="M6 12h16"/></svg>
                                 Send Reply
                             </button>
@@ -71,9 +106,13 @@
         (function() {
             let typingTimeout = null;
             const input = document.getElementById('adminReplyInput');
+            const messagesContainer = document.getElementById('chatMessages');
+            const chatContainer = document.getElementById('chatContainer');
             const chatId = @json($chat->id);
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            let lastId = @json($lastId);
 
+            // Typing Indicator
             if (input && csrfToken) {
                 input.addEventListener('input', function() {
                     if (typingTimeout) clearTimeout(typingTimeout);
@@ -89,6 +128,45 @@
                     }, 300);
                 });
             }
+
+            // Real-time Polling
+            async function pollMessages() {
+                try {
+                    const response = await fetch(`/admin/chats/${chatId}/poll?last_id=${lastId}`);
+                    const data = await response.json();
+
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            if (document.querySelector(`[data-id="${msg.id}"]`)) return;
+
+                            const isSelf = msg.sender === 'admin';
+                            const timeStr = new Date(msg.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                            
+                            const msgHtml = `
+                                <div class="flex ${isSelf ? 'justify-end' : 'justify-start'}" data-id="${msg.id}">
+                                    <div class="max-w-[80%]">
+                                        <div class="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 ${isSelf ? 'text-right' : ''}">
+                                            ${msg.sender} • ${timeStr}
+                                        </div>
+                                        <div class="p-4 rounded-2xl text-sm leading-relaxed ${isSelf ? 'bg-primary text-primary-foreground rounded-tr-none shadow-md shadow-primary/10' : (msg.sender === 'ai' ? 'bg-muted/30 border italic rounded-tl-none' : 'bg-white border font-medium rounded-tl-none shadow-sm')}">
+                                            ${msg.message}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            messagesContainer.insertAdjacentHTML('beforeend', msgHtml);
+                            lastId = Math.max(lastId, msg.id);
+                        });
+                        
+                        // Scroll to bottom
+                        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                    }
+                } catch (e) {
+                    console.error('Polling error:', e);
+                }
+            }
+
+            setInterval(pollMessages, 3000);
         })();
     </script>
 </x-admin-layout>

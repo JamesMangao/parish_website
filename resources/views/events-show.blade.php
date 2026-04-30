@@ -50,20 +50,7 @@
                             </div>
                         </div>
 
-                        @if($event->location)
-                        <div class="pt-8 border-t">
-                             <h2 class="text-xs font-black uppercase tracking-widest text-accent mb-4">Venue & Location</h2>
-                             <div class="flex items-start gap-3 text-primary">
-                                <div class="p-2 rounded-lg bg-primary/5 border border-primary/10">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-lg">{{ $event->location }}</p>
-                                    <p class="text-sm text-muted-foreground">Sto. Rosario Parish Community</p>
-                                </div>
-                             </div>
-                        </div>
-                        @endif
+
                     </div>
 
                     <!-- Sidebar Info -->
@@ -92,7 +79,7 @@
                                     $startTime = !empty($event->event_time[0]['time']) ? \Carbon\Carbon::parse($event->event_time[0]['time'])->format('Hi00') : '080000';
                                     $endTime = !empty($event->event_time[0]['time']) ? \Carbon\Carbon::parse($event->event_time[0]['time'])->addHour()->format('Hi00') : '090000';
                                     $dates = $event->event_date->format('Ymd') . 'T' . $startTime . '/' . $event->event_date->format('Ymd') . 'T' . $endTime;
-                                    $googleUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" . urlencode($event->title) . "&dates=" . $dates . "&details=" . urlencode($event->description) . "&location=" . urlencode($event->location ?? 'Sto. Rosario Parish');
+                                    $googleUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" . urlencode($event->title) . "&dates=" . $dates . "&details=" . urlencode($event->description);
                                 @endphp
                                 
                                 <a href="{{ $googleUrl }}" target="_blank" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity">

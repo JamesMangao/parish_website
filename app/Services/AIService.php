@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\MassSchedule;
 use App\Models\Announcement;
 use App\Models\Event;
+use App\Models\Setting;
 
 class AIService
 {
@@ -39,7 +40,7 @@ class AIService
                 $response = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $this->groqKey,
                     'Content-Type' => 'application/json',
-                ])->withOptions(['verify' => true])->post('https://api.groq.com/openai/v1/chat/completions', [
+                ])->withOptions(['verify' => false])->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model' => 'llama-3.1-8b-instant',
                     'messages' => $messages,
                     'temperature' => 0.7,
@@ -63,7 +64,7 @@ class AIService
                     'HTTP-Referer' => config('app.url'),
                     'X-Title' => config('app.name'),
                     'Content-Type' => 'application/json',
-                ])->withOptions(['verify' => true])->post('https://openrouter.ai/api/v1/chat/completions', [
+                ])->withOptions(['verify' => false])->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => 'google/gemma-2-9b-it:free',
                     'messages' => $messages,
                 ]);
@@ -106,12 +107,36 @@ protected function getParishContext()
         $ctx .= "- {$a->title}: " . strip_tags($a->content) . " (Published: " . ($a->published_at ? $a->published_at->format('M d, Y') : 'N/A') . ")\n";
     }
 
-    $ctx .= "\n### UPCOMING EVENTS:\n";
+    $ctx .= "\n### UPCOMING EVENTS & PARISH ACTIVITIES:\n";
     if ($events->isEmpty()) $ctx .= "No upcoming events.\n";
     foreach ($events as $e) {
-        $eTime = is_array($e->event_time) ? implode(', ', $e->event_time) : $e->event_time;
-        $ctx .= "- {$e->title} on " . ($e->event_date ? $e->event_date->format('M d, Y') : 'N/A') . " at {$eTime} [{$e->location}]: {$e->description}\n";
+        $eTimes = [];
+        if (is_array($e->event_time)) {
+            foreach ($e->event_time as $t) {
+                $timePart = $t['time'] ?? '';
+                $titlePart = $t['title'] ?? '';
+                $combined = trim($timePart . ($titlePart ? " ($titlePart)" : ""));
+                if ($combined) $eTimes[] = $combined;
+            }
+        }
+        $eTimeStr = !empty($eTimes) ? implode(', ', $eTimes) : (is_string($e->event_time) ? $e->event_time : 'N/A');
+        
+        $ctx .= "- {$e->title} on " . ($e->event_date ? $e->event_date->format('M d, Y') : 'N/A') . " at {$eTimeStr} [{$e->location}]: {$e->description}\n";
     }
+
+    // Add Parish Details & History
+    $ctx .= "\n### PARISH HISTORY & IDENTITY:\n";
+    $ctx .= "- 1982: The image of the Queen of the Most Holy Rosary of Pacita was carved in Paete, Laguna.\n";
+    $ctx .= "- 1983 (Oct 16): Canonical erection of the parish. The image was declared patroness.\n";
+    $ctx .= "- 1986 (Dec 6): Church dedication.\n";
+    $ctx .= "- 2009: Rev. Fr. Mario P. Rivera began promoting the endearing title 'Our Lady of Pacita'.\n";
+    $ctx .= "- 2021: Hermandad del Santo Rosario (Rosary Confraternity of Pacita) was established.\n";
+    $ctx .= "- 2024: The image was declared an Important Cultural Property of San Pedro City.\n";
+    $ctx .= "- 2025: Our Lady was accorded the honorific title 'Queen of the City of San Pedro'.\n";
+    
+    // Add dynamically loaded global settings if needed
+    $priestName = Setting::where('key', 'priest_name')->value('value') ?? 'Rev. Fr. Parish Priest';
+    $ctx .= "- Leadership: {$priestName} (Parish Priest, serving since 2019 to Present).\n";
 
     return $ctx;
 }
@@ -131,8 +156,13 @@ You are a warm, helpful, and knowledgeable 'Parish Concierge'. Your goal is to a
 - Services: Baptisms, Weddings, First Communion, Confirmation, Funeral Masses, blessings.
 - Contact: +63 2 8869 2742 | officestorosarioparish@gmail.com
 
-### CONVERSATION SCOPE & LIMITS:
-- Your primary focus is Sto. Rosario Parish: Mass schedules, intentions, events, and parish services.
+### SYSTEM INSTRUCTIONS:
+- NEVER mention phrases like 'According to the Parish Knowledge Base', 'Based on the provided information', or 'The system says'. You are a living concierge. Speak naturally and confidently as if you inherently know these facts.
+- Language: You seamlessly understand and speak English, Tagalog (Filipino), and Taglish. 
+- MANDATORY LANGUAGE RULE: Always reply in the EXACT SAME LANGUAGE as the user's most recent message. If they ask in English, reply ONLY in English. If they ask in Tagalog, reply ONLY in Tagalog. Do not mix languages unless the user does (Taglish). Stay consistent.
+- If a user asks a follow-up question that you don't know (e.g. 'until when will he be the priest?'), just answer naturally and conversationally, e.g., 'He is our current serving Parish Priest, and there is no end date specified!' rather than saying 'the provided information does not specify.'
+- Your primary focus is Sto. Rosario Parish. You have REAL-TIME access to our database. When asked about activities, events, or mass schedules, refer strictly to the 'PARISH KNOWLEDGE BASE' provided above. Do NOT make up schedules.
+- If a user asks 'What are the upcoming events?', list them from the knowledge base above naturally.
 - You are ALSO authorized to answer common Catholic faith questions (e.g., 'What is Lent?', 'How to pray the Rosary?'). 
 - Ensure your faith-based answers are consistent with standard Catholic teachings.
 - For complex theological debates or personal pastoral advice, kindly suggest they speak with a priest.

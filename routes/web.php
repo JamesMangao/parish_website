@@ -135,6 +135,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/chats/{id}', [ChatbotController::class, 'adminShow'])->name('admin.chats.show');
         Route::post('/admin/chats/{id}/reply', [ChatbotController::class, 'adminReply'])->name('admin.chats.reply');
         Route::post('/admin/chats/{id}/resolve', [ChatbotController::class, 'resolve'])->name('admin.chats.resolve');
+        Route::post('/admin/chats/{id}/pause', [ChatbotController::class, 'pause'])->name('admin.chats.pause');
+        Route::post('/admin/chats/{id}/resume', [ChatbotController::class, 'resume'])->name('admin.chats.resume');
+        Route::get('/admin/chats/{id}/poll', [ChatbotController::class, 'adminPoll'])->name('admin.chats.poll');
         Route::post('/admin/chats/{id}/typing', [ChatbotController::class, 'adminTyping'])->name('admin.chats.typing');
     });
 

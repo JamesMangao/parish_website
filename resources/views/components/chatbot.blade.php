@@ -1,4 +1,4 @@
-<div x-data="chatbot()" x-init="init()" class="fixed bottom-6 right-6 z-[100]" @keydown.escape.window="open = false">
+<div x-data="chatbot()" x-init="init()" class="fixed bottom-6 left-6 z-[100]" @keydown.escape.window="open = false">
     <!-- Trigger Button -->
     <button 
         @click="toggle()" 
@@ -20,11 +20,11 @@
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-10 scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave="transition ease-in duration-300 delay-150"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-10 scale-95"
-        class="absolute bottom-20 right-0 bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden"
-        style="width: 410px; height: 600px;"
+        class="absolute bottom-20 left-0 bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden"
+        style="width: min(410px, calc(100vw - 32px)); height: min(600px, calc(100vh - 160px));"
     >
         <!-- Header -->
         <div class="p-4 bg-primary text-primary-foreground flex items-center gap-3">
@@ -64,11 +64,15 @@
                             x-html="formatMessage(msg.content, msg.role)"
                         ></div>
 
-                        <!-- Timestamp -->
-                        <div class="text-[9px] px-1 opacity-40 font-medium"
-                             :class="msg.role === 'user' ? 'text-right' : 'text-left'"
-                             x-text="formatTime(msg.time)"
-                             x-show="msg.type !== 'system'"></div>
+                        <!-- Timestamp & Status -->
+                        <div class="flex items-center gap-1.5 px-1 opacity-40 font-medium"
+                             :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+                             x-show="msg.type !== 'system'">
+                            <span class="text-[9px]" x-text="formatTime(msg.time)"></span>
+                            <template x-if="msg.role === 'user' && msg.status === 'sent'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><path d="M20 6 9 17l-5-5"/></svg>
+                            </template>
+                        </div>
 
                         <!-- Special Interaction: Handover Prompt -->
                         <template x-if="msg.type === 'handover_prompt' && !msg.handoverActioned">
@@ -200,6 +204,7 @@
                 waitCounter: 0,
                 unreadCount: 0,
                 showChips: true,
+                isPolling: false,
                 _lastFailedMessage: null,
                 _sessionKey: 'srp_chatbot_state',
 
@@ -258,7 +263,7 @@
                 },
 
                 _makeMsg(role, content, type = null) {
-                    return { _id: ++_msgId, role, content, type, time: Date.now(), handoverActioned: false };
+                    return { _id: ++_msgId, role, content, type, time: Date.now(), handoverActioned: false, status: 'pending' };
                 },
 
                 sendChip(text) {
@@ -271,7 +276,9 @@
                     if (!this.canSend) return;
                     this.showChips = false;
                     const text = this.userInput.trim();
-                    this.messages.push(this._makeMsg('user', text));
+                    const msg = this._makeMsg('user', text);
+                    const currentMsgId = msg._id;
+                    this.messages.push(msg);
                     this.userInput = '';
                     this._lastFailedMessage = text;
                     this.loading = true;
@@ -287,13 +294,20 @@
                         });
                         if (!response.ok) throw new Error('HTTP ' + response.status);
                         const data = await response.json();
+                        
+                        // Mark user message as sent
+                        const userMsg = this.messages.find(m => m._id === currentMsgId);
+                        if (userMsg) userMsg.status = 'sent';
+
                         if (data.status === 'suggest_handover') {
                             this.liveAgentStatus = 'suggesting';
                             this.messages.push(this._makeMsg('assistant', data.message, 'handover_prompt'));
                         } else if (data.status === 'waiting_for_agent') {
-                            this.messages.push(this._makeMsg('assistant', data.message));
-                        } else {
-                            this.messages.push(this._makeMsg('assistant', data.message));
+                            // No bubble added, status already updated to sent
+                        } else if (data.message) {
+                            let newMsg = this._makeMsg('assistant', data.message);
+                            if (data.id) newMsg.id = data.id; // Store DB ID to prevent polling dupes
+                            this.messages.push(newMsg);
                         }
                         this._lastFailedMessage = null;
                     } catch (e) {
@@ -336,14 +350,22 @@
 
                 startPolling() {
                     if (this.pollInterval) clearInterval(this.pollInterval);
+                    this.isPolling = false;
                     this.pollInterval = setInterval(async () => {
+                        if (this.isPolling) return;
+                        this.isPolling = true;
                         try {
                             const response = await fetch('/api/chatbot/poll?last_id=' + this.lastMessageId);
                             const data = await response.json();
                             if (data.messages && data.messages.length > 0) {
                                 data.messages.forEach(msg => {
-                                    this.messages.push(this._makeMsg('assistant', msg.message));
-                                    this.lastMessageId = Math.max(this.lastMessageId, msg.id);
+                                    // Prevent duplicate insertion just in case
+                                    if (!this.messages.find(m => m.id === msg.id)) {
+                                        let newMsg = this._makeMsg('assistant', msg.message);
+                                        newMsg.id = msg.id; // Store db id to prevent dupes
+                                        this.messages.push(newMsg);
+                                        this.lastMessageId = Math.max(this.lastMessageId, msg.id);
+                                    }
                                 });
                                 if (!this.open) this.unreadCount += data.messages.length;
                                 this.scrollToBottom();
@@ -356,7 +378,9 @@
                             }
                             // Agent typing indicator from backend
                             this.agentTyping = !!data.agent_typing;
-                        } catch (e) {}
+                        } catch (e) {} finally {
+                            this.isPolling = false;
+                        }
                     }, 3000);
                 },
 
