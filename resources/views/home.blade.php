@@ -3,7 +3,14 @@
     <meta name="description" content="Welcome to Sto. Rosario Parish – Pacita, San Pedro, Laguna. Mass schedules, intentions, events, and community news.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/canterbury" rel="stylesheet">
     <style>
+        @font-face {
+    font-family: 'Canterbury';
+    src: url('/fonts/Canterbury.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
         :root {
             --gold:        #F5C518;
             --gold-light:  #FFD740;
@@ -346,17 +353,17 @@
             </span>
         </div>
 
-        <h1 class="font-heading animate-fade-up delay-1"
-            style="white-space: nowrap;
-                   font-weight: 700;
-                   line-height: 1;
-                   letter-spacing: -0.02em;
-                   margin-bottom: 20px;
-                   text-shadow: 0 4px 48px rgba(0,0,0,0.55);
-                   font-size: clamp(2.4rem, 6.5vw, 6.4rem);">
-            <em class="hero-title-accent" style="font-style:italic;">Sto. Rosario</em>
-            <span style="color:#FFFFFF;">Parish</span>
-        </h1>
+<h1 class="animate-fade-up delay-1"
+    style="font-family: 'Canterbury', serif;
+           white-space: nowrap;
+           font-weight: 400;
+           line-height: 1;
+           letter-spacing: 0.01em;
+           margin-bottom: 20px;
+           text-shadow: 0 4px 48px rgba(0,0,0,0.55);
+           font-size: clamp(2.4rem, 6.5vw, 6.4rem);">
+    <span class="hero-title-accent">Sto. Rosario Parish</span>
+</h1>
 
         <p class="font-heading animate-fade-up delay-2"
            style="font-style:italic; color:rgba(255,215,64,0.82); margin-bottom:14px;
@@ -539,7 +546,7 @@
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:0.50; height:180%; width:auto;" aria-hidden="true">
                 <img src="{{ asset('assets/img/parish-illustration.svg') }}"
                      alt="Parish Illustration"
-                     style="height:90%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
+                     style="height:70%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
             </div>
             <div class="flex items-center gap-2.5 mb-1.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
