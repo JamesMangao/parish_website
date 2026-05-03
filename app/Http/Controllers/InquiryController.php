@@ -57,7 +57,10 @@ class InquiryController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Your inquiry has been submitted. Reference ID: ' . $inquiry->reference_id);
+        return back()->with([
+            'success' => 'Your inquiry has been submitted. Our team will review it soon.',
+            'reference_id' => $inquiry->reference_id
+        ]);
     }
 
     public function show($id)

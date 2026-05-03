@@ -3,15 +3,12 @@
 namespace App\Notifications;
 
 use App\Models\Inquiry;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class InquirySubmitted extends Notification
 {
-    use Queueable;
-
-    protected $inquiry;
+    private $inquiry;
 
     public function __construct(Inquiry $inquiry)
     {

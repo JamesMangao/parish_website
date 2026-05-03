@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <div class="px-6 py-12 max-w-4xl mx-auto" x-data="{ showRejection: false }">
+    <div class="px-6 py-12 max-w-5xl mx-auto" x-data="{ showRejection: false }">
         <div class="mb-8 flex items-center justify-between">
             <a href="{{ route('admin.inquiries.index') }}" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -39,16 +39,16 @@
             </div>
 
             <div class="p-10 space-y-12">
-                <div class="grid md:grid-cols-3 gap-10">
-                    <div class="space-y-1">
+                <div class="grid md:grid-cols-12 gap-10">
+                    <div class="space-y-1 md:col-span-3">
                         <h3 class="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Full Name</h3>
                         <p class="font-bold text-primary text-lg">{{ $inquiry->full_name }}</p>
                     </div>
-                    <div class="space-y-1">
+                    <div class="space-y-1 md:col-span-6">
                         <h3 class="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Email Address</h3>
                         <p class="font-bold text-primary text-lg">{{ $inquiry->email }}</p>
                     </div>
-                    <div class="space-y-1">
+                    <div class="space-y-1 md:col-span-3">
                         <h3 class="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Contact Number</h3>
                         <p class="font-bold text-primary text-lg">{{ $inquiry->phone ?? 'None' }}</p>
                     </div>
@@ -60,7 +60,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
                         </div>
                         Preferred Ceremony Date: {{ \Carbon\Carbon::parse($inquiry->preferred_date)->format('F d, Y') }}
-                    </div>
+                    </div><br>
                 @endif
 
                 <div class="space-y-4">

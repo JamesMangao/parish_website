@@ -214,20 +214,70 @@
 <section class="py-20 max-w-[960px] mx-auto px-6">
 
     {{-- Success alert --}}
-    @if(session('success'))
-    <div class="success-alert reveal active">
-        <div class="success-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="rgb(16,185,129)" stroke-width="2.5"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M20 6 9 17l-5-5"/>
-            </svg>
-        </div>
-        <div>
-            <p class="eyebrow mb-1" style="color:rgb(6,120,83);">Submitted</p>
-            <p style="font-size:13.5px; color:rgb(6,95,70); font-weight:500; line-height:1.7;">
-                {{ session('success') }}
-            </p>
+    {{-- Success Modal --}}
+    @if(session('reference_id'))
+    <div x-data="{ 
+            showModal: true, 
+            copied: false,
+            copyId() {
+                navigator.clipboard.writeText('{{ session('reference_id') }}');
+                this.copied = true;
+                setTimeout(() => this.copied = false, 2000);
+            }
+         }"
+         x-show="showModal"
+         class="fixed inset-0 z-[100] flex items-center justify-center p-6"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         x-cloak>
+        
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-blue-900/60 backdrop-blur-sm" @click="showModal = false"></div>
+
+        {{-- Modal Card --}}
+        <div class="relative bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-blue-100 animate-fade-up">
+            {{-- Top Accent --}}
+            <div class="h-2 bg-gradient-to-r from-gold via-gold-light to-gold"></div>
+            
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-green-50 border border-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgb(16,185,129)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6 9 17l-5-5"/>
+                    </svg>
+                </div>
+
+                <h2 class="font-heading text-3xl font-bold text-blue-900 italic mb-2">Inquiry Submitted!</h2>
+                <p class="text-blue-600/70 text-sm mb-8">Please keep your reference ID to track the status of your request.</p>
+
+                <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 mb-8">
+                    <p class="eyebrow mb-3" style="color: var(--blue-mid); opacity: 0.6;">Reference ID</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <span class="font-cinzel text-2xl font-bold tracking-wider text-blue-900">
+                            {{ session('reference_id') }}
+                        </span>
+                        <button @click="copyId()" 
+                                class="p-2.5 rounded-xl transition-all active:scale-95"
+                                :class="copied ? 'bg-green-100 text-green-600' : 'bg-white text-blue-400 hover:text-blue-600 shadow-sm border border-blue-100'">
+                            <svg x-show="!copied" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                            </svg>
+                            <svg x-show="copied" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" x-cloak>
+                                <path d="M20 6 9 17l-5-5"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p x-show="copied" x-transition class="text-[10px] font-bold text-green-600 uppercase tracking-widest mt-3" x-cloak>Copied to clipboard</p>
+                </div>
+
+                <button @click="showModal = false" 
+                        class="gold-btn w-full h-14 rounded-2xl font-bold uppercase tracking-widest text-[11px]">
+                    Continue
+                </button>
+            </div>
         </div>
     </div>
     @endif

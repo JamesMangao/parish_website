@@ -3,14 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class InquiryStatusUpdated extends Notification
 {
-    use Queueable;
-
     private $inquiry;
 
     public function __construct($inquiry)
@@ -25,17 +22,12 @@ class InquiryStatusUpdated extends Notification
 
     public function toMail($notifiable): MailMessage
     {
-        $message = (new MailMessage)
-                    ->subject('Sacramental Inquiry Update - ' . strtoupper($this->inquiry->status))
-                    ->line('Your sacramental inquiry status has been updated.')
-                    ->line('Current Status: ' . strtoupper($this->inquiry->status));
-
-        if ($this->inquiry->status === 'declined' && $this->inquiry->rejection_reason) {
-            $message->line('Reason for status: ' . $this->inquiry->rejection_reason);
-        }
-
-        return $message->action('Track Status', route('track.status', ['refId' => $this->inquiry->reference_id]))
-                    ->line('Thank you for using Parish Pal!');
+        return (new MailMessage)
+            ->subject('Sacramental Inquiry Update: ' . strtoupper($this->inquiry->status))
+            ->markdown('emails.inquiry_status', [
+                'inquiry' => $this->inquiry,
+                'refId' => $this->inquiry->reference_id
+            ]);
     }
 
     public function toArray($notifiable): array
