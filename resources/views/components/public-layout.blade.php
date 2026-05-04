@@ -209,8 +209,8 @@
             x-show="show"
             x-transition 
             @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
-            style="position: fixed; bottom: 5rem; right: 2rem; z-index: 100;"
-            class="flex h-12 w-12 rounded-2xl bg-primary text-primary-foreground shadow-2xl items-center justify-center hover:-translate-y-2 transition-all active:scale-95"
+            style="position: fixed; z-index: 100;"
+            class="bottom-20 right-4 md:bottom-20 md:right-8 flex h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-primary text-primary-foreground shadow-2xl items-center justify-center hover:-translate-y-2 transition-all active:scale-95"
             title="Back to Top"
         >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>

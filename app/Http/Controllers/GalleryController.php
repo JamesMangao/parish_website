@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GalleryImage;
 use App\Models\GalleryAlbum;
+use App\Models\VideoHighlight;
 use Illuminate\Http\Request;
 
 class GalleryController extends Controller
@@ -18,14 +19,18 @@ class GalleryController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $latestPhotos = GalleryImage::whereHas('album', function($q) {
+        $latestItems = GalleryImage::whereHas('album', function($q) {
                 $q->where('is_published', true);
             })
             ->orderBy('created_at', 'desc')
             ->limit(12)
             ->get();
 
-        return view('gallery', compact('albums', 'latestPhotos'));
+        $highlights = VideoHighlight::where('is_published', true)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+ 
+        return view('gallery', compact('albums', 'latestItems', 'highlights'));
     }
 
     public function publicAlbum(GalleryAlbum $album)

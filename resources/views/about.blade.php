@@ -81,18 +81,18 @@
         /* ════════════════════════════════════════
            SCROLL-REVEAL BASE
         ════════════════════════════════════════ */
-        [data-reveal] {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity .65s ease, transform .65s ease;
+        .reveal {
+            opacity: 0; transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        [data-reveal="left"]  { transform: translateX(-32px); }
-        [data-reveal="right"] { transform: translateX(32px); }
-        [data-reveal="scale"] { transform: scale(.93); }
-        [data-reveal].revealed {
-            opacity: 1;
-            transform: none;
+        .reveal.active, [data-reveal].active { 
+            opacity: 1 !important; transform: translate(0) scale(1) !important; 
         }
+
+        [data-reveal="up"]    { opacity: 0; transform: translateY(50px); transition: all 1.2s ease; }
+        [data-reveal="left"]  { opacity: 0; transform: translateX(-50px); transition: all 1.2s ease; }
+        [data-reveal="right"] { opacity: 0; transform: translateX(50px); transition: all 1.2s ease; }
+        [data-reveal="scale"] { opacity: 0; transform: scale(0.92); transition: all 1.2s ease; }
 
         /* ════════════════════════════════════════
            HERO
@@ -596,6 +596,77 @@
             animation: shimmer 1.2s linear infinite;
         }
 
+
+        /* ═══════════════ SACRAMENTS ═══════════════ */
+        .sacraments-section {
+            padding: 100px 24px; background: var(--blue-pale); position: relative; overflow: hidden;
+        }
+        .sacraments-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px; max-width: 1200px; margin: 60px auto 0;
+        }
+        .sacrament-card {
+            background: #fff; padding: 40px 30px; border-radius: 24px;
+            border: 1px solid rgba(13,42,82,0.08); transition: all 0.4s ease;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .sacrament-card:hover {
+            transform: translateY(-8px); border-color: var(--gold);
+            box-shadow: 0 20px 40px rgba(13,42,82,0.1);
+        }
+        .sacrament-icon {
+            width: 56px; height: 56px; background: rgba(245,197,24,0.1);
+            border-radius: 16px; display: flex; align-items: center;
+            justify-content: center; margin: 0 auto 24px; color: var(--gold);
+            transition: all 0.4s ease;
+        }
+        .sacrament-card:hover .sacrament-icon {
+            background: var(--gold); color: #fff; transform: scale(1.1) rotate(5deg);
+        }
+        .sacrament-title {
+            font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
+            font-weight: 700; color: var(--blue-deep); margin-bottom: 12px; font-style: italic;
+        }
+        .sacrament-body {
+            font-size: 0.9rem; color: rgba(13,42,82,0.5); line-height: 1.6;
+        }
+
+        /* ═══════════════ PATRON SAINTS ═══════════════ */
+        .patrons-section {
+            padding: 100px 24px; background: #fff;
+        }
+        .patrons-layout {
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px;
+            max-width: 1100px; margin: 60px auto 0; align-items: center;
+        }
+        .patron-content h3 {
+            font-family: 'Cormorant Garamond', serif; font-size: 2.8rem;
+            font-weight: 700; color: var(--blue-deep); margin-bottom: 24px; font-style: italic; line-height: 1.1;
+        }
+        .patron-rule {
+            width: 60px; height: 2px; background: var(--gold); margin-bottom: 30px;
+        }
+        .patron-description {
+            font-size: 1.05rem; color: rgba(13,42,82,0.6); line-height: 1.8; margin-bottom: 24px;
+        }
+        .patron-img-wrap {
+            position: relative; border-radius: 30px; overflow: hidden;
+            box-shadow: 0 30px 60px rgba(13,42,82,0.15); aspect-ratio: 4/5;
+        }
+        .patron-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .patron-badge {
+            position: absolute; bottom: 30px; left: 30px; background: rgba(13,42,82,0.95);
+            color: #fff; padding: 12px 24px; border-radius: 100px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 992px) {
+            .patrons-layout { grid-template-columns: 1fr; gap: 40px; }
+            .patron-content { order: 2; text-align: center; }
+            .patron-rule { margin: 0 auto 30px; }
+            .patron-img-wrap { order: 1; max-width: 500px; margin: 0 auto; }
+        }
     </style>
 
     {{-- ═══════════════ HERO ═══════════════ --}}
@@ -626,7 +697,7 @@
         <div class="calling-section">
             <div class="calling-img-wrap" data-reveal="scale">
                 <img
-                    src="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}"
+                    src="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['hero_image']) : asset('bg.png') }}"
                     alt="Sto. Rosario Parish Church"
                 >
                 <div class="calling-badge">Est. 1983</div>
@@ -642,6 +713,47 @@
                     In 2024, the image was declared an <strong style="color:var(--maroon)">Important Cultural Property</strong> of the City of San Pedro. In 2025, Our Lady was accorded the honorific title <strong style="color:var(--maroon)">"Queen of the City of San Pedro."</strong>
                 </p>
             </div>
+        </div>
+    </section>
+
+    {{-- ═══════════════ THE SEVEN SACRAMENTS ═══════════════ --}}
+    <section class="sacraments-section">
+        <div class="text-center">
+            <p class="section-eyebrow" data-reveal>The Pillars of our Faith</p>
+            <h2 class="section-title" data-reveal style="font-size:3rem; font-style:italic;">The Seven Sacraments</h2>
+            <div style="width:40px; height:1px; background:var(--gold); margin:20px auto 0;"></div>
+        </div>
+
+        <div class="sacraments-grid">
+            @php
+            $sacraments = [
+                ['name' => 'Baptism',      'desc' => 'The gate of the sacraments and necessary for salvation, by which we are freed from sin and reborn as children of God.', 'icon' => 'droplets'],
+                ['name' => 'Confirmation', 'desc' => 'The perfection of Baptismal grace, strengthening us with the gifts of the Holy Spirit to be witnesses of Christ.', 'icon' => 'flame'],
+                ['name' => 'Eucharist',    'desc' => 'The source and summit of the Christian life, where we receive the real body and blood of our Lord Jesus Christ.', 'icon' => 'sun'],
+                ['name' => 'Penance',      'desc' => 'The sacrament of reconciliation through which we obtain God\'s mercy for sins committed against Him.', 'icon' => 'shield-check'],
+                ['name' => 'Anointing',    'desc' => 'A source of spiritual and physical healing for those whose health is seriously impaired by sickness or old age.', 'icon' => 'hand-heart'],
+                ['name' => 'Holy Orders',  'desc' => 'The sacrament through which the mission entrusted by Christ to his apostles continues to be exercised in the Church.', 'icon' => 'cross'],
+                ['name' => 'Matrimony',    'desc' => 'A sacred covenant between a man and a woman, established as a partnership of the whole of life for their mutual good.', 'icon' => 'heart'],
+            ];
+
+            $icons = [
+                'droplets' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+                'flame' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.5 4 6.5 2 2 3 5.5 3 8.5a7 7 0 0 1-14 0c0-1.15.3-2.35.9-3.5 1.5.5 2.5 1.5 3 2.5z"/></svg>',
+                'sun' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+                'shield-check' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>',
+                'hand-heart' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14h2a2 2 0 1 0 0-4h-3.5a2 2 0 1 0 0 4"/><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>',
+                'cross' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2h2v20h-2z"/><path d="M5 8h14v2H5z"/></svg>',
+                'heart' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+            ];
+            @endphp
+
+            @foreach($sacraments as $s)
+            <div class="sacrament-card" data-reveal="up" style="transition-delay: {{ $loop->index * 0.1 }}s">
+                <div class="sacrament-icon">{!! $icons[$s['icon']] !!}</div>
+                <h3 class="sacrament-title">{{ $s['name'] }}</h3>
+                <p class="sacrament-body">{{ $s['desc'] }}</p>
+            </div>
+            @endforeach
         </div>
     </section>
 
@@ -738,13 +850,58 @@
         </div>
     </section>
 
+    {{-- ═══════════════ CELESTIAL INTERCESSORS ═══════════════ --}}
+    <section class="patrons-section">
+        <div class="text-center">
+            <p class="section-eyebrow" data-reveal>Celestial Intercessors</p>
+            <h2 class="section-title" data-reveal style="font-size:3rem; font-style:italic;">Our Patron Saints</h2>
+        </div>
+
+        <div class="patrons-layout">
+            <div class="patron-content" data-reveal="left">
+                <h3>The Queen of the Most Holy Rosary</h3>
+                <div class="patron-rule"></div>
+                <p class="patron-description">
+                    Enshrined at the heart of our parish, Our Lady of the Most Holy Rosary of Pacita stands as the titular patroness and beloved protectress of our community. 
+                </p>
+                <p class="patron-description" style="font-size:0.95rem; font-style:italic;">
+                    "Through her intercession, we find the strength to walk the path of faith, united as one family in the love of her Son, our Lord Jesus Christ."
+                </p>
+                <div style="margin-top:40px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Feast Day: October 16</span>
+                </div>
+            </div>
+            <div class="patron-img-wrap" data-reveal="scale">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/olp.png') }}" alt="Our Lady of the Rosary">
+                <div class="patron-badge">Titular Patroness</div>
+            </div>
+        </div>
+
+        <div class="patrons-layout" style="margin-top:100px;">
+            <div class="patron-img-wrap" data-reveal="scale">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/svf.jpg') }}" alt="San Vicente Ferrer">
+                <div class="patron-badge">Segunda Patron</div>
+            </div>
+            <div class="patron-content" data-reveal="right">
+                <h3>San Vicente Ferrer</h3>
+                <div class="patron-rule"></div>
+                <p class="patron-description">
+                    The legendary "Angel of the Judgment," San Vicente Ferrer serves as the Segunda Patron of our parish. A powerful preacher and miracle-worker, he inspires our community to live a life of repentance, service, and unwavering devotion to the Gospel.
+                </p>
+                <div style="margin-top:40px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Feast Day: April 5</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- ═══════════════ LEADERSHIP ═══════════════ --}}
     <section class="leadership-section">
         <p class="section-eyebrow" data-reveal>Our Leadership</p>
         <h2 class="leadership-title" data-reveal>Shepherds of<br>the flock</h2>
         <div class="leader-card" data-reveal="scale">
             @if(isset($global_settings['priest_image']))
-                <div class="leader-avatar" style="background-image: url('{{ asset('storage/' . $global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
             @else
                 <div class="leader-avatar">FV</div>
             @endif
@@ -947,6 +1104,17 @@
     document.querySelectorAll('.stat-number[data-target]').forEach(el => {
         statObserver.observe(el);
     });
+
+    /* ── Reveal observer ── */
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, [data-reveal]').forEach(el => revealObserver.observe(el));
 
     /* ── Timeline Navigation Buttons ── */
     const btnLeft  = document.getElementById('tl-left');

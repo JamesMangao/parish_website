@@ -20,6 +20,7 @@ class GalleryImage extends Model
         'title',
         'caption',
         'storage_path',
+        'type',
         'is_published',
     ];
 
@@ -34,6 +35,6 @@ class GalleryImage extends Model
 
     public function getUrlAttribute()
     {
-        return asset('storage/gallery/' . $this->storage_path);
+        return \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url('gallery/' . $this->storage_path);
     }
 }

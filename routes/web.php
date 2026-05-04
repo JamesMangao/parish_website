@@ -126,6 +126,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/gallery/{album}/add-images', [App\Http\Controllers\GalleryAlbumController::class, 'addImages'])->name('admin.gallery.add-images');
         Route::delete('/admin/gallery/image/{image}', [App\Http\Controllers\GalleryAlbumController::class, 'removeImage'])->name('admin.gallery.remove-image');
 
+        // Video Highlights (Standalone)
+        Route::resource('/admin/highlights', App\Http\Controllers\VideoHighlightController::class)->names('admin.highlights');
+        Route::post('/admin/highlights/reorder', [App\Http\Controllers\VideoHighlightController::class, 'reorder'])->name('admin.highlights.reorder');
+
         // Route::get('/admin/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
         // Route::post('/admin/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
         // Route::delete('/admin/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');

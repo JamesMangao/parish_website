@@ -26,14 +26,16 @@ class GalleryAlbumController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'featured_video_url' => 'nullable|string',
             'is_published' => 'boolean',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,mov,ogv|max:102400', // Up to 100MB
         ]);
 
         try {
             $album = GalleryAlbum::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
+                'featured_video_url' => $validated['featured_video_url'] ?? null,
                 'is_published' => $request->has('is_published'),
             ]);
 
@@ -59,12 +61,14 @@ class GalleryAlbumController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'featured_video_url' => 'nullable|string',
             'is_published' => 'boolean',
         ]);
 
         $gallery->update([
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
+            'featured_video_url' => $validated['featured_video_url'] ?? null,
             'is_published' => $request->has('is_published'),
         ]);
 
@@ -80,7 +84,7 @@ class GalleryAlbumController extends Controller
     public function addImages(Request $request, GalleryAlbum $album)
     {
         $request->validate([
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4,mov,ogv|max:102400',
         ]);
 
         if ($request->hasFile('images')) {
@@ -104,17 +108,24 @@ class GalleryAlbumController extends Controller
             $filename = Str::uuid() . '.' . $file->extension();
             
             try {
-                // Save to local public storage instead of Supabase to avoid 42P01 errors
-                $path = $file->storeAs('gallery', $filename, 'public');
-
+                // Save to the default disk (Supabase Cloud)
+                $path = $file->storeAs('gallery', $filename);
+ 
                 if ($path) {
+                    $mime = $file->getMimeType();
+                    $ext  = strtolower($file->getClientOriginalExtension());
+                    
+                    $isVideo = Str::startsWith($mime, 'video/') || in_array($ext, ['mp4', 'mov', 'ogv', 'avi', 'wmv', 'flv', 'mkv', 'webm']);
+                    $type = $isVideo ? 'video' : 'image';
+                    
                     $album->images()->create([
                         'title' => $file->getClientOriginalName(),
                         'storage_path' => $filename,
+                        'type' => $type,
                         'is_published' => true,
                     ]);
                 } else {
-                    throw new \Exception('Failed to save file to local storage.');
+                    throw new \Exception('Failed to save file to cloud storage.');
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Local Upload Exception: ' . $e->getMessage());

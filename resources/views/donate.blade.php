@@ -64,7 +64,7 @@
 
                     <div style="padding:1.5rem;background:#F7F9FF;border-radius:1.5rem;border:1px solid rgba(26,64,128,0.08);margin-bottom:2rem;transition:transform .3s ease;" class="group-hover:scale-[1.02]">
                         @if(isset($global_settings['qr_code']))
-                            <img src="{{ asset('storage/' . $global_settings['qr_code']) }}"
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['qr_code']) }}"
                                  alt="Parish Donation QR"
                                  style="width:100%;height:auto;border-radius:12px;">
                         @else

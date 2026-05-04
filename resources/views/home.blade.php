@@ -151,7 +151,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shimmer 4s linear infinite;
+            animation: shimmer 12s linear infinite;
         }
 
         .hero-badge {

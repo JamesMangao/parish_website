@@ -2,8 +2,8 @@
     <div class="p-6">
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-3xl font-heading font-bold text-primary">Photo Gallery</h1>
-                <p class="text-muted-foreground mt-1">Manage your parish albums and memories</p>
+                <h1 class="text-3xl font-heading font-bold text-primary">Gallery</h1>
+                <p class="text-muted-foreground mt-1">Manage your parish albums, memories and video highlights</p>
             </div>
             <a href="{{ route('admin.gallery.create') }}" class="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
@@ -43,7 +43,7 @@
                             <div class="absolute bottom-4 left-4">
                                 <span class="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1.5 shadow-xl border border-white/10">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-                                    {{ $album->images_count }} Photos
+                                    {{ $album->images_count }} Items
                                 </span>
                             </div>
                         </div>

@@ -29,15 +29,16 @@ class SettingController extends Controller
             'qr_code' => 'nullable|image|max:10240',
             'priest_image' => 'nullable|image|max:10240',
             'priest_name' => 'nullable|string|max:255',
+            'gallery_highlights_video' => 'nullable|string|max:500',
         ]);
 
         if ($request->hasFile('qr_code')) {
-            $path = $request->file('qr_code')->store('settings', 'public');
+            $path = $request->file('qr_code')->store('settings');
             Setting::updateOrCreate(['key' => 'qr_code'], ['value' => $path]);
         }
 
         if ($request->hasFile('priest_image')) {
-            $path = $request->file('priest_image')->store('settings', 'public');
+            $path = $request->file('priest_image')->store('settings');
             Setting::updateOrCreate(['key' => 'priest_image'], ['value' => $path]);
         } elseif ($request->file('priest_image') !== null && !$request->file('priest_image')->isValid()) {
             return back()->withErrors(['priest_image' => 'File upload failed: ' . $request->file('priest_image')->getErrorMessage()]);

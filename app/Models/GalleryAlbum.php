@@ -17,6 +17,7 @@ class GalleryAlbum extends Model
     protected $fillable = [
         'title',
         'description',
+        'featured_video_url',
         'is_published',
     ];
 

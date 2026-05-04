@@ -87,6 +87,8 @@
                         :active="request()->is('admin/events*')" />
                     <x-admin-nav-link href="/admin/gallery" icon="image" label="Gallery"
                         :active="request()->is('admin/gallery*')" />
+                    <x-admin-nav-link href="/admin/highlights" icon="clapperboard" label="Video Highlights"
+                        :active="request()->is('admin/highlights*')" />
                     <x-admin-nav-link href="/admin/chats" icon="messages-square" label="Live Chat"
                         :active="request()->is('admin/chats*')" />
                 @endif

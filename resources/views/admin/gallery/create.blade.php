@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-heading font-bold text-primary">Create New Album</h1>
-                <p class="text-muted-foreground mt-1">Group your photos into a beautiful album</p>
+                <p class="text-muted-foreground mt-1">Group your photos and videos into a beautiful album</p>
             </div>
             <a href="{{ route('admin.gallery.index') }}" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
@@ -49,9 +49,21 @@
                             name="description" 
                             id="description" 
                             rows="4" 
-                            placeholder="Tell the story behind these photos..."
+                            placeholder="Tell the story behind these items..."
                             class="w-full px-4 py-3 rounded-lg border bg-background focus:ring-2 focus:ring-accent/20 outline-none transition-all resize-none"
                         ></textarea>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="featured_video_url" class="text-sm font-bold text-primary uppercase tracking-wider">Album Highlight Video (YouTube URL or Path)</label>
+                        <input 
+                            type="text" 
+                            name="featured_video_url" 
+                            id="featured_video_url" 
+                            placeholder="e.g. https://www.youtube.com/watch?v=..."
+                            class="w-full px-4 py-3 rounded-lg border bg-background focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                        >
+                        <p class="text-[10px] text-muted-foreground italic">This video will be featured at the top of the album page.</p>
                     </div>
 
                     <div class="flex items-center gap-2">
@@ -62,7 +74,7 @@
 
                 <div class="bg-card rounded-xl border p-6 shadow-sm space-y-4" x-data="{ images: [] }">
                     <div class="flex items-center justify-between">
-                        <label class="text-sm font-bold text-primary uppercase tracking-wider">Upload Photos</label>
+                        <label class="text-sm font-bold text-primary uppercase tracking-wider">Upload Media (Photos & Videos)</label>
                         <span class="text-xs text-muted-foreground" x-text="`${images.length} files selected`"></span>
                     </div>
 
@@ -82,14 +94,22 @@
                         <div class="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center text-accent mb-3 group-hover:scale-110 transition-transform">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-cloud"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
                         </div>
-                        <p class="text-sm font-bold text-primary">Click to select multiple photos</p>
-                        <p class="text-xs text-muted-foreground mt-1">Maximum 5MB per file</p>
+                        <p class="text-sm font-bold text-primary">Click to select photos or videos</p>
+                        <p class="text-xs text-muted-foreground mt-1">Images up to 5MB, Videos up to 100MB</p>
                     </div>
 
                     <div class="grid grid-cols-4 gap-4 mt-4" x-show="images.length > 0">
                         <template x-for="(file, index) in images" :key="index">
                             <div class="aspect-square rounded-lg bg-muted relative group overflow-hidden border">
-                                <img :src="URL.createObjectURL(file)" class="w-full h-full object-cover">
+                                <template x-if="file.type.startsWith('image/')">
+                                    <img :src="URL.createObjectURL(file)" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="file.type.startsWith('video/')">
+                                    <div class="w-full h-full flex flex-col items-center justify-center bg-primary/5 text-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-circle"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                        <span class="text-[8px] font-black uppercase mt-2 tracking-widest">Video Clip</span>
+                                    </div>
+                                </template>
                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </div>
                         </template>

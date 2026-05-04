@@ -176,7 +176,7 @@
             <div style="flex:1; min-width:0;">
                 <div class="divider-ornament mb-4" style="display:flex; align-items:center; gap:12px;">
                     <span class="eyebrow" style="color:rgba(245,197,24,0.75); white-space:nowrap;">
-                        Parish Gallery
+                        Gallery Album
                     </span>
                 </div>
                 <h1 class="font-heading"
@@ -197,7 +197,7 @@
                      style="display:inline-block; font-size:9px; letter-spacing:0.25em;
                             text-transform:uppercase; padding:6px 18px; border-radius:100px;
                             margin-bottom:8px;">
-                    {{ $album->images->count() }} Photos
+                    {{ $album->images->count() }} Items
                 </div>
                 <p class="font-cinzel"
                    style="font-size:9px; letter-spacing:0.2em; color:rgba(235,242,255,0.3);
@@ -209,27 +209,46 @@
     </div>
 </section>
 
-{{-- ═══════════════ PHOTO GRID ═══════════════ --}}
+{{-- ═══════════════ FEATURED VIDEO ═══════════════ --}}
+@if($album->featured_video_url)
+<section class="reveal" style="padding:4rem 1.5rem 0; max-width:1100px; margin:0 auto;">
+    <div class="divider-ornament mb-8" style="justify-content:flex-start;">
+        <span class="eyebrow">Album Highlight Video</span>
+        <div style="flex:1; height:1px; background:linear-gradient(90deg,rgba(245,197,24,0.3),transparent);"></div>
+    </div>
+
+    <div class="card-sacred overflow-hidden" 
+         style="position:relative; aspect-ratio:16/9; background:var(--blue-deep); 
+                border-radius:24px; box-shadow:0 20px 60px rgba(13,42,82,0.2); border:1px solid rgba(245,197,24,0.1);">
+        
+        @if(Str::contains($album->featured_video_url, ['youtube.com', 'youtu.be']))
+            @php
+                $videoId = Str::contains($album->featured_video_url, 'youtu.be') 
+                    ? Str::afterLast($album->featured_video_url, '/') 
+                    : Str::after(Str::after($album->featured_video_url, 'v='), '&');
+                if (Str::contains($videoId, '&')) $videoId = Str::before($videoId, '&');
+            @endphp
+            <iframe src="https://www.youtube.com/embed/{{ $videoId }}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+        @else
+            <video controls class="w-full h-full object-cover">
+                <source src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($album->featured_video_url) }}" type="video/mp4">
+            </video>
+        @endif
+    </div>
+</section>
+@endif
+
+{{-- ═══════════════ MULTIMEDIA GRID ═══════════════ --}}
 <section class="reveal" style="padding:3.5rem 1.5rem 5rem; max-width:1100px; margin:0 auto;">
 
     @if($album->images->isEmpty())
         <div style="text-align:center; padding:6rem 2rem;
                     border:1px dashed rgba(26,64,128,0.15); border-radius:20px;
                     background:var(--cream-deep);">
-            <div style="width:64px; height:64px; border-radius:50%; margin:0 auto 1.25rem;
-                        background:#fff; border:1px solid rgba(26,64,128,0.1);
-                        display:flex; align-items:center; justify-content:center;">
-                <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-                    <rect width="18" height="18" x="3" y="3" rx="2" stroke="#F5C518" stroke-width="1.5"/>
-                    <circle cx="9" cy="9" r="2" stroke="#F5C518" stroke-width="1.5"/>
-                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" stroke="#F5C518" stroke-width="1.5"/>
-                </svg>
-            </div>
             <p style="font-size:0.875rem; font-style:italic; color:rgba(13,42,82,0.4);">
-                No photos in this album yet. Check back soon.
+                No items in this album yet.
             </p>
         </div>
-
     @else
         <div id="photo-grid"
              style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.25rem;">
@@ -240,16 +259,29 @@
                  x-data="{ loaded: false }">
                 <div style="position:absolute; inset:0; background:var(--cream-deep);"
                      x-show="!loaded"></div>
-                <img src="{{ $img->url }}"
+                
+                @if($img->type === 'video')
+                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:10; pointer-events:none;">
+                        <div style="width:48px; height:48px; border-radius:50%; background:rgba(245,197,24,0.9); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#0D2A52"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                @endif
+
+                <img src="{{ $img->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $img->url }}"
                      alt="{{ $img->title }}"
                      @load="loaded = true"
                      :class="loaded ? '' : 'opacity-0'"
                      loading="lazy">
+                
                 <div class="photo-overlay">
                     <p style="font-size:0.8125rem; font-weight:600; color:#EBF2FF;
                               white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         {{ $img->caption ?: $img->title }}
                     </p>
+                    @if($img->type === 'video')
+                        <span style="font-size:8px; color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Video Highlight</span>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -277,7 +309,9 @@
 
     <div style="display:flex; flex-direction:column; align-items:center;
                 max-width:1000px; width:100%;">
-        <img id="lb-img" class="lightbox-img" src="" alt="">
+        <div id="lb-content" style="width:100%; display:flex; justify-content:center;">
+            {{-- Content will be injected here --}}
+        </div>
         <div id="lb-caption" style="margin-top:1.5rem; text-align:center;">
             <h3 id="lb-title" class="font-heading"
                 style="font-size:1.75rem; font-weight:700; font-style:italic;
@@ -299,14 +333,21 @@
 </div>
 
 <script>
-const images = @json($album->images->map(fn($i) => ['url' => $i->url, 'title' => $i->title, 'caption' => $i->caption]));
+const images = {!! json_encode($album->images->map(function($i) {
+    return [
+        'url' => $i->url,
+        'title' => $i->title,
+        'caption' => $i->caption,
+        'type' => $i->type
+    ];
+})) !!};
 let lbIdx = 0;
 
-const lb     = document.getElementById('lightbox');
-const lbImg  = document.getElementById('lb-img');
-const lbTitle = document.getElementById('lb-title');
-const lbSub   = document.getElementById('lb-sub');
-const lbCount = document.getElementById('lb-counter');
+const lb        = document.getElementById('lightbox');
+const lbContent = document.getElementById('lb-content');
+const lbTitle   = document.getElementById('lb-title');
+const lbSub     = document.getElementById('lb-sub');
+const lbCount   = document.getElementById('lb-counter');
 
 function openLightbox(idx) {
     lbIdx = idx;
@@ -317,17 +358,34 @@ function openLightbox(idx) {
 function closeLightbox() {
     lb.style.display = 'none';
     document.body.style.overflow = '';
+    lbContent.innerHTML = ''; // Stop video playback
 }
 function lbNav(dir) {
     lbIdx = (lbIdx + dir + images.length) % images.length;
     renderLb();
 }
 function renderLb() {
-    const img = images[lbIdx];
-    lbImg.src = img.url;
-    lbImg.alt = img.title;
-    lbTitle.textContent = img.title || '';
-    lbSub.textContent   = img.caption || '';
+    const item = images[lbIdx];
+    lbContent.innerHTML = '';
+    
+    if (item.type === 'video') {
+        const video = document.createElement('video');
+        video.src = item.url;
+        video.controls = true;
+        video.autoplay = true;
+        video.className = 'lightbox-img'; // Re-use styling
+        video.style.maxHeight = '75vh';
+        lbContent.appendChild(video);
+    } else {
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.title;
+        img.className = 'lightbox-img';
+        lbContent.appendChild(img);
+    }
+
+    lbTitle.textContent = item.title || '';
+    lbSub.textContent   = item.caption || '';
     lbCount.textContent = `${lbIdx + 1} / ${images.length}`;
 }
 

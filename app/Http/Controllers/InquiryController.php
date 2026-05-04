@@ -31,13 +31,18 @@ class InquiryController extends Controller
             'message' => 'required|string',
         ]);
 
+        $message = $validated['message'];
+        if ($request->has('wants_document')) {
+            $message .= "\n\n[Wants to proceed with document request: " . strtoupper($request->wants_document) . "]";
+        }
+
         $inquiry = Inquiry::create([
             'full_name' => $validated['fullName'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'inquiry_type' => $validated['inquiryType'],
             'preferred_date' => $validated['preferredDate'],
-            'message' => $validated['message'],
+            'message' => $message,
             'status' => 'pending',
         ]);
 

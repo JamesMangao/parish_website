@@ -136,7 +136,7 @@
                          :class="scrolled ? 'bg-white border-black/5 shadow-xl' : 'border-white/10 bg-[rgba(8,20,45,0.97)]'">
                         @foreach([
                             ['Parish Events',   '/events',  'Liturgical & community events'],
-                            ['Photo Gallery',   '/gallery', 'Memories & celebrations'],
+                            ['Gallery',         '/gallery', 'Memories & celebrations'],
                             ['About Our Parish','/about',   'History & our mission'],
                         ] as [$label,$url,$sub])
                         <a href="{{ $url }}" role="menuitem" tabindex="-1"
@@ -296,7 +296,7 @@
                     'icon'  => '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01"/>',
                 ],
                 [
-                    'label' => 'Photo Gallery',
+                    'label' => 'Gallery',
                     'url'   => '/gallery',
                     'sub'   => 'Memories & celebrations',
                     'icon'  => '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-heading font-bold text-primary">Edit Album</h1>
-                <p class="text-muted-foreground mt-1">Manage photos and details for "{{ $album->title }}"</p>
+                <p class="text-muted-foreground mt-1">Manage media and details for "{{ $album->title }}"</p>
             </div>
             <a href="{{ route('admin.gallery.index') }}" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
@@ -39,6 +39,19 @@
                             >{{ $album->description }}</textarea>
                         </div>
 
+                        <div class="space-y-2">
+                            <label for="featured_video_url" class="text-sm font-bold text-primary uppercase tracking-wider">Album Highlight Video (YouTube URL or Path)</label>
+                            <input 
+                                type="text" 
+                                name="featured_video_url" 
+                                id="featured_video_url" 
+                                value="{{ $album->featured_video_url }}"
+                                placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                class="w-full px-4 py-3 rounded-lg border bg-background focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                            >
+                            <p class="text-[10px] text-muted-foreground italic">Featured at the top of the album page.</p>
+                        </div>
+
                         <div class="flex items-center gap-2">
                             <input type="checkbox" name="is_published" id="is_published" value="1" {{ $album->is_published ? 'checked' : '' }} class="rounded border-gray-300 text-accent focus:ring-accent">
                             <label for="is_published" class="text-sm font-semibold text-primary">Published</label>
@@ -53,8 +66,8 @@
                 <!-- Add More Images -->
                 <div class="mt-8 bg-card rounded-xl border p-6 shadow-sm border-accent/20 bg-accent/5">
                     <h3 class="text-lg font-heading font-bold text-primary mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-plus"><path d="M16 5h6"/><path d="M19 2v6"/><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                        Add More Photos
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m7 3 10 18M3 7l18 10M7 21 21 7M3 17l18-10"/></svg>
+                        Add More Media
                     </h3>
                     <form action="{{ route('admin.gallery.add-images', $album) }}" method="POST" enctype="multipart/form-data" x-data="{ count: 0, loading: false }" @submit="loading = true">
                         @csrf
@@ -64,7 +77,23 @@
                             :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
                             @click="if(!loading) $refs.addInput.click()"
                         >
-                            <span class="text-xs font-bold text-accent" x-text="count === 0 ? 'Click to select files' : `${count} files ready` "></span>
+                            <span class="text-xs font-bold text-accent" x-text="count === 0 ? 'Click to select photos or videos' : `${count} files ready` "></span>
+                            <span class="text-[9px] text-muted-foreground mt-1">Images up to 5MB, Videos up to 100MB</span>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 mt-4 mb-4" x-show="count > 0">
+                            <template x-for="(file, index) in Array.from($refs.addInput.files)" :key="index">
+                                <div class="aspect-square rounded-lg bg-muted relative group overflow-hidden border">
+                                    <template x-if="file.type.startsWith('image/')">
+                                        <img :src="URL.createObjectURL(file)" class="w-full h-full object-cover">
+                                    </template>
+                                    <template x-if="file.type.startsWith('video/')">
+                                        <div class="w-full h-full flex flex-col items-center justify-center bg-primary/5 text-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-circle"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                         <button 
                             type="submit" 
@@ -85,15 +114,23 @@
             <!-- Photos Grid -->
             <div class="lg:col-span-2">
                 <div class="bg-card rounded-xl border p-6 shadow-sm">
-                    <h3 class="text-xl font-heading font-bold text-primary mb-6">Album Photos ({{ $album->images->count() }})</h3>
+                    <h3 class="text-xl font-heading font-bold text-primary mb-6">Album Media ({{ $album->images->count() }})</h3>
                     
                     @if($album->images->isEmpty())
-                        <p class="text-center py-20 text-muted-foreground italic">No photos in this album yet.</p>
+                        <p class="text-center py-20 text-muted-foreground italic">No media in this album yet.</p>
                     @else
                         <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
                             @foreach($album->images as $img)
                                 <div class="relative group aspect-square rounded-md overflow-hidden border bg-muted">
-                                    <img src="{{ $img->url }}" class="w-full h-full object-cover">
+                                    <img src="{{ $img->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $img->url }}" class="w-full h-full object-cover">
+                                    
+                                    @if($img->type === 'video')
+                                        <div class="absolute top-1 right-1 z-10">
+                                            <div class="p-1 bg-accent text-accent-foreground rounded shadow-lg">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                            </div>
+                                        </div>
+                                    @endif
                                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                         <form action="{{ route('admin.gallery.remove-image', $img) }}" method="POST" onsubmit="return confirm('Delete this image?')">
                                             @csrf @method('DELETE')
