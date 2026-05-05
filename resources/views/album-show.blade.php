@@ -15,7 +15,7 @@
         .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
 
         .eyebrow {
-            font-size: 10px; font-weight: 600;
+            font-size: 12px; font-weight: 600;
             letter-spacing: 0.32em; text-transform: uppercase;
             color: var(--gold);
         }
@@ -160,7 +160,7 @@
         {{-- Back link --}}
         <a href="{{ route('gallery') }}"
            style="display:inline-flex; align-items:center; gap:8px; margin-bottom:2rem;
-                  font-size:9.5px; font-weight:600; letter-spacing:0.28em; text-transform:uppercase;
+                  font-size:11.5px; font-weight:600; letter-spacing:0.28em; text-transform:uppercase;
                   color:rgba(235,242,255,0.45); text-decoration:none; transition:color 0.2s;"
            onmouseover="this.style.color='rgba(245,197,24,0.85)';"
            onmouseout="this.style.color='rgba(235,242,255,0.45)';">
@@ -185,7 +185,7 @@
                     {{ $album->title }}
                 </h1>
                 @if($album->description)
-                <p style="font-size:1rem; font-style:italic; color:rgba(235,242,255,0.45);
+                <p style="font-size:1.15rem; font-style:italic; color:rgba(235,242,255,0.45);
                           line-height:1.7; max-width:600px;">
                     {!! nl2br(e($album->description)) !!}
                 </p>
@@ -194,13 +194,13 @@
 
             <div style="text-align:right; flex-shrink:0;">
                 <div class="gold-btn"
-                     style="display:inline-block; font-size:9px; letter-spacing:0.25em;
+                     style="display:inline-block; font-size:11px; letter-spacing:0.25em;
                             text-transform:uppercase; padding:6px 18px; border-radius:100px;
                             margin-bottom:8px;">
                     {{ $album->images->count() }} Items
                 </div>
                 <p class="font-cinzel"
-                   style="font-size:9px; letter-spacing:0.2em; color:rgba(235,242,255,0.3);
+                   style="font-size:11px; letter-spacing:0.2em; color:rgba(235,242,255,0.3);
                           text-transform:uppercase;">
                     Added {{ $album->created_at->format('M d, Y') }}
                 </p>
@@ -245,7 +245,7 @@
         <div style="text-align:center; padding:6rem 2rem;
                     border:1px dashed rgba(26,64,128,0.15); border-radius:20px;
                     background:var(--cream-deep);">
-            <p style="font-size:0.875rem; font-style:italic; color:rgba(13,42,82,0.4);">
+            <p style="font-size:1.05rem; font-style:italic; color:rgba(13,42,82,0.4);">
                 No items in this album yet.
             </p>
         </div>
@@ -257,11 +257,15 @@
                  data-idx="{{ $idx }}"
                  onclick="openLightbox({{ $idx }})"
                  x-data="{ loaded: false }">
-                <div style="position:absolute; inset:0; background:var(--cream-deep);"
-                     x-show="!loaded"></div>
+                {{-- Skeleton --}}
+                <div x-show="!loaded" class="absolute inset-0 skeleton z-10"></div>
                 
+                @if($idx === 0)
+                {{-- First image loads faster usually, but we keep skeleton for consistency --}}
+                @endif
+
                 @if($img->type === 'video')
-                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:10; pointer-events:none;">
+                    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5; pointer-events:none;">
                         <div style="width:48px; height:48px; border-radius:50%; background:rgba(245,197,24,0.9); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="#0D2A52"><path d="M8 5v14l11-7z"/></svg>
                         </div>
@@ -275,12 +279,12 @@
                      loading="lazy">
                 
                 <div class="photo-overlay">
-                    <p style="font-size:0.8125rem; font-weight:600; color:#EBF2FF;
+                    <p style="font-size:1rem; font-weight:600; color:#EBF2FF;
                               white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         {{ $img->caption ?: $img->title }}
                     </p>
                     @if($img->type === 'video')
-                        <span style="font-size:8px; color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Video Highlight</span>
+                        <span style="font-size:11px; color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Video Highlight</span>
                     @endif
                 </div>
             </div>
@@ -317,9 +321,9 @@
                 style="font-size:1.75rem; font-weight:700; font-style:italic;
                        color:#EBF2FF; margin-bottom:0.25rem;"></h3>
             <p id="lb-sub"
-               style="font-size:0.875rem; font-style:italic; color:rgba(235,242,255,0.4);"></p>
+               style="font-size:1.05rem; font-style:italic; color:rgba(235,242,255,0.4);"></p>
             <p id="lb-counter" class="font-cinzel"
-               style="font-size:9px; letter-spacing:0.3em; color:rgba(235,242,255,0.25);
+               style="font-size:11px; letter-spacing:0.3em; color:rgba(235,242,255,0.25);
                       text-transform:uppercase; margin-top:0.75rem;"></p>
         </div>
     </div>

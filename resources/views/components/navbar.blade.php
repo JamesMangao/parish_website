@@ -25,12 +25,12 @@
                       style="font-family:'Cinzel',Georgia,serif;">✝</span>
             </div>
             <div>
-                <div class="text-[13px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
+                <div class="text-[15px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
                      :class="scrolled ? 'text-[#08142D]' : 'text-white'"
                      style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;">
                     Sto. Rosario Parish
                 </div>
-                <div class="text-[7.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
+                <div class="text-[9.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
                      :class="scrolled ? 'text-[#08142D]/60' : 'text-white/60'">
                     Pacita 1
                 </div>
@@ -50,7 +50,7 @@
                 <button x-ref="trigger" @click="toggle()"
                         :aria-expanded="isOpen" aria-haspopup="menu"
                         class="h-10 px-4 rounded-full flex items-center gap-1.5
-                               text-[11px] font-semibold uppercase tracking-widest
+                               text-[13px] font-semibold uppercase tracking-widest
                                transition-all duration-150 outline-none"
                         :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
                     Parish Services
@@ -89,9 +89,9 @@
                             <span class="w-1 h-1 rounded-full mt-2 shrink-0 transition-colors"
                                   :class="scrolled ? 'bg-[#F5C518]' : 'bg-[#F5C518]/40 group-hover/item:bg-[#F5C518]'"></span>
                             <div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider transition-colors duration-150"
+                                <div class="text-[13px] font-bold uppercase tracking-wider transition-colors duration-150"
                                      :class="scrolled ? 'text-[#08142D] group-hover/item:text-black' : 'text-white/90 group-hover/item:text-white'">{{ $label }}</div>
-                                <div class="text-[10px] mt-0.5 transition-colors duration-150"
+                                <div class="text-xs mt-0.5 transition-colors duration-150"
                                      :class="scrolled ? 'text-[#08142D]/60' : 'text-white/80'">{{ $sub }}</div>
                             </div>
                         </a>
@@ -110,7 +110,7 @@
                 <button x-ref="trigger" @click="toggle()"
                         :aria-expanded="isOpen" aria-haspopup="menu"
                         class="h-10 px-4 rounded-full flex items-center gap-1.5
-                               text-[11px] font-semibold uppercase tracking-widest
+                               text-[13px] font-semibold uppercase tracking-widest
                                transition-all duration-150 outline-none"
                         :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
                     Community
@@ -149,9 +149,9 @@
                             <span class="w-1 h-1 rounded-full mt-2 shrink-0 transition-colors"
                                   :class="scrolled ? 'bg-[#F5C518]' : 'bg-[#F5C518]/40 group-hover/item:bg-[#F5C518]'"></span>
                             <div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider transition-colors duration-150"
+                                <div class="text-[13px] font-bold uppercase tracking-wider transition-colors duration-150"
                                      :class="scrolled ? 'text-[#08142D] group-hover/item:text-black' : 'text-white/90 group-hover/item:text-white'">{{ $label }}</div>
-                                <div class="text-[10px] mt-0.5 transition-colors duration-150"
+                                <div class="text-xs mt-0.5 transition-colors duration-150"
                                      :class="scrolled ? 'text-[#08142D]/60' : 'text-white/80'">{{ $sub }}</div>
                             </div>
                         </a>
@@ -161,7 +161,7 @@
             </div>
 
             <a href="/track"
-               class="h-10 px-4 rounded-full flex items-center text-[11px] font-semibold uppercase tracking-widest
+               class="h-10 px-4 rounded-full flex items-center text-[13px] font-semibold uppercase tracking-widest
                       transition-all duration-150"
                :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
                 Track
@@ -171,7 +171,7 @@
                  :class="scrolled ? 'bg-[#08142D]/15' : 'bg-white/15'"></div>
 
             <a href="/donate"
-               class="relative overflow-hidden h-10 px-5 rounded-full text-[10px] font-bold
+               class="relative overflow-hidden h-10 px-5 rounded-full text-xs font-bold
                       uppercase tracking-widest text-[#1A0E00] hover:scale-[1.03]
                       active:scale-95 transition-all duration-150 flex items-center"
                style="background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
@@ -224,7 +224,7 @@
         <div class="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-2">
 
             {{-- Section: Parish Services --}}
-            <p style="font-size:9px; font-weight:700; letter-spacing:0.35em;
+            <p style="font-size:10.5px; font-weight:700; letter-spacing:0.35em;
                       text-transform:uppercase; color:rgba(245,197,24,0.6);
                       padding:0 4px; margin-bottom:4px;">Parish Services</p>
 
@@ -264,10 +264,10 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <div style="font-size:13px; font-weight:700; color:#EBF2FF; line-height:1.2;">
+                    <div style="font-size:16px; font-weight:700; color:#EBF2FF; line-height:1.2;">
                         {{ $item['label'] }}
                     </div>
-                    <div style="font-size:10px; color:rgba(235,242,255,0.38); margin-top:2px;">
+                    <div style="font-size:13.5px; color:rgba(235,242,255,0.38); margin-top:2px;">
                         {{ $item['sub'] }}
                     </div>
                 </div>
@@ -284,7 +284,7 @@
                         background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);"></div>
 
             {{-- Section: Community --}}
-            <p style="font-size:9px; font-weight:700; letter-spacing:0.35em;
+            <p style="font-size:10.5px; font-weight:700; letter-spacing:0.35em;
                       text-transform:uppercase; color:rgba(245,197,24,0.6);
                       padding:0 4px; margin-bottom:4px;">Community</p>
 
@@ -324,10 +324,10 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <div style="font-size:13px; font-weight:700; color:#EBF2FF; line-height:1.2;">
+                    <div style="font-size:14.5px; font-weight:700; color:#EBF2FF; line-height:1.2;">
                         {{ $item['label'] }}
                     </div>
-                    <div style="font-size:10px; color:rgba(235,242,255,0.38); margin-top:2px;">
+                    <div style="font-size:12px; color:rgba(235,242,255,0.38); margin-top:2px;">
                         {{ $item['sub'] }}
                     </div>
                 </div>
@@ -359,8 +359,8 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <div style="font-size:13px; font-weight:700; color:#EBF2FF;">Track Submission</div>
-                    <div style="font-size:10px; color:rgba(235,242,255,0.38); margin-top:2px;">Check your intention status</div>
+                    <div style="font-size:14.5px; font-weight:700; color:#EBF2FF;">Track Submission</div>
+                    <div style="font-size:12px; color:rgba(235,242,255,0.38); margin-top:2px;">Check your intention status</div>
                 </div>
                 <svg class="ml-auto flex-shrink-0" width="14" height="14" viewBox="0 0 24 24"
                      fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"
@@ -377,7 +377,7 @@
                class="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
                       font-bold uppercase tracking-widest active:scale-95
                       transition-transform duration-150"
-               style="font-size:11px; color:#1A0E00;
+               style="font-size:12.5px; color:#1A0E00;
                       background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
                       box-shadow:0 4px 24px rgba(245,197,24,0.35);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"

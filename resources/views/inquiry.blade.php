@@ -86,13 +86,13 @@
             background: rgba(245,197,24,0.08);
             display: flex; align-items: center; justify-content: center;
             font-family: 'Cinzel', Georgia, serif;
-            font-size: 9px; font-weight: 600;
+            font-size:11px; font-weight: 600;
             color: rgba(245,197,24,0.80);
             margin-top: 2px; flex-shrink: 0;
         }
         .sidebar-contact {
             display: flex; align-items: center; gap: 12px;
-            font-size: 13px; color: rgba(235,242,255,0.60);
+            font-size: 14px; color: rgba(235,242,255,0.60);
         }
         .sidebar-contact svg { flex-shrink: 0; opacity: 0.55; }
 
@@ -119,7 +119,7 @@
 
         .field-label {
             display: block;
-            font-size: 9.5px; font-weight: 700;
+            font-size: 11px; font-weight: 700;
             letter-spacing: 0.28em; text-transform: uppercase;
             color: rgba(13,42,82,0.45);
             margin-bottom: 7px; margin-left: 2px;
@@ -162,7 +162,7 @@
         }
         .sacred-step-badge {
             color: #B08D00;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: 0.2em;
             text-transform: uppercase;
@@ -371,7 +371,7 @@
                             </svg>
                         </button>
                     </div>
-                    <p x-show="copied" x-transition class="text-[10px] font-bold text-green-600 uppercase tracking-widest mt-3" x-cloak>Copied to clipboard</p>
+                    <p x-show="copied" x-transition class="text-[11px] font-bold text-green-600 uppercase tracking-widest mt-3" x-cloak>Copied to clipboard</p>
                 </div>
 
                 <button @click="showModal = false" 
@@ -392,7 +392,7 @@
                 <div class="relative z-10">
                     <p class="eyebrow mb-2" style="color:rgba(245,197,24,0.65);">How It Works</p>
                     <h2 class="font-heading font-bold italic mb-8"
-                        style="font-size:1.85rem; color:#FFF; line-height:1.15;">
+                        style="font-size:2.15rem; color:#FFF; line-height:1.15;">
                         Sacramental Services
                     </h2>
 
@@ -587,7 +587,7 @@
                                             </div>
 
                                             <div class="pt-3 border-t border-[#E6D5B8]/20">
-                                                <p class="text-[9px] font-bold text-[#B08D00] uppercase tracking-widest mb-1.5">Optional Donations & Fees</p>
+                                                <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1.5">Optional Donations & Fees</p>
                                                 <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-blue-900/60">
                                                     <div class="bg-white/50 px-2 py-1 rounded">Wedding: ₱5k</div>
                                                     <div class="bg-white/50 px-2 py-1 rounded">Floral: ₱12k</div>
@@ -595,9 +595,9 @@
                                                     <div class="bg-white/50 px-2 py-1 rounded">Lights: ₱3k-5k</div>
                                                 </div>
                                             </div>
-                                            <div class="pt-2 border-t border-[#E6D5B8]/20 text-[11px] text-blue-800/60 space-y-2">
+                                            <div class="pt-2 border-t border-[#E6D5B8]/20 text-sm text-blue-800/60 space-y-2">
                                                 <div>
-                                                    <p class="text-[9px] font-bold text-[#B08D00] uppercase tracking-widest mb-1">Schedule & Deadlines</p>
+                                                    <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1">Schedule & Deadlines</p>
                                                     <p>• Completion: 2 months before preferred date</p>
                                                     <p>• Interview: 1 month before preferred date</p>
                                                 </div>
@@ -706,13 +706,13 @@
                             <template x-if="inquiryType === 'Baptism'">
                                 <div class="p-4 bg-blue-50/30 border border-blue-100 rounded-2xl space-y-4 mb-4">
                                     <div>
-                                        <p class="text-[10px] font-bold uppercase tracking-wider text-blue-900 mb-2 flex items-center gap-2">
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-blue-900 mb-2 flex items-center gap-2">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
                                             </svg>
                                             Baptism Rites Requirements
                                         </p>
-                                        <ul class="space-y-1.5 text-left text-[11px] text-blue-800/70">
+                                        <ul class="space-y-1.5 text-left text-sm text-blue-800/70">
                                             <li>1. Birth Certificate with Registry Number (Original & Photocopy)</li>
                                             <li>2. Photocopy of Marriage Contract (If parents are married)</li>
                                             <li>3. Original Copy of Baptismal Permit (If not Pacita 1 residents)</li>
@@ -721,8 +721,8 @@
                                     </div>
                                     <div class="pt-3 border-t border-blue-100 space-y-4">
                                         <div class="space-y-1.5">
-                                            <p class="text-[9px] font-bold text-blue-900/60 uppercase tracking-widest">Notes & Schedule</p>
-                                            <ul class="text-[11px] text-blue-800/70 space-y-1">
+                                            <p class="text-[11px] font-bold text-blue-900/60 uppercase tracking-widest">Notes & Schedule</p>
+                                            <ul class="text-sm text-blue-800/70 space-y-1">
                                                 <li>• Deadline: At least 1 week before the date.</li>
                                                 <li>• Schedule: Saturdays & Sundays only (No special baptism).</li>
                                                 <li>• Seminar: 10:00 AM (Parents & Sponsors must attend).</li>
@@ -731,13 +731,13 @@
                                         </div>
 
                                         <div class="space-y-1.5">
-                                            <p class="text-[9px] font-bold text-blue-900/60 uppercase tracking-widest">Dress Code</p>
-                                            <p class="text-[11px] text-blue-800/70"><strong>Person to be baptized:</strong> White baptismal attire</p>
-                                            <p class="text-[11px] text-blue-800/70"><strong>Parents & Godparents:</strong> Sunday attire; formal or casual</p>
+                                            <p class="text-[11px] font-bold text-blue-900/60 uppercase tracking-widest">Dress Code</p>
+                                            <p class="text-sm text-blue-800/70"><strong>Person to be baptized:</strong> White baptismal attire</p>
+                                            <p class="text-sm text-blue-800/70"><strong>Parents & Godparents:</strong> Sunday attire; formal or casual</p>
                                         </div>
 
                                         <div class="bg-red-50 p-2 rounded-xl border border-red-100 text-center">
-                                            <p class="text-[8px] font-black text-red-600 uppercase tracking-tighter">
+                                            <p class="text-[10px] font-black text-red-600 uppercase tracking-tighter">
                                                 NO CAPS, PLUNGING NECKLINES, SPAGHETTI STRAPS, SHORTS, MINI-SKIRTS OR REVEALING APPARELS
                                             </p>
                                         </div>

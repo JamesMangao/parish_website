@@ -20,7 +20,7 @@
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-10 scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-        x-transition:leave="transition ease-in duration-300 delay-150"
+        x-transition:leave="transition ease-in duration-300"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-10 scale-95"
         class="absolute bottom-20 left-0 bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden"
@@ -110,7 +110,7 @@
 
             <!-- AI/Agent Typing Indicator -->
             <div x-show="loading || agentTyping" x-cloak class="flex justify-start">
-                <div class="bg-white border p-3 rounded-2xl rounded-tl-none flex items-center gap-2">
+                <div class="bg-white border p-3 rounded-2xl rounded-tl-none flex items-center gap-2 skeleton">
                     <span class="h-1.5 w-1.5 rounded-full bg-accent animate-bounce"></span>
                     <span class="h-1.5 w-1.5 rounded-full bg-accent animate-bounce" style="animation-delay: 0.1s"></span>
                     <span class="h-1.5 w-1.5 rounded-full bg-accent animate-bounce" style="animation-delay: 0.2s"></span>

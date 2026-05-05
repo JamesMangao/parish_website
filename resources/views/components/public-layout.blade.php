@@ -73,9 +73,30 @@
             transform: none;
         }
 
+        /* ════════════════════════════════════════
+           GLOBAL SKELETON / SHIMMER
+        ════════════════════════════════════════ */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f2f5 25%, #e1e4e8 37%, #f0f2f5 63%);
+            background-size: 1000px 100%;
+            animation: shimmer 2.5s infinite linear;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-dark {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 37%, rgba(255,255,255,0.05) 63%);
+            background-size: 1000px 100%;
+            animation: shimmer 2.5s infinite linear;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-            .reveal-global, [data-reveal] {
+            .reveal-global, [data-reveal], .skeleton, .skeleton-dark {
                 transition: none !important;
+                animation: none !important;
                 opacity: 1 !important;
                 transform: none !important;
             }

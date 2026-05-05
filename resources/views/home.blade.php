@@ -28,7 +28,7 @@
         .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
 
         .eyebrow {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 600;
             letter-spacing: 0.32em;
             text-transform: uppercase;
@@ -208,7 +208,7 @@
 
             /* Hero */
             .hero-badge { padding: 5px 14px; }
-            .hero-badge span:last-child { font-size: 8px; letter-spacing: 0.22em; }
+            .hero-badge span:last-child { font-size: 11px; letter-spacing: 0.22em; }
 
             /* Hero CTAs — stack full-width */
             .hero-cta-wrap {
@@ -296,7 +296,7 @@
 
             /* Office hours — keep 3-col, tighten padding */
             .office-col { padding: 20px 12px !important; }
-            .office-col p { font-size: 11.5px !important; }
+            .office-col p { font-size: 13.5px !important; }
 
             /* Quick actions — 2x2 on tablet */
             .quick-actions-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
@@ -348,7 +348,7 @@
 
         <div class="hero-badge animate-fade-in" style="margin-bottom:24px;">
             <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); display:block; box-shadow:0 0 8px rgba(245,197,24,0.8);"></span>
-            <span style="font-size:9.5px; font-weight:600; letter-spacing:0.38em; text-transform:uppercase; color:rgba(255,248,180,0.85);">
+            <span style="font-size:11.5px; font-weight:600; letter-spacing:0.38em; text-transform:uppercase; color:rgba(255,248,180,0.85);">
                 Est. · Diocese of San Pablo · Pacita
             </span>
         </div>
@@ -389,19 +389,19 @@
              style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px; margin-bottom:40px;">
             <a href="/mass-schedule"
                class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
-               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-decoration:none;">
+               style="padding:13px 30px; font-size:12.5px; letter-spacing:0.18em; text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 Mass Schedule
             </a>
             <a href="/submit-intention"
                class="gold-btn inline-flex items-center gap-2 rounded-full"
-               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none;">
+               style="padding:13px 30px; font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                 Offer an Intention
             </a>
             <a href="/inquiry"
                class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
-               style="padding:13px 30px; font-size:10.5px; letter-spacing:0.18em; text-decoration:none;">
+               style="padding:13px 30px; font-size:12.5px; letter-spacing:0.18em; text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
                 Parish Inquiry
             </a>
@@ -417,7 +417,7 @@
                 <div class="font-heading stat-val"
                      style="font-size:1.75rem; font-weight:700; font-style:italic;
                             color:var(--gold-light); line-height:1;">{{ $stat[0] }}</div>
-                <div style="font-size:9px; text-transform:uppercase; letter-spacing:0.3em;
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.3em;
                              color:rgba(200,215,255,0.45); margin-top:5px;">{{ $stat[1] }}</div>
             </div>
             @endforeach
@@ -427,7 +427,7 @@
     <div class="animate-fade-in delay-5"
          style="position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
                 z-index:10; display:flex; flex-direction:column; align-items:center; gap:8px;">
-        <span style="color:rgba(245,197,24,0.45); font-size:9px; text-transform:uppercase; letter-spacing:0.4em;">Scroll</span>
+        <span style="color:rgba(245,197,24,0.45); font-size:11px; text-transform:uppercase; letter-spacing:0.4em;">Scroll</span>
         <div class="scroll-line"
              style="height:36px; width:1.5px; background:linear-gradient(to bottom, rgba(245,197,24,0.6), transparent);"></div>
     </div>
@@ -484,13 +484,13 @@
                         style="font-size:clamp(2.2rem,4vw,3.6rem); color:#FFFFFF; letter-spacing:-0.01em;">{{ $nextMass->calculated_day }}</h2>
                     <p class="font-heading font-bold italic"
                        style="font-size:clamp(1.8rem,3.5vw,3rem); color:#F5C518; line-height:1.1;">{{ $nextMass->calculated_time }}</p>
-                    <p style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:rgba(235,242,255,0.5); margin-top:6px;">
+                    <p style="font-size:12px; letter-spacing:0.22em; text-transform:uppercase; color:rgba(235,242,255,0.5); margin-top:6px;">
                         {{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}
                     </p>
                     @else
                     <h2 class="font-heading font-bold italic leading-none" style="font-size:3.6rem; color:#FFFFFF;">Sunday</h2>
                     <p class="font-heading font-bold italic" style="font-size:3rem; color:#F5C518; line-height:1.1;">6:00 AM</p>
-                    <p style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:rgba(235,242,255,0.5); margin-top:6px;">SUNDAY MASS</p>
+                    <p style="font-size:12px; letter-spacing:0.22em; text-transform:uppercase; color:rgba(235,242,255,0.5); margin-top:6px;">SUNDAY MASS</p>
                     @endif
                 </div>
             </div>
@@ -504,14 +504,10 @@
                 <span style="flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(201,162,0,0.3));"></span>
                 <div class="flex items-center gap-2">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.3em; color:var(--blue-deep); font-weight:600;">OFFICE HOURS</span>
+                    <span class="font-cinzel" style="font-size:12.5px; letter-spacing:0.3em; color:var(--blue-deep); font-weight:600;">OFFICE HOURS</span>
                 </div>
                 <span style="flex:1; height:1px; background:linear-gradient(90deg,rgba(201,162,0,0.3),transparent);"></span>
             </div>
-            <div class="flex justify-center mb-5">
-                <div style="width:6px; height:6px; background:rgba(201,162,0,0.4); transform:rotate(45deg);"></div>
-            </div>
-
             <div class="office-cols grid grid-cols-3 overflow-hidden"
                  style="border:1px solid rgba(26,64,128,0.07); border-radius:16px;">
                 @foreach([
@@ -526,12 +522,12 @@
                          style="background:var(--blue-deep);">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ohCol['icon'] !!}</svg>
                     </div>
-                    <p style="font-size:9.5px; letter-spacing:0.2em; color:rgba(13,42,82,0.45); font-weight:500; margin-bottom:10px;">{{ $ohCol['day'] }}</p>
+                    <p style="font-size:11.5px; letter-spacing:0.2em; color:rgba(13,42,82,0.45); font-weight:500; margin-bottom:10px;">{{ $ohCol['day'] }}</p>
                     @if($ohCol['closed'])
                     <p class="font-cinzel font-semibold" style="color:#C9A200; font-size:0.8rem; letter-spacing:0.08em;">CLOSED</p>
                     @else
                     @foreach($ohCol['hours'] as $ohHour)
-                    <p style="font-size:12.5px; color:var(--blue-deep); line-height:1.9;">{{ $ohHour }}</p>
+                    <p style="font-size:14.5px; color:var(--blue-deep); line-height:1.9;">{{ $ohHour }}</p>
                     @endforeach
                     @endif
                 </div>
@@ -554,7 +550,7 @@
                     <path d="M16 2v4M8 2v4M3 10h18"/>
                     <path d="M11 2v3M9 3h4"/>
                 </svg>
-                <span class="font-cinzel" style="font-size:10.5px; letter-spacing:0.32em; color:#FFFFFF; font-weight:600;">FULL SCHEDULE</span>
+                <span class="font-cinzel" style="font-size:12.5px; letter-spacing:0.32em; color:#FFFFFF; font-weight:600;">FULL SCHEDULE</span>
             </div>
             <span class="transition-transform duration-300 group-hover:translate-x-1 block" style="color:#C9A200; font-size:16px; line-height:1;" aria-hidden="true">→</span>
         </a>
@@ -592,7 +588,7 @@
                 <div>
                     <p class="font-heading font-bold text-lg italic transition-colors duration-200 group-hover:text-[#C9A200]"
                        style="color:var(--blue-deep);">{{ $a['label'] }}</p>
-                    <p class="text-[11px] mt-1 tracking-wide" style="color:rgba(13,42,82,0.4);">{{ $a['sub'] }}</p>
+                    <p class="text-sm mt-1 tracking-wide" style="color:rgba(13,42,82,0.4);">{{ $a['sub'] }}</p>
                 </div><br><br>
             </a>
             @endforeach
@@ -636,7 +632,7 @@
             <div class="flex justify-center mb-4">
                 <div style="width:7px; height:7px; background:rgba(201,162,0,0.42); transform:rotate(45deg);"></div>
             </div>
-            <p style="color:rgba(13,42,82,0.45); font-size:14px; max-width:480px; margin:0 auto; line-height:1.7;">
+            <p style="color:rgba(13,42,82,0.45); font-size:16px; max-width:480px; margin:0 auto; line-height:1.7;">
                 Stay connected. Join us in our liturgical celebrations and events.
             </p>
         </div>
@@ -647,7 +643,7 @@
             <div class="card-event card-event-featured relative">
                 <div class="event-badge-today">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style="font-size:9px; font-weight:700; letter-spacing:0.18em; color:#C9A200; text-transform:uppercase;">TODAY</span>
+                    <span style="font-size:11px; font-weight:700; letter-spacing:0.18em; color:#C9A200; text-transform:uppercase;">TODAY</span>
                 </div><br>
                 <div class="flex flex-col items-center text-center pt-14 pb-5 px-6" style="flex:1;">
                     <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -656,7 +652,7 @@
                             <path d="M8 22h8"/><path d="M12 11v11"/><path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/>
                         </svg>
                     </div>
-                    <p style="font-size:10px; letter-spacing:0.22em; color:rgba(13,42,82,0.5); text-transform:uppercase; font-weight:600; margin-bottom:10px;">
+                    <p style="font-size:12px; letter-spacing:0.22em; color:rgba(13,42,82,0.5); text-transform:uppercase; font-weight:600; margin-bottom:10px;">
                         {{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}
                     </p>
                     <div class="flex justify-center mb-3">
@@ -679,7 +675,7 @@
                 <div class="flex flex-col items-center text-center pt-5 pb-5 px-6" style="flex:1;">
                     <div class="flex items-center gap-1.5 mb-4" style="align-self:flex-start;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                        <span style="font-size:10px; letter-spacing:0.14em; color:rgba(13,42,82,0.4); text-transform:uppercase; font-weight:500;">
+                        <span style="font-size:12px; letter-spacing:0.14em; color:rgba(13,42,82,0.4); text-transform:uppercase; font-weight:500;">
                             {{ $evt->event_date->format('M d, Y') }}
                         </span>
                     </div>
@@ -687,13 +683,13 @@
                          style="background:rgba(245,197,24,0.07); border:1.5px solid rgba(201,162,0,0.28);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $evtIcons[$loop->index % 2] !!}</svg>
                     </div>
-                    <p style="font-size:10px; letter-spacing:0.22em; color:rgba(13,42,82,0.5); text-transform:uppercase; font-weight:600; margin-bottom:10px;">
+                    <p style="font-size:12px; letter-spacing:0.22em; color:rgba(13,42,82,0.5); text-transform:uppercase; font-weight:600; margin-bottom:10px;">
                         {{ strtoupper($evt->title) }}
                     </p>
                     <div class="flex justify-center mb-3">
                         <div style="width:5px; height:5px; background:rgba(201,162,0,0.45); transform:rotate(45deg);"></div>
                     </div>
-                    <p style="font-size:13px; color:var(--blue-deep); line-height:1.8;">
+                    <p style="font-size:15px; color:var(--blue-deep); line-height:1.8;">
                         @php
                             $times = is_array($evt->event_time) ? $evt->event_time : [$evt->event_time];
                             $formattedTimes = array_map(function($t) {
@@ -745,7 +741,7 @@
                         <path d="M16 2v4M8 2v4M3 10h18"/>
                     </svg>
                     <span class="font-cinzel"
-                          style="font-size:11px; letter-spacing:0.35em; color:#FFFFFF; font-weight:700; text-transform:uppercase;">
+                          style="font-size:13px; letter-spacing:0.35em; color:#FFFFFF; font-weight:700; text-transform:uppercase;">
                         View Full Schedule
                     </span>
                 </div>
@@ -793,7 +789,7 @@
                 </div>
                 <h2 class="font-cinzel font-semibold"
                     style="font-size:clamp(1.25rem,3vw,2.15rem); color:var(--blue-deep); letter-spacing:0.16em; margin-bottom:8px;">LATEST ANNOUNCEMENTS</h2>
-                <p style="color:rgba(13,42,82,0.4); font-size:13.5px; max-width:480px; margin:0 auto 14px;">Stay informed. Be involved. Grow in faith together.</p>
+                <p style="color:rgba(13,42,82,0.4); font-size:15.5px; max-width:480px; margin:0 auto 14px;">Stay informed. Be involved. Grow in faith together.</p>
                 <div class="flex justify-center">
                     <div style="width:6px; height:6px; background:rgba(201,162,0,0.42); transform:rotate(45deg);"></div>
                 </div>

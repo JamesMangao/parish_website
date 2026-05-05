@@ -76,7 +76,7 @@
         .recent-photo:hover { filter: grayscale(0); transform: scale(1.08); }
 
         .video-description {
-            font-size: 0.925rem;
+            font-size: 1.1rem;
             color: rgba(13,42,82,0.7);
             line-height: 1.8;
             margin-bottom: 2rem;
@@ -216,7 +216,7 @@
                                  background:var(--gold); display:inline-block;
                                  box-shadow:0 0 0 3px rgba(245,197,24,0.25);"></span>
                     <span class="font-cinzel"
-                          style="font-size:9px; letter-spacing:0.28em; color:#fff;
+                          style="font-size:11px; letter-spacing:0.28em; color:#fff;
                                  font-weight:700; text-transform:uppercase;">Highlight Video</span>
                 </div>
 
@@ -548,10 +548,16 @@
                 <div style="position:relative; aspect-ratio:4/3; overflow:hidden; background:var(--cream-deep);">
                     @if($album->images->count() > 0)
                         @php $thumb = $album->images->first(); @endphp
-                        <img src="{{ $thumb->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $thumb->url }}" alt="{{ $album->title }}"
-                             style="width:100%; height:100%; object-fit:cover;
-                                    transition:transform 0.7s ease;"
-                             class="group-hover:scale-110" loading="lazy">
+                        <div x-data="{ loaded: false }" class="relative w-full h-full">
+                            {{-- Skeleton --}}
+                            <div x-show="!loaded" class="absolute inset-0 skeleton z-10"></div>
+                            
+                            <img src="{{ $thumb->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $thumb->url }}" 
+                                 alt="{{ $album->title }}"
+                                 style="width:100%; height:100%; object-fit:cover; transition:transform 0.7s ease;"
+                                 class="group-hover:scale-110" loading="lazy"
+                                 @load="loaded = true">
+                        </div>
                         @if($thumb->type === 'video' || $album->images->where('type', 'video')->count() > 0)
                             <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5;">
                                 <div style="width:40px; height:40px; border-radius:50%; background:rgba(245,197,24,0.85); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.3);">
@@ -632,9 +638,17 @@
                         </div>
                     @endif
 
-                    <img src="{{ $item->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $item->url }}" alt="Recent highlight"
-                         class="recent-photo"
-                         style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+                    <div x-data="{ loaded: false }" class="relative w-full h-full">
+                        {{-- Skeleton --}}
+                        <div x-show="!loaded" class="absolute inset-0 skeleton-dark z-10"></div>
+                        
+                        <img src="{{ $item->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $item->url }}" 
+                             alt="Recent highlight"
+                             class="recent-photo"
+                             style="width:100%; height:100%; object-fit:cover;" 
+                             loading="lazy"
+                             @load="loaded = true">
+                    </div>
                     <div style="position:absolute; inset:0; opacity:0; background:rgba(245,197,24,0.08);
                                 transition:opacity 0.5s;" class="group-hover:opacity-100"></div>
                 </a>
