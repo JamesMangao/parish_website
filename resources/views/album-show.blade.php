@@ -1,18 +1,7 @@
 <x-public-layout>
 <x-slot name="meta">
+    <meta name="description" content="{{ $album->title }} – View photos and highlights from this album at Sto. Rosario Parish.">
     <style>
-        :root {
-            --gold:       #F5C518;
-            --gold-light: #FFD740;
-            --blue-deep:  #0D2A52;
-            --blue-mid:   #1A4080;
-            --blue-pale:  #EBF2FF;
-            --cream:      #F7F9FF;
-            --cream-deep: #EDF2FC;
-        }
-        body { background: var(--cream); font-family: 'Jost', sans-serif; }
-        .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
 
         .eyebrow {
             font-size: 12px; font-weight: 600;
@@ -228,7 +217,9 @@
                     : Str::after(Str::after($album->featured_video_url, 'v='), '&');
                 if (Str::contains($videoId, '&')) $videoId = Str::before($videoId, '&');
             @endphp
-            <iframe src="https://www.youtube.com/embed/{{ $videoId }}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/{{ $videoId }}" 
+                    title="{{ $album->title }} highlight video"
+                    class="w-full h-full" frameborder="0" allowfullscreen></iframe>
         @else
             <video controls class="w-full h-full object-cover">
                 <source src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($album->featured_video_url) }}" type="video/mp4">
@@ -274,6 +265,7 @@
 
                 <img src="{{ $img->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $img->url }}"
                      alt="{{ $img->title }}"
+                     width="400" height="300"
                      @load="loaded = true"
                      :class="loaded ? '' : 'opacity-0'"
                      loading="lazy">

@@ -1,19 +1,7 @@
 <x-public-layout>
 <x-slot name="meta">
+    <meta name="description" content="Explore photo and video highlights from the Sto. Rosario Parish community in our official gallery.">
     <style>
-        :root {
-            --gold:       #F5C518;
-            --gold-light: #FFD740;
-            --blue-deep:  #0D2A52;
-            --blue-mid:   #1A4080;
-            --blue-pale:  #EBF2FF;
-            --cream:      #F7F9FF;
-            --cream-deep: #EDF2FC;
-        }
-        body { background: var(--cream); font-family: 'Jost', sans-serif; }
-        .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
-
         .eyebrow {
             font-size: 10px; font-weight: 600;
             letter-spacing: 0.32em; text-transform: uppercase;
@@ -554,6 +542,7 @@
                             
                             <img src="{{ $thumb->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $thumb->url }}" 
                                  alt="{{ $album->title }}"
+                                 width="400" height="300"
                                  style="width:100%; height:100%; object-fit:cover; transition:transform 0.7s ease;"
                                  class="group-hover:scale-110" loading="lazy"
                                  @load="loaded = true">

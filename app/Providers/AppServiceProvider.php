@@ -21,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
     {
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                $settings = \App\Models\Setting::all()->pluck('value', 'key');
+                $settings = \Illuminate\Support\Facades\Cache::remember('global_settings', now()->addHours(24), function() {
+                    return \App\Models\Setting::all()->pluck('value', 'key');
+                });
                 view()->share('global_settings', $settings);
             }
         } catch (\Exception $e) {

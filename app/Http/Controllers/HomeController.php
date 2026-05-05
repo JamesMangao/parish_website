@@ -11,10 +11,12 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::active()
-            ->orderBy('created_at', 'desc')
-            ->take(3)
-            ->get();
+        $announcements = \Illuminate\Support\Facades\Cache::remember('home_announcements', now()->addMinutes(15), function() {
+            return Announcement::active()
+                ->orderBy('created_at', 'desc')
+                ->take(3)
+                ->get();
+        });
 
         // Enhanced "Next Mass" logic: find the closest mass by searching through the week
         $now = now();
@@ -25,18 +27,20 @@ class HomeController extends Controller
             $checkDayIndex = ($now->dayOfWeek + $i) % 7;
             $dayName = $daysOfWeek[$checkDayIndex];
             
-            $masses = MassSchedule::where('is_active', true)
-                ->where(function($q) use ($dayName) {
-                    $q->whereJsonContains('day_of_week', $dayName);
-                    
-                    if ($dayName === 'Sunday') {
-                        $q->orWhere('mass_type', 'sunday');
-                    } elseif ($dayName === 'Saturday') {
-                        $q->orWhere('mass_type', 'saturday')
-                          ->orWhere('mass_type', 'anticipated');
-                    }
-                })
-                ->get();
+            $masses = \Illuminate\Support\Facades\Cache::remember("active_masses_{$dayName}", now()->addHours(24), function() use ($dayName) {
+                return MassSchedule::where('is_active', true)
+                    ->where(function($q) use ($dayName) {
+                        $q->whereJsonContains('day_of_week', $dayName);
+                        
+                        if ($dayName === 'Sunday') {
+                            $q->orWhere('mass_type', 'sunday');
+                        } elseif ($dayName === 'Saturday') {
+                            $q->orWhere('mass_type', 'saturday')
+                              ->orWhere('mass_type', 'anticipated');
+                        }
+                    })
+                    ->get();
+            });
                 
             $upcomingMassesToday = [];
             foreach ($masses as $mass) {
@@ -87,10 +91,13 @@ class HomeController extends Controller
         
         // Absolute fallback to first Sunday mass if nothing else matches
         if (!$nextMass) {
-            $nextMass = MassSchedule::where('is_active', true)
-                ->where('mass_type', 'sunday')
-                ->orderByRaw('time->>0 asc')
-                ->first();
+            $nextMass = \Illuminate\Support\Facades\Cache::remember('fallback_sunday_mass', now()->addHours(24), function() {
+                return MassSchedule::where('is_active', true)
+                    ->where('mass_type', 'sunday')
+                    ->orderByRaw('time->>0 asc')
+                    ->first();
+            });
+
             if ($nextMass) {
                 $times = is_array($nextMass->time) ? $nextMass->time : (is_string($nextMass->time) ? json_decode($nextMass->time, true) : []);
                 $fallbackTime = $times[0] ?? '6:00 AM';
@@ -99,11 +106,13 @@ class HomeController extends Controller
             }
         }
 
-        $upcomingEvents = \App\Models\Event::where('is_published', true)
-            ->whereDate('event_date', '>=', $now->toDateString())
-            ->orderBy('event_date', 'asc')
-            ->take(2)
-            ->get();
+        $upcomingEvents = \Illuminate\Support\Facades\Cache::remember('home_upcoming_events', now()->addMinutes(30), function() use ($now) {
+            return \App\Models\Event::where('is_published', true)
+                ->whereDate('event_date', '>=', $now->toDateString())
+                ->orderBy('event_date', 'asc')
+                ->take(2)
+                ->get();
+        });
 
         return view('home', compact('announcements', 'nextMass', 'upcomingEvents'));
     }

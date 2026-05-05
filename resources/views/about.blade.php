@@ -872,14 +872,14 @@
                 </div>
             </div>
             <div class="patron-img-wrap" data-reveal="scale">
-                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/olp.png') }}" alt="Our Lady of the Rosary">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/olp.webp') }}" alt="Our Lady of the Most Holy Rosary">
                 <div class="patron-badge">Titular Patroness</div>
             </div>
         </div>
 
         <div class="patrons-layout" style="margin-top:100px;">
             <div class="patron-img-wrap" data-reveal="scale">
-                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/svf.jpg') }}" alt="San Vicente Ferrer">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/svf.webp') }}" alt="San Vicente Ferrer">
                 <div class="patron-badge">Segunda Patron</div>
             </div>
             <div class="patron-content" data-reveal="right">

@@ -1,22 +1,7 @@
 <x-public-layout>
 <x-slot name="meta">
     <meta name="description" content="Parish inquiries – sacraments, blessings, and document requests at Sto. Rosario Parish, Pacita, San Pedro, Laguna.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gold:       #F5C518;
-            --gold-light: #FFD740;
-            --blue-deep:  #0D2A52;
-            --blue-mid:   #1A4080;
-            --blue-soft:  #2255A4;
-            --blue-pale:  #EBF2FF;
-            --cream:      #F7F9FF;
-            --cream-deep: #EDF2FC;
-        }
-        body { background: var(--cream); font-family: 'Jost', sans-serif; }
-        .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
 
         .eyebrow {
             font-size: 10px; font-weight: 600;

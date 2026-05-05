@@ -1,31 +1,8 @@
 <x-public-layout>
 <x-slot name="meta">
     <meta name="description" content="Welcome to Sto. Rosario Parish – Pacita, San Pedro, Laguna. Mass schedules, intentions, events, and community news.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/canterbury" rel="stylesheet">
-    <style>
-        @font-face {
-    font-family: 'Canterbury';
-    src: url('/fonts/Canterbury.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-        :root {
-            --gold:        #F5C518;
-            --gold-light:  #FFD740;
-            --gold-pale:   #FFF8DC;
-            --blue-deep:   #0D2A52;
-            --blue-mid:    #1A4080;
-            --blue-soft:   #2255A4;
-            --blue-pale:   #EBF2FF;
-            --cream:       #F7F9FF;
-            --cream-deep:  #EDF2FC;
-            --stone-text:  #1E3254;
-        }
-        body { background: var(--cream); font-family: 'Jost', sans-serif; }
-        .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
+    <link rel="preload" href="/fonts/Canterbury.ttf" as="font" type="font/ttf" crossorigin>
+<style>@font-face{font-family:'Canterbury';src:url('/fonts/Canterbury.ttf') format('truetype');font-weight:normal;font-style:normal;font-display:swap;}:root{--gold:#F5C518;--gold-light:#FFD740;--gold-pale:#FFF8DC;--blue-deep:#0D2A52;--blue-mid:#1A4080;--blue-soft:#2255A4;--blue-pale:#EBF2FF;--cream:#F7F9FF;--cream-deep:#EDF2FC;--stone-text:#1E3254;}body{background:var(--cream);font-family:'Jost',sans-serif;}.font-heading{font-family:'Cormorant Garamond',Georgia,serif;}.font-cinzel{font-family:'Cinzel',Georgia,serif;}
 
         .eyebrow {
             font-size: 12px;
@@ -57,10 +34,8 @@
             100% { background-position:  200% center; }
         }
         @keyframes scrollLine {
-            0%   { transform: scaleY(0); transform-origin: top; }
-            50%  { transform: scaleY(1); transform-origin: top; }
-            51%  { transform: scaleY(1); transform-origin: bottom; }
-            100% { transform: scaleY(0); transform-origin: bottom; }
+            0%   { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
         }
 
         html { scroll-behavior: smooth; }
@@ -71,7 +46,19 @@
         .delay-3 { animation-delay: 0.45s; }
         .delay-4 { animation-delay: 0.60s; }
         .delay-5 { animation-delay: 0.80s; }
-        .scroll-line { animation: scrollLine 2s ease infinite; }
+        
+        .scroll-line { 
+            position: relative; 
+            overflow: hidden; 
+            background: transparent !important;
+        }
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold);
+            animation: scrollLine 2s ease infinite;
+        }
 
         .reveal {
             opacity: 0;
@@ -151,7 +138,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shimmer 12s linear infinite;
         }
 
         .hero-badge {
@@ -331,7 +317,9 @@
 <section style="position:relative; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;">
 
     <div style="position:absolute; inset:0; z-index:0;">
-        <img src="/bg.png" alt="Sto. Rosario Parish"
+        <img src="/bg.webp" alt="Sto. Rosario Parish"
+             fetchpriority="high" decoding="async"
+             width="1920" height="1080"
              style="width:100%; height:100%; object-fit:cover; filter:saturate(0.75) brightness(0.85); transform:scale(1.04);">
         <div class="hero-overlay" style="position:absolute; inset:0;"></div>
     </div>
@@ -346,14 +334,14 @@
                 align-items:center; padding: 0 24px; width:100%; max-width:960px;
                 margin-top: 72px;">
 
-        <div class="hero-badge animate-fade-in" style="margin-bottom:24px;">
+        <div class="hero-badge" style="margin-bottom:24px;">
             <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); display:block; box-shadow:0 0 8px rgba(245,197,24,0.8);"></span>
             <span style="font-size:11.5px; font-weight:600; letter-spacing:0.38em; text-transform:uppercase; color:rgba(255,248,180,0.85);">
                 Est. · Diocese of San Pablo · Pacita
             </span>
         </div>
 
-<h1 class="animate-fade-up delay-1"
+<h1 class=""
     style="font-family: 'Canterbury', serif;
            white-space: nowrap;
            font-weight: 400;
@@ -365,7 +353,7 @@
     <span class="hero-title-accent">Sto. Rosario Parish</span>
 </h1>
 
-        <p class="font-heading animate-fade-up delay-2"
+        <p class="font-heading"
            style="font-style:italic; color:rgba(255,215,64,0.82); margin-bottom:14px;
                   font-size:clamp(0.9rem, 1.8vw, 1.15rem); font-weight:300;
                   text-shadow:0 2px 12px rgba(0,0,0,0.4);">
@@ -385,7 +373,7 @@
         </p>
 
         {{-- CTA buttons --}}
-        <div class="animate-fade-up delay-4 hero-cta-wrap"
+        <div class="hero-cta-wrap"
              style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px; margin-bottom:40px;">
             <a href="/mass-schedule"
                class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
@@ -408,7 +396,7 @@
         </div>
 
         {{-- Stats strip --}}
-        <div class="animate-fade-up delay-5 hero-stats-strip"
+        <div class="hero-stats-strip"
              style="display:flex; align-items:center; justify-content:center; gap:40px;
                     padding-top:28px; width:100%; max-width:400px;
                     border-top:1px solid rgba(245,197,24,0.15);">
@@ -444,8 +432,9 @@
         {{-- ── Next Mass ── --}}
         <div class="relative overflow-hidden" style="min-height:215px; background:#0d2a52;">
             <div class="absolute inset-0">
-                <img src="{{ asset('assets/img/mass.jpg') }}"
+                <img src="{{ asset('assets/img/mass.webp') }}"
                      alt="Mass"
+                     loading="lazy" width="1200" height="800"
                      style="width:100%; height:100%; object-fit:cover; opacity:0.35;">
                 <div class="absolute inset-0"
                      style="background:linear-gradient(90deg, #0d2a52 0%, rgba(13,42,82,0.4) 50%, #0d2a52 100%);"></div>
@@ -542,6 +531,7 @@
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:0.50; height:180%; width:auto;" aria-hidden="true">
                 <img src="{{ asset('assets/img/parish-illustration.svg') }}"
                      alt="Parish Illustration"
+                     width="226" height="107"
                      style="height:70%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
             </div>
             <div class="flex items-center gap-2.5 mb-1.5">
@@ -602,7 +592,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="relative pt-12 pb-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
     <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <img src="https://images.pexels.com/photos/17702529/pexels-photo-17702529.jpeg?auto=compress&w=1400"
+        <img src="{{ asset('assets/img/church1.webp') }}"
              alt=""
              class="w-full h-full object-cover"
              style="filter:saturate(0.2) brightness(1.2) blur(4px); transform:scale(1.06);">
@@ -732,6 +722,7 @@
                  aria-hidden="true">
                 <img src="{{ asset('assets/img/parish-illustration.svg') }}"
                      alt="Parish Illustration"
+                     width="285" height="135"
                      style="height:90%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
             </div>
             <div class="relative z-10 flex flex-col items-center gap-2">
@@ -758,8 +749,9 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="relative py-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
     <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <img src="{{ asset('assets/img/church1.jpg') }}"
+        <img src="{{ asset('assets/img/church1.webp') }}"
              alt=""
+             loading="lazy" width="1200" height="800"
              class="w-full h-full object-cover"
              style="filter:saturate(0.18) brightness(1.15) blur(4px); transform:scale(1.06);">
         <div style="position:absolute; inset:0; background:rgba(246,243,238,0.91);"></div>
@@ -767,9 +759,9 @@
 
     @php
     $annImgs = [
-        asset('assets/img/church1.jpg'),
-        'https://images.pexels.com/photos/6756378/pexels-photo-6756378.jpeg?auto=compress&w=800',
-        'https://images.pexels.com/photos/5735003/pexels-photo-5735003.jpeg?auto=compress&w=800',
+        asset('assets/img/church1.webp'),
+        asset('assets/img/mass.webp'),
+        asset('assets/img/church1.webp'),
     ];
     $annCats = ['Liturgical', 'Parish Life', 'Parish Event'];
     @endphp
@@ -974,19 +966,5 @@
     </div>
 </section>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
-
-        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
-    });
-</script>
 
 </x-public-layout>

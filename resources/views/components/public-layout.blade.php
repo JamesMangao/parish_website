@@ -6,6 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Sto. Rosario Parish') }}</title>
 
+    <!-- Fonts Preload -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" as="style">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +51,7 @@
         }
         
         .page-animate {
-            animation: pageFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: pageFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         ::view-transition-group(root) {
@@ -77,20 +81,52 @@
            GLOBAL SKELETON / SHIMMER
         ════════════════════════════════════════ */
         @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+            100% { transform: translateX(100%); }
         }
         .skeleton {
-            background: linear-gradient(90deg, #f0f2f5 25%, #e1e4e8 37%, #f0f2f5 63%);
-            background-size: 1000px 100%;
-            animation: shimmer 2.5s infinite linear;
             position: relative;
+            background: #f0f2f5;
             overflow: hidden;
         }
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
         .skeleton-dark {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 37%, rgba(255,255,255,0.05) 63%);
-            background-size: 1000px 100%;
-            animation: shimmer 2.5s infinite linear;
+            position: relative;
+            background: rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        .skeleton-dark::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--blue-deep, #0D2A52);
+            color: #fff;
+            padding: 12px 24px;
+            z-index: 9999;
+            transition: top 0.3s;
+            text-decoration: none;
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .skip-link:focus {
+            top: 0;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -210,10 +246,11 @@
         revealEls.forEach(el => revealObserver.observe(el));
     }
 }" x-init="initGlobalReveal()">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="flex min-h-screen flex-col bg-background text-foreground">
         <x-navbar />
 
-        <main class="flex-1 page-animate">
+        <main id="main-content" class="flex-1 page-animate" role="main">
             {{ $slot }}
         </main>
 
