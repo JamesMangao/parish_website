@@ -34,7 +34,7 @@
     }">
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="font-heading text-3xl font-bold text-primary italic text-primary">Mass Intentions</h1>
+            <h1 class="font-heading text-3xl font-bold text-primary italic">Mass Intentions</h1>
             <p class="text-sm text-muted-foreground mt-1">Review and manage mass intention submissions.</p>
         </div>
         
@@ -58,10 +58,13 @@
 
     <!-- Batch Actions Bar -->
     <div x-show="selected.length > 0" x-transition 
-         class="mb-4 p-4 bg-primary/5 border border-primary/20 rounded-xl flex items-center justify-between animate-in slide-in-from-top-4 duration-300">
+         class="mb-4 p-4 bg-accent/5 border border-accent/20 rounded-xl flex items-center justify-between animate-in slide-in-from-top-4 duration-300">
         <div class="flex items-center gap-3">
-            <span class="text-sm font-bold text-primary italic">
-                <span x-text="selected.length"></span> intentions selected
+            <div class="h-8 w-8 bg-accent/20 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><path d="m9 11 3 3L22 4"/><path d="M21 12a9 9 0 1 1-9-9c.456 0 .9.053 1.323.155"/></svg>
+            </div>
+            <span class="text-sm font-bold text-accent italic">
+                <span x-text="selected.length"></span> intentions selected for batch action
             </span>
         </div>
         <div class="flex items-center gap-2">
@@ -74,16 +77,17 @@
                 <input type="hidden" name="rejection_reason" id="batch-rejection-reason">
             </form>
             <button @click="document.getElementById('batch-action-type').value = 'approved'; document.getElementById('batch-form').submit()" 
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-green-700 transition-all flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    class="px-5 py-2 bg-accent text-accent-foreground rounded-lg text-xs font-black uppercase tracking-wider shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 Approve Selected
             </button>
             <button @click="openReject()" 
-                    class="px-4 py-2 bg-destructive text-white rounded-lg text-xs font-bold shadow-md hover:bg-destructive/90 transition-all flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                    class="px-5 py-2 bg-destructive text-destructive-foreground rounded-lg text-xs font-black uppercase tracking-wider shadow-md hover:bg-destructive/90 active:scale-95 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
                 Reject Selected
             </button>
-            <button @click="selected = []" class="text-xs text-muted-foreground hover:text-primary font-bold px-2">Cancel</button>
+            <div class="h-6 w-px bg-accent/20 mx-2"></div>
+            <button @click="selected = []" class="text-xs text-muted-foreground hover:text-accent font-bold px-2 transition-colors">Cancel</button>
         </div>
     </div>
 
@@ -142,31 +146,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                @if(($i->status ?? '') === 'pending')
-                                    <div class="flex items-center justify-end gap-2">
-                                        <form action="/admin/intentions/{{ $i->id }}/status" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="status" value="approved">
-                                            <button class="p-1.5 rounded-md border border-green-200 text-green-600 hover:bg-green-600 hover:text-white transition-all" title="Approve">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                            </button>
-                                        </form>
-                                        <form id="reject-form-{{ $i->id }}" action="/admin/intentions/{{ $i->id }}/status" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="status" value="rejected">
-                                            <button type="button" @click="openReject('{{ $i->id }}')" class="p-1.5 rounded-md border border-destructive/20 text-destructive hover:bg-destructive hover:text-white transition-all" title="Reject">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                @else
-                                    <div class="flex flex-col items-end">
-                                        <span class="text-[10px] text-muted-foreground">{{ isset($i->updated_at) ? $i->updated_at->format('M d, H:i') : '—' }}</span>
-                                        @if($i->rejection_reason)
-                                            <span class="text-[9px] text-destructive italic font-medium mt-1 truncate max-w-[150px]" title="{{ $i->rejection_reason }}">Reason: {{ $i->rejection_reason }}</span>
-                                        @endif
-                                    </div>
-                                @endif
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.intentions.show', $i->id) }}" 
+                                       class="p-2 rounded-lg border border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all group"
+                                       title="View Details">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

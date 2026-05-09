@@ -24,6 +24,8 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'is_recruitment' => 'boolean',
+            'registration_link' => 'nullable|url|max:255',
             'is_published' => 'boolean',
             'expires_at' => 'nullable|date',
         ]);
@@ -43,6 +45,8 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'is_recruitment' => 'boolean',
+            'registration_link' => 'nullable|url|max:255',
             'is_published' => 'boolean',
             'expires_at' => 'nullable|date',
         ]);

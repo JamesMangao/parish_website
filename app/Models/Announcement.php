@@ -18,6 +18,8 @@ class Announcement extends Model
     protected $fillable = [
         'title',
         'content',
+        'is_recruitment',
+        'registration_link',
         'is_published',
         'published_at',
         'expires_at',
@@ -25,6 +27,7 @@ class Announcement extends Model
     ];
 
     protected $casts = [
+        'is_recruitment' => 'boolean',
         'is_published' => 'boolean',
         'published_at' => 'datetime',
         'expires_at' => 'datetime',

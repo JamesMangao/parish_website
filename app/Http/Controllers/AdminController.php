@@ -55,6 +55,12 @@ class AdminController extends Controller
         return view('admin.intentions', compact('intentions'));
     }
 
+    public function showIntention($id)
+    {
+        $intention = MassIntention::findOrFail($id);
+        return view('admin.intentions-show', compact('intention'));
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $request->validate([

@@ -27,8 +27,7 @@
         .delay-1 { animation-delay: 0.15s; }
         .delay-2 { animation-delay: 0.30s; }
 
-        .reveal { opacity:0; transform:translateY(40px); transition: all 1.2s cubic-bezier(0.22,1,0.36,1); }
-        .reveal.active { opacity:1; transform:translateY(0); }
+        .reveal { opacity:1; transform:translateY(0); }
 
         /* ── Hero ── */
         .page-hero {
@@ -369,7 +368,7 @@
     @endif
 
     {{-- Card --}}
-    <div class="inquiry-card reveal">
+    <div class="inquiry-card">
         <div class="grid md:grid-cols-5">
 
             {{-- ── SIDEBAR ── --}}

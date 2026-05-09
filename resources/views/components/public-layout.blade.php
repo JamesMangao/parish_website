@@ -43,6 +43,16 @@
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
+        :root {
+            --blue-deep: #0D2A52;
+            --blue-mid: #1A4080;
+            --blue-soft: #2255A4;
+            --blue-pale: #F0F4FA;
+            --gold: #F5C518;
+            --gold-light: #FFD740;
+            --cream: #FDFBF5;
+        }
+
         [x-cloak] { display: none !important; }
         
         @keyframes pageFadeIn {
@@ -58,24 +68,6 @@
             animation-duration: 0.5s;
         }
 
-        /* ════════════════════════════════════════
-           GLOBAL SCROLL REVEAL
-        ════════════════════════════════════════ */
-        .reveal-global,
-        [data-reveal] {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        [data-reveal="left"]  { transform: translateX(-32px) translateY(0); }
-        [data-reveal="right"] { transform: translateX(32px) translateY(0); }
-        [data-reveal="scale"] { transform: scale(.93) translateY(0); }
-        
-        .reveal-global.revealed,
-        [data-reveal].revealed {
-            opacity: 1;
-            transform: none;
-        }
 
         /* ════════════════════════════════════════
            GLOBAL SKELETON / SHIMMER
@@ -127,6 +119,14 @@
         }
         .skip-link:focus {
             top: 0;
+        }
+
+        /* ── Force Visibility (Deactivates hidden reveal states) ── */
+        .reveal, .reveal-global, [data-reveal] {
+            opacity: 1 !important;
+            transform: none !important;
+            visibility: visible !important;
+            transition: none !important;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -223,34 +223,12 @@
         }
     </style>
 </head>
-<body class="antialiased" x-data="{
-    initGlobalReveal() {
-        // Auto-apply reveal class to common elements if they don't have it
-        const autoTargets = document.querySelectorAll('main section > h1, main section > h2, main section > p:not(.no-reveal), .card, .bg-card, .bg-white');
-        autoTargets.forEach(el => {
-            if (!el.hasAttribute('data-reveal') && !el.classList.contains('reveal-global')) {
-                el.classList.add('reveal-global');
-            }
-        });
-
-        const revealEls = document.querySelectorAll('.reveal-global, [data-reveal]');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        
-        revealEls.forEach(el => revealObserver.observe(el));
-    }
-}" x-init="initGlobalReveal()">
+<body class="antialiased">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="flex min-h-screen flex-col bg-background text-foreground">
         <x-navbar />
 
-        <main id="main-content" class="flex-1 page-animate" role="main">
+        <main id="main-content" class="flex-1" role="main">
             {{ $slot }}
         </main>
 

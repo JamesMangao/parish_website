@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:super_admin,staff')->group(function () {
         Route::get('/admin/intentions', [AdminController::class, 'intentions'])->name('admin.intentions');
         Route::get('/admin/intentions/create', [AdminController::class, 'createIntention'])->name('admin.intentions.create');
+        Route::get('/admin/intentions/{id}', [AdminController::class, 'showIntention'])->name('admin.intentions.show');
         Route::post('/admin/intentions', [AdminController::class, 'storeIntention'])->name('admin.intentions.store');
         Route::post('/admin/intentions/batch', [AdminController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
         Route::post('/admin/intentions/{id}/status', [AdminController::class, 'updateStatus']);

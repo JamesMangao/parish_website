@@ -70,86 +70,93 @@
             pointer-events: none;
         }
 
-        /* ── Schedule cards ── */
-        .card-sacred {
+        /* ── Schedule cards redesigned ── */
+        .card-schedule {
+            display: flex;
             background: #FFFFFF;
-            border: 1px solid rgba(26,64,128,0.12);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(26,64,128,0.08);
+            box-shadow: 0 4px 20px rgba(13,42,82,0.04);
+            margin-bottom: 24px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .card-sacred:hover {
-            border-color: rgba(245, 197, 24, 0.55);
-            box-shadow: 0 10px 40px rgba(13,42,82,0.12);
-            transform: translateY(-3px);
+        .card-schedule:hover {
+            box-shadow: 0 12px 40px rgba(13,42,82,0.12);
+            transform: translateY(-2px);
+            border-color: rgba(245,197,24,0.3);
         }
 
-        /* ── Time pill ── */
-        .time-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #FFFFFF;
-            border: 1px solid rgba(245,197,24,0.5);
+        .schedule-sidebar {
+            width: 260px;
+            background: linear-gradient(160deg, #0d2a52 0%, #153a70 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            color: #FFFFFF;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .schedule-sidebar::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("/assets/img/christ1.webp") center center no-repeat;
+            background-size: cover;
+            opacity: 0.3;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        .schedule-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ── Time chips ── */
+        .time-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: #F8FAFF;
+            border: 1px solid rgba(26,64,128,0.08);
             border-radius: 100px;
-            padding: 7px 18px;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.15rem; font-weight: 700; font-style: italic;
+            font-size: 14px;
+            font-weight: 600;
             color: var(--blue-deep);
             transition: all 0.2s ease;
         }
-        .card-sacred:hover .time-pill {
-            background: var(--blue-pale);
-            border-color: rgba(34,85,164,0.3);
-            color: var(--blue-deep);
-        }
-
-        /* ── Type badge ── */
-        .type-badge {
-            display: inline-block;
-            font-size: 8.5px; font-weight: 700;
-            letter-spacing: 0.28em; text-transform: uppercase;
-            padding: 4px 14px; border-radius: 100px;
-        }
-        .badge-sunday      { background: #FFFFFF; color: #8a6800;  border: 1px solid rgba(245,197,24,0.6); }
-        .badge-anticipated { background: #FFFFFF; color: #7a5e00;  border: 1px solid rgba(245,197,24,0.4); }
-        .badge-weekday     { background: #FFFFFF; color: var(--blue-mid); border: 1px solid rgba(26,64,128,0.3); }
-        .badge-saturday    { background: #FFFFFF; color: var(--blue-soft); border: 1px solid rgba(34,85,164,0.3); }
-        .badge-special     { background: #FFFFFF; color: var(--blue-deep); border: 1px solid rgba(13,42,82,0.3); }
-
-        /* ── Section rule ── */
-        .section-title-rule {
-            display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
-        }
-        .section-title-rule::after {
-            content: ''; flex: 1; height: 1px;
-            background: linear-gradient(90deg, rgba(26,64,128,0.15), transparent);
-        }
-
-        /* ── Cal buttons ── */
-        .cal-link {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(13,42,82,0.65); text-decoration: none;
-            padding: 5px 12px; border-radius: 100px;
-            border: 1px solid rgba(13,42,82,0.25);
+        .time-chip svg { color: rgba(13,42,82,0.3); }
+        .time-chip:hover {
             background: #FFFFFF;
-            transition: all 0.2s ease; cursor: pointer;
-        }
-        .cal-link:hover {
-            border-color: rgba(34,85,164,0.3);
-            color: var(--blue-deep);
-            background: var(--blue-pale);
+            border-color: var(--gold);
+            box-shadow: 0 4px 12px rgba(245,197,24,0.15);
         }
 
-        /* ── Gold btn (reused from home) ── */
-        .gold-btn {
-            background: linear-gradient(135deg, #FFD740 0%, #F5C518 55%, #E0A800 100%);
-            color: var(--blue-deep);
-            box-shadow: 0 4px 20px rgba(245,197,24,0.40), 0 1px 0 rgba(255,255,255,0.35) inset;
-            transition: all 0.25s ease; font-weight: 700;
+        .schedule-divider {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(26,64,128,0.05) 0%, rgba(26,64,128,0.02) 100%);
         }
-        .gold-btn:hover {
-            box-shadow: 0 8px 32px rgba(245,197,24,0.55), 0 1px 0 rgba(255,255,255,0.35) inset;
-            transform: translateY(-2px);
+
+        .schedule-desc-box {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .desc-icon {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .card-schedule { flex-direction: column; }
+            .schedule-sidebar { width: 100%; padding: 32px; text-align: center; align-items: center; }
+            .schedule-content { padding: 32px; }
         }
 
         html { scroll-behavior: smooth; }
@@ -269,16 +276,6 @@
 
     <div class="reveal mb-20">
 
-        {{-- Section heading --}}
-        <div class="section-title-rule">
-            <div>
-                <p class="eyebrow mb-1">{{ $type === 'special' ? 'Liturgical Calendar' : 'Regular Schedule' }}</p>
-                <h2 class="font-heading font-bold italic"
-                    style="font-size:clamp(1.8rem,3.5vw,2.8rem); color:var(--blue-deep); line-height:1.1;">
-                    {{ $labels[$type] }}
-                </h2>
-            </div>
-        </div>
 
         {{-- Cards --}}
         <div class="space-y-5 p-6 md:p-8 rounded-2xl" style="background: #FDFBF5; border: 1px solid rgba(245, 197, 24, 0.25);">
@@ -308,81 +305,88 @@
                 .'&dates='.$dtStart.'/'.$dtEnd
                 .'&location='.urlencode('Sto. Rosario Parish, Pacita Complex 1, San Pedro, Laguna');
             if ($rrule) $googleUrl .= '&recur=RRULE:'.$rrule;
+
+            // Image-specific mapping
+            $icon = match($type) {
+                'sunday' => '<path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8-9v1m8 8h1m-9 8v1m-6.4-15.4l.7.7m12.1-.7l-.7.7m0 11.4l.7.7m-12.1-.7l-.7.7"/>',
+                'weekday' => '<path d="M12 3v18M3 12h18"/>',
+                'saturday' => '<path d="M3 21h18M9 21V10a3 3 0 0 1 6 0v11M12 10V5m-2 0h4"/>',
+                default => '<path d="M12 2v20M5 12h14"/>'
+            };
+            $subTitle = match($type) {
+                'sunday' => 'The Lord\'s Day',
+                'anticipated' => 'Vigil Mass',
+                'weekday' => 'Monday – Friday',
+                'saturday' => 'Vigil Mass',
+                default => 'Special Liturgy'
+            };
+            $descText = match($type) {
+                'sunday' => 'Main parish assembly for the community.',
+                'weekday' => 'Start your day with prayer. All are welcome.',
+                'saturday' => 'Anticipated Mass for Sunday obligation.',
+                default => 'Special liturgical celebration.'
+            };
+            $descIcon = match($type) {
+                'sunday' => '<path d="M9 7a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>',
+                'weekday' => '<path d="M7 20h10"/><path d="M6 6l6 -1l6 1"/><path d="M12 3v17"/>',
+                'saturday' => '<path d="M8 22h8"/><path d="M12 11v11"/><path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/>',
+                default => '<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>'
+            };
         @endphp
 
-        <article class="card-sacred p-6 md:p-8">
-            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+        <article class="card-schedule">
+            {{-- Left: Sidebar --}}
+            <div class="schedule-sidebar">
+                <div class="mb-6 opacity-80" style="color:var(--gold);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">{!! $icon !!}</svg>
+                </div>
+                <h3 class="font-heading font-bold italic" style="font-size:2.2rem; color:#FFFFFF; line-height:1.1;">
+                    {{ $type === 'weekday' ? 'Weekdays' : (is_array($s->day_of_week) ? implode(', ', $s->day_of_week) : ($s->day_of_week ?: $s->title)) }}
+                </h3>
+                <p class="font-heading italic mt-1" style="color:var(--gold); font-size:1rem; opacity:0.9;">
+                    {{ $subTitle }}
+                </p>
+            </div>
 
-                {{-- Left: info --}}
-                <div class="flex-1 min-w-0">
-                    {{-- Title row --}}
-                    @if($s->title)
-                    <div class="flex flex-wrap items-center gap-3 mb-3">
-                        <h3 class="font-heading font-bold italic"
-                            style="font-size:1.45rem; color:var(--blue-deep); line-height:1.2;">
-                            {{ $s->title }}
-                        </h3>
+            {{-- Right: Content --}}
+            <div class="schedule-content">
+                {{-- Time chips row --}}
+                <div class="flex flex-wrap gap-3">
+                    @foreach($times as $t)
+                    @php
+                        $label = is_array($t) ? \Carbon\Carbon::parse($t['time'] ?? '00:00')->format('g:i A') : \Carbon\Carbon::parse($t)->format('g:i A');
+                    @endphp
+                    <div class="time-chip">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        {{ $label }}
                     </div>
-                    @endif
+                    @endforeach
+                </div>
 
-                    {{-- Day / date --}}
-                    @if($s->day_of_week || $s->specific_date)
-                    <div class="flex items-center gap-2 mb-5">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="rgba(13,42,82,0.38)" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect width="18" height="18" x="3" y="4" rx="2"/>
-                            <path d="M16 2v4M8 2v4M3 10h18"/>
-                        </svg>
-                        <span style="font-size:12px; font-weight:600; color:rgba(13,42,82,0.48); letter-spacing:0.06em;">
-                            @if(is_array($s->day_of_week))
-                                {{ implode(', ', $s->day_of_week) }}
-                            @else
-                                {{ $s->day_of_week ?: ($s->specific_date ? $s->specific_date->format('F d, Y') : '') }}
-                            @endif
-                        </span>
-                    </div>
-                    @endif
+                <div class="schedule-divider"></div>
 
-                    {{-- Time pills --}}
-                    <div class="flex flex-wrap gap-2">
-                        @forelse($times as $t)
-                        @php
-                            $label = is_array($t) ? \Carbon\Carbon::parse($t['time'] ?? '00:00')->format('g:i A') : \Carbon\Carbon::parse($t)->format('g:i A');
-                            $sub   = is_array($t) && !empty($t['title']) ? $t['title'] : null;
-                        @endphp
-                        <div class="time-pill">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2"
-                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                            {{ $label }}{{ $sub ? ' · '.$sub : '' }}
+                {{-- Description area --}}
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="schedule-desc-box">
+                        <div class="desc-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $descIcon !!}</svg>
                         </div>
-                        @empty
-                        <span style="font-size:12px; color:rgba(13,42,82,0.32); font-style:italic;">Time TBD</span>
-                        @endforelse
+                        <div>
+                            <p class="font-bold text-primary text-sm">{{ $s->title ?? ($type === 'sunday' ? 'Sunday Celebration' : 'Mass Celebration') }}</p>
+                            <p class="text-xs text-muted-foreground mt-1">{{ $descText }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="{{ $googleUrl }}" target="_blank" class="p-2 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all" title="Add to Google">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
+                        </a>
+                        <button @click="downloadICS('Mass: {{ addslashes($s->title ?? 'Sto Rosario') }}', 'Regular mass schedule', '{{ $dtStart }}','{{ $dtEnd }}', 'Sto. Rosario Parish', '{{ $rrule }}')" 
+                                class="p-2 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all" title="Download iCal">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        </button>
                     </div>
                 </div>
-
-                {{-- Right: cal buttons --}}
-                <div class="flex items-center gap-2 md:flex-col md:items-end shrink-0">
-                    <a href="{{ $googleUrl }}" target="_blank" rel="noopener" class="cal-link" title="Add to Google Calendar">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
-                        Google Cal
-                    </a>
-                    <button @click="downloadICS(
-                        'Mass: {{ addslashes($s->title ?? 'Sto Rosario') }}',
-                        'Regular mass schedule at Sto. Rosario Parish',
-                        '{{ $dtStart }}','{{ $dtEnd }}',
-                        'Sto. Rosario Parish, Pacita Complex 1, San Pedro, Laguna',
-                        '{{ $rrule }}')"
-                        class="cal-link" title="Download iCal">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                        iCal
-                    </button>
-                </div>
-
             </div>
         </article>
         @endforeach

@@ -39,46 +39,6 @@
         }
 
         html { scroll-behavior: smooth; }
-        .animate-fade-up { animation: fadeUp 0.9s ease both; }
-        .animate-fade-in { animation: fadeIn 1.2s ease both; }
-        .delay-1 { animation-delay: 0.15s; }
-        .delay-2 { animation-delay: 0.30s; }
-        .delay-3 { animation-delay: 0.45s; }
-        .delay-4 { animation-delay: 0.60s; }
-        .delay-5 { animation-delay: 0.80s; }
-        
-        .scroll-line { 
-            position: relative; 
-            overflow: hidden; 
-            background: transparent !important;
-        }
-        .scroll-line::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gold);
-            animation: scrollLine 2s ease infinite;
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-            will-change: transform, opacity;
-        }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-        .reveal-left {
-            opacity: 0;
-            transform: translateX(-40px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .reveal-left.active  { opacity: 1; transform: translateX(0); }
-        .reveal-right {
-            opacity: 0;
-            transform: translateX(40px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .reveal-right.active { opacity: 1; transform: translateX(0); }
 
         .gold-btn {
             background: linear-gradient(135deg, #FFD740 0%, #F5C518 55%, #E0A800 100%);
@@ -314,7 +274,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- HERO                                               --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section style="position:relative; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;">
+<section class="hero-section" style="position:relative; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;">
 
     <div style="position:absolute; inset:0; z-index:0;">
         <img src="/bg.webp" alt="Sto. Rosario Parish"
@@ -331,8 +291,7 @@
                 background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 stitchTiles=%22stitch%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>');"></div>
 
     <div style="position:relative; z-index:10; text-align:center; display:flex; flex-direction:column;
-                align-items:center; padding: 0 24px; width:100%; max-width:960px;
-                margin-top: 72px;">
+                align-items:center; padding: 80px 24px 0; width:100%; max-width:960px;">
 
         <div class="hero-badge" style="margin-bottom:24px;">
             <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); display:block; box-shadow:0 0 8px rgba(245,197,24,0.8);"></span>
@@ -343,13 +302,13 @@
 
 <h1 class=""
     style="font-family: 'Canterbury', serif;
-           white-space: nowrap;
            font-weight: 400;
-           line-height: 1;
+           line-height: 1.1;
            letter-spacing: 0.01em;
            margin-bottom: 20px;
            text-shadow: 0 4px 48px rgba(0,0,0,0.55);
-           font-size: clamp(2.4rem, 6.5vw, 6.4rem);">
+           font-size: clamp(2.2rem, 8vw, 5.5rem);
+           color: #FFFFFF;">
     <span class="hero-title-accent">Sto. Rosario Parish</span>
 </h1>
 
@@ -360,12 +319,10 @@
             Pacita Complex 1, San Pedro, Laguna
         </p>
 
-        <div class="animate-fade-in delay-2"
-             style="width:56px; height:1px; margin-bottom:22px;
+        <div style="width:56px; height:1px; margin-bottom:22px;
                     background:linear-gradient(90deg, transparent, rgba(245,197,24,0.65), transparent);"></div>
 
-        <p class="animate-fade-up delay-3"
-           style="color:rgba(220,232,255,0.78); font-size:clamp(0.85rem,1.4vw,1rem);
+        <p style="color:rgba(220,232,255,0.78); font-size:clamp(0.85rem,1.4vw,1rem);
                   line-height:1.78; max-width:430px; font-weight:300; letter-spacing:0.01em;
                   margin-bottom:36px;">
             Home to the Queen of the Most Holy Rosary — a beacon of faith,
@@ -374,7 +331,7 @@
 
         {{-- CTA buttons --}}
         <div class="hero-cta-wrap"
-             style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px; margin-bottom:40px;">
+             style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:20px; margin-bottom:40px;">
             <a href="/mass-schedule"
                class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
                style="padding:13px 30px; font-size:12.5px; letter-spacing:0.18em; text-decoration:none;">
@@ -412,12 +369,10 @@
         </div>
     </div>
 
-    <div class="animate-fade-in delay-5"
-         style="position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+    <div style="position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
                 z-index:10; display:flex; flex-direction:column; align-items:center; gap:8px;">
         <span style="color:rgba(245,197,24,0.45); font-size:11px; text-transform:uppercase; letter-spacing:0.4em;">Scroll</span>
-        <div class="scroll-line"
-             style="height:36px; width:1.5px; background:linear-gradient(to bottom, rgba(245,197,24,0.6), transparent);"></div>
+        <div style="height:36px; width:1.5px; background:linear-gradient(to bottom, rgba(245,197,24,0.6), transparent);"></div>
     </div>
 </section>
 
@@ -425,7 +380,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- NEXT MASS + OFFICE HOURS                           --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="max-w-5xl mx-auto px-6 mt-10 reveal section-px-mobile">
+<section class="max-w-5xl mx-auto px-6 mt-48 section-px-mobile"><br><br>
     <div class="rounded-3xl overflow-hidden"
          style="background:#FFFFFF; border:1px solid rgba(201,162,0,0.22); box-shadow:0 12px 50px rgba(13,42,82,0.09);">
 
@@ -497,16 +452,14 @@
                 </div>
                 <span style="flex:1; height:1px; background:linear-gradient(90deg,rgba(201,162,0,0.3),transparent);"></span>
             </div>
-            <div class="office-cols grid grid-cols-3 overflow-hidden"
-                 style="border:1px solid rgba(26,64,128,0.07); border-radius:16px;">
+            <div class="office-cols grid grid-cols-1 md:grid-cols-3 gap-5"
+                 style="border-radius:16px;">
                 @foreach([
                     ['icon'=>'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>', 'day'=>'· TUE – SAT ·', 'hours'=>['6:00 AM – 12:00 NN','1:30 PM – 6:00 PM'], 'closed'=>false],
                     ['icon'=>'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>', 'day'=>'· SUNDAY ·', 'hours'=>['6:00 AM – 12:00 NN','3:00 PM – 6:00 PM'], 'closed'=>false],
                     ['icon'=>'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'day'=>'· MONDAY ·', 'hours'=>[], 'closed'=>true],
                 ] as $ohIdx => $ohCol)
-                <div class="office-col flex flex-col items-center py-7 px-4 text-center"
-                     style="{{ $ohIdx > 0 ? 'border-left:1px solid rgba(26,64,128,0.07);' : '' }}"
-                     class="{{ $ohIdx > 0 ? 'office-col-border' : '' }}">
+                <div class="office-col flex flex-col items-center py-7 px-4 text-center bg-white rounded-2xl shadow-sm border border-[rgba(26,64,128,0.07)]">
                     <br><div class="w-11 h-11 rounded-full flex items-center justify-center mb-4"
                          style="background:var(--blue-deep);">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ohCol['icon'] !!}</svg>
@@ -557,7 +510,7 @@
             <div class="divider-ornament mb-4"><span class="eyebrow">Quick Access</span></div>
             <h2 class="font-heading text-4xl md:text-5xl font-bold italic" style="color:var(--blue-deep);">How Can We Serve You?</h2>
         </div>
-        <div class="quick-actions-grid grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div class="quick-actions-grid grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             @php
             $actions = [
                 ['href'=>'/mass-schedule','icon'=>'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>','label'=>'Mass Schedule','sub'=>'Times & days'],
@@ -627,7 +580,7 @@
             </p>
         </div>
 
-        <div class="events-grid grid md:grid-cols-3 gap-5 mb-8">
+        <div class="events-grid grid md:grid-cols-3 gap-8 mb-8">
 
             @if($nextMass)
             <div class="card-event card-event-featured relative">
@@ -847,13 +800,17 @@
                     </p>
                     @endif
                 </div>
-                <div class="flex items-center justify-between px-5 py-3.5"
-                     style="border-top:1px solid rgba(26,64,128,0.06);">
-                    <a href="#"
-                       style="font-size:9.5px; font-weight:700; letter-spacing:0.15em; color:#C9A200; text-decoration:none; text-transform:uppercase;"
-                       class="hover:opacity-60 transition-opacity"
-                       aria-label="Read more about {{ $ann->title }}">READ MORE →</a>
+                @if($ann->is_recruitment && $ann->registration_link)
+                <div class="px-5 pb-5 mt-auto">
+                    <a href="{{ $ann->registration_link }}" 
+                       target="_blank"
+                       style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 0; border-radius:12px; font-size:10px; font-weight:800; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none;"
+                       class="gold-btn group/reg transition-all hover:scale-[1.02] active:scale-95 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                        Register Now
+                    </a>
                 </div>
+                @endif
             </article>
             @endforeach
         </div>
