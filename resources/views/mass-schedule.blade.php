@@ -100,7 +100,7 @@
         .schedule-sidebar::after {
             content: '';
             position: absolute; inset: 0;
-            background: url("/assets/img/christ1.webp") center center no-repeat;
+            background: url("{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/christ1.webp') }}") center center no-repeat;
             background-size: cover;
             opacity: 0.3;
             mix-blend-mode: overlay;

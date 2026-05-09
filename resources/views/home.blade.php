@@ -277,7 +277,7 @@
 <section class="hero-section" style="position:relative; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;">
 
     <div style="position:absolute; inset:0; z-index:0;">
-        <img src="/bg.webp" alt="Sto. Rosario Parish"
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}" alt="Sto. Rosario Parish"
              fetchpriority="high" decoding="async"
              width="1920" height="1080"
              style="width:100%; height:100%; object-fit:cover; filter:saturate(0.75) brightness(0.85); transform:scale(1.04);">
@@ -387,7 +387,7 @@
         {{-- ── Next Mass ── --}}
         <div class="relative overflow-hidden" style="min-height:215px; background:#0d2a52;">
             <div class="absolute inset-0">
-                <img src="{{ asset('assets/img/mass.webp') }}"
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/mass.webp') }}"
                      alt="Mass"
                      loading="lazy" width="1200" height="800"
                      style="width:100%; height:100%; object-fit:cover; opacity:0.35;">
@@ -482,7 +482,7 @@
            style="background:var(--blue-deep); text-decoration:none; padding:22px 24px; border-radius:0 0 24px 24px; display:flex; min-height:82px;"
            aria-label="View Full Mass Schedule">
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:0.50; height:180%; width:auto;" aria-hidden="true">
-                <img src="{{ asset('assets/img/parish-illustration.svg') }}"
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}"
                      alt="Parish Illustration"
                      width="226" height="107"
                      style="height:70%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
@@ -545,7 +545,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="relative pt-12 pb-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
     <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <img src="{{ asset('assets/img/church1.webp') }}"
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}"
              alt=""
              class="w-full h-full object-cover"
              style="filter:saturate(0.2) brightness(1.2) blur(4px); transform:scale(1.06);">
@@ -673,7 +673,7 @@
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110"
                  style="opacity:0.50; height:150%; width:auto;"
                  aria-hidden="true">
-                <img src="{{ asset('assets/img/parish-illustration.svg') }}"
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}"
                      alt="Parish Illustration"
                      width="285" height="135"
                      style="height:90%; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
@@ -702,7 +702,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="relative py-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
     <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <img src="{{ asset('assets/img/church1.webp') }}"
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}"
              alt=""
              loading="lazy" width="1200" height="800"
              class="w-full h-full object-cover"
@@ -712,9 +712,9 @@
 
     @php
     $annImgs = [
-        asset('assets/img/church1.webp'),
-        asset('assets/img/mass.webp'),
-        asset('assets/img/church1.webp'),
+        \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp'),
+        \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/mass.webp'),
+        \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp'),
     ];
     $annCats = ['Liturgical', 'Parish Life', 'Parish Event'];
     @endphp

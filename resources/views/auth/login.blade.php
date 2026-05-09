@@ -10,7 +10,7 @@
 <body class="bg-background font-sans antialiased text-foreground flex items-center justify-center min-h-screen relative overflow-hidden">
     <!-- Background Decoration -->
     <div class="absolute inset-0 z-0">
-        <img src="/bg.png" alt="Background" class="w-full h-full object-cover">
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}" alt="Background" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-primary/80 backdrop-blur-sm"></div>
     </div>
 

@@ -697,7 +697,7 @@
         <div class="calling-section">
             <div class="calling-img-wrap" data-reveal="scale">
                 <img
-                    src="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['hero_image']) : asset('bg.png') }}"
+                    src="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}"
                     alt="Sto. Rosario Parish Church"
                 >
                 <div class="calling-badge">Est. 1983</div>

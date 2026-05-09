@@ -31,14 +31,14 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="{{ config('app.name', 'Sto. Rosario Parish') }}">
     <meta property="og:description" content="{{ $meta_description ?? 'Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
-    <meta property="og:image" content="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}">
+    <meta property="og:image" content="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="{{ config('app.name', 'Sto. Rosario Parish') }}">
-    <meta property="twitter:description" content="{{ $meta_description ?? 'Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
-    <meta property="twitter:image" content="{{ asset($global_settings['hero_image'] ?? 'bg.png') }}">
+    <meta property="twitter:title" content="{{ $title ?? 'Sto. Rosario Parish' }} | Divine Grace & Community">
+    <meta property="twitter:description" content="{{ $description ?? 'Official portal of Sto. Rosario Parish - Pacita 1. Experience our community of faith through daily masses, sacraments, and spiritual activities.' }}">
+    <meta property="twitter:image" content="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}">
     
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

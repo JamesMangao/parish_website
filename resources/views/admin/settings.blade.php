@@ -64,7 +64,7 @@
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payment QR Code</label>
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
                             @if(isset($settings['qr_code']))
-                                <img src="{{ asset('storage/' . $settings['qr_code']) }}" class="h-32 w-32 object-contain border rounded bg-white shadow-sm" />
+                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['qr_code']) }}" class="h-32 w-32 object-contain border rounded bg-white shadow-sm" />
                             @else
                                 <div class="h-32 w-32 flex items-center justify-center bg-white border rounded text-muted-foreground text-[10px] uppercase font-black text-center px-4">No QR Uploaded</div>
                             @endif
@@ -92,7 +92,7 @@
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
                             <div id="priest_preview_container" class="h-32 w-32 relative rounded-full overflow-hidden border bg-white shadow-sm flex items-center justify-center">
                                 @if(isset($settings['priest_image']))
-                                    <img id="priest_preview_image" src="{{ asset('storage/' . $settings['priest_image']) }}" class="h-full w-full object-cover" />
+                                    <img id="priest_preview_image" src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['priest_image']) }}" class="h-full w-full object-cover" />
                                     <span id="priest_no_image_text" class="hidden text-muted-foreground text-[10px] font-black text-center px-4">No Image</span>
                                 @else
                                     <img id="priest_preview_image" src="" class="hidden h-full w-full object-cover" />
