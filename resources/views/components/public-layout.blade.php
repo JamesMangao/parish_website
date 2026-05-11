@@ -222,6 +222,95 @@
             }
         }
     </style>
+
+    <style>
+        /* ════════════════════════════════════════
+           LAPTOP 125% SCALE (1024px – 1600px)
+           Effective viewport ≈ 1536 × 864
+        ════════════════════════════════════════ */
+        @media (min-width: 1024px) and (max-width: 1600px) {
+
+            /* ── Global vertical compression ── */
+            .py-28, .py-32 { padding-top: 5rem !important; padding-bottom: 5rem !important; }
+            .py-24 { padding-top: 4rem !important; padding-bottom: 4rem !important; }
+            .mb-16 { margin-bottom: 2.5rem !important; }
+            .mb-14 { margin-bottom: 2rem !important; }
+            .mt-48 { margin-top: 6rem !important; }
+
+            /* ── Hero section ── */
+            .hero-section { height: 100vh !important; min-height: 640px !important; }
+            .hero-section > div[style*="padding: 80px"] {
+                padding-top: 48px !important;
+            }
+            .hero-cta-wrap { gap: 14px !important; margin-bottom: 28px !important; }
+            .hero-stats-strip { gap: 28px !important; padding-top: 20px !important; }
+
+            /* ── Containers – widen slightly to use screen real estate ── */
+            .max-w-5xl { max-width: 1100px !important; }
+            .max-w-\[1200px\] { max-width: 1280px !important; }
+
+            /* ── Quick Actions cards – tighter padding ── */
+            .card-sacred { padding: 1.75rem !important; }
+            .quick-actions-grid { gap: 1.25rem !important; }
+
+            /* ── Next Mass section ── */
+            .next-mass-inner { padding: 1.75rem 2rem !important; min-height: 180px !important; }
+
+            /* ── Office hours columns ── */
+            .office-col { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+
+            /* ── Events / Announcements grids ── */
+            .events-cta-banner { min-height: 68px !important; padding: 16px 20px !important; }
+
+            /* ── Section page heroes (About, Gallery, Mass, Inquiry) ── */
+            .page-hero { padding-top: 80px !important; padding-bottom: 60px !important; }
+
+            /* ── Gallery highlights – video pane ── */
+            .highlight-card-outer [style*="min-height:360px"] {
+                min-height: 320px !important;
+            }
+
+            /* ── Mass schedule card ── */
+            .schedule-sidebar { width: 220px !important; padding: 28px !important; }
+            .schedule-content { padding: 28px !important; gap: 18px !important; }
+            .card-schedule { min-height: auto !important; }
+
+            /* ── About page patron saints ── */
+            .patrons-layout { gap: 2rem !important; }
+            .patron-content h3 { font-size: 1.6rem !important; }
+            .patron-img-wrap { max-height: 420px !important; }
+            .patron-img-wrap img { max-height: 420px !important; object-fit: cover !important; }
+
+            /* ── Footer – tighter ── */
+            footer { padding-top: 3rem !important; padding-bottom: 1.5rem !important; }
+
+            /* ── Typography scale-down ── */
+            .text-5xl, .text-6xl { font-size: 2.75rem !important; }
+            .text-4xl { font-size: 2rem !important; }
+            .section-title { font-size: 2.5rem !important; }
+            .section-eyebrow { font-size: 11px !important; }
+
+            /* ── Inquiry form card ── */
+            .inquiry-card { border-radius: 20px !important; }
+
+            /* ── Scroll/breathing room at bottom ── */
+            section:last-of-type { margin-bottom: 0 !important; }
+        }
+
+        /* ════════════════════════════════════════
+           HEIGHT-CONSTRAINED (short viewports)
+           For 864px height or less
+        ════════════════════════════════════════ */
+        @media (max-height: 900px) and (min-width: 1024px) {
+            .hero-section {
+                min-height: 100vh !important;
+            }
+            .hero-section > div[style*="padding: 80px"] {
+                padding-top: 36px !important;
+            }
+            .hero-stats-strip { padding-top: 16px !important; }
+        }
+    </style>
 </head>
 <body class="antialiased">
     <a href="#main-content" class="skip-link">Skip to main content</a>
