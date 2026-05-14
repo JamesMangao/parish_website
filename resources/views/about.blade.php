@@ -81,18 +81,7 @@
         /* ════════════════════════════════════════
            SCROLL-REVEAL BASE
         ════════════════════════════════════════ */
-        .reveal {
-            opacity: 0; transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .reveal.active, [data-reveal].active { 
-            opacity: 1 !important; transform: translate(0) scale(1) !important; 
-        }
 
-        [data-reveal="up"]    { opacity: 0; transform: translateY(50px); transition: all 1.2s ease; }
-        [data-reveal="left"]  { opacity: 0; transform: translateX(-50px); transition: all 1.2s ease; }
-        [data-reveal="right"] { opacity: 0; transform: translateX(50px); transition: all 1.2s ease; }
-        [data-reveal="scale"] { opacity: 0; transform: scale(0.92); transition: all 1.2s ease; }
 
         /* ════════════════════════════════════════
            HERO
@@ -1105,16 +1094,7 @@
         statObserver.observe(el);
     });
 
-    /* ── Reveal observer ── */
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, [data-reveal]').forEach(el => revealObserver.observe(el));
+
 
     /* ── Timeline Navigation Buttons ── */
     const btnLeft  = document.getElementById('tl-left');

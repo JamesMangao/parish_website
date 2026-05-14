@@ -24,20 +24,6 @@
             background: linear-gradient(90deg, rgba(245,197,24,0.5), transparent);
         }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes shimmer {
-            0%   { background-position: -200% center; }
-            100% { background-position:  200% center; }
-        }
-        @keyframes scrollLine {
-            0%   { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
         html { scroll-behavior: smooth; }
 
         .gold-btn {
@@ -293,14 +279,14 @@
     <div style="position:relative; z-index:10; text-align:center; display:flex; flex-direction:column;
                 align-items:center; padding: 80px 24px 0; width:100%; max-width:960px;">
 
-        <div class="hero-badge" style="margin-bottom:24px;">
+        <div class="hero-badge animate-fade-in-down" style="margin-bottom:24px; animation-delay: 0.1s;">
             <span style="width:6px; height:6px; border-radius:50%; background:var(--gold); display:block; box-shadow:0 0 8px rgba(245,197,24,0.8);"></span>
             <span style="font-size:11.5px; font-weight:600; letter-spacing:0.38em; text-transform:uppercase; color:rgba(255,248,180,0.85);">
                 Est. · Diocese of San Pablo · Pacita
             </span>
         </div>
 
-<h1 class=""
+<h1 class="animate-fade-in-up"
     style="font-family: 'Canterbury', serif;
            font-weight: 400;
            line-height: 1.1;
@@ -308,30 +294,33 @@
            margin-bottom: 20px;
            text-shadow: 0 4px 48px rgba(0,0,0,0.55);
            font-size: clamp(2.2rem, 8vw, 5.5rem);
-           color: #FFFFFF;">
+           color: #FFFFFF;
+           animation-delay: 0.2s;">
     <span class="hero-title-accent">Sto. Rosario Parish</span>
 </h1>
 
-        <p class="font-heading"
+        <p class="font-heading animate-fade-in-up"
            style="font-style:italic; color:rgba(255,215,64,0.82); margin-bottom:14px;
                   font-size:clamp(0.9rem, 1.8vw, 1.15rem); font-weight:300;
-                  text-shadow:0 2px 12px rgba(0,0,0,0.4);">
+                  text-shadow:0 2px 12px rgba(0,0,0,0.4);
+                  animation-delay: 0.3s;">
             Pacita Complex 1, San Pedro, Laguna
         </p>
 
         <div style="width:56px; height:1px; margin-bottom:22px;
                     background:linear-gradient(90deg, transparent, rgba(245,197,24,0.65), transparent);"></div>
 
-        <p style="color:rgba(220,232,255,0.78); font-size:clamp(0.85rem,1.4vw,1rem);
+        <p class="animate-fade-in-up" 
+                  style="color:rgba(220,232,255,0.78); font-size:clamp(0.85rem,1.4vw,1rem);
                   line-height:1.78; max-width:430px; font-weight:300; letter-spacing:0.01em;
-                  margin-bottom:36px;">
+                  margin-bottom:36px; animation-delay: 0.4s;">
             Home to the Queen of the Most Holy Rosary — a beacon of faith,
             community, and service for over four decades.
         </p>
 
         {{-- CTA buttons --}}
-        <div class="hero-cta-wrap"
-             style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:20px; margin-bottom:40px;">
+        <div class="hero-cta-wrap animate-fade-in-up"
+             style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:20px; margin-bottom:40px; animation-delay: 0.5s;">
             <a href="/mass-schedule"
                class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase"
                style="padding:13px 30px; font-size:12.5px; letter-spacing:0.18em; text-decoration:none;">
@@ -353,10 +342,11 @@
         </div>
 
         {{-- Stats strip --}}
-        <div class="hero-stats-strip"
+        <div class="hero-stats-strip animate-fade-in-up"
              style="display:flex; align-items:center; justify-content:center; gap:40px;
                     padding-top:28px; width:100%; max-width:400px;
-                    border-top:1px solid rgba(245,197,24,0.15);">
+                    border-top:1px solid rgba(245,197,24,0.15);
+                    animation-delay: 0.6s;">
             @foreach([['40+','Years of Service'],['7','Weekly Masses'],['1','Community']] as $stat)
             <div style="text-align:center;">
                 <div class="font-heading stat-val"
@@ -380,7 +370,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- NEXT MASS + OFFICE HOURS                           --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="max-w-5xl mx-auto px-6 mt-48 section-px-mobile"><br><br>
+<section class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile"><br><br>
     <div class="rounded-3xl overflow-hidden"
          style="background:#FFFFFF; border:1px solid rgba(201,162,0,0.22); box-shadow:0 12px 50px rgba(13,42,82,0.09);">
 
@@ -504,13 +494,13 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- QUICK ACTIONS                                      --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-32 bg-[var(--cream)] reveal section-pad-mobile section-pad-tablet">
+<section class="py-32 bg-[var(--cream)] reveal reveal-up section-pad-mobile section-pad-tablet">
     <div class="max-w-[1200px] mx-auto px-6 section-px-mobile"><br><br><br>
         <div class="text-center mb-16">
             <div class="divider-ornament mb-4"><span class="eyebrow">Quick Access</span></div>
             <h2 class="font-heading text-4xl md:text-5xl font-bold italic" style="color:var(--blue-deep);">How Can We Serve You?</h2>
         </div>
-        <div class="quick-actions-grid grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+        <div class="quick-actions-grid grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto reveal reveal-stagger">
             @php
             $actions = [
                 ['href'=>'/mass-schedule','icon'=>'<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>','label'=>'Mass Schedule','sub'=>'Times & days'],
@@ -543,7 +533,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- UPCOMING EVENTS                                    --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="relative pt-12 pb-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
+<section class="relative pt-12 pb-24 overflow-hidden reveal reveal-up section-pad-mobile section-pad-tablet">
     <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
         <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}"
              alt=""
@@ -580,7 +570,7 @@
             </p>
         </div>
 
-        <div class="events-grid grid md:grid-cols-3 gap-8 mb-8">
+        <div class="events-grid grid md:grid-cols-3 gap-8 mb-8 reveal reveal-stagger">
 
             @if($nextMass)
             <div class="card-event card-event-featured relative">
@@ -760,7 +750,7 @@
             <p style="color:rgba(13,42,82,0.3); font-size:14px;">No announcements at this time.</p>
         </div>
         @else
-        <div id="ann-grid" class="ann-grid grid md:grid-cols-3 gap-5 mb-10">
+        <div id="ann-grid" class="ann-grid grid md:grid-cols-3 gap-5 mb-10 reveal reveal-stagger">
             @foreach($announcements as $ann)
             @php $aIdx = $loop->index; $aIsFirst = $loop->first; @endphp
             <article class="card-sacred overflow-hidden flex flex-col group/ann">
@@ -821,7 +811,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- SACRAMENTAL SERVICES                               --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-28 relative overflow-hidden reveal section-pad-mobile section-pad-tablet" style="background:var(--blue-deep);">
+<section class="py-28 relative overflow-hidden reveal reveal-up section-pad-mobile section-pad-tablet" style="background:var(--blue-deep);">
 
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none font-cinzel leading-none"
          style="font-size:420px; color:rgba(255,255,255,0.018);">✝</div>
@@ -841,7 +831,7 @@
             <p class="mt-4 text-sm font-light" style="color:rgba(235,242,255,0.40); letter-spacing:0.05em;">Inquire about any sacramental service at our parish office.</p>
         </div>
 
-        <div class="services-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
+        <div class="services-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto reveal reveal-stagger">
             @php
             $services = [
                 ['label'=>'Baptism',       'href'=>'/inquiry','svg'=>'<circle cx="12" cy="6" r="3"/><path d="M5 12a7 7 0 0 1 14 0"/><line x1="12" y1="12" x2="12" y2="20"/><path d="M9 20h6"/>'],
@@ -879,7 +869,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- INTENTION CTA                                      --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<section class="py-28 relative overflow-hidden bg-[var(--cream)] reveal section-pad-mobile section-pad-tablet">
+<section class="py-28 relative overflow-hidden bg-[var(--cream)] reveal reveal-up section-pad-mobile section-pad-tablet">
 
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
          style="background:radial-gradient(circle,rgba(26,64,128,0.05) 0%,transparent 70%);"></div>

@@ -33,7 +33,7 @@ class InquiryController extends Controller
 
         $message = $validated['message'];
         if ($request->has('wants_document')) {
-            $message .= "\n\n[Wants to proceed with document request: " . strtoupper($request->wants_document) . "]";
+            $message .= "\n\n[Wants to request a document: " . strtoupper($request->wants_document) . "]";
         }
 
         $inquiry = Inquiry::create([

@@ -20,8 +20,7 @@
                 background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
                 -webkit-text-fill-color: transparent; animation: shimmer 4s linear infinite;
             }
-            .reveal { opacity:0; transform:translateY(40px); transition: all 1.2s cubic-bezier(0.22,1,0.36,1); }
-            .reveal.active { opacity:1; transform:translateY(0); }
+
         </style>
     </x-slot>
 
@@ -31,13 +30,13 @@
         <div style="position:absolute;width:520px;height:520px;border-radius:50%;border:1px solid rgba(245,197,24,0.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin-slow 60s linear infinite;pointer-events:none;"></div>
         <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,197,24,0.4),transparent);"></div>
         <div style="position:relative;z-index:10;max-width:600px;margin:0 auto;">
-            <div style="font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:rgba(245,197,24,0.8);margin-bottom:18px;">Stewardship &amp; Giving</div>
+            <div class="animate-fade-in-down" style="font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:rgba(245,197,24,0.8);margin-bottom:18px;">Stewardship &amp; Giving</div>
             <div class="font-cinzel" style="color:var(--gold);font-size:1.35rem;opacity:.65;margin-bottom:16px;text-shadow:0 0 20px rgba(245,197,24,0.5);">✝</div>
-            <h1 class="font-heading" style="font-weight:700;font-style:italic;font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.05;color:#fff;letter-spacing:-0.02em;margin-bottom:16px;">
+            <h1 class="font-heading animate-fade-in-up" style="font-weight:700;font-style:italic;font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.05;color:#fff;letter-spacing:-0.02em;margin-bottom:16px; animation-delay: 0.2s;">
                 Support <em class="hero-accent">Our Parish</em>
             </h1>
             <div style="width:56px;height:1px;margin:0 auto 20px;background:linear-gradient(90deg,transparent,rgba(245,197,24,0.65),transparent);"></div>
-            <p style="color:rgba(235,242,255,0.6);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.78;font-weight:300;">
+            <p class="animate-fade-in-up" style="color:rgba(235,242,255,0.6);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.78;font-weight:300; animation-delay: 0.3s;">
                 Your tithes and donations help us maintain our sacred space, support our<br class="hidden md:block"> community outreach programs, and continue our mission of spiritual service.
             </p>
         </div>
@@ -46,7 +45,7 @@
 
     {{-- ═══════════ MAIN ═══════════ --}}
     <div class="container py-16 mx-auto px-4 max-w-4xl" x-data="{ copiedG: false, copiedM: false }">
-        <div class="grid md:grid-cols-2 gap-8 items-start reveal">
+        <div class="grid md:grid-cols-2 gap-8 items-start reveal reveal-up">
 
             {{-- ── QR Card ── --}}
             <div style="background:#fff;border-radius:2.5rem;border:1px solid rgba(26,64,128,0.12);box-shadow:0 20px 60px rgba(13,42,82,0.10);padding:2rem;position:sticky;top:6rem;overflow:hidden;" class="group">
@@ -169,12 +168,5 @@
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const obs = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('active'); obs.unobserve(e.target); } });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-    });
-    </script>
+
 </x-public-layout>

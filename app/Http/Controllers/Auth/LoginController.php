@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -20,11 +22,23 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
+        $key = 'login:' . Str::lower($request->email) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            return back()->withErrors([
+                'email' => "Too many failed login attempts. Please try again in {$seconds} seconds.",
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            RateLimiter::clear($key);
             $request->session()->regenerate();
 
             return redirect()->intended('/admin/dashboard');
         }
+
+        RateLimiter::hit($key, 300);
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',

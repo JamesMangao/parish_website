@@ -33,10 +33,10 @@ Route::get('/track-intention/{refId}', [TrackController::class, 'showStatus'])->
 // Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
 
 Route::get('/submit-intention', [IntentionController::class, 'create'])->name('submit-intention');
-Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:5,1');
+Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:submissions');
 
 Route::get('/inquiry', [InquiryController::class, 'create'])->name('inquiry');
-Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('throttle:5,1')->name('inquiry.store');
+Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('throttle:submissions')->name('inquiry.store');
 
 Route::get('/events', [EventsController::class, 'publicIndex'])->name('events');
 Route::get('/events/{event}', [EventsController::class, 'publicShow'])->name('events.show');
@@ -44,17 +44,19 @@ Route::get('/gallery', [GalleryController::class, 'publicIndex'])->name('gallery
 Route::get('/gallery/{album}', [GalleryController::class, 'publicAlbum'])->name('gallery.album');
 
 // API Proxies
-Route::post('/api/chatbot', [ChatbotController::class, 'chat'])->middleware('throttle:10,1');
-Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
-Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
+Route::middleware('throttle:chat')->group(function () {
+    Route::post('/api/chatbot', [ChatbotController::class, 'chat']);
+    Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
+    Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
+});
 
 Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:auth');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'throttle:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/notifications/count', [AdminController::class, 'getNotifications'])->name('admin.notifications.count');
 
@@ -66,6 +68,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/google/auth', function () {
             $client = new \Google\Client();
+            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
             $client->setAuthConfig(storage_path('app/google_oauth_client.json'));
             $client->addScope('https://www.googleapis.com/auth/presentations');
             $client->addScope('https://www.googleapis.com/auth/drive');
@@ -86,6 +89,7 @@ Route::middleware('auth')->group(function () {
             }
 
             $client = new \Google\Client();
+            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
             $client->setAuthConfig(storage_path('app/google_oauth_client.json'));
             $client->setRedirectUri(url('/google/callback'));
             $token = $client->fetchAccessTokenWithAuthCode($request->get('code'));

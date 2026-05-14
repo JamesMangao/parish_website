@@ -42,8 +42,7 @@
         .delay-1 { animation-delay: 0.15s; }
         .delay-2 { animation-delay: 0.30s; }
 
-        .reveal { opacity:0; transform:translateY(40px); transition: all 1.2s cubic-bezier(0.22,1,0.36,1); }
-        .reveal.active { opacity:1; transform:translateY(0); }
+
 
         /* ── Hero ── */
         .page-hero {
@@ -397,14 +396,6 @@
          style="background:linear-gradient(90deg,transparent,rgba(245,197,24,0.25),transparent);"></div>
 </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const obs = new IntersectionObserver(
-        entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('active'); obs.unobserve(e.target); } }),
-        { threshold: 0.10, rootMargin: '0px 0px -40px 0px' }
-    );
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-});
-</script>
+
 
 </x-public-layout>

@@ -53,6 +53,40 @@
             --cream: #FDFBF5;
         }
 
+        /* ── ENTRANCE ANIMATIONS ── */
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-in-down { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .animate-fade-in { animation: fade-in 0.8s ease-out forwards; }
+        .animate-fade-in-up { animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in-down { animation: fade-in-down 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Scroll Reveal System */
+        .reveal { opacity: 0; transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; }
+        .reveal.reveal-up { transform: translateY(50px); }
+        .reveal.reveal-down { transform: translateY(-50px); }
+        .reveal.reveal-left { transform: translateX(-50px); }
+        .reveal.reveal-right { transform: translateX(50px); }
+        .reveal.active { opacity: 1 !important; transform: translate(0, 0) scale(1) !important; }
+
+        /* Staggered children reveal */
+        .reveal-stagger > * {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-stagger.active > * {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-stagger.active > *:nth-child(1) { transition-delay: 0.1s; }
+        .reveal-stagger.active > *:nth-child(2) { transition-delay: 0.2s; }
+        .reveal-stagger.active > *:nth-child(3) { transition-delay: 0.3s; }
+        .reveal-stagger.active > *:nth-child(4) { transition-delay: 0.4s; }
+        .reveal-stagger.active > *:nth-child(5) { transition-delay: 0.5s; }
+        .reveal-stagger.active > *:nth-child(6) { transition-delay: 0.6s; }
+
         [x-cloak] { display: none !important; }
         
         @keyframes pageFadeIn {
@@ -249,6 +283,8 @@
             .max-w-5xl { max-width: 1100px !important; }
             .max-w-\[1200px\] { max-width: 1280px !important; }
 
+
+
             /* ── Quick Actions cards – tighter padding ── */
             .card-sacred { padding: 1.75rem !important; }
             .quick-actions-grid { gap: 1.25rem !important; }
@@ -386,5 +422,26 @@
             </div>
         </template>
     </div>
+
+    <script>
+        // Entrance Animations Reveal System
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal, .reveal-stagger');
+            revealElements.forEach(el => revealObserver.observe(el));
+        });
+    </script>
 </body>
 </html>

@@ -145,6 +145,9 @@ class AdminController extends Controller
         }
 
         $objPHPPresentation = new PhpPresentation();
+        $oLayout = new \PhpOffice\PhpPresentation\DocumentLayout();
+        $oLayout->setDocumentLayout(\PhpOffice\PhpPresentation\DocumentLayout::LAYOUT_SCREEN_16X9);
+        $objPHPPresentation->getLayout()->setDocumentLayout($oLayout);
 
         foreach ($slidesData as $s) {
             $slide = $objPHPPresentation->createSlide();
@@ -154,9 +157,9 @@ class AdminController extends Controller
 
             if ($s['type'] === 'intro') {
                 $slide->createLineShape(20, 20, 930, 20)->getBorder()->getColor()->setARGB('FF000000');
-                $slide->createLineShape(20, 700, 930, 700)->getBorder()->getColor()->setARGB('FF000000');
-                $slide->createLineShape(20, 20, 20, 700)->getBorder()->getColor()->setARGB('FF000000');
-                $slide->createLineShape(930, 20, 930, 700)->getBorder()->getColor()->setARGB('FF000000');
+                $slide->createLineShape(20, 520, 930, 520)->getBorder()->getColor()->setARGB('FF000000');
+                $slide->createLineShape(20, 20, 20, 520)->getBorder()->getColor()->setARGB('FF000000');
+                $slide->createLineShape(930, 20, 930, 520)->getBorder()->getColor()->setARGB('FF000000');
 
                 $introText = $slide->createRichTextShape();
                 $introText->setHeight(300)->setWidth(800)
@@ -184,7 +187,7 @@ class AdminController extends Controller
                 $title->getFont()->setBold(true)->setSize(24)->setColor(new \PhpOffice\PhpPresentation\Style\Color('FFFFFFFF'));
 
                 $bodyShape = $slide->createRichTextShape();
-                $bodyShape->setHeight(600)->setWidth(850)
+                $bodyShape->setHeight(420)->setWidth(850)
                     ->setOffsetX($s['offsetX'] ?? 50)
                     ->setOffsetY(($s['offsetY'] ?? 90) + 10);
 
@@ -292,8 +295,8 @@ class AdminController extends Controller
                     'items' => $chunk->map(function ($i) {
                         return [
                             'id' => $i->id,
-                            'name' => strtoupper($i->full_name),
-                            'description' => $i->raw_message
+                            'name' => strtoupper($i->raw_message),
+                            'description' => null
                         ];
                     })->values()->toArray()
                 ];
@@ -351,6 +354,7 @@ class AdminController extends Controller
 
         try {
             $client = new \Google\Client();
+            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
             $client->setAuthConfig($oauthConfigPath);
             $client->addScope('https://www.googleapis.com/auth/presentations');
             $client->addScope('https://www.googleapis.com/auth/drive');

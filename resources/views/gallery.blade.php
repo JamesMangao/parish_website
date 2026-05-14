@@ -42,11 +42,7 @@
             transform: translateY(-3px);
         }
 
-        .reveal {
-            opacity: 0; transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+
 
         @keyframes shimmer {
             0%   { background-position: -200% center; }
