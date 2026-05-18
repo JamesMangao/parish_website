@@ -15,6 +15,7 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\TrackController;
+use App\Http\Controllers\DailyReadingController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -49,6 +50,8 @@ Route::middleware('throttle:chat')->group(function () {
     Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
     Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
 });
+
+Route::get('/api/readings/today', DailyReadingController::class);
 
 Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:auth');

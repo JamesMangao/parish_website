@@ -492,6 +492,157 @@
 
 
 {{-- ═══════════════════════════════════════════════════ --}}
+{{-- READINGS OF THE DAY --}}
+<section class="py-24 bg-[var(--cream)] reveal reveal-up section-pad-mobile section-pad-tablet">
+    <div class="max-w-5xl mx-auto px-6 section-px-mobile">
+        <div id="daily-readings-widget"
+             class="card-sacred overflow-hidden"
+             data-readings-url="/api/readings/today"
+             style="box-shadow:0 12px 50px rgba(13,42,82,0.08);">
+            <div class="px-6 md:px-8 py-7"
+                 style="background:linear-gradient(135deg,#FFFFFF 0%,#F0F5FF 100%); border-bottom:1px solid rgba(26,64,128,0.08);">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <span style="display:inline-block; width:34px; height:1px; background:linear-gradient(90deg,transparent,rgba(245,197,24,0.75));"></span>
+                            <span class="eyebrow" style="color:#C9A200;">READINGS OF THE DAY</span>
+                        </div>
+                        <h2 class="font-heading font-bold italic"
+                            data-reading-title
+                            style="font-size:clamp(2rem,4vw,3.2rem); line-height:1.05; color:var(--blue-deep);">
+                            Daily Mass Readings
+                        </h2>
+                        <p data-reading-date
+                           style="font-size:13px; color:rgba(13,42,82,0.48); margin-top:8px;">
+                            Loading today&rsquo;s readings...
+                        </p>
+                    </div>
+
+                    <div class="flex-shrink-0"
+                         style="display:flex !important; flex-direction:row !important; align-items:center; background:rgba(26,64,128,0.05); border:1px solid rgba(26,64,128,0.08); border-radius:999px; padding:4px; width:140px; height:40px; box-shadow:0 6px 20px rgba(13,42,82,0.04);">
+                        <button type="button"
+                                data-reading-tab="EN"
+                                class="reading-tab active"
+                                style="flex:1; border:0; border-radius:999px; height:100%; font-size:11px; font-weight:800; letter-spacing:0.12em; color:var(--blue-deep); background:var(--gold); transition:all 0.3s ease; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center;"
+                                onmouseover="if(!this.classList.contains('active')) { this.style.background='rgba(26,64,128,0.05)'; this.style.color='var(--blue-deep)'; }"
+                                onmouseout="if(!this.classList.contains('active')) { this.style.background='transparent'; this.style.color='rgba(13,42,82,0.55)'; }">
+                            EN
+                        </button>
+                        <button type="button"
+                                data-reading-tab="TG"
+                                class="reading-tab"
+                                style="flex:1; border:0; border-radius:999px; height:100%; font-size:11px; font-weight:800; letter-spacing:0.12em; color:rgba(13,42,82,0.55); background:transparent; transition:all 0.3s ease; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center;"
+                                onmouseover="if(!this.classList.contains('active')) { this.style.background='rgba(26,64,128,0.05)'; this.style.color='var(--blue-deep)'; }"
+                                onmouseout="if(!this.classList.contains('active')) { this.style.background='transparent'; this.style.color='rgba(13,42,82,0.55)'; }">
+                            FIL
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 md:px-8 py-8">
+                <div data-reading-status
+                     style="font-size:14px; color:rgba(13,42,82,0.55);">
+                    Fetching readings...
+                </div>
+                <div data-reading-content class="grid gap-5" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(() => {
+    const widget = document.getElementById('daily-readings-widget');
+    if (!widget) return;
+
+    const tabs = [...widget.querySelectorAll('[data-reading-tab]')];
+    const title = widget.querySelector('[data-reading-title]');
+    const date = widget.querySelector('[data-reading-date]');
+    const status = widget.querySelector('[data-reading-status]');
+    const content = widget.querySelector('[data-reading-content]');
+    const cache = {};
+    let active = 'EN';
+
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    }[char]));
+
+    const setTabs = lang => tabs.forEach(tab => {
+        const isActive = tab.dataset.readingTab === lang;
+        tab.classList.toggle('active', isActive);
+        tab.style.background = isActive ? 'var(--gold)' : 'transparent';
+        tab.style.color = isActive ? 'var(--blue-deep)' : 'rgba(13,42,82,0.55)';
+    });
+
+    const normalize = data => {
+        const readings = data?.readings || data?.data?.readings || [];
+        const liturgy = data?.liturgic_title || data?.data?.liturgic_title || data?.title || 'Daily Mass Readings';
+        const displayDate = data?.date_displayed || data?.data?.date_displayed || data?.date || new Date().toLocaleDateString();
+
+        return {
+            title: liturgy,
+            date: displayDate,
+            readings: readings.map(item => ({
+                type: item.type || item.kind || item.title || 'Reading',
+                reference: item.reference || item.ref || '',
+                text: item.text || item.content || item.reading || ''
+            })).filter(item => item.text || item.reference)
+        };
+    };
+
+    const render = payload => {
+        const data = normalize(payload);
+        title.textContent = data.title;
+        date.textContent = data.date;
+        status.style.display = data.readings.length ? 'none' : 'block';
+        status.textContent = data.readings.length ? '' : 'No readings available today.';
+        content.style.display = data.readings.length ? 'grid' : 'none';
+        content.innerHTML = data.readings.map(item => `
+            <article class="rounded-2xl p-5"
+                     style="background:#FFFFFF; border:1px solid rgba(26,64,128,0.09);">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+                    <h3 class="font-cinzel"
+                        style="font-size:12px; letter-spacing:0.22em; color:#C9A200; font-weight:700; text-transform:uppercase;">
+                        ${esc(item.type)}
+                    </h3>
+                    ${item.reference ? `<span style="font-size:12px; color:rgba(13,42,82,0.45);">${esc(item.reference)}</span>` : ''}
+                </div>
+                <p style="font-size:15px; line-height:1.85; color:rgba(13,42,82,0.72); white-space:pre-line;">
+                    ${esc(item.text)}
+                </p>
+            </article>
+        `).join('');
+    };
+
+    const load = async lang => {
+        active = lang;
+        setTabs(lang);
+        status.style.display = 'block';
+        status.textContent = 'Fetching readings...';
+        content.style.display = 'none';
+
+        try {
+            if (!cache[lang]) {
+                const response = await fetch(`${widget.dataset.readingsUrl}?language=${lang}`, {
+                    headers: { Accept: 'application/json' }
+                });
+                if (!response.ok) throw new Error('Readings unavailable');
+                cache[lang] = await response.json();
+            }
+            if (active === lang) render(cache[lang]);
+        } catch (error) {
+            status.textContent = 'Readings unavailable. Please try again later.';
+        }
+    };
+
+    tabs.forEach(tab => tab.addEventListener('click', () => load(tab.dataset.readingTab)));
+    load(active);
+})();
+</script>
+
+
+{{-- ═══════════════════════════════════════════════════ --}}
 {{-- QUICK ACTIONS                                      --}}
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="py-32 bg-[var(--cream)] reveal reveal-up section-pad-mobile section-pad-tablet">
