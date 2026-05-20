@@ -34,29 +34,7 @@ class AIService
             ]);
         }
 
-        // Try Groq First
-        if ($this->groqKey) {
-            try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->groqKey,
-                    'Content-Type' => 'application/json',
-                ])->withOptions(['verify' => false])->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'llama-3.1-8b-instant',
-                    'messages' => $messages,
-                    'temperature' => 0.7,
-                ]);
-
-                if ($response->successful()) {
-                    return $response->json()['choices'][0]['message']['content'];
-                }
-                
-                Log::warning('Groq API failed: ' . $response->body());
-            } catch (\Exception $e) {
-                Log::error('Groq connection error: ' . $e->getMessage());
-            }
-        }
-
-        // Fallback to OpenRouter
+        // Try OpenRouter First (Better for long token outputs)
         if ($this->openRouterKey) {
             try {
                 $response = Http::withHeaders([
@@ -65,8 +43,9 @@ class AIService
                     'X-Title' => config('app.name'),
                     'Content-Type' => 'application/json',
                 ])->withOptions(['verify' => false])->post('https://openrouter.ai/api/v1/chat/completions', [
-                    'model' => 'google/gemma-2-9b-it:free',
+                    'model' => 'google/gemini-2.0-flash-lite-preview-02-05:free',
                     'messages' => $messages,
+                    'max_tokens' => 4000,
                 ]);
 
                 if ($response->successful()) {
@@ -76,6 +55,29 @@ class AIService
                 Log::warning('OpenRouter API failed: ' . $response->body());
             } catch (\Exception $e) {
                 Log::error('OpenRouter connection error: ' . $e->getMessage());
+            }
+        }
+
+        // Fallback to Groq
+        if ($this->groqKey) {
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $this->groqKey,
+                    'Content-Type' => 'application/json',
+                ])->withOptions(['verify' => false])->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => 'llama-3.1-8b-instant',
+                    'messages' => $messages,
+                    'temperature' => 0.7,
+                    'max_tokens' => 2000,
+                ]);
+
+                if ($response->successful()) {
+                    return $response->json()['choices'][0]['message']['content'];
+                }
+                
+                Log::warning('Groq API failed: ' . $response->body());
+            } catch (\Exception $e) {
+                Log::error('Groq connection error: ' . $e->getMessage());
             }
         }
 
