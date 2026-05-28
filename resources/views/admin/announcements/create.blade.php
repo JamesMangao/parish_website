@@ -1,8 +1,8 @@
 <x-admin-form 
     title="Create Announcement" 
     description="Post a new update or news item for the parish community."
-    backRoute="/admin/announcements"
-    action="/admin/announcements"
+    backRoute="/admin-portal/announcements"
+    action="/admin-portal/announcements"
     submitLabel="Post Announcement"
 >
     <div class="space-y-4">

@@ -35,7 +35,7 @@ class LoginController extends Controller
             RateLimiter::clear($key);
             $request->session()->regenerate();
 
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended('/admin-portal/dashboard');
         }
 
         RateLimiter::hit($key, 300);

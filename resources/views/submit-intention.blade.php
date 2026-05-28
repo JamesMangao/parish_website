@@ -522,7 +522,7 @@ function intentionForm() {
         formData: {
             fullName: '', email: '', intentionType: '',
             preferredDate: '', massTime: '', description: '',
-            paymentMethod: 'GCash'
+            paymentMethod: ''
         },
 
         init() {
@@ -590,7 +590,7 @@ function intentionForm() {
             this.formData = {
                 fullName:'', email:'', intentionType:'',
                 preferredDate:'', massTime:'', description:'',
-                paymentMethod:'GCash'
+                paymentMethod:''
             };
         }
     }

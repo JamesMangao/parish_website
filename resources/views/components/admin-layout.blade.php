@@ -64,33 +64,33 @@
             <nav class="flex-1 py-6 space-y-1 overflow-y-auto">
                 @php $role = Auth::user()->role ?? 'super_admin'; @endphp
 
-                <x-admin-nav-link href="/admin/dashboard" icon="layout-dashboard" label="Dashboard"
-                    :active="request()->is('admin/dashboard')" />
+                <x-admin-nav-link href="/admin-portal/dashboard" icon="layout-dashboard" label="Dashboard"
+                    :active="request()->is('admin-portal/dashboard')" />
 
                 @if($role === 'super_admin' || $role === 'staff')
-                    <x-admin-nav-link href="/admin/intentions" icon="heart" label="Mass Intentions"
-                        :active="request()->is('admin/intentions*')" />
+                    <x-admin-nav-link href="/admin-portal/intentions" icon="heart" label="Mass Intentions"
+                        :active="request()->is('admin-portal/intentions*')" />
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom' || $role === 'staff')
-                    <x-admin-nav-link href="/admin/inquiries" icon="message-square-quote" label="Inquiries"
-                        :active="request()->is('admin/inquiries*')" />
+                    <x-admin-nav-link href="/admin-portal/inquiries" icon="message-square-quote" label="Inquiries"
+                        :active="request()->is('admin-portal/inquiries*')" />
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom')
-                    <x-admin-nav-link href="/admin/schedules" icon="calendar" label="Schedules"
-                        :active="request()->is('admin/schedules*')" />
+                    <x-admin-nav-link href="/admin-portal/schedules" icon="calendar" label="Schedules"
+                        :active="request()->is('admin-portal/schedules*')" />
 
-                    <x-admin-nav-link href="/admin/announcements" icon="megaphone" label="Announcements"
-                        :active="request()->is('admin/announcements*')" />
-                    <x-admin-nav-link href="/admin/events" icon="sparkles" label="Events"
-                        :active="request()->is('admin/events*')" />
-                    <x-admin-nav-link href="/admin/gallery" icon="image" label="Gallery"
-                        :active="request()->is('admin/gallery*')" />
-                    <x-admin-nav-link href="/admin/highlights" icon="clapperboard" label="Video Highlights"
-                        :active="request()->is('admin/highlights*')" />
-                    <x-admin-nav-link href="/admin/chats" icon="messages-square" label="Live Chat"
-                        :active="request()->is('admin/chats*')" />
+                    <x-admin-nav-link href="/admin-portal/announcements" icon="megaphone" label="Announcements"
+                        :active="request()->is('admin-portal/announcements*')" />
+                    <x-admin-nav-link href="/admin-portal/events" icon="sparkles" label="Events"
+                        :active="request()->is('admin-portal/events*')" />
+                    <x-admin-nav-link href="/admin-portal/gallery" icon="image" label="Gallery"
+                        :active="request()->is('admin-portal/gallery*')" />
+                    <x-admin-nav-link href="/admin-portal/highlights" icon="clapperboard" label="Video Highlights"
+                        :active="request()->is('admin-portal/highlights*')" />
+                    <x-admin-nav-link href="/admin-portal/chats" icon="messages-square" label="Live Chat"
+                        :active="request()->is('admin-portal/chats*')" />
                 @endif
 
                 @if($role === 'super_admin')
@@ -98,12 +98,12 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-primary-foreground/40">System</p>
                     </div>
 
-                    <x-admin-nav-link href="/admin/users" icon="users" label="Users"
-                        :active="request()->is('admin/users*')" />
-                    <x-admin-nav-link href="/admin/logs" icon="scroll-text" label="Logs"
-                        :active="request()->is('admin/logs*')" />
-                    <x-admin-nav-link href="/admin/settings" icon="settings" label="Settings"
-                        :active="request()->is('admin/settings*')" />
+                    <x-admin-nav-link href="/admin-portal/users" icon="users" label="Users"
+                        :active="request()->is('admin-portal/users*')" />
+                    <x-admin-nav-link href="/admin-portal/logs" icon="scroll-text" label="Logs"
+                        :active="request()->is('admin-portal/logs*')" />
+                    <x-admin-nav-link href="/admin-portal/settings" icon="settings" label="Settings"
+                        :active="request()->is('admin-portal/settings*')" />
                 @endif
             </nav>
 
@@ -170,7 +170,7 @@
                                     <div class="p-4 text-center text-xs text-muted-foreground italic">No new notifications</div>
                                 </template>
                                 <template x-if="counts.intentions > 0">
-                                    <a href="/admin/intentions?status=pending" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                                    <a href="/admin-portal/intentions?status=pending" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
                                         <div class="h-8 w-8 rounded-full bg-accent/10 text-accent flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.505 4.04 3 5.5L12 21l7-7Z"/></svg>
                                         </div>
@@ -181,7 +181,7 @@
                                     </a>
                                 </template>
                                 <template x-if="counts.inquiries > 0">
-                                    <a href="/admin/inquiries" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                                    <a href="/admin-portal/inquiries" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
                                         <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
                                         </div>
@@ -192,7 +192,7 @@
                                     </a>
                                 </template>
                                 <template x-if="counts.chats > 0">
-                                    <a href="/admin/chats" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                                    <a href="/admin-portal/chats" class="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
                                         <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6 6-6"/><path d="m5 12 6 6 6-6"/></svg>
                                         </div>
@@ -204,7 +204,7 @@
                                 </template>
                             </div>
                             <div class="p-2 border-t bg-muted/10">
-                                <a href="/admin/dashboard" class="block w-full text-center py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">View All Activities</a>
+                                <a href="/admin-portal/dashboard" class="block w-full text-center py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">View All Activities</a>
                             </div>
                         </div>
                     </div>

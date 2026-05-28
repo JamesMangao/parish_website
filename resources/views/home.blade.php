@@ -35,6 +35,19 @@
         .card-event-featured{border:2px solid var(--gold);box-shadow:0 10px 30px rgba(245,197,24,.1);}
         .event-badge-today{position:absolute;top:-1px;left:-1px;background:#FFF9E6;border:1px solid var(--gold);border-top-left-radius:20px;border-bottom-right-radius:20px;padding:8px 18px;display:flex;align-items:center;gap:6px;}
 
+        /* Skeleton Loading Styles */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .45; }
+        }
+        .skeleton-pulse {
+            animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .skeleton-block {
+            background: rgba(26,64,128,.07);
+            border-radius: 4px;
+        }
+
         .reading-text{font-size:15px;line-height:1.85;color:rgba(13,42,82,.72);}
         .reading-card[data-reading-kind="salmong-tugunan"] .reading-response,
         .reading-card[data-reading-kind="salmong-tugunan"] .reading-marker{font-weight:800;color:rgba(13,42,82,.88);}
@@ -137,11 +150,6 @@
             @endforeach
         </div>
     </div>
-
-    <div style="position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;">
-        <span style="color:rgba(245,197,24,.45);font-size:11px;text-transform:uppercase;letter-spacing:.4em;">Scroll</span>
-        <div style="height:36px;width:1.5px;background:linear-gradient(to bottom,rgba(245,197,24,.6),transparent);"></div>
-    </div>
 </section>
 
 <section class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile"><br><br>
@@ -218,8 +226,8 @@
         </div>
 
         <a href="/mass-schedule" class="group relative flex flex-col items-center justify-center overflow-hidden mt-6 events-cta-banner" style="background:var(--blue-deep);text-decoration:none;padding:22px 24px;border-radius:0 0 24px 24px;display:flex;min-height:82px;" aria-label="View Full Mass Schedule">
-            <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:180%;width:auto;" aria-hidden="true">
-                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="226" height="107" style="height:70%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
+            <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
             <div class="flex items-center gap-2.5 mb-1.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M11 2v3M9 3h4"/></svg>
@@ -262,54 +270,26 @@
     const widget = document.getElementById('daily-readings-widget');
     if (!widget) return;
 
-    const tabs = [...widget.querySelectorAll('[data-reading-tab]')];
-    const title = widget.querySelector('[data-reading-title]');
-    const date = widget.querySelector('[data-reading-date]');
-    const status = widget.querySelector('[data-reading-status]');
+    const tabs    = [...widget.querySelectorAll('[data-reading-tab]')];
+    const title   = widget.querySelector('[data-reading-title]');
+    const date    = widget.querySelector('[data-reading-date]');
+    const status  = widget.querySelector('[data-reading-status]');
     const content = widget.querySelector('[data-reading-content]');
-    const cache = {};
-    let active = 'EN';
+    const cache   = {};
+    let active    = 'EN';
 
-    const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    }[char]));
+    const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+    }[c]));
 
-    const slug = value => String(value ?? '')
+    // FIX: slug must match exact controller type strings
+    // e.g. "Salmong Tugunan" → "salmong-tugunan", "Mabuting Balita" → "mabuting-balita"
+    const slug = v => String(v ?? '')
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
-
-    const normalizePsalmText = () => [
-        'R. Tanang mga kaharian,',
-        'ang Poong D’yos ay awitan.',
-        '',
-        'Dahil sa ’yo, yaong ulang masagana ay pumatak,',
-        'lupain mong natuyo na’y nanariwa at umunlad.',
-        'At doon mo pinatira yaong iyong mga lingkod,',
-        'ang mahirap nilang buhay sa biyaya ay pinuspos.',
-        '',
-        'R. Tanang mga kaharian,',
-        'ang Poong D’yos ay awitan.',
-        '',
-        'Purihin ang Panginoon, ang Diyos nating nagliligtas',
-        'at may dala araw-araw, ng pasanin nating hawak.',
-        'Ang ating Diyos ay isang Diyos na ang gawa ay magligtas,',
-        'ang Diyos ang Panginoon, Panginoon nating lahat!',
-        'Sa bingit ng kamataya’y hinahango tayo agad.',
-        '',
-        'R. Tanang mga kaharian,',
-        'ang Poong D’yos ay awitan.'
-    ].join('\n');
-
-    const normalizeAlleluiaText = () => [
-        'A. Aleluya! Aleluya!',
-        'Hihilingin ko sa Ama',
-        'Espiritu’y isugo n’ya',
-        'upang sumainyo t’wana.',
-        'A. Aleluya! Aleluya!'
-    ].join('\n');
 
     const renderReadingText = text => {
         let inResponse = false;
@@ -329,30 +309,19 @@
                     inResponse = false;
                     return `<div class="reading-line reading-line--or">${esc(line)}</div>`;
                 }
-
+                if (/^(Ang Mabuting Balita|Pagbasa mula sa|A reading from|The holy Gospel)/i.test(line)) {
+                    inResponse = false;
+                    return `<div class="reading-line reading-line--intro" style="font-weight:700;color:var(--blue-deep);margin-bottom:4px;">${esc(line)}</div>`;
+                }
                 const responseMatch = line.match(/^(R\.|A\.|Response:|Refrain:|Tugon:)\s*(.*)$/i);
-
                 if (responseMatch) {
                     inResponse = true;
                     const marker = /^(Response:|Refrain:|Tugon:)$/i.test(responseMatch[1]) ? 'R.' : responseMatch[1];
-
-                    return `
-                        <div class="reading-line--response">
-                            <span class="reading-marker">${esc(marker)}</span>
-                            <strong class="reading-response">${esc(responseMatch[2])}</strong>
-                        </div>
-                    `;
+                    return `<div class="reading-line--response"><span class="reading-marker">${esc(marker)}</span><strong class="reading-response">${esc(responseMatch[2])}</strong></div>`;
                 }
-
                 if (inResponse) {
-                    return `
-                        <div class="reading-line--response">
-                            <span class="reading-marker">&nbsp;</span>
-                            <strong class="reading-response">${esc(line)}</strong>
-                        </div>
-                    `;
+                    return `<div class="reading-line--response"><span class="reading-marker">&nbsp;</span><strong class="reading-response">${esc(line)}</strong></div>`;
                 }
-
                 return `<div class="reading-line">${esc(line)}</div>`;
             })
             .join('');
@@ -362,79 +331,113 @@
         const isActive = tab.dataset.readingTab === lang;
         tab.classList.toggle('active', isActive);
         tab.style.background = isActive ? 'var(--gold)' : 'transparent';
-        tab.style.color = isActive ? 'var(--blue-deep)' : 'rgba(13,42,82,0.55)';
+        tab.style.color      = isActive ? 'var(--blue-deep)' : 'rgba(13,42,82,0.55)';
     });
 
+    // FIX: normalize() no longer injects hardcoded psalm/alleluia text.
+    // Backend (DailyReadingController) is the single source of truth for reading content.
+    // Frontend only structures the data for display.
     const normalize = data => {
-        const readings = data?.readings || data?.data?.readings || [];
-        const liturgy = data?.liturgic_title || data?.data?.liturgic_title || data?.title || 'Daily Mass Readings';
-        const displayDate = data?.date_displayed || data?.data?.date_displayed || data?.date || new Date().toLocaleDateString();
+        const readings    = data?.readings || data?.data?.readings || [];
+        let liturgy       = data?.liturgic_title || data?.data?.liturgic_title || data?.title || 'Daily Mass Readings';
+        if (liturgy && typeof liturgy === 'string') liturgy = liturgy.split(' • ')[0];
+        const displayDate = data?.date_displayed || data?.data?.date_displayed || data?.date
+            || new Date().toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
         return {
             title: liturgy,
-            date: displayDate,
-            readings: readings.map(item => {
-                const type = item.type || item.kind || item.title || 'Reading';
-                const kind = slug(type);
-                let text = item.text || item.content || item.reading || '';
-
-                if (active === 'TG' && kind === 'salmong-tugunan') text = normalizePsalmText();
-                if (active === 'TG' && kind === 'aleluya') text = normalizeAlleluiaText();
-
-                return {
-                    type,
+            date:  displayDate,
+            readings: readings
+                .map(item => ({
+                    type:      item.type || item.kind || item.title || 'Reading',
                     reference: item.reference || item.ref || '',
-                    text
-                };
-            }).filter(item => item.text || item.reference)
+                    text:      item.text || item.content || item.reading || '',
+                    kind:      slug(item.type || item.kind || item.title || '')
+                }))
+                .filter(item => item.text || item.reference)
         };
     };
 
     const render = payload => {
         const data = normalize(payload);
-
         title.textContent = data.title;
-        date.textContent = data.date;
-        status.style.display = data.readings.length ? 'none' : 'block';
-        status.textContent = data.readings.length ? '' : 'No readings available today.';
-        content.style.display = data.readings.length ? 'grid' : 'none';
 
-        content.innerHTML = data.readings.map(item => {
-            const kind = slug(item.type);
+        if (payload?.is_fallback) {
+            date.innerHTML = `${esc(data.date)} <span style="display:inline-block;padding:2px 8px;font-size:10px;font-weight:700;color:#c27803;background:#fef3c7;border:1px solid #fcd34d;border-radius:999px;margin-left:8px;vertical-align:middle;text-transform:uppercase;letter-spacing:.05em;">Offline Fallback</span>`;
+        } else {
+            date.textContent = data.date;
+        }
 
-            return `
-                <article class="reading-card rounded-2xl p-5"
-                         data-reading-kind="${esc(kind)}"
-                         style="background:#fff;border:1px solid rgba(26,64,128,.09);">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
-                        <h3 class="font-cinzel" style="font-size:12px;letter-spacing:.22em;color:#C9A200;font-weight:700;text-transform:uppercase;">${esc(item.type)}</h3>
-                        ${item.reference ? `<span style="font-size:12px;color:rgba(13,42,82,.45);">${esc(item.reference)}</span>` : ''}
-                    </div>
-                    <div class="reading-text">${renderReadingText(item.text)}</div>
-                </article>
-            `;
-        }).join('');
+        if (!data.readings.length) {
+            status.style.display  = 'block';
+            status.textContent    = 'No readings available today.';
+            content.style.display = 'none';
+            return;
+        }
+
+        status.style.display  = 'none';
+        content.style.display = 'grid';
+        content.innerHTML     = data.readings.map(item => `
+            <article class="reading-card rounded-2xl p-5"
+                     data-reading-kind="${esc(item.kind)}"
+                     style="background:#fff;border:1px solid rgba(26,64,128,.09);">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+                    <h3 class="font-cinzel" style="font-size:12px;letter-spacing:.22em;color:#C9A200;font-weight:700;text-transform:uppercase;">${esc(item.type)}</h3>
+                    ${item.reference ? `<span style="font-size:12px;color:rgba(13,42,82,.45);">${esc(item.reference)}</span>` : ''}
+                </div>
+                <div class="reading-text">${renderReadingText(item.text)}</div>
+            </article>
+        `).join('');
     };
+
+    const getSkeletonHtml = () => `
+        <div class="grid gap-5 skeleton-pulse" style="width:100%;">
+            ${[['120px','100px',['100%','96%','90%','45%']],['140px','80px',['100%','92%','75%']]].map(([w1,w2,lines]) => `
+            <div class="rounded-2xl p-5" style="background:#fff;border:1px solid rgba(26,64,128,.06);display:flex;flex-direction:column;gap:12px;">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="skeleton-block" style="width:${w1};height:14px;"></div>
+                    <div class="skeleton-block" style="width:${w2};height:12px;"></div>
+                </div>
+                ${lines.map(w => `<div class="skeleton-block" style="width:${w};height:14px;"></div>`).join('')}
+            </div>`).join('')}
+        </div>`;
+
+    const getErrorHtml = () => `
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 16px;gap:18px;max-width:400px;margin:0 auto;">
+            <div class="rounded-full flex items-center justify-center" style="width:52px;height:52px;background:rgba(239,68,68,.08);color:#ef4444;border:1.5px solid rgba(239,68,68,.18);">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div>
+                <p class="font-heading font-bold italic" style="font-size:1.4rem;color:var(--blue-deep);margin-bottom:6px;">Readings Unavailable</p>
+                <p style="font-size:13.5px;color:rgba(13,42,82,.55);line-height:1.5;">We encountered an issue fetching today's readings. Please try again.</p>
+            </div>
+            <button type="button" data-reading-retry style="background:var(--blue-deep);color:#fff;border:0;border-radius:999px;padding:9px 28px;font-size:11.5px;font-weight:800;letter-spacing:.08em;cursor:pointer;transition:all .25s ease;box-shadow:0 6px 20px rgba(13,42,82,.15);">RETRY FETCH</button>
+        </div>`;
 
     const load = async lang => {
         active = lang;
         setTabs(lang);
-        status.style.display = 'block';
-        status.textContent = 'Fetching readings...';
+        status.style.display  = 'block';
+        status.innerHTML      = getSkeletonHtml();
         content.style.display = 'none';
 
         try {
             if (!cache[lang]) {
-                const response = await fetch(`${widget.dataset.readingsUrl}?language=${lang}`, {
+                const res = await fetch(`${widget.dataset.readingsUrl}?language=${lang}`, {
                     headers: { Accept: 'application/json' }
                 });
-                if (!response.ok) throw new Error('Readings unavailable');
-                cache[lang] = await response.json();
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                cache[lang] = await res.json();
             }
-
             if (active === lang) render(cache[lang]);
-        } catch (error) {
-            status.textContent = 'Readings unavailable. Please try refreshing the page or try again later.';
+        } catch (err) {
+            if (active === lang) {
+                status.innerHTML = getErrorHtml();
+                status.querySelector('[data-reading-retry]')?.addEventListener('click', () => {
+                    delete cache[lang];
+                    load(lang);
+                });
+            }
         }
     };
 
@@ -444,7 +447,7 @@
 </script>
 
 <section class="py-32 bg-[var(--cream)] reveal reveal-up section-pad-mobile section-pad-tablet">
-    <div class="max-w-[1200px] mx-auto px-6 section-px-mobile"><br><br><br>
+    <div class="max-w-[1200px] mx-auto px-6 section-px-mobile">
         <div class="text-center mb-16">
             <div class="divider-ornament mb-4"><span class="eyebrow">Quick Access</span></div>
             <h2 class="font-heading text-4xl md:text-5xl font-bold italic" style="color:var(--blue-deep);">How Can We Serve You?</h2>

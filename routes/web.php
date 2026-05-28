@@ -53,21 +53,24 @@ Route::middleware('throttle:chat')->group(function () {
 
 Route::get('/api/readings/today', DailyReadingController::class);
 
-Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:auth');
+Route::permanentRedirect('/admin', '/admin-portal/dashboard');
+Route::permanentRedirect('/admin/{path}', '/admin-portal/{path}')->where('path', '.*');
+
+Route::get('/admin-portal/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/admin-portal/login', [LoginController::class, 'login'])->middleware('throttle:auth');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 
 Route::middleware(['auth', 'throttle:admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/notifications/count', [AdminController::class, 'getNotifications'])->name('admin.notifications.count');
+    Route::get('/admin-portal/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin-portal/notifications/count', [AdminController::class, 'getNotifications'])->name('admin.notifications.count');
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
-        Route::post('/admin/generate-ppt', [AdminController::class, 'generatePPT']);
-        Route::get('/admin/preview-ppt', [AdminController::class, 'previewPPT'])->name('admin.preview-ppt');
-        Route::post('/admin/create-google-slides', [AdminController::class, 'createGoogleSlides'])->name('admin.create-google-slides');
+        Route::post('/admin-portal/generate-ppt', [AdminController::class, 'generatePPT']);
+        Route::get('/admin-portal/preview-ppt', [AdminController::class, 'previewPPT'])->name('admin.preview-ppt');
+        Route::post('/admin-portal/create-google-slides', [AdminController::class, 'createGoogleSlides'])->name('admin.create-google-slides');
 
         Route::get('/google/auth', function () {
             $client = new \Google\Client();
@@ -108,60 +111,60 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
 
     // Role: super_admin or staff
     Route::middleware('role:super_admin,staff')->group(function () {
-        Route::get('/admin/intentions', [AdminController::class, 'intentions'])->name('admin.intentions');
-        Route::get('/admin/intentions/create', [AdminController::class, 'createIntention'])->name('admin.intentions.create');
-        Route::get('/admin/intentions/{id}', [AdminController::class, 'showIntention'])->name('admin.intentions.show');
-        Route::post('/admin/intentions', [AdminController::class, 'storeIntention'])->name('admin.intentions.store');
-        Route::post('/admin/intentions/batch', [AdminController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
-        Route::post('/admin/intentions/{id}/status', [AdminController::class, 'updateStatus']);
+        Route::get('/admin-portal/intentions', [AdminController::class, 'intentions'])->name('admin.intentions');
+        Route::get('/admin-portal/intentions/create', [AdminController::class, 'createIntention'])->name('admin.intentions.create');
+        Route::get('/admin-portal/intentions/{id}', [AdminController::class, 'showIntention'])->name('admin.intentions.show');
+        Route::post('/admin-portal/intentions', [AdminController::class, 'storeIntention'])->name('admin.intentions.store');
+        Route::post('/admin-portal/intentions/batch', [AdminController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
+        Route::post('/admin-portal/intentions/{id}/status', [AdminController::class, 'updateStatus']);
     });
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
         // Inquiries
-        Route::get('/admin/inquiries', [InquiryController::class, 'index'])->name('admin.inquiries.index');
-        Route::get('/admin/inquiries/{id}', [InquiryController::class, 'show'])->name('admin.inquiries.show');
-        Route::post('/admin/inquiries/{id}/accept', [InquiryController::class, 'accept'])->name('admin.inquiries.accept');
-        Route::post('/admin/inquiries/{id}/decline', [InquiryController::class, 'decline'])->name('admin.inquiries.decline');
+        Route::get('/admin-portal/inquiries', [InquiryController::class, 'index'])->name('admin.inquiries.index');
+        Route::get('/admin-portal/inquiries/{id}', [InquiryController::class, 'show'])->name('admin.inquiries.show');
+        Route::post('/admin-portal/inquiries/{id}/accept', [InquiryController::class, 'accept'])->name('admin.inquiries.accept');
+        Route::post('/admin-portal/inquiries/{id}/decline', [InquiryController::class, 'decline'])->name('admin.inquiries.decline');
     });
 
     // Role: super_admin or soccom
     Route::middleware('role:super_admin,soccom')->group(function () {
-        Route::resource('/admin/schedules', ScheduleController::class)->names('admin.schedules');
-        Route::resource('/admin/announcements', AnnouncementController::class)->names('admin.announcements');
-        Route::resource('/admin/events', EventsController::class)->names('admin.events');
-        Route::resource('/admin/gallery', App\Http\Controllers\GalleryAlbumController::class)->names('admin.gallery');
-        Route::post('/admin/gallery/{album}/add-images', [App\Http\Controllers\GalleryAlbumController::class, 'addImages'])->name('admin.gallery.add-images');
-        Route::delete('/admin/gallery/image/{image}', [App\Http\Controllers\GalleryAlbumController::class, 'removeImage'])->name('admin.gallery.remove-image');
+        Route::resource('/admin-portal/schedules', ScheduleController::class)->names('admin.schedules');
+        Route::resource('/admin-portal/announcements', AnnouncementController::class)->names('admin.announcements');
+        Route::resource('/admin-portal/events', EventsController::class)->names('admin.events');
+        Route::resource('/admin-portal/gallery', App\Http\Controllers\GalleryAlbumController::class)->names('admin.gallery');
+        Route::post('/admin-portal/gallery/{album}/add-images', [App\Http\Controllers\GalleryAlbumController::class, 'addImages'])->name('admin.gallery.add-images');
+        Route::delete('/admin-portal/gallery/image/{image}', [App\Http\Controllers\GalleryAlbumController::class, 'removeImage'])->name('admin.gallery.remove-image');
 
         // Video Highlights (Standalone)
-        Route::resource('/admin/highlights', App\Http\Controllers\VideoHighlightController::class)->names('admin.highlights');
-        Route::post('/admin/highlights/reorder', [App\Http\Controllers\VideoHighlightController::class, 'reorder'])->name('admin.highlights.reorder');
+        Route::resource('/admin-portal/highlights', App\Http\Controllers\VideoHighlightController::class)->names('admin.highlights');
+        Route::post('/admin-portal/highlights/reorder', [App\Http\Controllers\VideoHighlightController::class, 'reorder'])->name('admin.highlights.reorder');
 
-        // Route::get('/admin/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
-        // Route::post('/admin/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
-        // Route::delete('/admin/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
+        // Route::get('/admin-portal/bulletins', [BulletinController::class, 'adminIndex'])->name('admin.bulletins.index');
+        // Route::post('/admin-portal/bulletins', [BulletinController::class, 'store'])->name('admin.bulletins.store');
+        // Route::delete('/admin-portal/bulletins/{bulletin}', [BulletinController::class, 'destroy'])->name('admin.bulletins.destroy');
 
         // Live Chat Admin
-        Route::get('/admin/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');
-        Route::get('/admin/chats/{id}', [ChatbotController::class, 'adminShow'])->name('admin.chats.show');
-        Route::post('/admin/chats/{id}/reply', [ChatbotController::class, 'adminReply'])->name('admin.chats.reply');
-        Route::post('/admin/chats/{id}/resolve', [ChatbotController::class, 'resolve'])->name('admin.chats.resolve');
-        Route::post('/admin/chats/{id}/pause', [ChatbotController::class, 'pause'])->name('admin.chats.pause');
-        Route::post('/admin/chats/{id}/resume', [ChatbotController::class, 'resume'])->name('admin.chats.resume');
-        Route::get('/admin/chats/{id}/poll', [ChatbotController::class, 'adminPoll'])->name('admin.chats.poll');
-        Route::post('/admin/chats/{id}/typing', [ChatbotController::class, 'adminTyping'])->name('admin.chats.typing');
+        Route::get('/admin-portal/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');
+        Route::get('/admin-portal/chats/{id}', [ChatbotController::class, 'adminShow'])->name('admin.chats.show');
+        Route::post('/admin-portal/chats/{id}/reply', [ChatbotController::class, 'adminReply'])->name('admin.chats.reply');
+        Route::post('/admin-portal/chats/{id}/resolve', [ChatbotController::class, 'resolve'])->name('admin.chats.resolve');
+        Route::post('/admin-portal/chats/{id}/pause', [ChatbotController::class, 'pause'])->name('admin.chats.pause');
+        Route::post('/admin-portal/chats/{id}/resume', [ChatbotController::class, 'resume'])->name('admin.chats.resume');
+        Route::get('/admin-portal/chats/{id}/poll', [ChatbotController::class, 'adminPoll'])->name('admin.chats.poll');
+        Route::post('/admin-portal/chats/{id}/typing', [ChatbotController::class, 'adminTyping'])->name('admin.chats.typing');
     });
 
 
     // Role: super_admin only
     Route::middleware('role:super_admin')->group(function () {
-        Route::get('/admin/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users');
-        Route::post('/admin/users', [\App\Http\Controllers\UserController::class, 'store'])->name('admin.users.store');
-        Route::put('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/admin/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('admin.users.destroy');
-        Route::get('/admin/logs', [AdminController::class, 'logs'])->name('admin.logs');
-        Route::get('/admin/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings');
-        Route::post('/admin/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
+        Route::get('/admin-portal/users', [\App\Http\Controllers\UserController::class, 'index'])->name('admin.users');
+        Route::post('/admin-portal/users', [\App\Http\Controllers\UserController::class, 'store'])->name('admin.users.store');
+        Route::put('/admin-portal/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin-portal/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::get('/admin-portal/logs', [AdminController::class, 'logs'])->name('admin.logs');
+        Route::get('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings');
+        Route::post('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
     });
 });

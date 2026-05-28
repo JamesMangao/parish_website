@@ -1,5 +1,5 @@
 <x-admin-form title="Create Parish Event" description="Organize a new community activity or religious celebration."
-    backRoute="/admin/events" action="/admin/events" submitLabel="Create Event">
+    backRoute="/admin-portal/events" action="/admin-portal/events" submitLabel="Create Event">
     <div class="space-y-4">
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Event

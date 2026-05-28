@@ -1,8 +1,8 @@
 <x-admin-form 
     title="Edit Mass Schedule" 
     description="Update the details of an existing mass service."
-    backRoute="/admin/schedules"
-    action="/admin/schedules/{{ $schedule->id }}"
+    backRoute="/admin-portal/schedules"
+    action="/admin-portal/schedules/{{ $schedule->id }}"
     method="PUT"
     submitLabel="Update Schedule"
 >

@@ -2,7 +2,8 @@
     x-data="nav()"
     x-init="init()"
     @keydown.escape.window="closeAll()"
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+    style="padding-top: 8px; padding-bottom: 8px;">
 
     {{-- Scrolled background --}}
     <div class="absolute inset-0 transition-all duration-500 pointer-events-none shadow-sm"
@@ -13,32 +14,35 @@
 
     {{-- ── Top bar ── --}}
     <div class="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10
-                h-[64px] flex items-center justify-between gap-2">
+                h-[72px] flex items-center justify-between gap-2 pt-2">
 
-        {{-- Logo --}}
-        <a href="/" class="flex items-center gap-2.5 group flex-shrink-0">
-            <div class="relative w-8 h-8 flex items-center justify-center flex-shrink-0">
-                <div class="absolute inset-0 rounded-full border transition-colors duration-500"
-                     :style="scrolled ? 'border-color:rgba(8,20,45,0.2);' : 'border-color:rgba(245,197,24,0.5);'"></div>
-                <span class="text-base leading-none transition-colors duration-300"
-                      :class="scrolled ? 'text-[#08142D]' : 'text-white'"
-                      style="font-family:'Cinzel',Georgia,serif;">✝</span>
-            </div>
-            <div>
-                <div class="text-[15px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
-                     :class="scrolled ? 'text-[#08142D]' : 'text-white'"
-                     style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;">
-                    Sto. Rosario Parish
-                </div>
-                <div class="text-[9.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
-                     :class="scrolled ? 'text-[#08142D]/60' : 'text-white/60'">
-                    Pacita 1
-                </div>
-            </div>
-        </a>
+{{-- Logo (exact navy via mask; needs silhouette-friendly PNG) --}}
+<a href="/" class="flex items-start gap-2.5 group flex-shrink-0 pt-1">
+    <div class="relative w-8 h-8 flex items-center justify-center flex-shrink-0">
+        <span
+            class="w-8 h-8 transition-all duration-300"
+            :style="scrolled
+              ? `background:#08142D;-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`
+              : `background:#fff;-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`"
+            aria-label="Sto. Rosario Parish Logo"
+            role="img"
+        ></span>
+    </div>
+    <div>
+        <div class="text-[15px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
+            :style="`font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; color:${scrolled ? '#0B1F3B' : '#fff'};`">
+            Sto. Rosario Parish
+        </div>
+
+        <div class="text-[9.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
+            :style="`color:${scrolled ? 'rgba(11,31,59,0.6)' : 'rgba(255,255,255,0.6)'};`">
+            Pacita 1
+        </div>
+    </div>
+</a>
 
         {{-- Desktop links --}}
-        <div class="hidden md:flex items-center gap-1">
+        <div class="hidden md:flex items-center gap-1 self-center">
 
             {{-- Parish Services --}}
             <div class="relative"
@@ -182,7 +186,7 @@
 
         {{-- Hamburger --}}
         <button class="md:hidden w-10 h-10 flex items-center justify-center
-                       rounded-full transition-all duration-200 flex-shrink-0"
+                       rounded-full transition-all duration-200 flex-shrink-0 self-center"
                 :class="scrolled ? 'text-[#08142D] hover:bg-[#08142D]/5' : 'text-white hover:bg-white/10'"
                 @click="open = !open"
                 :aria-expanded="open"
@@ -202,10 +206,7 @@
         </button>
     </div>
 
-    {{-- ══════════════════════════════════════
-         MOBILE FULL-SCREEN DRAWER
-         Slides down from top, covers full viewport
-    ══════════════════════════════════════ --}}
+    {{-- MOBILE FULL-SCREEN DRAWER --}}
     <div x-show="open" x-cloak
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 -translate-y-3"
@@ -214,7 +215,7 @@
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-3"
          class="md:hidden fixed inset-0 z-40 flex flex-col"
-         style="top:64px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
+         style="top:72px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
                 -webkit-backdrop-filter:blur(24px);">
 
         {{-- Gold top rule --}}
@@ -400,7 +401,6 @@ document.addEventListener('alpine:init', () => {
             window.addEventListener('scroll', () => {
                 this.scrolled = window.scrollY > 80
             }, { passive: true })
-            // Close drawer on resize to desktop
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 768) this.open = false
             }, { passive: true })

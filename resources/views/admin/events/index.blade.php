@@ -1,5 +1,5 @@
 <x-admin-index title="Parish Events" description="Manage upcoming parish activities and celebrations."
-    createRoute="/admin/events/create" :headers="['Event Name', 'Date & Time', 'Status']">
+    createRoute="/admin-portal/events/create" :headers="['Event Name', 'Date & Time', 'Status']">
     @foreach($events as $e)
         <tr class="hover:bg-muted/20 transition-colors">
             <td class="px-6 py-4">
@@ -30,7 +30,7 @@
             </td>
             <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
-                    <a href="/admin/events/{{ $e->id }}/edit"
+                    <a href="/admin-portal/events/{{ $e->id }}/edit"
                         class="p-1.5 rounded-md border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -39,7 +39,7 @@
                             <path d="m15 5 4 4" />
                         </svg>
                     </a>
-                    <form :id="'delete-event-{{ $e->id }}'" action="/admin/events/{{ $e->id }}" method="POST">
+                    <form :id="'delete-event-{{ $e->id }}'" action="/admin-portal/events/{{ $e->id }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <button type="button" 

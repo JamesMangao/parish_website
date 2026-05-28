@@ -36,25 +36,33 @@ class AIService
 
         // Try OpenRouter First (Better for long token outputs)
         if ($this->openRouterKey) {
-            try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->openRouterKey,
-                    'HTTP-Referer' => config('app.url'),
-                    'X-Title' => config('app.name'),
-                    'Content-Type' => 'application/json',
-                ])->withOptions(['verify' => false])->post('https://openrouter.ai/api/v1/chat/completions', [
-                    'model' => 'google/gemini-2.0-flash-lite-preview-02-05:free',
-                    'messages' => $messages,
-                    'max_tokens' => 4000,
-                ]);
+            $openRouterModels = [
+                'google/gemini-2.0-flash-lite-001',
+                'google/gemini-2.5-flash-lite',
+                'google/gemini-3.1-flash-lite'
+            ];
 
-                if ($response->successful()) {
-                    return $response->json()['choices'][0]['message']['content'];
+            foreach ($openRouterModels as $model) {
+                try {
+                    $response = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $this->openRouterKey,
+                        'HTTP-Referer' => config('app.url'),
+                        'X-Title' => config('app.name'),
+                        'Content-Type' => 'application/json',
+                    ])->withOptions(['verify' => false])->post('https://openrouter.ai/api/v1/chat/completions', [
+                        'model' => $model,
+                        'messages' => $messages,
+                        'max_tokens' => 4000,
+                    ]);
+
+                    if ($response->successful()) {
+                        return $response->json()['choices'][0]['message']['content'];
+                    }
+                    
+                    Log::warning("OpenRouter API failed for model {$model}: " . $response->body());
+                } catch (\Exception $e) {
+                    Log::error("OpenRouter connection error for model {$model}: " . $e->getMessage());
                 }
-                
-                Log::warning('OpenRouter API failed: ' . $response->body());
-            } catch (\Exception $e) {
-                Log::error('OpenRouter connection error: ' . $e->getMessage());
             }
         }
 

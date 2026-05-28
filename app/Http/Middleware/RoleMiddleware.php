@@ -19,12 +19,12 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!auth()->check()) {
-            return redirect('/admin/login');
+            return redirect('/admin-portal/login');
         }
 
         if (!auth()->user()->is_active) {
             auth()->logout();
-            return redirect('/admin/login')->withErrors(['email' => 'Your account has been deactivated.']);
+            return redirect('/admin-portal/login')->withErrors(['email' => 'Your account has been deactivated.']);
         }
 
         if (!in_array(auth()->user()->role, $roles)) {

@@ -9,7 +9,7 @@
                 
                 async fetchPreview() {
                     try {
-                        const response = await fetch('/admin/preview-ppt');
+                        const response = await fetch('/admin-portal/preview-ppt');
                         if (!response.ok) throw new Error('Failed to fetch');
                         const data = await response.json();
                         
@@ -28,7 +28,7 @@
                 },
                 async generateFinal() {
                     try {
-                        const response = await fetch('/admin/generate-ppt', {
+                        const response = await fetch('/admin-portal/generate-ppt', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -103,7 +103,7 @@
                     this.creatingSlides = true;
 
                     try {
-                        const response = await fetch('/admin/create-google-slides', {
+                        const response = await fetch('/admin-portal/create-google-slides', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -509,7 +509,7 @@
             <h2 class="font-heading text-xl font-bold text-primary mb-6">Quick Actions</h2>
             <div class="grid gap-4 md:grid-cols-3">
                 @if($role === 'super_admin' || $role === 'staff')
-                    <a href="/admin/intentions"
+                    <a href="/admin-portal/intentions"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div
                             class="h-10 w-10 flex items-center justify-center rounded-full bg-accent text-accent-foreground">
@@ -525,7 +525,7 @@
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom')
-                    <a href="/admin/schedules"
+                    <a href="/admin-portal/schedules"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div class="h-10 w-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -539,7 +539,7 @@
                         </div>
                         <div class="text-sm font-bold text-primary">Manage Schedules</div>
                     </a>
-                    <a href="/admin/gallery"
+                    <a href="/admin-portal/gallery"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100 text-green-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -552,7 +552,7 @@
                         </div>
                         <div class="text-sm font-bold text-primary">Parish Gallery</div>
                     </a>
-                    <a href="/admin/events"
+                    <a href="/admin-portal/events"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div class="h-10 w-10 flex items-center justify-center rounded-full bg-amber-100 text-amber-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"

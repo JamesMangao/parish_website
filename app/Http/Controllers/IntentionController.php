@@ -32,6 +32,10 @@ class IntentionController extends Controller
         $count = MassIntention::whereYear('created_at', $year)->count() + 1;
         $refNumber = 'SRP-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
 
+        $paymentMethod = filled($validated['paymentMethod'] ?? null)
+            ? $validated['paymentMethod']
+            : null;
+
         $intention = MassIntention::create([
             'reference_number' => $refNumber,
             'full_name' => $validated['fullName'],
@@ -41,7 +45,7 @@ class IntentionController extends Controller
             'preferred_date' => $validated['preferredDate'],
             'mass_time' => $validated['massTime'],
             'status' => 'pending',
-            'payment_method' => $validated['paymentMethod'],
+            'payment_method' => $paymentMethod,
         ]);
 
         // Send confirmation email

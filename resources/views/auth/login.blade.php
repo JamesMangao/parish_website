@@ -26,7 +26,7 @@
         <div class="bg-card/95 backdrop-blur-lg rounded-2xl border p-8 shadow-2xl">
             <h2 class="font-heading text-xl font-bold text-primary mb-6">Staff Login</h2>
             
-            <form method="POST" action="/admin/login" class="space-y-5">
+            <form method="POST" action="/admin-portal/login" class="space-y-5">
                 @csrf
                 <div class="space-y-2">
                     <label class="text-sm font-bold text-primary" for="email">Email Address</label>

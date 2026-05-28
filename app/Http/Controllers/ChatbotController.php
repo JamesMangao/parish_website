@@ -8,6 +8,8 @@ use App\Services\AIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use App\Http\Controllers\DailyReadingController;
+use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
 {
@@ -53,6 +55,51 @@ class ChatbotController extends Controller
             ]);
         }
 
+        // 3b. Smart Intent Interception: Daily Mass Readings
+        $lowerMessage = strtolower($userMessage);
+        $isReadingsRequest = preg_match('/\b(reading|readings|pagbasa|ewanghelyo|gospel)\b/i', $lowerMessage);
+
+        if ($isReadingsRequest) {
+            $initialLanguage = preg_match('/\b(pagbasa|ewanghelyo|tagalog|filipino|ngayon|bukas)\b/i', $lowerMessage) ? 'TG' : 'EN';
+            $date = now('Asia/Manila')->format('Ymd');
+
+            try {
+                $dailyReadingController = app(DailyReadingController::class);
+                
+                // Fetch both languages so UI can toggle
+                $readingDataEN = $dailyReadingController->getOrFetchReadings($date, 'EN');
+                $readingDataTG = $dailyReadingController->getOrFetchReadings($date, 'TG');
+
+                $intro = $initialLanguage === 'TG' 
+                    ? "Narito ang mga Pagbasa sa Araw na ito (" . $readingDataTG['date_displayed'] . "):"
+                    : "Here are the Daily Mass Readings for today (" . $readingDataEN['date_displayed'] . "):";
+
+                $aiMsg = ChatMessage::create([
+                    'chat_session_id' => $session->id,
+                    'sender' => 'ai',
+                    'message' => $intro,
+                ]);
+
+                $suggestions = $this->getDynamicSuggestions($userMessage, 'readings');
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => $intro,
+                    'id' => $aiMsg->id,
+                    'type' => 'readings_card',
+                    'readings' => $readingDataEN['readings'], // legacy fallback
+                    'readings_en' => $readingDataEN['readings'],
+                    'readings_tg' => $readingDataTG['readings'],
+                    'initial_lang' => $initialLanguage,
+                    'title_en' => $readingDataEN['title'],
+                    'title_tg' => $readingDataTG['title'],
+                    'suggestions' => $suggestions,
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Chatbot Readings Interception failed: " . $e->getMessage());
+            }
+        }
+
         // 4. AIService Response
         $history = $session->messages()
             ->latest()
@@ -74,10 +121,13 @@ class ChatbotController extends Controller
             'message' => $aiResponse,
         ]);
  
+        $suggestions = $this->getDynamicSuggestions($userMessage);
+
         return response()->json([
             'status' => 'success',
             'message' => $aiResponse,
             'id' => $aiMsg->id,
+            'suggestions' => $suggestions,
         ]);
     }
 
@@ -226,5 +276,60 @@ class ChatbotController extends Controller
                 'status' => 'active'
             ]
         );
+    }
+
+    /**
+     * Get dynamic, context-aware suggestions based on user query and topic.
+     */
+    protected function getDynamicSuggestions(string $message, string $detectedTopic = ''): array
+    {
+        $lower = strtolower($message);
+
+        if ($detectedTopic === 'readings' || Str::contains($lower, ['reading', 'readings', 'pagbasa', 'ewanghelyo', 'gospel'])) {
+            return [
+                '⛪ Mass Schedules',
+                '🕯️ Offer Mass Intention',
+                '📅 Upcoming Parish Events'
+            ];
+        }
+
+        if (Str::contains($lower, ['intention', 'alay', 'panalangin', 'offering'])) {
+            return [
+                '🔍 Track Intention Status',
+                '📝 Sacramental Inquiry',
+                '⛪ Mass Schedules'
+            ];
+        }
+
+        if (Str::contains($lower, ['mass', 'misa', 'schedule', 'oras', 'time'])) {
+            return [
+                '🕯️ Offer Mass Intention',
+                '📝 Sacramental Inquiry',
+                '📖 Today\'s Readings'
+            ];
+        }
+
+        if (Str::contains($lower, ['inquiry', 'sacrament', 'baptis', 'baptize', 'baptized', 'wedding', 'kasal', 'binyag', 'confirmation', 'kumpil', 'funeral'])) {
+            return [
+                '🔍 Check Inquiry Status',
+                'ℹ️ Office Hours & Address',
+                '🙏 Parish Donation Info'
+            ];
+        }
+
+        if (Str::contains($lower, ['donate', 'donation', 'ambag', 'tulong'])) {
+            return [
+                '⛪ Mass Schedules',
+                '📖 Today\'s Readings',
+                '🕯️ Offer Mass Intention'
+            ];
+        }
+
+        // Default follow-up suggestions
+        return [
+            '⛪ Mass Schedules',
+            '📖 Today\'s Readings',
+            '🕯️ Offer Mass Intention'
+        ];
     }
 }

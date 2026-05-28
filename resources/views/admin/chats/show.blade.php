@@ -117,7 +117,7 @@
                 input.addEventListener('input', function() {
                     if (typingTimeout) clearTimeout(typingTimeout);
                     typingTimeout = setTimeout(() => {
-                        fetch(`/admin/chats/${chatId}/typing`, {
+                        fetch(`/admin-portal/chats/${chatId}/typing`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': csrfToken,
@@ -132,7 +132,7 @@
             // Real-time Polling
             async function pollMessages() {
                 try {
-                    const response = await fetch(`/admin/chats/${chatId}/poll?last_id=${lastId}`);
+                    const response = await fetch(`/admin-portal/chats/${chatId}/poll?last_id=${lastId}`);
                     const data = await response.json();
 
                     if (data.messages && data.messages.length > 0) {

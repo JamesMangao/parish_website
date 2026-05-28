@@ -30,7 +30,6 @@
                     <a href="/track" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Track Submission</a>
                     <a href="/about" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">About Us</a>
                     <a href="/donate" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Donate</a>
-                    <a href="/admin/login" class="text-sm text-primary-foreground/40 hover:text-accent transition-colors">Admin Portal</a>
                 </div>
             </div>
             <div>
