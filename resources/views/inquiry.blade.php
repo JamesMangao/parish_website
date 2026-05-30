@@ -127,7 +127,7 @@
 
         /* Sacred Luxury Components */
         .sacred-confirm-card {
-            background: #FFFAF0; /* Ivory/Cream base */
+            background: #FFFAF0;
             border: 1px solid #E6D5B8;
             border-radius: 0.75rem;
             position: relative;
@@ -291,8 +291,7 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="py-20 max-w-[960px] mx-auto px-6 pb-32 md:pb-20">
 
-    {{-- Success alert --}}
-    {{-- Success Modal --}}
+    {{-- ── Success Modal ── --}}
     @if(session('reference_id'))
     <div x-data="{ 
             showModal: true, 
@@ -435,31 +434,40 @@
             getRequirements() {
                 return this.serviceRequirements[this.inquiryType] || [];
             },
-            // Temporary storage for Baptismal Request fields
             certData: {
                 name: '', birthdate: '', baptism: '', birthplace: '', contact: '',
                 father: '', mother: '', purpose: '', 
                 partner: '', weddingDate: '', weddingPlace: ''
             },
-            // Computed message for certificate/rites requests
             getCombinedMessage() {
                 if (!['Baptism', 'Baptismal Certificate'].includes(this.inquiryType)) return '';
-                let msg = `NAME: ${this.certData.name}\n`;
-                msg += `BIRTHDATE: ${this.certData.birthdate}\n`;
-                msg += `BAPTISM: ${this.certData.baptism}\n`;
-                msg += `PLACE OF BIRTH: ${this.certData.birthplace}\n`;
-                msg += `CONTACT: ${this.certData.contact}\n\n`;
-                msg += `FATHER: ${this.certData.father}\n`;
-                msg += `MOTHER: ${this.certData.mother}\n\n`;
-                msg += `PURPOSE: ${this.certData.purpose}\n`;
-                
+                let msg = 'NAME: ' + this.certData.name + '\n';
+                msg += 'BIRTHDATE: ' + this.certData.birthdate + '\n';
+                msg += 'BAPTISM: ' + this.certData.baptism + '\n';
+                msg += 'PLACE OF BIRTH: ' + this.certData.birthplace + '\n';
+                msg += 'CONTACT: ' + this.certData.contact + '\n\n';
+                msg += 'FATHER: ' + this.certData.father + '\n';
+                msg += 'MOTHER: ' + this.certData.mother + '\n\n';
+                msg += 'PURPOSE: ' + this.certData.purpose + '\n';
                 if (this.certData.purpose.toLowerCase().includes('marriage')) {
-                    msg += `\n(FOR MARRIAGE)\n`;
-                    msg += `NAME OF PARTNER: ${this.certData.partner}\n`;
-                    msg += `DATE OF WEDDING: ${this.certData.weddingDate}\n`;
-                    msg += `PLACE OF WEDDING: ${this.certData.weddingPlace}\n`;
+                    msg += '\n(FOR MARRIAGE)\n';
+                    msg += 'NAME OF PARTNER: ' + this.certData.partner + '\n';
+                    msg += 'DATE OF WEDDING: ' + this.certData.weddingDate + '\n';
+                    msg += 'PLACE OF WEDDING: ' + this.certData.weddingPlace + '\n';
                 }
                 return msg;
+            },
+            // FIX: validate before allowing submit
+            validateAndSubmit(e) {
+                if (['Baptism', 'Baptismal Certificate'].includes(this.inquiryType)) {
+                    const msg = this.getCombinedMessage().trim();
+                    if (!this.certData.name || !this.certData.father || !this.certData.mother || !this.certData.purpose) {
+                        e.preventDefault();
+                        alert('Please fill in all required fields (Name, Father, Mother, Purpose).');
+                        return;
+                    }
+                }
+                this.loading = true;
             }
         }">
 
@@ -470,7 +478,7 @@
                 </h3>
 
                 <form action="{{ route('inquiry.store') }}" method="POST"
-                      class="space-y-5" @submit="loading = true">
+                      class="space-y-5" @submit="validateAndSubmit($event)">
                     @csrf
 
                     {{-- Full Name --}}
@@ -535,61 +543,58 @@
                                 </div>
                             </div>
 
-                            {{-- Dynamic Requirements & Guidelines Box (HIDDEN for Baptism/Certificate as they have structured inputs) --}}
-                            <template x-if="inquiryType && !['Baptism','Baptismal Certificate'].includes(inquiryType) && inquiryType === 'Wedding'">
+                            {{-- Dynamic Requirements for Wedding --}}
+                            <template x-if="inquiryType === 'Wedding'">
                                 <div class="mt-4 space-y-4 animate-fade-down">
-                                    {{-- WEDDING SPECIFIC GUIDELINES --}}
-                                    <template x-if="inquiryType === 'Wedding'">
-                                        <div class="p-4 bg-[#FDFBF7] border border-[#E6D5B8]/50 rounded-2xl space-y-4">
-                                            <div>
-                                                <p class="text-[10px] font-bold uppercase tracking-wider text-[#B08D00] mb-2 flex items-center gap-2">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
-                                                    </svg>
-                                                    Wedding Requirements
-                                                </p>
-                                                <ul class="space-y-1.5 text-left text-[11px] text-blue-800/70">
-                                                    <li>1. Original Copy of Certificate of Baptism with "For Marriage Purpose" annotation</li>
-                                                    <li>2. Original Copy of Certificate of Confirmation with "For Marriage Purpose" annotation</li>
-                                                    <li>3. PSA-issued Birth Certificate</li>
-                                                    <li>4. PSA-issued Certificate of No Records of Marriage (Cenomar)</li>
-                                                    <li>5. Permit from the parish of the bride (if non-parishioner)</li>
-                                                    <li>6. Certificate of Legal Capacity to Marry (from Embassy, for non-Filipinos)</li>
-                                                    <li>7. Death Certificate & Marriage Contract of deceased spouse (for widows/widowers)</li>
-                                                    <li>8. Original Copy of Marriage License from respective municipalities</li>
-                                                    <li>9. NSO Certified True Copy of Civil Marriage Contract (if applicable)</li>
-                                                    <li>10. Affidavit of 5+ years cohabitation (if applicable)</li>
-                                                    <li>11. Wedding Fees to be settled one (1) week before the date</li>
-                                                </ul>
-                                            </div>
+                                    <div class="p-4 bg-[#FDFBF7] border border-[#E6D5B8]/50 rounded-2xl space-y-4">
+                                        <div>
+                                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#B08D00] mb-2 flex items-center gap-2">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
+                                                </svg>
+                                                Wedding Requirements
+                                            </p>
+                                            <ul class="space-y-1.5 text-left text-[11px] text-blue-800/70">
+                                                <li>1. Original Copy of Certificate of Baptism with "For Marriage Purpose" annotation</li>
+                                                <li>2. Original Copy of Certificate of Confirmation with "For Marriage Purpose" annotation</li>
+                                                <li>3. PSA-issued Birth Certificate</li>
+                                                <li>4. PSA-issued Certificate of No Records of Marriage (Cenomar)</li>
+                                                <li>5. Permit from the parish of the bride (if non-parishioner)</li>
+                                                <li>6. Certificate of Legal Capacity to Marry (from Embassy, for non-Filipinos)</li>
+                                                <li>7. Death Certificate & Marriage Contract of deceased spouse (for widows/widowers)</li>
+                                                <li>8. Original Copy of Marriage License from respective municipalities</li>
+                                                <li>9. NSO Certified True Copy of Civil Marriage Contract (if applicable)</li>
+                                                <li>10. Affidavit of 5+ years cohabitation (if applicable)</li>
+                                                <li>11. Wedding Fees to be settled one (1) week before the date</li>
+                                            </ul>
+                                        </div>
 
-                                            <div class="pt-3 border-t border-[#E6D5B8]/20">
-                                                <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1.5">Optional Donations & Fees</p>
-                                                <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-blue-900/60">
-                                                    <div class="bg-white/50 px-2 py-1 rounded">Wedding: ₱5k</div>
-                                                    <div class="bg-white/50 px-2 py-1 rounded">Floral: ₱12k</div>
-                                                    <div class="bg-white/50 px-2 py-1 rounded">Aircon: ₱8k</div>
-                                                    <div class="bg-white/50 px-2 py-1 rounded">Lights: ₱3k-5k</div>
-                                                </div>
-                                            </div>
-                                            <div class="pt-2 border-t border-[#E6D5B8]/20 text-sm text-blue-800/60 space-y-2">
-                                                <div>
-                                                    <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1">Schedule & Deadlines</p>
-                                                    <p>• Completion: 2 months before preferred date</p>
-                                                    <p>• Interview: 1 month before preferred date</p>
-                                                </div>
-                                                <div class="pt-2 border-t border-[#E6D5B8]/10">
-                                                    <p><strong>Seminar Schedule:</strong></p>
-                                                    <p>1st Sat: 1:00-6:00 PM | 2nd Sat: 1:00-4:00 PM</p>
-                                                </div>
+                                        <div class="pt-3 border-t border-[#E6D5B8]/20">
+                                            <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1.5">Optional Donations & Fees</p>
+                                            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-blue-900/60">
+                                                <div class="bg-white/50 px-2 py-1 rounded">Wedding: ₱5k</div>
+                                                <div class="bg-white/50 px-2 py-1 rounded">Floral: ₱12k</div>
+                                                <div class="bg-white/50 px-2 py-1 rounded">Aircon: ₱8k</div>
+                                                <div class="bg-white/50 px-2 py-1 rounded">Lights: ₱3k-5k</div>
                                             </div>
                                         </div>
-                                    </template>
+                                        <div class="pt-2 border-t border-[#E6D5B8]/20 text-sm text-blue-800/60 space-y-2">
+                                            <div>
+                                                <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1">Schedule & Deadlines</p>
+                                                <p>• Completion: 2 months before preferred date</p>
+                                                <p>• Interview: 1 month before preferred date</p>
+                                            </div>
+                                            <div class="pt-2 border-t border-[#E6D5B8]/10">
+                                                <p><strong>Seminar Schedule:</strong></p>
+                                                <p>1st Sat: 1:00-6:00 PM | 2nd Sat: 1:00-4:00 PM</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
                         </div>
                         
-                        {{-- Document Confirmation - ULTRA MINIMAL BANNER --}}
+                        {{-- Document Confirmation Banner --}}
                         <div x-show="['Baptismal Certificate', 'Confirmation Certificate', 'Marriage Certificate'].includes(inquiryType)" 
                              x-transition
                              class="mt-3 sacred-confirm-card">
@@ -657,7 +662,11 @@
                         </div>
                     </div>
 
-                    {{-- Message / Dynamic Structured Inputs --}}
+                    {{-- ── MESSAGE AREA ──
+                         FIX: Use x-if so only ONE input named "message" is ever in the DOM.
+                         Previously both the textarea and hidden input coexisted, causing PHP
+                         to receive an empty string (from the hidden input) instead of the
+                         textarea's value, failing validation. --}}
                     <div class="pt-2">
                         <div class="flex items-center justify-between mb-4">
                             <label class="field-label mb-0" x-show="!inquiryType">Message / Details</label>
@@ -666,123 +675,127 @@
                             </label>
                         </div>
 
-                        {{-- Standard Textarea for most types --}}
-                        <div x-show="inquiryType && !['Baptism', 'Baptismal Certificate'].includes(inquiryType)">
-                            <textarea name="message" id="message" rows="4" 
-                                      :required="inquiryType && !['Baptism', 'Baptismal Certificate'].includes(inquiryType)"
+                        {{-- Standard textarea — rendered only when NOT a Baptism/Certificate type --}}
+                        <template x-if="!['Baptism', 'Baptismal Certificate'].includes(inquiryType)">
+                            <textarea name="message" id="message" rows="4"
+                                      :required="true"
                                       placeholder="Provide details about your request (e.g. occasion, names)…"
                                       class="sacred-input"></textarea>
-                        </div>
+                        </template>
 
-                        {{-- Structured Inputs for Baptism / Certificate (REPLACES Initial Requirements box) --}}
-                        <div x-show="['Baptism', 'Baptismal Certificate'].includes(inquiryType)" x-transition class="space-y-4">
-                            {{-- Hidden input to send the combined data --}}
-                            <input type="hidden" name="message" :value="getCombinedMessage()" :required="['Baptism', 'Baptismal Certificate'].includes(inquiryType)">
+                        {{-- Structured inputs for Baptism / Baptismal Certificate --}}
+                        <template x-if="['Baptism', 'Baptismal Certificate'].includes(inquiryType)">
+                            <div class="space-y-4">
+                                {{-- Single hidden input — only present in DOM for these types --}}
+                                <input type="hidden" name="message" :value="getCombinedMessage()">
 
-                            {{-- Restore Guidelines for Baptism --}}
-                            <template x-if="inquiryType === 'Baptism'">
-                                <div class="p-4 bg-blue-50/30 border border-blue-100 rounded-2xl space-y-4 mb-4">
-                                    <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-blue-900 mb-2 flex items-center gap-2">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
-                                            </svg>
-                                            Baptism Rites Requirements
-                                        </p>
-                                        <ul class="space-y-1.5 text-left text-sm text-blue-800/70">
-                                            <li>1. Birth Certificate with Registry Number (Original & Photocopy)</li>
-                                            <li>2. Photocopy of Marriage Contract (If parents are married)</li>
-                                            <li>3. Original Copy of Baptismal Permit (If not Pacita 1 residents)</li>
-                                            <li>4. Registration Fee of ₱500.00 (Fixed Amount)</li>
-                                        </ul>
-                                    </div>
-                                    <div class="pt-3 border-t border-blue-100 space-y-4">
-                                        <div class="space-y-1.5">
-                                            <p class="text-[11px] font-bold text-blue-900/60 uppercase tracking-widest">Notes & Schedule</p>
-                                            <ul class="text-sm text-blue-800/70 space-y-1">
-                                                <li>• Deadline: At least 1 week before the date.</li>
-                                                <li>• Schedule: Saturdays & Sundays only (No special baptism).</li>
-                                                <li>• Seminar: 10:00 AM (Parents & Sponsors must attend).</li>
-                                                <li>• Sponsors: Must be Catholic members.</li>
+                                {{-- Baptism-specific guidelines --}}
+                                <template x-if="inquiryType === 'Baptism'">
+                                    <div class="p-4 bg-blue-50/30 border border-blue-100 rounded-2xl space-y-4 mb-4">
+                                        <div>
+                                            <p class="text-[11px] font-bold uppercase tracking-wider text-blue-900 mb-2 flex items-center gap-2">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
+                                                </svg>
+                                                Baptism Rites Requirements
+                                            </p>
+                                            <ul class="space-y-1.5 text-left text-sm text-blue-800/70">
+                                                <li>1. Birth Certificate with Registry Number (Original & Photocopy)</li>
+                                                <li>2. Photocopy of Marriage Contract (If parents are married)</li>
+                                                <li>3. Original Copy of Baptismal Permit (If not Pacita 1 residents)</li>
+                                                <li>4. Registration Fee of ₱500.00 (Fixed Amount)</li>
                                             </ul>
                                         </div>
+                                        <div class="pt-3 border-t border-blue-100 space-y-4">
+                                            <div class="space-y-1.5">
+                                                <p class="text-[11px] font-bold text-blue-900/60 uppercase tracking-widest">Notes & Schedule</p>
+                                                <ul class="text-sm text-blue-800/70 space-y-1">
+                                                    <li>• Deadline: At least 1 week before the date.</li>
+                                                    <li>• Schedule: Saturdays & Sundays only (No special baptism).</li>
+                                                    <li>• Seminar: 10:00 AM (Parents & Sponsors must attend).</li>
+                                                    <li>• Sponsors: Must be Catholic members.</li>
+                                                </ul>
+                                            </div>
 
-                                        <div class="space-y-1.5">
-                                            <p class="text-[11px] font-bold text-blue-900/60 uppercase tracking-widest">Dress Code</p>
-                                            <p class="text-sm text-blue-800/70"><strong>Person to be baptized:</strong> White baptismal attire</p>
-                                            <p class="text-sm text-blue-800/70"><strong>Parents & Godparents:</strong> Sunday attire; formal or casual</p>
-                                        </div>
+                                            <div class="space-y-1.5">
+                                                <p class="text-[11px] font-bold text-blue-900/60 uppercase tracking-widest">Dress Code</p>
+                                                <p class="text-sm text-blue-800/70"><strong>Person to be baptized:</strong> White baptismal attire</p>
+                                                <p class="text-sm text-blue-800/70"><strong>Parents & Godparents:</strong> Sunday attire; formal or casual</p>
+                                            </div>
 
-                                        <div class="bg-red-50 p-2 rounded-xl border border-red-100 text-center">
-                                            <p class="text-[10px] font-black text-red-600 uppercase tracking-tighter">
-                                                NO CAPS, PLUNGING NECKLINES, SPAGHETTI STRAPS, SHORTS, MINI-SKIRTS OR REVEALING APPARELS
-                                            </p>
+                                            <div class="bg-red-50 p-2 rounded-xl border border-red-100 text-center">
+                                                <p class="text-[10px] font-black text-red-600 uppercase tracking-tighter">
+                                                    NO CAPS, PLUNGING NECKLINES, SPAGHETTI STRAPS, SHORTS, MINI-SKIRTS OR REVEALING APPARELS
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Name</label>
-                                    <input x-model="certData.name" placeholder="Full Name" class="sacred-input">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Birthdate</label>
-                                    <input x-model="certData.birthdate" type="date" class="sacred-input">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Baptism Date</label>
-                                    <input x-model="certData.baptism" type="date" class="sacred-input">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Place of Birth</label>
-                                    <input x-model="certData.birthplace" placeholder="City/Municipality" class="sacred-input">
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Father's Name</label>
-                                    <input x-model="certData.father" placeholder="Full Name" class="sacred-input">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Mother's Name</label>
-                                    <input x-model="certData.mother" placeholder="Full Name" class="sacred-input">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Purpose of Request</label>
-                                <select x-model="certData.purpose" class="sacred-input">
-                                    <option value="">Select purpose…</option>
-                                    <option value="Personal Copy">Personal Copy</option>
-                                    <option value="Marriage Purpose">For Marriage Purpose</option>
-                                    <option value="School Requirement">School Requirement</option>
-                                    <option value="Employment">Employment</option>
-                                </select>
-                            </div>
-
-                            {{-- Marriage Specific Fields --}}
-                            <div x-show="certData.purpose === 'Marriage Purpose'" x-transition 
-                                 class="p-5 bg-[#FDFBF7] border border-[#E6D5B8]/40 rounded-2xl space-y-4">
-                                <p class="text-[10px] font-bold text-[#B08D00] uppercase tracking-widest border-b border-[#E6D5B8]/20 pb-2">Marriage Information</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="md:col-span-2">
-                                        <label class="text-[9px] font-bold text-[#B08D00]/60 uppercase mb-1 block ml-1">Name of Partner</label>
-                                        <input x-model="certData.partner" placeholder="Full Name" class="sacred-input" style="background:#FFF;">
+                                    <div>
+                                        <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Name <span class="text-red-400">*</span></label>
+                                        <input x-model="certData.name" placeholder="Full Name" class="sacred-input">
                                     </div>
                                     <div>
-                                        <label class="text-[9px] font-bold text-[#B08D00]/60 uppercase mb-1 block ml-1">Date of Wedding</label>
-                                        <input x-model="certData.weddingDate" type="date" class="sacred-input" style="background:#FFF;">
+                                        <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Birthdate</label>
+                                        <input x-model="certData.birthdate" type="date" class="sacred-input">
                                     </div>
                                     <div>
-                                        <label class="text-[9px] font-bold text-[#B08D00]/60 uppercase mb-1 block ml-1">Place of Wedding</label>
-                                        <input x-model="certData.weddingPlace" placeholder="Church & Location" class="sacred-input" style="background:#FFF;">
+                                        <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Baptism Date</label>
+                                        <input x-model="certData.baptism" type="date" class="sacred-input">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Place of Birth</label>
+                                        <input x-model="certData.birthplace" placeholder="City/Municipality" class="sacred-input">
                                     </div>
                                 </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Father's Name <span class="text-red-400">*</span></label>
+                                        <input x-model="certData.father" placeholder="Full Name" class="sacred-input">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Mother's Name <span class="text-red-400">*</span></label>
+                                        <input x-model="certData.mother" placeholder="Full Name" class="sacred-input">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-[9px] font-bold text-blue-900/40 uppercase mb-1 block ml-1">Purpose of Request <span class="text-red-400">*</span></label>
+                                    <select x-model="certData.purpose" class="sacred-input">
+                                        <option value="">Select purpose…</option>
+                                        <option value="Personal Copy">Personal Copy</option>
+                                        <option value="Marriage Purpose">For Marriage Purpose</option>
+                                        <option value="School Requirement">School Requirement</option>
+                                        <option value="Employment">Employment</option>
+                                    </select>
+                                </div>
+
+                                {{-- Marriage Specific Fields --}}
+                                <template x-if="certData.purpose === 'Marriage Purpose'">
+                                    <div x-transition 
+                                         class="p-5 bg-[#FDFBF7] border border-[#E6D5B8]/40 rounded-2xl space-y-4">
+                                        <p class="text-[10px] font-bold text-[#B08D00] uppercase tracking-widest border-b border-[#E6D5B8]/20 pb-2">Marriage Information</p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="md:col-span-2">
+                                                <label class="text-[9px] font-bold text-[#B08D00]/60 uppercase mb-1 block ml-1">Name of Partner</label>
+                                                <input x-model="certData.partner" placeholder="Full Name" class="sacred-input" style="background:#FFF;">
+                                            </div>
+                                            <div>
+                                                <label class="text-[9px] font-bold text-[#B08D00]/60 uppercase mb-1 block ml-1">Date of Wedding</label>
+                                                <input x-model="certData.weddingDate" type="date" class="sacred-input" style="background:#FFF;">
+                                            </div>
+                                            <div>
+                                                <label class="text-[9px] font-bold text-[#B08D00]/60 uppercase mb-1 block ml-1">Place of Wedding</label>
+                                                <input x-model="certData.weddingPlace" placeholder="Church & Location" class="sacred-input" style="background:#FFF;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
-                        </div>
+                        </template>
                     </div>
 
                     {{-- Submit --}}
@@ -813,10 +826,5 @@
         </div>
     </div>
 </section>
-
-    </div>
-</section>
-
-
 
 </x-public-layout>
