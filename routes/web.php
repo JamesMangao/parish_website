@@ -167,4 +167,23 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::get('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings');
         Route::post('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
     });
+    Route::get('/debug-readings-raw', function () {
+    $date = now('Asia/Manila');
+    
+    $text = "\n\nUNANG PAGBASA\n2 Timoteo 1, 1-3. 6-12\nTest first reading text with Mabuting Balita mentioned here.\nAng Salita ng Diyos.\n\nSALMONG TUGUNAN\nSalmo 122\nAng mata ko'y nakatuon\n\nALELUYA\nJuan 11, 25a\nAleluya! Aleluya!\n\nMABUTING BALITA\nMarcos 12, 18-27\nActual gospel text here.\nAng Mabuting Balita ng Panginoon.\nPANALANGIN NG BAYAN\nPages: 1 2";
+
+    $startPattern = "\n\nMABUTING BALITA\n";
+    $pos = strpos($text, $startPattern);
+    
+    // Also test what the controller actually produces
+    $controller = app(\App\Http\Controllers\DailyReadingController::class);
+    $ref = new \ReflectionMethod($controller, 'fetchAwitAtPapuriReadings');
+    $ref->setAccessible(true);
+    $result = $ref->invoke($controller, $date, 'tl');
+
+    return response()->json([
+        'pattern_found_at' => $pos,
+        'parsed_result'    => $result,
+    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+});
 });

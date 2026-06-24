@@ -374,7 +374,7 @@
             Stay connected with the parish. View the latest news, novenas, and community updates.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="/announcements"
+            <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
                class="gold-btn inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest"
                style="text-decoration:none;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>

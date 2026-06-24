@@ -101,34 +101,42 @@ class ChatbotController extends Controller
         }
 
         // 4. AIService Response
-        $history = $session->messages()
-            ->latest()
-            ->take(10)
-            ->get()
-            ->reverse()
-            ->map(fn($m) => [
-                'role' => $m->sender === 'user' ? 'user' : 'assistant',
-                'content' => $m->message
-            ])
-            ->toArray();
+        try {
+            $history = $session->messages()
+                ->latest()
+                ->take(10)
+                ->get()
+                ->reverse()
+                ->map(fn($m) => [
+                    'role' => $m->sender === 'user' ? 'user' : 'assistant',
+                    'content' => $m->message
+                ])
+                ->toArray();
 
-        $aiResponse = $this->aiService->getResponse($history);
+            $aiResponse = $this->aiService->getResponse($history);
 
-        // 5. Store AI Response
-        $aiMsg = ChatMessage::create([
-            'chat_session_id' => $session->id,
-            'sender' => 'ai',
-            'message' => $aiResponse,
-        ]);
- 
-        $suggestions = $this->getDynamicSuggestions($userMessage);
+            // 5. Store AI Response
+            $aiMsg = ChatMessage::create([
+                'chat_session_id' => $session->id,
+                'sender' => 'ai',
+                'message' => $aiResponse,
+            ]);
+    
+            $suggestions = $this->getDynamicSuggestions($userMessage);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => $aiResponse,
-            'id' => $aiMsg->id,
-            'suggestions' => $suggestions,
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => $aiResponse,
+                'id' => $aiMsg->id,
+                'suggestions' => $suggestions,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Chatbot AI Service failed: " . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'I am sorry, I am having trouble connecting to the parish servers right now.',
+            ], 500);
+        }
     }
 
     /**

@@ -291,6 +291,43 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="py-20 max-w-[960px] mx-auto px-6 pb-32 md:pb-20">
 
+    {{-- ── Duplicate Warning Modal ── --}}
+    @if(session('duplicate_warning'))
+    <div x-data="{ showModal: true }" x-show="showModal"
+         class="fixed inset-0 z-[100] flex items-center justify-center p-6"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         x-cloak>
+        <div class="absolute inset-0 bg-amber-900/60 backdrop-blur-sm" @click="showModal = false"></div>
+        <div class="relative bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-amber-100 animate-fade-up">
+            <div class="h-2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400"></div>
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <h2 class="font-heading text-2xl font-bold text-amber-900 italic mb-2">Duplicate Inquiry Detected</h2>
+                <p class="text-amber-700/70 text-sm mb-4">You already have a pending <strong>{{ session('duplicate_type') }}</strong> inquiry (Ref: {{ session('duplicate_ref') }}).</p>
+                <p class="text-amber-600/60 text-xs mb-6">Submitting a duplicate may cause delays. Would you like to track your existing inquiry instead?</p>
+                <div class="flex flex-col gap-3">
+                    <a href="/track" class="gold-btn w-full h-12 rounded-2xl font-bold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2" style="text-decoration:none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Track Existing Inquiry
+                    </a>
+                    <button @click="showModal = false" class="w-full h-12 rounded-2xl font-bold uppercase tracking-widest text-[11px] border-2 border-amber-300 text-amber-700 hover:bg-amber-50 transition-all">
+                        Submit Anyway
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ── Success Modal ── --}}
     @if(session('reference_id'))
     <div x-data="{ 
@@ -354,6 +391,14 @@
                         class="gold-btn w-full h-14 rounded-2xl font-bold uppercase tracking-widest text-[11px]">
                     Continue
                 </button>
+                <a href="/track" 
+                   class="mt-3 w-full h-12 rounded-2xl font-bold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 border-2 transition-all duration-200 hover:-translate-y-0.5"
+                   style="border-color:rgba(26,64,128,0.25);color:var(--blue-deep);background:transparent;text-decoration:none;"
+                   onmouseover="this.style.borderColor='var(--blue-mid)';this.style.background='rgba(26,64,128,0.05)';"
+                   onmouseout="this.style.borderColor='rgba(26,64,128,0.25)';this.style.background='transparent';">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Check Track Status
+                </a>
             </div>
         </div>
     </div>
@@ -480,6 +525,21 @@
                 <form action="{{ route('inquiry.store') }}" method="POST"
                       class="space-y-5" @submit="validateAndSubmit($event)">
                     @csrf
+
+                    @if(session('duplicate_warning'))
+                    <div class="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/80 flex items-start gap-3" x-data="{ showDup: true }" x-show="showDup">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" class="shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-amber-800">Duplicate inquiry detected</p>
+                            <p class="text-xs text-amber-600/70 mt-1">You already have a pending <strong>{{ session('duplicate_type') }}</strong> inquiry (Ref: {{ session('duplicate_ref') }}). You may submit again, but consider tracking your existing one first.</p>
+                            <div class="flex gap-2 mt-3">
+                                <a href="/track" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-300 text-amber-700 hover:bg-amber-100 transition-all" style="text-decoration:none;">Track Existing</a>
+                                <button type="button" @click="showDup = false" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-amber-600 hover:text-amber-800 transition-all">Dismiss</button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="force_submit" value="1">
+                    @endif
 
                     {{-- Full Name --}}
                     <div>

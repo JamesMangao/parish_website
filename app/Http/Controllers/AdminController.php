@@ -295,7 +295,7 @@ class AdminController extends Controller
                     'items' => $chunk->map(function ($i) {
                         return [
                             'id' => $i->id,
-                            'name' => strtoupper($i->raw_message),
+                            'name' => strtoupper(!empty($i->raw_message) ? $i->raw_message : $i->full_name),
                             'description' => null
                         ];
                     })->values()->toArray()

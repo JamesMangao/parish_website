@@ -48,6 +48,21 @@ class InquiryController extends Controller
             'preferredDate.required' => 'A preferred date is required for this type of inquiry.',
         ]);
 
+        // Check for duplicate inquiries (same email + same type + pending status)
+        $duplicate = Inquiry::where('email', $validated['email'])
+            ->where('inquiry_type', $validated['inquiryType'])
+            ->where('status', 'pending')
+            ->first();
+
+        if ($duplicate && !$request->input('force_submit')) {
+            return back()->with([
+                'duplicate_warning' => true,
+                'duplicate_ref'     => $duplicate->reference_id,
+                'duplicate_type'    => $validated['inquiryType'],
+                'old_input'         => $validated,
+            ])->withInput();
+        }
+
         // Append document-request flag when present
         $message = trim($validated['message']);
         if ($request->filled('wants_document')) {

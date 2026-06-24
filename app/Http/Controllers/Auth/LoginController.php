@@ -32,6 +32,13 @@ class LoginController extends Controller
         }
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = Auth::user();
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account has been disabled. Please contact the administrator.',
+                ])->onlyInput('email');
+            }
             RateLimiter::clear($key);
             $request->session()->regenerate();
 

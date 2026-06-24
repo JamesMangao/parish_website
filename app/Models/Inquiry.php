@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Inquiry extends Model
 {
     protected $fillable = [
-        'full_name', 'email', 'phone', 'inquiry_type', 'preferred_date', 'message', 'status', 'accepted_at', 'reference_id'
+        'full_name', 'email', 'phone', 'inquiry_type', 'preferred_date', 'message', 'status', 'accepted_at', 'reference_id', 'rejection_reason'
     ];
 
     protected $casts = [

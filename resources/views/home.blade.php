@@ -141,11 +141,11 @@
             </a>
         </div>
 
-        <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:40px;padding-top:28px;width:100%;max-width:400px;border-top:1px solid rgba(245,197,24,.15);animation-delay:.6s;">
+        <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:40px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
             @foreach([['40+','Years of Service'],['7','Weekly Masses'],['1','Community']] as $stat)
             <div style="text-align:center;">
                 <div class="font-heading stat-val" style="font-size:1.75rem;font-weight:700;font-style:italic;color:var(--gold-light);line-height:1;">{{ $stat[0] }}</div>
-                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.3em;color:rgba(200,215,255,.45);margin-top:5px;">{{ $stat[1] }}</div>
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.3em;color:rgb(255, 255, 255);margin-top:5px;">{{ $stat[1] }}</div>
             </div>
             @endforeach
         </div>
@@ -291,41 +291,51 @@
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
 
-    const renderReadingText = text => {
-        let inResponse = false;
-        return String(text ?? '')
-            .replace(/\\n/g, '\n')
-            .replace(/\\"/g, '"')
-            .replace(/\\'/g, "'")
-            .replace(/\r\n/g, '\n')
-            .split('\n')
-            .map(rawLine => {
-                const line = rawLine.trim();
-                if (!line) {
-                    inResponse = false;
-                    return '<div class="reading-line--blank"></div>';
-                }
-                if (/^(or|o kaya):?$/i.test(line)) {
-                    inResponse = false;
-                    return `<div class="reading-line reading-line--or">${esc(line)}</div>`;
-                }
-                if (/^(Ang Mabuting Balita|Pagbasa mula sa|A reading from|The holy Gospel)/i.test(line)) {
-                    inResponse = false;
-                    return `<div class="reading-line reading-line--intro" style="font-weight:700;color:var(--blue-deep);margin-bottom:4px;">${esc(line)}</div>`;
-                }
-                const responseMatch = line.match(/^(R\.|A\.|Response:|Refrain:|Tugon:)\s*(.*)$/i);
-                if (responseMatch) {
-                    inResponse = true;
-                    const marker = /^(Response:|Refrain:|Tugon:)$/i.test(responseMatch[1]) ? 'R.' : responseMatch[1];
-                    return `<div class="reading-line--response"><span class="reading-marker">${esc(marker)}</span><strong class="reading-response">${esc(responseMatch[2])}</strong></div>`;
-                }
-                if (inResponse) {
-                    return `<div class="reading-line--response"><span class="reading-marker">&nbsp;</span><strong class="reading-response">${esc(line)}</strong></div>`;
-                }
-                return `<div class="reading-line">${esc(line)}</div>`;
-            })
-            .join('');
-    };
+const renderReadingText = text => {
+    if (!text) return '';
+
+    // The DB stores newlines as literal \n string sequences — unwrap all variants
+    let normalized = String(text);
+    // Handle JSON-encoded unicode smart quotes (already decoded by browser, but just in case)
+    normalized = normalized
+        .replace(/\\u2019/g, '\u2019')
+        .replace(/\\u2018/g, '\u2018')
+        .replace(/\\u201c/g, '\u201c')
+        .replace(/\\u201d/g, '\u201d')
+        .replace(/\\u2013/g, '\u2013')
+        .replace(/\\u2014/g, '\u2014');
+
+    // Split on ALL possible newline representations
+    const lines = normalized.split(/\\n|\n|\r\n|\r/);
+
+    let inResponse = false;
+
+    return lines.map(rawLine => {
+        const line = rawLine.trim();
+        if (!line) {
+            inResponse = false;
+            return '<div class="reading-line--blank"></div>';
+        }
+        if (/^(or|o kaya):?$/i.test(line)) {
+            inResponse = false;
+            return `<div class="reading-line reading-line--or">${esc(line)}</div>`;
+        }
+        if (/^(Ang Mabuting Balita ng Panginoon|Ang Salita ng Diyos|Pagbasa mula sa|A reading from|The holy Gospel|The word of the Lord|Aleluya!)/i.test(line)) {
+            inResponse = false;
+            return `<div class="reading-line" style="font-weight:700;color:var(--blue-deep);margin-top:8px;">${esc(line)}</div>`;
+        }
+        const responseMatch = line.match(/^(R\.|A\.|Response:|Refrain:|Tugon:)\s*(.*)$/i);
+        if (responseMatch) {
+            inResponse = true;
+            const marker = /^(Response:|Refrain:|Tugon:)/i.test(responseMatch[1]) ? 'R.' : responseMatch[1];
+            return `<div class="reading-line--response"><span class="reading-marker">${esc(marker)}</span><strong class="reading-response">${esc(responseMatch[2])}</strong></div>`;
+        }
+        if (inResponse) {
+            return `<div class="reading-line--response"><span class="reading-marker">&nbsp;</span><strong class="reading-response">${esc(line)}</strong></div>`;
+        }
+        return `<div class="reading-line">${esc(line)}</div>`;
+    }).join('');
+};
 
     const setTabs = lang => tabs.forEach(tab => {
         const isActive = tab.dataset.readingTab === lang;

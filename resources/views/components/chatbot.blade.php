@@ -434,6 +434,18 @@
                                 clearInterval(this.waitTimer);
                                 this.scrollToBottom();
                             }
+                            // Notify user when admin pauses or resolves the chat
+                            if (data.status === 'paused' && this.liveAgentStatus !== 'none') {
+                                this.liveAgentStatus = 'none';
+                                this.messages.push(this._makeMsg('assistant', 'The live agent has paused this conversation. Our AI assistant will now handle your questions. An agent will return shortly.', 'system'));
+                                this.scrollToBottom();
+                            }
+                            if (data.status === 'resolved' && this.liveAgentStatus !== 'none') {
+                                this.liveAgentStatus = 'none';
+                                this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved by our team. Thank you for contacting Sto. Rosario Parish! Feel free to start a new conversation anytime.', 'system'));
+                                this.scrollToBottom();
+                                if (this.pollInterval) clearInterval(this.pollInterval);
+                            }
                             // Agent typing indicator from backend
                             this.agentTyping = !!data.agent_typing;
                         } catch (e) {} finally {

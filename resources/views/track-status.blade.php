@@ -163,7 +163,7 @@
     @if(isset($status))
     @php
         $sc = in_array($status, ['approved','accepted']) ? 'status-approved'
-            : ($status === 'rejected' ? 'status-rejected' : 'status-pending');
+            : (in_array($status, ['rejected', 'declined']) ? 'status-rejected' : 'status-pending');
     @endphp
 
     <div class="card-sacred result-in {{ $sc }}"
@@ -246,7 +246,7 @@
         </div>
 
         {{-- Rejection reason --}}
-        @if($status === 'rejected' && !empty($item->rejection_reason))
+                        @if(in_array($status, ['rejected', 'declined']) && !empty($item->rejection_reason))
         <div style="margin:0 2rem; padding:1rem 1.25rem;
                     background:var(--s-light); border:1px solid var(--s-border);
                     border-radius:12px; margin-bottom:0;">
@@ -271,7 +271,7 @@
                 <p style="font-size:0.875rem; font-weight:700; color:var(--s-text); line-height:1.6;">
                     Request approved. We look forward to seeing you — check email for final instructions.
                 </p>
-            @elseif($status === 'rejected')
+            @elseif(in_array($status, ['rejected', 'declined']))
                 <p style="font-size:0.875rem; font-weight:700; color:var(--s-text); line-height:1.6;">
                     Request could not be approved at this time. See reason above or contact parish office.
                 </p>
