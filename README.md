@@ -54,8 +54,8 @@ A full-featured Catholic parish management web application built for **Sto. Rosa
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
-   cd parish-pal-laravel
+   git clone https://github.com/JamesMangao/parish_website
+   cd parish-website
    ```
 
 2. **Install PHP dependencies**
