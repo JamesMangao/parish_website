@@ -8,7 +8,10 @@ use App\Http\Controllers\IntentionController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdminIntentionController;
+use App\Http\Controllers\PptController;
+use App\Http\Controllers\GoogleSlidesController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\InquiryController;
@@ -63,14 +66,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 Route::middleware(['auth', 'throttle:admin'])->group(function () {
-    Route::get('/admin-portal/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin-portal/notifications/count', [AdminController::class, 'getNotifications'])->name('admin.notifications.count');
+    Route::get('/admin-portal/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin-portal/notifications/count', [DashboardController::class, 'getNotifications'])->name('admin.notifications.count');
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
-        Route::post('/admin-portal/generate-ppt', [AdminController::class, 'generatePPT'])->name('admin.generate-ppt');
-        Route::get('/admin-portal/preview-ppt', [AdminController::class, 'previewPPT'])->name('admin.preview-ppt');
-        Route::post('/admin-portal/create-google-slides', [AdminController::class, 'createGoogleSlides'])->name('admin.create-google-slides');
+        Route::post('/admin-portal/generate-ppt', [PptController::class, 'generate'])->name('admin.generate-ppt');
+        Route::get('/admin-portal/preview-ppt', [PptController::class, 'preview'])->name('admin.preview-ppt');
+        Route::post('/admin-portal/create-google-slides', [GoogleSlidesController::class, 'create'])->name('admin.create-google-slides');
 
         Route::get('/google/auth', function () {
             $client = new \Google\Client();
@@ -111,12 +114,12 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
 
     // Role: super_admin or staff
     Route::middleware('role:super_admin,staff')->group(function () {
-        Route::get('/admin-portal/intentions', [AdminController::class, 'intentions'])->name('admin.intentions');
-        Route::get('/admin-portal/intentions/create', [AdminController::class, 'createIntention'])->name('admin.intentions.create');
-        Route::get('/admin-portal/intentions/{id}', [AdminController::class, 'showIntention'])->name('admin.intentions.show');
-        Route::post('/admin-portal/intentions', [AdminController::class, 'storeIntention'])->name('admin.intentions.store');
-        Route::post('/admin-portal/intentions/batch', [AdminController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
-        Route::post('/admin-portal/intentions/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.intentions.status');
+        Route::get('/admin-portal/intentions', [AdminIntentionController::class, 'index'])->name('admin.intentions');
+        Route::get('/admin-portal/intentions/create', [AdminIntentionController::class, 'create'])->name('admin.intentions.create');
+        Route::get('/admin-portal/intentions/{id}', [AdminIntentionController::class, 'show'])->name('admin.intentions.show');
+        Route::post('/admin-portal/intentions', [AdminIntentionController::class, 'store'])->name('admin.intentions.store');
+        Route::post('/admin-portal/intentions/batch', [AdminIntentionController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
+        Route::post('/admin-portal/intentions/{id}/status', [AdminIntentionController::class, 'updateStatus'])->name('admin.intentions.status');
     });
 
     // Role: super_admin, staff, or soccom
@@ -163,7 +166,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::post('/admin-portal/users', [\App\Http\Controllers\UserController::class, 'store'])->name('admin.users.store');
         Route::put('/admin-portal/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/admin-portal/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('admin.users.destroy');
-        Route::get('/admin-portal/logs', [AdminController::class, 'logs'])->name('admin.logs');
+        Route::get('/admin-portal/logs', [DashboardController::class, 'logs'])->name('admin.logs');
         Route::get('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings');
         Route::post('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
     });

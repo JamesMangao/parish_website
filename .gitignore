@@ -1,8 +1,11 @@
 *.log
 .DS_Store
+Thumbs.db
 .env
 .env.backup
 .env.production
+.env.local
+.env.staging
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -31,5 +34,6 @@
 /vendor
 Homestead.json
 Homestead.yaml
-Thumbs.db
 test_readings.php
+database/database.sqlite
+database/database.sqlite.backup

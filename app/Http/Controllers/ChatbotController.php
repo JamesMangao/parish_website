@@ -8,7 +8,7 @@ use App\Services\AIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use App\Http\Controllers\DailyReadingController;
+use App\Http\Requests\ChatRequest;
 use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
@@ -23,12 +23,8 @@ class ChatbotController extends Controller
     /**
      * Handle incoming chat messages.
      */
-    public function chat(Request $request)
+    public function chat(ChatRequest $request)
     {
-        $request->validate([
-            'message' => 'required|string|max:1000',
-        ]);
-
         $session = $this->getOrCreateSession();
         $userMessage = $request->input('message');
 
