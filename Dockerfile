@@ -3,8 +3,9 @@ FROM php:8.2-cli
 # Install system deps
 RUN apt-get update && apt-get install -y \
     curl unzip git nodejs npm \
-    libzip-dev libpng-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
+    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd \
+       xml dom curl intl openssl opcache
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -13,8 +14,11 @@ WORKDIR /var/www
 
 COPY . .
 
-# Install PHP deps
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP deps (ignore platform reqs to avoid extension mismatch during build)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Run post-install scripts after extensions are available
+RUN composer dump-autoload --optimize --no-dev
 
 # Install JS deps and build
 RUN npm install && npm run build
