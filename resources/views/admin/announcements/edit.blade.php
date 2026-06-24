@@ -1,8 +1,8 @@
 <x-admin-form 
     title="Edit Announcement" 
     description="Update the details of your parish announcement."
-    backRoute="/admin-portal/announcements"
-    action="/admin-portal/announcements/{{ $announcement->id }}"
+    backRoute="{{ route('admin.announcements.index') }}"
+    action="{{ route('admin.announcements.update', $announcement) }}"
     method="PUT"
     submitLabel="Update Announcement"
 >

@@ -315,7 +315,7 @@
                 <p class="text-amber-700/70 text-sm mb-4">You already have a pending <strong>{{ session('duplicate_type') }}</strong> inquiry (Ref: {{ session('duplicate_ref') }}).</p>
                 <p class="text-amber-600/60 text-xs mb-6">Submitting a duplicate may cause delays. Would you like to track your existing inquiry instead?</p>
                 <div class="flex flex-col gap-3">
-                    <a href="/track" class="gold-btn w-full h-12 rounded-2xl font-bold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2" style="text-decoration:none;">
+                    <a href="{{ route('track') }}" class="gold-btn w-full h-12 rounded-2xl font-bold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2" style="text-decoration:none;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         Track Existing Inquiry
                     </a>
@@ -391,7 +391,7 @@
                         class="gold-btn w-full h-14 rounded-2xl font-bold uppercase tracking-widest text-[11px]">
                     Continue
                 </button>
-                <a href="/track" 
+                <a href="{{ route('track') }}"
                    class="mt-3 w-full h-12 rounded-2xl font-bold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 border-2 transition-all duration-200 hover:-translate-y-0.5"
                    style="border-color:rgba(26,64,128,0.25);color:var(--blue-deep);background:transparent;text-decoration:none;"
                    onmouseover="this.style.borderColor='var(--blue-mid)';this.style.background='rgba(26,64,128,0.05)';"
@@ -533,7 +533,7 @@
                             <p class="text-sm font-bold text-amber-800">Duplicate inquiry detected</p>
                             <p class="text-xs text-amber-600/70 mt-1">You already have a pending <strong>{{ session('duplicate_type') }}</strong> inquiry (Ref: {{ session('duplicate_ref') }}). You may submit again, but consider tracking your existing one first.</p>
                             <div class="flex gap-2 mt-3">
-                                <a href="/track" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-300 text-amber-700 hover:bg-amber-100 transition-all" style="text-decoration:none;">Track Existing</a>
+                                <a href="{{ route('track') }}" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-300 text-amber-700 hover:bg-amber-100 transition-all" style="text-decoration:none;">Track Existing</a>
                                 <button type="button" @click="showDup = false" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-amber-600 hover:text-amber-800 transition-all">Dismiss</button>
                             </div>
                         </div>

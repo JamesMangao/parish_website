@@ -1,5 +1,5 @@
 <x-admin-form title="Edit Parish Event" description="Update the details of your parish activity or celebration."
-    backRoute="/admin-portal/events" action="/admin-portal/events/{{ $event->id }}" method="PUT" submitLabel="Update Event">
+    backRoute="{{ route('admin.events.index') }}" action="{{ route('admin.events.update', $event) }}" method="PUT" submitLabel="Update Event">
     <div class="space-y-4">
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Event

@@ -15,6 +15,10 @@ class VideoHighlight extends Model
         'sort_order',
     ];
 
+    protected $casts = [
+        'is_published' => 'boolean',
+    ];
+
     public function getVideoUrlAttribute()
     {
         $value = $this->video_path;

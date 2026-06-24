@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
                 view()->share('global_settings', $settings);
             }
         } catch (\Exception $e) {
-            // Silently fail if table doesn't exist yet
+            \Illuminate\Support\Facades\Log::warning('Failed to load global settings: ' . $e->getMessage());
         }
     }
 

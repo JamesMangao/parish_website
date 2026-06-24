@@ -16,6 +16,12 @@ class GalleryAlbumController extends Controller
         return view('admin.gallery.index', compact('albums'));
     }
 
+    public function show(GalleryAlbum $gallery)
+    {
+        $gallery->load('images');
+        return view('admin.gallery.show', ['album' => $gallery]);
+    }
+
     public function create()
     {
         return view('admin.gallery.create');

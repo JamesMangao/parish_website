@@ -2,16 +2,15 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\MassIntention;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class IntentionStatusUpdated extends Notification
 {
-    private $intention;
+    private MassIntention $intention;
 
-    public function __construct($intention)
+    public function __construct(MassIntention $intention)
     {
         $this->intention = $intention;
     }

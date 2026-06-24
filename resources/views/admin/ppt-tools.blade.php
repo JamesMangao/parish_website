@@ -8,7 +8,7 @@
                 
                 async fetchPreview() {
                     try {
-                        const response = await fetch('/admin-portal/preview-ppt');
+                        const response = await fetch('{{ route('admin.preview-ppt') }}');
                         if (!response.ok) throw new Error('Failed to fetch');
                         const data = await response.json();
                         
@@ -27,7 +27,7 @@
                 },
                 async generateFinal() {
                     try {
-                        const response = await fetch('/admin-portal/generate-ppt', {
+                        const response = await fetch('{{ route('admin.generate-ppt') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -102,7 +102,7 @@
                     this.creatingSlides = true;
 
                     try {
-                        const response = await fetch('/admin-portal/create-google-slides', {
+                        const response = await fetch('{{ route('admin.create-google-slides') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -147,7 +147,7 @@
                     </svg>
                     Preview Content
                 </button>
-                <form action="/admin-portal/generate-ppt" method="POST">
+                <form action="{{ route('admin.generate-ppt') }}" method="POST">
                     @csrf
                     <button type="submit"
                         class="inline-flex items-center gap-2 bg-accent text-accent-foreground px-4 py-2 rounded-md font-bold text-sm shadow-md hover:opacity-90 transition-opacity">

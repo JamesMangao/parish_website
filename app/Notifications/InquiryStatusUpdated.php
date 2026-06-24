@@ -2,15 +2,15 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
+use App\Models\Inquiry;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class InquiryStatusUpdated extends Notification
 {
-    private $inquiry;
+    private Inquiry $inquiry;
 
-    public function __construct($inquiry)
+    public function __construct(Inquiry $inquiry)
     {
         $this->inquiry = $inquiry;
     }

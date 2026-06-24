@@ -15,6 +15,11 @@ class VideoHighlightController extends Controller
         return view('admin.gallery.highlights.index', compact('highlights'));
     }
 
+    public function show(VideoHighlight $highlight)
+    {
+        return view('admin.gallery.highlights.show', compact('highlight'));
+    }
+
     public function create()
     {
         return view('admin.gallery.highlights.create');

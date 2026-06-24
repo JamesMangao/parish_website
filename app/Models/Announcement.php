@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
@@ -40,5 +41,10 @@ class Announcement extends Model
                          $q->whereNull('expires_at')
                            ->orWhere('expires_at', '>', now());
                      });
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

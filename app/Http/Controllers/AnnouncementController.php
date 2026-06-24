@@ -14,6 +14,11 @@ class AnnouncementController extends Controller
         return view('admin.announcements.index', compact('announcements'));
     }
 
+    public function show(Announcement $announcement)
+    {
+        return view('admin.announcements.show', compact('announcement'));
+    }
+
     public function create()
     {
         return view('admin.announcements.create');

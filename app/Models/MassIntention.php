@@ -40,4 +40,9 @@ class MassIntention extends Model
     {
         return $this->belongsTo(MassSchedule::class, 'mass_schedule_id');
     }
+
+    public function reviewedBy()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
 }

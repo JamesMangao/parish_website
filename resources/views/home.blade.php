@@ -1,9 +1,9 @@
 <x-public-layout>
 <x-slot name="meta">
     <meta name="description" content="Welcome to Sto. Rosario Parish – Pacita, San Pedro, Laguna. Mass schedules, intentions, events, and community news.">
-    <link rel="preload" href="/fonts/Canterbury.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/Canterbury.ttf') }}" as="font" type="font/ttf" crossorigin>
     <style>
-        @font-face{font-family:'Canterbury';src:url('/fonts/Canterbury.ttf') format('truetype');font-weight:normal;font-style:normal;font-display:swap;}
+        @font-face{font-family:'Canterbury';src:url('{{ asset('fonts/Canterbury.ttf') }}') format('truetype');font-weight:normal;font-style:normal;font-display:swap;}
         :root{--gold:#F5C518;--gold-light:#FFD740;--gold-pale:#FFF8DC;--blue-deep:#0D2A52;--blue-mid:#1A4080;--blue-soft:#2255A4;--blue-pale:#EBF2FF;--cream:#F7F9FF;--cream-deep:#EDF2FC;--stone-text:#1E3254;}
         body{background:var(--cream);font-family:'Jost',sans-serif;}
         .font-heading{font-family:'Cormorant Garamond',Georgia,serif;}
@@ -127,15 +127,15 @@
         <p class="animate-fade-in-up" style="color:rgba(220,232,255,.78);font-size:clamp(.85rem,1.4vw,1rem);line-height:1.78;max-width:430px;font-weight:300;letter-spacing:.01em;margin-bottom:36px;animation-delay:.4s;">Home to the Queen of the Most Holy Rosary — a beacon of faith, community, and service for over four decades.</p>
 
         <div class="hero-cta-wrap animate-fade-in-up" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:20px;margin-bottom:40px;animation-delay:.5s;">
-            <a href="/mass-schedule" class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-decoration:none;">
+            <a href="{{ route('mass-schedule') }}" class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 Mass Schedule
             </a>
-            <a href="/submit-intention" class="gold-btn inline-flex items-center gap-2 rounded-full" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;">
+            <a href="{{ route('submit-intention') }}" class="gold-btn inline-flex items-center gap-2 rounded-full" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                 Offer an Intention
             </a>
-            <a href="/inquiry" class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-decoration:none;">
+            <a href="{{ route('inquiry') }}" class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
                 Parish Inquiry
             </a>
@@ -225,7 +225,7 @@
             </div>
         </div>
 
-        <a href="/mass-schedule" class="group relative flex flex-col items-center justify-center overflow-hidden mt-6 events-cta-banner" style="background:var(--blue-deep);text-decoration:none;padding:22px 24px;border-radius:0 0 24px 24px;display:flex;min-height:82px;" aria-label="View Full Mass Schedule">
+        <a href="{{ route('mass-schedule') }}" class="group relative flex flex-col items-center justify-center overflow-hidden mt-6 events-cta-banner" style="background:var(--blue-deep);text-decoration:none;padding:22px 24px;border-radius:0 0 24px 24px;display:flex;min-height:82px;" aria-label="View Full Mass Schedule">
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
@@ -324,10 +324,11 @@ const renderReadingText = text => {
             inResponse = false;
             return `<div class="reading-line" style="font-weight:700;color:var(--blue-deep);margin-top:8px;">${esc(line)}</div>`;
         }
-        const responseMatch = line.match(/^(R\.|A\.|Response:|Refrain:|Tugon:)\s*(.*)$/i);
+        const responseMatch = line.match(/^((?:R\.|A\.|S\.|Response:|Refrain:|Tugon:|Tugon))\s*(.*)$/i);
         if (responseMatch) {
             inResponse = true;
-            const marker = /^(Response:|Refrain:|Tugon:)/i.test(responseMatch[1]) ? 'R.' : responseMatch[1];
+            const raw = responseMatch[1];
+            const marker = /^(Response|Refrain|Tugon)/i.test(raw) ? 'R.' : raw;
             return `<div class="reading-line--response"><span class="reading-marker">${esc(marker)}</span><strong class="reading-response">${esc(responseMatch[2])}</strong></div>`;
         }
         if (inResponse) {
@@ -578,7 +579,7 @@ const renderReadingText = text => {
             @endfor
         </div>
 
-        <a href="/events" class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl events-cta-banner" style="background:#0A2342;text-decoration:none;padding:24px;min-height:100px;transition:all .35s ease;" aria-label="View full events schedule">
+        <a href="{{ route('events') }}" class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl events-cta-banner" style="background:#0A2342;text-decoration:none;padding:24px;min-height:100px;transition:all .35s ease;" aria-label="View full events schedule">
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
@@ -727,11 +728,11 @@ const renderReadingText = text => {
             <p class="text-lg leading-relaxed mb-12 font-light" style="color:rgba(13,42,82,.55);">Unite your prayers with the Holy Sacrifice of the Mass. Submit your intention online and our staff will include it in the upcoming liturgy.</p>
 
             <div class="intention-btns flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="/submit-intention" class="gold-btn inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest" style="text-decoration:none;">
+                <a href="{{ route('submit-intention') }}" class="gold-btn inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest" style="text-decoration:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                     Submit Intention
                 </a>
-                <a href="/track" class="inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest border-2 transition-all duration-300 hover:-translate-y-0.5" style="border-color:rgba(26,64,128,.25);color:var(--blue-deep);background:transparent;text-decoration:none;" onmouseover="this.style.borderColor='var(--blue-mid)';this.style.background='rgba(26,64,128,0.05)';" onmouseout="this.style.borderColor='rgba(26,64,128,0.25)';this.style.background='transparent';">
+                <a href="{{ route('track') }}" class="inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest border-2 transition-all duration-300 hover:-translate-y-0.5" style="border-color:rgba(26,64,128,.25);color:var(--blue-deep);background:transparent;text-decoration:none;" onmouseover="this.style.borderColor='var(--blue-mid)';this.style.background='rgba(26,64,128,0.05)';" onmouseout="this.style.borderColor='rgba(26,64,128,0.25)';this.style.background='transparent';">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     Track Status
                 </a>

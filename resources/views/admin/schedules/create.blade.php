@@ -1,8 +1,8 @@
 <x-admin-form 
     title="Create Mass Schedule" 
     description="Add a new service time to the parish schedule."
-    backRoute="/admin-portal/schedules"
-    action="/admin-portal/schedules"
+    backRoute="{{ route('admin.schedules.index') }}"
+    action="{{ route('admin.schedules.store') }}"
     submitLabel="Create Schedule"
 >
     <div class="space-y-4">

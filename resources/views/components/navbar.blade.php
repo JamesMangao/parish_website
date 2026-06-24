@@ -17,7 +17,7 @@
                 h-[72px] flex items-center justify-between gap-2 pt-2">
 
 {{-- Logo (exact navy via mask; needs silhouette-friendly PNG) --}}
-<a href="/" class="flex items-start gap-2.5 group flex-shrink-0 pt-1">
+<a href="{{ route('home') }}" class="flex items-start gap-2.5 group flex-shrink-0 pt-1">
     <div class="relative w-8 h-8 flex items-center justify-center flex-shrink-0">
         <span
             class="w-8 h-8 transition-all duration-300"
@@ -164,7 +164,7 @@
                 </div>
             </div>
 
-            <a href="/track"
+            <a href="{{ route('track') }}"
                class="h-10 px-4 rounded-full flex items-center text-[13px] font-semibold uppercase tracking-widest
                       transition-all duration-150"
                :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
@@ -174,7 +174,7 @@
             <div class="w-px h-5 mx-1 transition-colors duration-300"
                  :class="scrolled ? 'bg-[#08142D]/15' : 'bg-white/15'"></div>
 
-            <a href="/donate"
+            <a href="{{ route('donate') }}"
                class="relative overflow-hidden h-10 px-5 rounded-full text-xs font-bold
                       uppercase tracking-widest text-[#1A0E00] hover:scale-[1.03]
                       active:scale-95 transition-all duration-150 flex items-center"
@@ -345,7 +345,7 @@
                         background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);"></div>
 
             {{-- Track row --}}
-            <a href="/track" @click="open = false"
+            <a href="{{ route('track') }}" @click="open = false"
                class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200"
                style="border:1px solid rgba(255,255,255,0.06);"
                onmouseover="this.style.background='rgba(245,197,24,0.07)'; this.style.borderColor='rgba(245,197,24,0.25)';"
@@ -374,7 +374,7 @@
         {{-- Sticky donate button at bottom --}}
         <div class="px-5 py-4"
              style="border-top:1px solid rgba(255,255,255,0.06);">
-            <a href="/donate" @click="open = false"
+            <a href="{{ route('donate') }}" @click="open = false"
                class="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
                       font-bold uppercase tracking-widest active:scale-95
                       transition-transform duration-150"

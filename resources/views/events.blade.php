@@ -380,7 +380,7 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 View Announcements
             </a>
-            <a href="/inquiry"
+            <a href="{{ route('inquiry') }}"
                class="inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest border transition-all duration-300 hover:-translate-y-0.5"
                style="border-color:rgba(245,197,24,0.35); color:rgba(235,242,255,0.80);
                       background:rgba(255,255,255,0.04); backdrop-filter:blur(6px); text-decoration:none;"

@@ -2,24 +2,19 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\Inquiry;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
 class InquiryAccepted extends Mailable
 {
-    use Queueable, SerializesModels;
-
-    public $inquiry;
+    public Inquiry $inquiry;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($inquiry)
+    public function __construct(Inquiry $inquiry)
     {
         $this->inquiry = $inquiry;
     }

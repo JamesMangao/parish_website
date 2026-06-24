@@ -77,7 +77,7 @@
                         <!-- Special Interaction: Handover Prompt -->
                         <template x-if="msg.type === 'handover_prompt' && !msg.handoverActioned">
                             <div class="flex flex-col gap-2 mt-2">
-                                <a href="/inquiry" class="text-center px-4 py-2 border border-primary text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-white transition-all">
+                                <a href="{{ route('inquiry') }}" class="text-center px-4 py-2 border border-primary text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-white transition-all">
                                     Submit Inquiry Form
                                 </a>
                                 <button @click="requestAgent(msg)" class="px-4 py-2 bg-accent text-accent-foreground rounded-xl text-xs font-bold shadow-md hover:opacity-90 transition-all">
@@ -161,7 +161,7 @@
                         <!-- Special Interaction: Timeout -->
                         <template x-if="msg.type === 'timeout'">
                             <div class="mt-2">
-                                <a href="/inquiry" class="block text-center px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold shadow-md">
+                                <a href="{{ route('inquiry') }}" class="block text-center px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold shadow-md">
                                     Go to Inquiry Page
                                 </a>
                             </div>

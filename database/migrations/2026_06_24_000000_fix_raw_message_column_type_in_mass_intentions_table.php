@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('video_highlights', function (Blueprint $table) {
-            //
+        Schema::table('mass_intentions', function (Blueprint $table) {
+            $table->text('raw_message')->nullable()->change();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('video_highlights', function (Blueprint $table) {
-            //
+        Schema::table('mass_intentions', function (Blueprint $table) {
+            $table->string('raw_message')->nullable()->change();
         });
     }
 };

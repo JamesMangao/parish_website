@@ -13,6 +13,11 @@ class ScheduleController extends Controller
         return view('admin.schedules.index', compact('schedules'));
     }
 
+    public function show(MassSchedule $schedule)
+    {
+        return view('admin.schedules.show', compact('schedule'));
+    }
+
     public function create()
     {
         return view('admin.schedules.create');

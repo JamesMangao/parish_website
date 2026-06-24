@@ -552,7 +552,7 @@ function intentionForm() {
             if (this.loading) return;
             this.loading = true;
             try {
-                const res = await fetch('/submit-intention', {
+                const res = await fetch('{{ route('submit-intention') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

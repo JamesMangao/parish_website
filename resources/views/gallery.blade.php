@@ -705,7 +705,7 @@
                 </svg>
                 Follow on Facebook
             </a>
-            <a href="/about"
+            <a href="{{ route('about') }}"
                style="display:inline-flex; align-items:center; padding:14px 28px;
                       border-radius:100px; font-size:10px; letter-spacing:0.2em;
                       text-transform:uppercase; font-weight:700; text-decoration:none;

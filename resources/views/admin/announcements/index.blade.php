@@ -1,7 +1,7 @@
 <x-admin-index 
     title="Announcements" 
     description="Manage latest news and updates for the parish."
-    createRoute="/admin-portal/announcements/create"
+    createRoute="{{ route('admin.announcements.create') }}"
     :headers="['Title', 'Content Preview', 'Status', 'Posted']"
 >
     @forelse($announcements as $a)
@@ -28,10 +28,10 @@
             <td class="px-6 py-4 text-muted-foreground text-xs">{{ $a->created_at->format('M d, Y') }}</td>
             <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
-                    <a href="/admin-portal/announcements/{{ $a->id }}/edit" class="p-1.5 rounded-md border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all">
+                    <a href="{{ route('admin.announcements.edit', $a->id) }}" class="p-1.5 rounded-md border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                     </a>
-                    <form action="/admin-portal/announcements/{{ $a->id }}" method="POST" onsubmit="return confirm('Delete this announcement?')">
+                    <form action="{{ route('admin.announcements.destroy', $a->id) }}" method="POST" onsubmit="return confirm('Delete this announcement?')">
                         @csrf
                         @method('DELETE')
                         <button class="p-1.5 rounded-md border border-border text-muted-foreground hover:border-destructive hover:text-destructive transition-all">

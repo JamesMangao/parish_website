@@ -1,8 +1,8 @@
 <x-admin-form 
     title="Create Mass Intention" 
     description="Manually add a mass intention to the parish record."
-    backRoute="/admin-portal/intentions"
-    action="/admin-portal/intentions"
+    backRoute="{{ route('admin.intentions') }}"
+    action="{{ route('admin.intentions.store') }}"
     submitLabel="Create Intention"
 >
     <div class="space-y-4">

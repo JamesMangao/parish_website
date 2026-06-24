@@ -1,4 +1,4 @@
-@component('mail::message')
+<x-mail::message>
 # Sacramental Inquiry Update
 
 Dear {{ $inquiry->full_name ?? 'Parishioner' }},
@@ -29,11 +29,11 @@ We are unable to process your inquiry at this time. Please refer to the reason p
 Your inquiry is currently under review.
 @endif
 
-@component('mail::button', ['url' => route('track.status', ['refId' => $refId])])
+<x-mail::button :url="route('track.status', ['refId' => $refId])">
 Track Status Online
-@endcomponent
+</x-mail::button>
 
 Thank you for using Parish Portal!<br>
 God bless,<br>
 **Sto. Rosario Parish**
-@endcomponent
+</x-mail::message>

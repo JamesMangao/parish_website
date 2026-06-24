@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AIService;
 use App\Models\DailyReading;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -13,13 +12,6 @@ use Carbon\Carbon;
 
 class DailyReadingController extends Controller
 {
-    protected AIService $aiService;
-
-    public function __construct(AIService $aiService)
-    {
-        $this->aiService = $aiService;
-    }
-
     public function __invoke(Request $request)
     {
         $language = Str::upper($request->query('language', 'EN'));
@@ -64,15 +56,10 @@ class DailyReadingController extends Controller
             ->first();
 
         if ($record) {
-            $isStale = false;
-            if ($language === 'TG') {
-                $readingsText = json_encode($record->readings);
-                if (str_contains($readingsText, "Tanang mga kaharian") || str_contains($readingsText, "Hihilingin ko sa Ama")) {
-                    $isStale = true;
-                }
-            }
+            $readingsArr = $record->readings ?? [];
+            $readingCount = is_array($readingsArr) ? count($readingsArr) : 0;
 
-            if (!$isStale) {
+            if ($readingCount >= 3) {
                 return [
                     'title'          => $record->title,
                     'date_displayed' => $record->date_displayed,
@@ -83,13 +70,16 @@ class DailyReadingController extends Controller
             $record->delete();
         }
 
-        $dateObj    = Carbon::createFromFormat('Ymd', $date, 'Asia/Manila');
-        $scraperLang = $language === 'TG' ? 'tl' : 'en';
+        $dateObj = Carbon::createFromFormat('Ymd', $date, 'Asia/Manila');
+        $data = [];
 
-        $data = $this->fetchAwitAtPapuriReadings($dateObj, $scraperLang);
-
-        if (empty($data) || empty($data['readings'])) {
-            $data = $this->fetchWithAi($dateObj, $language);
+        if ($language === 'TG') {
+            $data = $this->fetchAwitAtPapuriReadings($dateObj);
+        } else {
+            $data = $this->fetchUsccbReadings($dateObj);
+            if (empty($data['readings'])) {
+                $data = $this->fetchEvangelizoReadings($dateObj, 'EN');
+            }
         }
 
         if (empty($data) || empty($data['readings'])) {
@@ -108,7 +98,213 @@ class DailyReadingController extends Controller
         return $data;
     }
 
-    private function fetchAwitAtPapuriReadings(Carbon $targetDate, string $lang = 'tl'): array
+    // ─── USCCB (English) ────────────────────────────────────────────────
+
+    private function fetchUsccbReadings(Carbon $targetDate): array
+    {
+        try {
+            $mdy = $targetDate->format('mdy');
+            $url = "https://bible.usccb.org/bible/readings/{$mdy}.cfm";
+            $agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+
+            $html = $this->fetchWithObolus($url, $agent);
+            if (!$html || stripos($html, 'Checking connection') !== false) {
+                return [];
+            }
+
+            return $this->parseUsccbPage($html, $targetDate);
+        } catch (\Exception $e) {
+            Log::warning('USCCB fetch failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    private function fetchWithObolus(string $url, string $agent): string
+    {
+        $html = $this->httpGet($url, $agent);
+        if (!$html || stripos($html, 'Checking connection') === false) {
+            return $html ?: '';
+        }
+
+        $nonce = $this->extractObolusParam($html, '/nonce\s*:\s*[\'"]([a-f0-9]+)[\'"]/');
+        $token = $this->extractObolusParam($html, '/challengeToken\s*:\s*[\'"]([a-f0-9]+)[\'"]/');
+        $timestamp = $this->extractObolusParam($html, '/challengeTimestamp\s*:\s*[\'"](\d+)[\'"]/');
+        $difficulty = (int) $this->extractObolusParam($html, '/difficulty\s*:\s*[\'"](\d+)[\'"]/');
+
+        if (!$nonce || !$token || !$timestamp || $difficulty < 10) {
+            return '';
+        }
+
+        $solution = $this->solveObolusPow($nonce, $difficulty);
+        if (!$solution) {
+            return '';
+        }
+
+        $proof = "{$timestamp}:{$nonce}:{$token}:{$solution['elapsed']}:{$solution['miningNonce']}";
+        return $this->httpGet($url, $agent, $proof);
+    }
+
+    private function solveObolusPow(string $nonce, int $difficulty): ?array
+    {
+        $miningNonce = 0;
+        $maxAttempts = 1 << ($difficulty + 2);
+        $startTime = microtime(true);
+
+        while ($miningNonce < $maxAttempts) {
+            $hash = hash('sha256', $nonce . ':mine:' . $miningNonce);
+            if ($this->countLeadingZeroBits($hash) >= $difficulty) {
+                return [
+                    'miningNonce' => $miningNonce,
+                    'hash'        => $hash,
+                    'elapsed'     => (int) round((microtime(true) - $startTime) * 1000),
+                ];
+            }
+            $miningNonce++;
+        }
+
+        return null;
+    }
+
+    private function countLeadingZeroBits(string $hex): int
+    {
+        $count = 0;
+        for ($i = 0; $i < strlen($hex); $i++) {
+            $digit = hexdec($hex[$i]);
+            if ($digit === 0) {
+                $count += 4;
+            } else {
+                $count += (4 - (int) ceil(log($digit + 1, 2)));
+                break;
+            }
+        }
+        return $count;
+    }
+
+    private function extractObolusParam(string $html, string $pattern): ?string
+    {
+        return preg_match($pattern, $html, $m) ? $m[1] : null;
+    }
+
+    private function parseUsccbPage(string $html, Carbon $targetDate): array
+    {
+        $text = strip_tags($html);
+        $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+        $text = preg_replace('/[ \t]+/', ' ', $text);
+        $text = preg_replace('/\s*\n\s*/', "\n", $text);
+
+        $title = $this->firstMatch($text, '/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[^\n]+/u')
+            ?: 'Daily Mass Readings';
+        $dateDisplayed = $targetDate->format('l, F j, Y');
+
+        $readings = [];
+
+        if ($v = $this->sectionBetween($text, 'Reading I', 'Responsorial Psalm'))
+            $readings[] = $this->makeReading('First Reading', $v, 'en');
+
+        if ($v = $this->sectionBetween($text, 'Responsorial Psalm', 'Reading II'))
+            $readings[] = $this->makeReading('Responsorial Psalm', $v, 'en');
+
+        if ($v = $this->sectionBetween($text, 'Reading II', 'Alleluia'))
+            $readings[] = $this->makeReading('Second Reading', $v, 'en');
+
+        if ($v = $this->sectionBetween($text, 'Alleluia', 'Gospel'))
+            $readings[] = $this->makeReading('Alleluia', $v, 'en');
+
+        if ($v = $this->sectionAfter($text, 'Gospel', ['Prayer of the Faithful', 'Copyright', '©']))
+            $readings[] = $this->makeReading('Gospel', $v, 'en');
+
+        if (empty($readings)) {
+            return [];
+        }
+
+        return [
+            'title'          => $title,
+            'date_displayed' => $dateDisplayed,
+            'readings'       => $readings,
+        ];
+    }
+
+    // ─── Evangelizo (English fallback) ───────────────────────────────────
+
+    private function fetchEvangelizoReadings(Carbon $targetDate, string $language): array
+    {
+        try {
+            $dateStr = $targetDate->format('Ymd');
+            $langCode = $language === 'TG' ? 'TL' : 'AM';
+
+            $res = Http::timeout(15)->withoutVerifying()->get('https://feed.evangelizo.org/v2/reader.php', [
+                'date' => $dateStr,
+                'lang' => $langCode,
+                'type' => 'all',
+            ]);
+
+            if (!$res->successful() || empty(trim($res->body()))) {
+                return [];
+            }
+
+            return $this->parseEvangelizoPage($res->body(), $targetDate, $language);
+        } catch (\Exception $e) {
+            Log::warning("Evangelizo {$language} fetch failed: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    private function parseEvangelizoPage(string $html, Carbon $targetDate, string $language): array
+    {
+        $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
+        $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
+        $html = strip_tags($html, '');
+        $html = preg_replace('/[ \t]+/', ' ', $html);
+        $html = preg_replace('/\n{3,}/', "\n\n", $html);
+
+        $title = $this->firstMatch($html, '/^[^\n]+/u') ?: 'Daily Mass Readings';
+        $dateDisplayed = $targetDate->format('l, F j, Y');
+
+        $sections = array_filter(array_map('trim', preg_split("/\n\n+/", $html)));
+        if (empty($sections)) {
+            return [];
+        }
+
+        $readings = [];
+        $enTypes = ['First Reading', 'Responsorial Psalm', 'Second Reading', 'Alleluia', 'Gospel'];
+        $tlTypes = ['Unang Pagbasa', 'Salmong Tugunan', 'Ikalawang Pagbasa', 'Aleluya', 'Mabuting Balita'];
+        $types = $language === 'TG' ? $tlTypes : $enTypes;
+
+        $i = 0;
+        foreach ($sections as $section) {
+            if ($i >= count($types)) break;
+            if (strlen($section) < 20) continue;
+
+            $lines = array_values(array_filter(array_map('trim', preg_split("/\n+/", $section))));
+            $reference = '';
+
+            if (!empty($lines[0])) {
+                $refPattern = '/^(?:(?:Book of |First book of |2nd book of |Acts of the Apostles |Psalms |Holy Gospel)[^\n]*|[A-Z][a-z]+ \d)/u';
+                if (preg_match($refPattern, $lines[0])) {
+                    $reference = array_shift($lines);
+                }
+            }
+
+            $readings[] = [
+                'type'      => $types[$i],
+                'reference' => $reference,
+                'text'      => trim(implode("\n", $lines)),
+            ];
+            $i++;
+        }
+
+        $readings = array_values(array_filter($readings, fn ($r) => !empty($r['text'])));
+
+        return empty($readings) ? [] : [
+            'title'          => $title,
+            'date_displayed' => $dateDisplayed,
+            'readings'       => $readings,
+        ];
+    }
+
+    // ─── Awit at Papuri (Filipino) ───────────────────────────────────────
+
+    private function fetchAwitAtPapuriReadings(Carbon $targetDate): array
     {
         try {
             $year  = $targetDate->format('Y');
@@ -131,11 +327,9 @@ class DailyReadingController extends Controller
             $readingsRes = Http::timeout(15)->withoutVerifying()->withHeaders($this->browserHeaders())->get($readingsUrl);
             if (!$readingsRes->successful()) return [];
 
-            $parsedPage = $this->parseAwitAtPapuriPage($readingsRes->body(), $targetDate, $lang);
+            $parsedPage = $this->parseAwitAtPapuriPage($readingsRes->body(), $targetDate);
 
-            return $lang === 'en'
-                ? $this->normalizeEnglishReadings($parsedPage)
-                : $this->normalizeTagalogReadings($parsedPage);
+            return $this->normalizeReadings($parsedPage);
 
         } catch (\Exception $e) {
             Log::warning('Failed to fetch from Awit at Papuri: ' . $e->getMessage());
@@ -143,200 +337,106 @@ class DailyReadingController extends Controller
         }
     }
 
-private function parseAwitAtPapuriPage(string $html, Carbon $targetDate, string $lang): array
-{
-    $dom = new \DOMDocument();
-    @$dom->loadHTML($html);
-    $xpath = new \DOMXPath($dom);
+    private function parseAwitAtPapuriPage(string $html, Carbon $targetDate): array
+    {
+        $dom = new \DOMDocument();
+        @$dom->loadHTML($html);
+        $xpath = new \DOMXPath($dom);
 
-    $candidates = $lang === 'tl'
-        ? ['tl', 'tagalog', 'filipino', 'fil']
-        : ['en', 'english'];
+        $contentNode = null;
+        $candidates = ['tl', 'tagalog', 'filipino', 'fil'];
+        foreach ($candidates as $cls) {
+            $contentNode = $xpath->query("//div[contains(@class, 'entry-content')]//div[contains(@class, '{$cls}')]")->item(0);
+            if ($contentNode) break;
+        }
+        if (!$contentNode) {
+            $contentNode = $xpath->query("//div[contains(@class, 'entry-content')]")->item(0);
+        }
+        if (!$contentNode) return [];
 
-    $contentNode = null;
-    foreach ($candidates as $cls) {
-        $contentNode = $xpath->query("//div[contains(@class, 'entry-content')]//div[contains(@class, '{$cls}')]")->item(0);
-        if ($contentNode) break;
-    }
-    if (!$contentNode) {
-        $contentNode = $xpath->query("//div[contains(@class, 'entry-content')]")->item(0);
-    }
-    if (!$contentNode) return [];
+        $text = $this->getNodeText($contentNode);
+        $text = preg_replace('/[ \t]+/', ' ', $text);
+        $text = preg_replace('/(\s*\n\s*){2,}/', "\n\n", $text);
 
-    $text = $this->getNodeText($contentNode);
-    $text = preg_replace('/[ \t]+/', ' ', $text);
-    $text = preg_replace('/(\s*\n\s*){2,}/', "\n\n", $text);
+        $allHeaders = ['UNANG PAGBASA', 'IKALAWANG PAGBASA', 'SALMONG TUGUNAN', 'ALELUYA', 'MABUTING BALITA'];
 
-    // Normalize section headers to uppercase on their own line
-    $allHeaders = $lang === 'tl'
-        ? ['UNANG PAGBASA', 'IKALAWANG PAGBASA', 'SALMONG TUGUNAN', 'ALELUYA', 'MABUTING BALITA']
-        : ['FIRST READING', 'SECOND READING', 'RESPONSORIAL PSALM', 'ALLELUIA', 'GOSPEL ACCLAMATION', 'GOSPEL'];
+        foreach ($allHeaders as $header) {
+            $text = preg_replace(
+                '/(?:^|\n)\s*(' . preg_quote($header, '/') . ')\s*(?:\n|$)/iu',
+                "\n\n" . strtoupper($header) . "\n\n",
+                $text
+            );
+        }
 
-    foreach ($allHeaders as $header) {
-        // Match header anywhere on its own line (case-insensitive), ensure it's on its own line
-        $text = preg_replace(
-            '/(?:^|\n)\s*(' . preg_quote($header, '/') . ')\s*(?:\n|$)/iu',
-            "\n\n" . strtoupper($header) . "\n\n",
-            $text
-        );
-    }
+        $text = preg_replace('/\n{3,}/', "\n\n", $text);
 
-    // Ensure double newlines between all sections
-    $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        $title = $this->firstMatch($text, '/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday).+?(?=\n)/u') ?: 'Daily Mass Readings';
+        $dateDisplayed = $this->firstMatch($text, '/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+[A-Za-zñÑ]+ \d{1,2}, \d{4}/u')
+            ?: $targetDate->translatedFormat('l, F j, Y');
 
-    $title = $this->firstMatch($text, '/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday).+?(?=\n)/u') ?: 'Daily Readings';
-    $dateDisplayed = $this->firstMatch($text, '/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+[A-Za-zñÑ]+ \d{1,2}, \d{4}/u')
-        ?: $targetDate->translatedFormat('l, F j, Y');
+        $firstHeader = 'UNANG PAGBASA';
+        $start = strpos($text, "\n\n" . $firstHeader . "\n");
+        if ($start !== false) {
+            $text = substr($text, $start);
+        }
 
-    // Trim everything before the first section header
-    $firstHeader = $lang === 'tl' ? 'UNANG PAGBASA' : 'FIRST READING';
-    $start = strpos($text, "\n\n" . $firstHeader . "\n");
-    if ($start !== false) {
-        $text = substr($text, $start);
-    }
+        $readings = [];
 
-    $readings = [];
-
-    if ($lang === 'en') {
-        if ($v = $this->sectionBetweenExact($text, 'FIRST READING', 'RESPONSORIAL PSALM'))
-            $readings[] = $this->makeReading('First Reading', $v, 'en');
-
-        if ($v = $this->sectionBetweenExact($text, 'RESPONSORIAL PSALM', 'ALLELUIA'))
-            $readings[] = $this->makeReading('Responsorial Psalm', $v, 'en');
-
-        if ($v = $this->sectionBetweenMultiEnd($text, 'ALLELUIA', ['GOSPEL ACCLAMATION', 'GOSPEL']))
-            $readings[] = $this->makeReading('Alleluia', $v, 'en');
-
-        if ($v = $this->sectionAfterExact($text, 'GOSPEL', ['PRAYER OF THE FAITHFUL', 'PANALANGIN', 'Pages:']))
-            $readings[] = $this->makeReading('Gospel', $v, 'en');
-
-    } else {
         if ($v = $this->sectionBetweenExact($text, 'UNANG PAGBASA', 'SALMONG TUGUNAN'))
             $readings[] = $this->makeReading('Unang Pagbasa', $v, 'tl');
 
-        if ($v = $this->sectionBetweenExact($text, 'SALMONG TUGUNAN', 'ALELUYA'))
+        if ($v = $this->sectionBetweenExact($text, 'SALMONG TUGUNAN', 'IKALAWANG PAGBASA'))
             $readings[] = $this->makeReading('Salmong Tugunan', $v, 'tl');
+
+        if ($v = $this->sectionBetweenExact($text, 'IKALAWANG PAGBASA', 'ALELUYA'))
+            $readings[] = $this->makeReading('Ikalawang Pagbasa', $v, 'tl');
 
         if ($v = $this->sectionBetweenExact($text, 'ALELUYA', 'MABUTING BALITA'))
             $readings[] = $this->makeReading('Aleluya', $v, 'tl');
 
         if ($v = $this->sectionAfterExact($text, 'MABUTING BALITA', ['PANALANGIN NG BAYAN', 'Pages:', 'Mga Pagbasa']))
             $readings[] = $this->makeReading('Mabuting Balita', $v, 'tl');
+
+        return [
+            'title'          => $title,
+            'date_displayed' => $dateDisplayed,
+            'readings'       => $readings,
+        ];
     }
 
-    return [
-        'title'          => $title,
-        'date_displayed' => $dateDisplayed,
-        'readings'       => $readings,
-    ];
-}
+    // ─── Shared helpers ──────────────────────────────────────────────────
 
-/**
- * Match headers that are on their OWN LINE (double-newline delimited).
- * Falls back to case-insensitive search if strict match fails.
- */
-private function sectionBetweenExact(string $text, string $start, string $end): string
-{
-    $startPattern = "\n\n" . strtoupper($start) . "\n";
-    $endPattern   = "\n\n" . strtoupper($end) . "\n";
-
-    $startPos = strpos($text, $startPattern);
-    if ($startPos === false) {
-        // Fallback: case-insensitive search for header on its own line
-        $startPos = preg_match('/(?:^|\n)\s*' . preg_quote(strtoupper($start), '/') . '\s*\n/im', $text, $m, PREG_OFFSET_CAPTURE);
-        if (!$startPos) return '';
-        $startPos = $m[0][1] + strlen($m[0][0]);
-    } else {
-        $startPos += strlen($startPattern);
-    }
-
-    $endPos = strpos($text, $endPattern, $startPos);
-    if ($endPos === false) {
-        // Fallback: case-insensitive search for end header
-        $endMatch = preg_match('/(?:^|\n)\s*' . preg_quote(strtoupper($end), '/') . '\s*\n/im', $text, $m, PREG_OFFSET_CAPTURE, $startPos);
-        $endPos = $endMatch ? $m[0][1] : false;
-    }
-
-    return trim($endPos === false ? substr($text, $startPos) : substr($text, $startPos, $endPos - $startPos));
-}
-
-private function sectionAfterExact(string $text, string $start, array $stops = []): string
-{
-    $startPattern = "\n\n" . strtoupper($start) . "\n";
-    $startPos = strpos($text, $startPattern);
-    if ($startPos === false) {
-        // Fallback: case-insensitive search
-        $found = preg_match('/(?:^|\n)\s*' . preg_quote(strtoupper($start), '/') . '\s*\n/im', $text, $m, PREG_OFFSET_CAPTURE);
-        if (!$found) return '';
-        $startPos = $m[0][1] + strlen($m[0][0]);
-    } else {
-        $startPos += strlen($startPattern);
-    }
-
-    $section = substr($text, $startPos);
-
-    $cutAt = null;
-    foreach ($stops as $stop) {
-        $pos = stripos($section, $stop);
-        if ($pos !== false && ($cutAt === null || $pos < $cutAt)) {
-            $cutAt = $pos;
-        }
-    }
-
-    return trim($cutAt !== null ? substr($section, 0, $cutAt) : $section);
-}
-    private function getNodeText(\DOMNode $node): string
+    private function httpGet(string $url, string $agent, ?string $proofCookie = null): string
     {
-        $text = '';
-        foreach ($node->childNodes as $child) {
-            if ($child->nodeType === XML_TEXT_NODE) {
-                $text .= $child->nodeValue;
-            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
-                $tag = strtolower($child->nodeName);
-                if ($tag === 'br' || $tag === 'p') $text .= "\n";
-                $text .= $this->getNodeText($child);
-                if ($tag === 'p') $text .= "\n";
-            }
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_USERAGENT      => $agent,
+            CURLOPT_FOLLOWLOCATION => true,
+        ]);
+
+        if ($proofCookie) {
+            curl_setopt($ch, CURLOPT_COOKIE, "X_Obolus_Proof={$proofCookie}");
         }
-        return trim(preg_replace('/(\s*\n\s*){2,}/', "\n\n", $text));
+
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return $result ?: '';
     }
 
-    private function normalizeEnglishReadings(array $data): array
+    private function normalizeReadings(array $data): array
     {
         if (empty($data['readings'])) return [];
-
-        $types     = array_map(fn ($r) => Str::lower($r['type'] ?? ''), $data['readings']);
-        $hasFirst  = collect($types)->contains(fn ($t) => str_contains($t, 'first') || str_contains($t, 'reading'));
-        $hasGospel = collect($types)->contains(fn ($t) => str_contains($t, 'gospel'));
-
-        if (!$hasFirst || !$hasGospel) return [];
 
         $data['readings'] = array_values(array_filter(
             $data['readings'],
             fn ($r) => !empty(trim($r['text'] ?? ''))
         ));
 
-        return $data;
-    }
-
-    private function normalizeTagalogReadings(array $data): array
-    {
-        if (empty($data['readings'])) return [];
-
-        $types     = array_map(fn ($r) => Str::lower($r['type'] ?? ''), $data['readings']);
-        $hasFirst  = collect($types)->contains(fn ($t) => str_contains($t, 'unang') || str_contains($t, 'pagbasa'));
-        $hasGospel = collect($types)->contains(fn ($t) => str_contains($t, 'mabuting') || str_contains($t, 'balita'));
-
-        if (!$hasFirst || !$hasGospel) return [];
-
-        $data['readings'] = array_values(array_filter(
-            $data['readings'],
-            fn ($r) => !empty(trim($r['text'] ?? ''))
-        ));
-
-        if (empty($data['readings'])) return [];
-
-        return $data;
+        return !empty($data['readings']) ? $data : [];
     }
 
     private function makeReading(string $type, string $section, string $lang = 'en'): array
@@ -345,8 +445,8 @@ private function sectionAfterExact(string $text, string $start, array $stops = [
         $reference = '';
 
         if (!empty($lines[0])) {
-            $enPattern = '/\d|Gen|Ex|Lev|Num|Deut|Josh|Judg|Ruth|Sam|Kgs|Chr|Ezra|Neh|Tob|Jdt|Esth|Macc|Job|Ps|Prov|Eccl|Song|Wis|Sir|Isa|Jer|Lam|Bar|Ezek|Dan|Hos|Joel|Amos|Obad|Jon|Mic|Nah|Hab|Zeph|Hag|Zech|Mal|Matt|Mark|Luke|John|Acts|Rom|Cor|Gal|Eph|Phil|Col|Thess|Tim|Tit|Phlm|Heb|Jas|Pet|Jn|Jude|Rev/';
-            $tlPattern = '/\d|Salmo|Juan|Lucas|Marcos|Mateo|Gawa|Roma|Corinto|Pedro|Santiago|Hebreo|Galata|Efeso|Filipos|Colosas|Tesaloni|Timoteo|Tito|Filemon|Pahayag/u';
+            $enPattern = '/^\d|Gen|Ex|Lev|Num|Deut|Josh|Judg|Ruth|Sam|Kgs|Chr|Ezra|Neh|Tob|Jdt|Esth|Macc|Job|Ps|Prov|Eccl|Song|Wis|Sir|Isa|Jer|Lam|Bar|Ezek|Dan|Hos|Joel|Amos|Obad|Jon|Mic|Nah|Hab|Zeph|Hag|Zech|Mal|Matt|Mark|Luke|John|Acts|Rom|Cor|Gal|Eph|Phil|Col|Thess|Tim|Tit|Phlm|Heb|Jas|Pet|Jn|Jude|Rev|Book of|Psalms|Holy Gospel/u';
+            $tlPattern = '/^\d|Salmo|Juan|Lucas|Marcos|Mateo|Gawa|Roma|Corinto|Pedro|Santiago|Hebreo|Galata|Efeso|Filipos|Colosas|Tesaloni|Timoteo|Tito|Filemon|Pahayag/u';
             $pattern   = $lang === 'tl' ? $tlPattern : $enPattern;
 
             if (preg_match($pattern, $lines[0])) {
@@ -361,110 +461,6 @@ private function sectionAfterExact(string $text, string $start, array $stops = [
         ];
     }
 
-    private function fetchWithAi(Carbon $targetDate, string $language): array
-    {
-        $displayDate = $targetDate->format('l, F j, Y');
-        $dateStr     = $targetDate->format('Ymd');
-        $rawText     = '';
-        $sourceUsed  = '';
-
-        if ($language === 'TG') {
-            foreach (['TG', 'FI'] as $evLang) {
-                try {
-                    $res = Http::timeout(15)->withoutVerifying()->get('https://feed.evangelizo.org/v2/reader.php', [
-                        'date' => $dateStr,
-                        'lang' => $evLang,
-                        'type' => 'all',
-                    ]);
-                    if ($res->successful() && !empty(trim($res->body()))) {
-                        $rawText    = $res->body();
-                        $sourceUsed = "Evangelizo ({$evLang})";
-                        break;
-                    }
-                } catch (\Exception $e) {
-                    Log::warning("Evangelizo {$evLang} fetch failed: " . $e->getMessage());
-                }
-            }
-        }
-
-        if (empty($rawText) && $language === 'EN') {
-            try {
-                $usccbDate = $targetDate->format('mdy');
-                $response  = Http::timeout(10)->withoutVerifying()->withHeaders($this->browserHeaders())
-                    ->get("https://bible.usccb.org/bible/readings/{$usccbDate}.cfm");
-
-                if ($response->successful() && strpos($response->body(), 'Verify you are human') === false) {
-                    $rawText    = $response->body();
-                    $sourceUsed = 'USCCB';
-                }
-            } catch (\Exception $e) {
-                Log::warning('Failed to fetch from USCCB: ' . $e->getMessage());
-            }
-        }
-
-        if (empty($rawText)) {
-            try {
-                $response = Http::timeout(15)->withoutVerifying()->get('https://feed.evangelizo.org/v2/reader.php', [
-                    'date' => $dateStr,
-                    'lang' => 'AM',
-                    'type' => 'all',
-                ]);
-                if ($response->successful()) {
-                    $rawText    = $response->body();
-                    $sourceUsed = 'Evangelizo (EN)';
-                }
-            } catch (\Exception $e) {
-                Log::warning('Evangelizo EN fallback failed: ' . $e->getMessage());
-            }
-        }
-
-        if (empty($rawText)) throw new \Exception('Daily readings could not be retrieved from any source.');
-
-        $cleanRawText = str_ireplace(['<br>', '<br/>', '<br />', '</p>', '</div>'], "\n", $rawText);
-        $cleanRawText = strip_tags($cleanRawText);
-        $cleanRawText = html_entity_decode($cleanRawText, ENT_QUOTES, 'UTF-8');
-        $cleanRawText = preg_replace('/[ \t]+/', ' ', $cleanRawText);
-        $cleanRawText = preg_replace("/\n{3,}/", "\n\n", $cleanRawText);
-        $cleanRawText = substr($cleanRawText, 0, 12000);
-
-        $langInstruction = $language === 'TG'
-            ? 'Translate ALL reading texts and labels to Filipino/Tagalog. Use these exact type labels: "Unang Pagbasa", "Salmong Tugunan", "Aleluya", "Mabuting Balita". Preserve all R. and A. response markers.'
-            : 'Keep all texts in English. Use these exact type labels: "First Reading", "Responsorial Psalm", "Alleluia", "Gospel".';
-
-        $systemPrompt = "You are a Catholic liturgical assistant. Parse raw Catholic daily Mass readings into strict JSON only. No markdown, no explanation — only the JSON object. Preserve line breaks using \\n. {$langInstruction} Required JSON format: {\"title\":\"\",\"date_displayed\":\"\",\"readings\":[{\"type\":\"\",\"reference\":\"\",\"text\":\"\"}]}";
-
-        $aiResponse = $this->aiService->getResponse([
-            ['role' => 'system', 'content' => $systemPrompt],
-            ['role' => 'user', 'content' => "Raw Readings for {$displayDate} (Language: {$language}, Source: {$sourceUsed}):\n\n" . $cleanRawText],
-        ]);
-
-        $jsonText  = trim($aiResponse);
-        $jsonStart = strpos($jsonText, '{');
-        $jsonEnd   = strrpos($jsonText, '}');
-
-        if ($jsonStart !== false && $jsonEnd !== false) {
-            $jsonText = substr($jsonText, $jsonStart, $jsonEnd - $jsonStart + 1);
-        }
-
-        $parsed = json_decode($jsonText, true);
-        if (json_last_error() !== JSON_ERROR_NONE || !isset($parsed['readings'])) {
-            throw new \Exception('Failed to parse daily readings JSON from AI response.');
-        }
-
-        foreach ($parsed['readings'] as &$reading) {
-            if (isset($reading['text'])) {
-                $reading['text'] = str_replace(['\n', '\"', "\'"], ["\n", '"', "'"], $reading['text']);
-            }
-        }
-        unset($reading);
-
-        return $language === 'TG'
-            ? $this->normalizeTagalogReadings($parsed)
-            : $this->normalizeEnglishReadings($parsed);
-    }
-
-    // ─── Section Helpers ────────────────────────────────────────────────────────
-
     private function sectionBetween(string $text, string $start, string $end): string
     {
         $startPos = stripos($text, $start);
@@ -474,43 +470,58 @@ private function sectionAfterExact(string $text, string $start, array $stops = [
         return trim($endPos === false ? substr($text, $startPos) : substr($text, $startPos, $endPos - $startPos));
     }
 
-    private function sectionAfter(string $text, string $start): string
-    {
-        $startPos = stripos($text, $start);
-        return $startPos === false ? '' : trim(substr($text, $startPos + strlen($start)));
-    }
-
-    /**
-     * sectionBetween but tries multiple end markers — uses earliest match.
-     */
-    private function sectionBetweenMultiEnd(string $text, string $start, array $ends): string
+    private function sectionAfter(string $text, string $start, array $stops = []): string
     {
         $startPos = stripos($text, $start);
         if ($startPos === false) return '';
         $startPos += strlen($start);
+        $section = substr($text, $startPos);
 
-        $endPos = null;
-        foreach ($ends as $end) {
-            $pos = stripos($text, $end, $startPos);
-            if ($pos !== false && ($endPos === null || $pos < $endPos)) {
-                $endPos = $pos;
+        $cutAt = null;
+        foreach ($stops as $stop) {
+            $pos = stripos($section, $stop);
+            if ($pos !== false && ($cutAt === null || $pos < $cutAt)) {
+                $cutAt = $pos;
             }
         }
 
-        return trim($endPos !== null
-            ? substr($text, $startPos, $endPos - $startPos)
-            : substr($text, $startPos));
+        return trim($cutAt !== null ? substr($section, 0, $cutAt) : $section);
     }
 
-    /**
-     * sectionAfter but hard-stops at first match of any stop string.
-     * Prevents footer/nav content bleeding into Gospel/Mabuting Balita.
-     */
-    private function sectionAfterWithStop(string $text, string $start, array $stops): string
+    private function sectionBetweenExact(string $text, string $start, string $end): string
     {
-        $startPos = stripos($text, $start);
-        if ($startPos === false) return '';
-        $startPos += strlen($start);
+        $startPattern = "\n\n" . strtoupper($start) . "\n";
+        $endPattern   = "\n\n" . strtoupper($end) . "\n";
+
+        $startPos = strpos($text, $startPattern);
+        if ($startPos === false) {
+            $startPos = preg_match('/(?:^|\n)\s*' . preg_quote(strtoupper($start), '/') . '\s*\n/im', $text, $m, PREG_OFFSET_CAPTURE);
+            if (!$startPos) return '';
+            $startPos = $m[0][1] + strlen($m[0][0]);
+        } else {
+            $startPos += strlen($startPattern);
+        }
+
+        $endPos = strpos($text, $endPattern, $startPos);
+        if ($endPos === false) {
+            $endMatch = preg_match('/(?:^|\n)\s*' . preg_quote(strtoupper($end), '/') . '\s*\n/im', $text, $m, PREG_OFFSET_CAPTURE, $startPos);
+            $endPos = $endMatch ? $m[0][1] : false;
+        }
+
+        return trim($endPos === false ? substr($text, $startPos) : substr($text, $startPos, $endPos - $startPos));
+    }
+
+    private function sectionAfterExact(string $text, string $start, array $stops = []): string
+    {
+        $startPattern = "\n\n" . strtoupper($start) . "\n";
+        $startPos = strpos($text, $startPattern);
+        if ($startPos === false) {
+            $found = preg_match('/(?:^|\n)\s*' . preg_quote(strtoupper($start), '/') . '\s*\n/im', $text, $m, PREG_OFFSET_CAPTURE);
+            if (!$found) return '';
+            $startPos = $m[0][1] + strlen($m[0][0]);
+        } else {
+            $startPos += strlen($startPattern);
+        }
 
         $section = substr($text, $startPos);
 
@@ -523,6 +534,22 @@ private function sectionAfterExact(string $text, string $start, array $stops = [
         }
 
         return trim($cutAt !== null ? substr($section, 0, $cutAt) : $section);
+    }
+
+    private function getNodeText(\DOMNode $node): string
+    {
+        $text = '';
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType === XML_TEXT_NODE) {
+                $text .= $child->nodeValue;
+            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
+                $tag = strtolower($child->nodeName);
+                if ($tag === 'br' || $tag === 'p') $text .= "\n";
+                $text .= $this->getNodeText($child);
+                if ($tag === 'p') $text .= "\n";
+            }
+        }
+        return trim(preg_replace('/(\s*\n\s*){2,}/', "\n\n", $text));
     }
 
     private function firstMatch(string $text, string $pattern): string

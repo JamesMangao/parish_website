@@ -3,16 +3,12 @@
 namespace App\Notifications;
 
 use App\Models\MassIntention;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Str;
 
 class IntentionSubmitted extends Notification
 {
-    use Queueable;
-
-    protected $intention;
+    protected MassIntention $intention;
 
     public function __construct(MassIntention $intention)
     {

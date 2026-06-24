@@ -955,8 +955,8 @@
         <div class="cta-rule" data-reveal></div>
         <p class="cta-sub" data-reveal>Our doors and hearts are always open to you.</p>
         <div class="cta-btns" data-reveal>
-            <a href="/mass-schedule" class="btn-gold">View schedule</a>
-            <a href="/inquiry"       class="btn-ghost">Contact office</a>
+            <a href="{{ route('mass-schedule') }}" class="btn-gold">View schedule</a>
+            <a href="{{ route('inquiry') }}"       class="btn-ghost">Contact office</a>
         </div>
     </section>
 

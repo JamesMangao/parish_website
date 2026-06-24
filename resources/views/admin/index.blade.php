@@ -6,7 +6,7 @@
             </div>
             <h2 class="font-heading text-xl font-bold text-primary mb-2">Under Construction</h2>
             <p class="text-muted-foreground text-sm max-w-xs">This management module is currently being migrated and will be available shortly.</p>
-            <a href="/admin-portal/dashboard" class="mt-6 inline-block text-accent font-bold text-sm uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Return to Dashboard</a>
+            <a href="{{ route('admin.dashboard') }}" class="mt-6 inline-block text-accent font-bold text-sm uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Return to Dashboard</a>
         </div>
     </div>
 </x-admin-layout>

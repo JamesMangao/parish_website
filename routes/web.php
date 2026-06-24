@@ -30,8 +30,8 @@ Route::post('/track', [TrackController::class, 'track'])->name('track.post');
 Route::get('/track-intention/{refId}', [TrackController::class, 'showStatus'])->name('track.status');
 
 // Bulletins
-// Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
-// Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
+Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
+Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
 
 Route::get('/submit-intention', [IntentionController::class, 'create'])->name('submit-intention');
 Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:submissions');
@@ -46,7 +46,7 @@ Route::get('/gallery/{album}', [GalleryController::class, 'publicAlbum'])->name(
 
 // API Proxies
 Route::middleware('throttle:chat')->group(function () {
-    Route::post('/api/chatbot', [ChatbotController::class, 'chat']);
+    Route::post('/api/chatbot', [ChatbotController::class, 'chat'])->name('chatbot.chat');
     Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
     Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
 });
@@ -57,7 +57,7 @@ Route::permanentRedirect('/admin', '/admin-portal/dashboard');
 Route::permanentRedirect('/admin/{path}', '/admin-portal/{path}')->where('path', '.*');
 
 Route::get('/admin-portal/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/admin-portal/login', [LoginController::class, 'login'])->middleware('throttle:auth');
+Route::post('/admin-portal/login', [LoginController::class, 'login'])->middleware('throttle:auth')->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
@@ -68,13 +68,13 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
-        Route::post('/admin-portal/generate-ppt', [AdminController::class, 'generatePPT']);
+        Route::post('/admin-portal/generate-ppt', [AdminController::class, 'generatePPT'])->name('admin.generate-ppt');
         Route::get('/admin-portal/preview-ppt', [AdminController::class, 'previewPPT'])->name('admin.preview-ppt');
         Route::post('/admin-portal/create-google-slides', [AdminController::class, 'createGoogleSlides'])->name('admin.create-google-slides');
 
         Route::get('/google/auth', function () {
             $client = new \Google\Client();
-            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            $client->setHttpClient(new \GuzzleHttp\Client());
             $client->setAuthConfig(storage_path('app/google_oauth_client.json'));
             $client->addScope('https://www.googleapis.com/auth/presentations');
             $client->addScope('https://www.googleapis.com/auth/drive');
@@ -95,7 +95,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
             }
 
             $client = new \Google\Client();
-            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            $client->setHttpClient(new \GuzzleHttp\Client());
             $client->setAuthConfig(storage_path('app/google_oauth_client.json'));
             $client->setRedirectUri(url('/google/callback'));
             $token = $client->fetchAccessTokenWithAuthCode($request->get('code'));
@@ -116,7 +116,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::get('/admin-portal/intentions/{id}', [AdminController::class, 'showIntention'])->name('admin.intentions.show');
         Route::post('/admin-portal/intentions', [AdminController::class, 'storeIntention'])->name('admin.intentions.store');
         Route::post('/admin-portal/intentions/batch', [AdminController::class, 'batchUpdateStatus'])->name('admin.intentions.batch');
-        Route::post('/admin-portal/intentions/{id}/status', [AdminController::class, 'updateStatus']);
+        Route::post('/admin-portal/intentions/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.intentions.status');
     });
 
     // Role: super_admin, staff, or soccom
@@ -167,23 +167,4 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::get('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings');
         Route::post('/admin-portal/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
     });
-    Route::get('/debug-readings-raw', function () {
-    $date = now('Asia/Manila');
-    
-    $text = "\n\nUNANG PAGBASA\n2 Timoteo 1, 1-3. 6-12\nTest first reading text with Mabuting Balita mentioned here.\nAng Salita ng Diyos.\n\nSALMONG TUGUNAN\nSalmo 122\nAng mata ko'y nakatuon\n\nALELUYA\nJuan 11, 25a\nAleluya! Aleluya!\n\nMABUTING BALITA\nMarcos 12, 18-27\nActual gospel text here.\nAng Mabuting Balita ng Panginoon.\nPANALANGIN NG BAYAN\nPages: 1 2";
-
-    $startPattern = "\n\nMABUTING BALITA\n";
-    $pos = strpos($text, $startPattern);
-    
-    // Also test what the controller actually produces
-    $controller = app(\App\Http\Controllers\DailyReadingController::class);
-    $ref = new \ReflectionMethod($controller, 'fetchAwitAtPapuriReadings');
-    $ref->setAccessible(true);
-    $result = $ref->invoke($controller, $date, 'tl');
-
-    return response()->json([
-        'pattern_found_at' => $pos,
-        'parsed_result'    => $result,
-    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-});
 });

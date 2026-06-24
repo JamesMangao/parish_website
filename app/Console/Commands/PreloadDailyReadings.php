@@ -10,62 +10,55 @@ use Illuminate\Support\Facades\Log;
 
 class PreloadDailyReadings extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'readings:preload {--days=7 : The number of days to preload}';
+    protected $signature = 'readings:preload {--days=15 : The number of days to preload}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Pre-fetches Catholic daily readings for both English and Tagalog languages';
+    protected $description = 'Pre-fetches Catholic daily readings for both English and Filipino languages';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(DailyReadingController $controller)
     {
         $days = (int) $this->option('days');
         $this->info("Preloading daily readings for the next {$days} days...");
 
         $now = Carbon::now('Asia/Manila');
+        $successCount = 0;
+        $skipCount = 0;
+        $failCount = 0;
 
         for ($i = 0; $i < $days; $i++) {
             $targetDate = $now->copy()->addDays($i);
             $dateStr = $targetDate->format('Ymd');
+            $dateLabel = $targetDate->format('D, M j');
 
-            foreach (['EN', 'TG'] as $lang) {
-                $this->info("Checking {$dateStr} ({$lang})...");
-
-                // Check if already in DB
+            foreach (['TG', 'EN'] as $lang) {
                 $exists = DailyReading::where('date', $dateStr)
                     ->where('language', $lang)
+                    ->where('deleted_at', null)
                     ->exists();
 
                 if ($exists) {
-                    $this->line("-> Already exists in database.");
+                    $this->line("  [SKIP] {$dateLabel} ({$lang}) - already in DB");
+                    $skipCount++;
                     continue;
                 }
 
-                $this->info("-> Fetching readings for {$dateStr} ({$lang})...");
+                $this->line("  [FETCH] {$dateLabel} ({$lang})...");
                 try {
                     $controller->getOrFetchReadings($dateStr, $lang);
-                    $this->info("-> Successfully preloaded!");
+                    $this->info("  [OK] {$dateLabel} ({$lang})");
+                    $successCount++;
                 } catch (\Exception $e) {
-                    $this->error("-> Failed to preload: " . $e->getMessage());
-                    Log::warning("Artisan command readings:preload failed for date {$dateStr} ({$lang}): " . $e->getMessage());
+                    $this->error("  [FAIL] {$dateLabel} ({$lang}): " . $e->getMessage());
+                    Log::warning("readings:preload failed for {$dateStr} ({$lang}): " . $e->getMessage());
+                    $failCount++;
                 }
 
-                // Add a small sleep between requests to avoid rate limits
-                usleep(500000); // 0.5s
+                usleep(800000);
             }
         }
 
-        $this->info('Preloading completed!');
+        $this->newLine();
+        $this->info("Done! Success: {$successCount}, Skipped: {$skipCount}, Failed: {$failCount}");
+
         return self::SUCCESS;
     }
 }

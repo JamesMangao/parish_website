@@ -21,15 +21,15 @@
             <div>
                 <h4 class="font-heading font-semibold mb-4 text-accent">Quick Links</h4>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2">
-                    <a href="/mass-schedule" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Mass Schedule</a>
-                    <a href="/submit-intention" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Submit Intention</a>
-                    <a href="/inquiry" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Sacramental Inquiry</a>
-                    <a href="/events" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Parish Events</a>
-                    <a href="/gallery" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Photo Gallery</a>
+                    <a href="{{ route('mass-schedule') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Mass Schedule</a>
+                    <a href="{{ route('submit-intention') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Submit Intention</a>
+                    <a href="{{ route('inquiry') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Sacramental Inquiry</a>
+                    <a href="{{ route('events') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Parish Events</a>
+                    <a href="{{ route('gallery') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Photo Gallery</a>
 
-                    <a href="/track" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Track Submission</a>
-                    <a href="/about" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">About Us</a>
-                    <a href="/donate" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Donate</a>
+                    <a href="{{ route('track') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Track Submission</a>
+                    <a href="{{ route('about') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">About Us</a>
+                    <a href="{{ route('donate') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Donate</a>
                 </div>
             </div>
             <div>

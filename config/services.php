@@ -52,4 +52,9 @@ return [
         'office_email' => env('PARISH_OFFICE_EMAIL', 'officestorosarioparish@gmail.com'),
     ],
 
+    'google' => [
+        'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID'),
+        'share_email' => env('GOOGLE_SHARE_EMAIL'),
+    ],
+
 ];

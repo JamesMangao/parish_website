@@ -21,7 +21,7 @@ class AIService
     }
 
     /**
-     * Get a response from AI, trying Groq first then OpenRouter.
+     * Get a response from AI, trying OpenRouter first then Groq.
      */
     public function getResponse(array $messages)
     {
@@ -37,19 +37,19 @@ class AIService
         // Try OpenRouter First (Better for long token outputs)
         if ($this->openRouterKey) {
             $openRouterModels = [
-                'google/gemini-2.0-flash-lite-001',
+                'google/gemini-2.5-flash',
                 'google/gemini-2.5-flash-lite',
-                'google/gemini-3.1-flash-lite'
+                'meta-llama/llama-4-scout',
             ];
 
             foreach ($openRouterModels as $model) {
                 try {
-                    $response = Http::withHeaders([
+                    $response = Http::withoutVerifying()->withHeaders([
                         'Authorization' => 'Bearer ' . $this->openRouterKey,
                         'HTTP-Referer' => config('app.url'),
                         'X-Title' => config('app.name'),
                         'Content-Type' => 'application/json',
-                    ])->withOptions(['verify' => false])->post('https://openrouter.ai/api/v1/chat/completions', [
+                    ])->timeout(30)->post('https://openrouter.ai/api/v1/chat/completions', [
                         'model' => $model,
                         'messages' => $messages,
                         'max_tokens' => 4000,
@@ -69,10 +69,10 @@ class AIService
         // Fallback to Groq
         if ($this->groqKey) {
             try {
-                $response = Http::withHeaders([
+                $response = Http::withoutVerifying()->withHeaders([
                     'Authorization' => 'Bearer ' . $this->groqKey,
                     'Content-Type' => 'application/json',
-                ])->withOptions(['verify' => false])->post('https://api.groq.com/openai/v1/chat/completions', [
+                ])->timeout(30)->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model' => 'llama-3.1-8b-instant',
                     'messages' => $messages,
                     'temperature' => 0.7,
@@ -89,7 +89,7 @@ class AIService
             }
         }
 
-        return "I am sorry, my contemplative silence is being interrupted by technical connectivity. Please try again or contact the parish office directly.";
+        throw new \RuntimeException('All AI providers are currently unavailable. Please try again later.');
     }
 
 /**

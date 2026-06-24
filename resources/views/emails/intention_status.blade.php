@@ -1,4 +1,4 @@
-@component('mail::message')
+<x-mail::message>
 # Mass Intention Update
 
 Dear {{ $intention->full_name ?? 'Parishioner' }},
@@ -21,11 +21,11 @@ Unfortunately, we cannot accommodate your intention at this time for the reason 
 Your intention is currently pending review.
 @endif
 
-@component('mail::button', ['url' => route('track.status', ['refId' => $refId])])
+<x-mail::button :url="route('track.status', ['refId' => $refId])">
 Track Status Online
-@endcomponent
+</x-mail::button>
 
 Thank you for your faith and patience.<br>
 God bless,<br>
 **Sto. Rosario Parish**
-@endcomponent
+</x-mail::message>

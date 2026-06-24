@@ -334,6 +334,7 @@ class AdminController extends Controller
             'status' => 'approved', // Admin submitted are approved by default
             'payment_method' => $validated['paymentMethod'],
             'reviewed_by' => auth()->id(),
+            'reference_number' => $this->generateReferenceNumber(),
         ]);
 
         return redirect()->route('admin.intentions')->with('success', 'Mass intention created successfully.');
@@ -354,7 +355,7 @@ class AdminController extends Controller
 
         try {
             $client = new \Google\Client();
-            $client->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            $client->setHttpClient(new \GuzzleHttp\Client());
             $client->setAuthConfig($oauthConfigPath);
             $client->addScope('https://www.googleapis.com/auth/presentations');
             $client->addScope('https://www.googleapis.com/auth/drive');
@@ -378,7 +379,7 @@ class AdminController extends Controller
 
             $targetDate = $request->input('date') ?? date('Y-m-d');
             $presentationTitle = 'Mass Intentions - ' . $targetDate;
-            $targetFolderId = '1FLhWonUy8eaE-VxEH_-Tp1hQ79REcbDV'; // MASS INTENTION SLIDES folder
+            $targetFolderId = config('services.google.folder_id', '1FLhWonUy8eaE-VxEH_-Tp1hQ79REcbDV');
             
             // 1. Search for existing presentation for this date in the folder
             $presentationId = null;
@@ -665,7 +666,7 @@ class AdminController extends Controller
                 $permission = new \Google\Service\Drive\Permission([
                     'type' => 'user',
                     'role' => 'writer',
-                    'emailAddress' => 'publicojamesmangao25@gmail.com',
+                    'emailAddress' => config('services.google.share_email', env('PARISH_OFFICE_EMAIL', 'publicojamesmangao25@gmail.com')),
                 ]);
                 $driveService->permissions->create($presentationId, $permission, [
                     'sendNotificationEmail' => false,
@@ -700,5 +701,12 @@ class AdminController extends Controller
     {
         $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
         return view('admin.logs', compact('logs'));
+    }
+
+    private function generateReferenceNumber(): string
+    {
+        $year = date('Y');
+        $count = MassIntention::whereYear('created_at', $year)->count() + 1;
+        return 'SRP-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 }

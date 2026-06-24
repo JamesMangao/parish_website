@@ -47,7 +47,7 @@
             @php $currentFilter = request('status', 'all'); @endphp
             @foreach(['all', 'pending', 'approved', 'rejected'] as $f)
                 <a 
-                    href="/admin-portal/intentions?status={{ $f }}" 
+                    href="{{ route('admin.intentions', ['status' => $f]) }}"
                     class="px-4 py-1.5 rounded-md text-xs font-bold transition-all capitalize border {{ $currentFilter === $f ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-muted-foreground border-border hover:border-primary hover:text-primary' }}"
                 >
                     {{ $f }}

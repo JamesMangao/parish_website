@@ -26,7 +26,7 @@
         <div class="bg-card/95 backdrop-blur-lg rounded-2xl border p-8 shadow-2xl">
             <h2 class="font-heading text-xl font-bold text-primary mb-6">Staff Login</h2>
             
-            <form method="POST" action="/admin-portal/login" class="space-y-5">
+            <form method="POST" action="{{ route('login.submit') }}" class="space-y-5">
                 @csrf
                 <div class="space-y-2">
                     <label class="text-sm font-bold text-primary" for="email">Email Address</label>
@@ -72,7 +72,7 @@
         </div>
         
         <div class="text-center mt-8">
-            <a href="/" class="text-white/60 hover:text-white text-xs font-bold transition-colors uppercase tracking-widest flex items-center justify-center gap-2">
+            <a href="{{ route('home') }}" class="text-white/60 hover:text-white text-xs font-bold transition-colors uppercase tracking-widest flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                 Back to Public Site
             </a>

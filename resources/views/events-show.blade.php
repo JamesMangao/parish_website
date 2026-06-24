@@ -8,11 +8,11 @@
     <div class="container py-12 mx-auto px-4 max-w-4xl" x-data="{}">
         <nav class="flex mb-8 text-sm font-medium text-muted-foreground" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+                <li><a href="{{ route('home') }}" class="hover:text-primary transition-colors">Home</a></li>
                 <li>
                     <div class="flex items-center">
                         <svg class="w-3 h-3 mx-1" fill="currentColor" viewBox="0 0 20 20"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path></svg>
-                        <a href="/events" class="hover:text-primary transition-colors">Events</a>
+                        <a href="{{ route('events') }}" class="hover:text-primary transition-colors">Events</a>
                     </div>
                 </li>
                 <li aria-current="page">
@@ -93,7 +93,7 @@
                         <div class="text-center p-6 bg-accent/5 rounded-3xl border border-accent/10">
                             <p class="text-xs font-bold text-accent uppercase tracking-widest mb-2">Need Help?</p>
                             <p class="text-sm text-primary/80 mb-4">Contact the parish office for more inquiries about this event.</p>
-                            <a href="/inquiry" class="text-xs font-black uppercase underline hover:text-accent transition-colors">Submit an Inquiry</a>
+                            <a href="{{ route('inquiry') }}" class="text-xs font-black uppercase underline hover:text-accent transition-colors">Submit an Inquiry</a>
                         </div>
                     </div>
                 </div>
@@ -101,7 +101,7 @@
         </article>
         
         <div class="mt-12 text-center">
-            <a href="/events" class="inline-flex items-center gap-2 text-primary font-bold hover:text-accent transition-colors group">
+            <a href="{{ route('events') }}" class="inline-flex items-center gap-2 text-primary font-bold hover:text-accent transition-colors group">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
                 Back to All Events
             </a>

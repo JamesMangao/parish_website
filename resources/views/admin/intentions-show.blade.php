@@ -11,7 +11,7 @@
                     <button @click="showRejection = true" class="px-4 py-2 rounded-xl border-2 border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-widest hover:bg-destructive/5 transition-all">
                         Reject Intention
                     </button>
-                    <form action="/admin-portal/intentions/{{ $intention->id }}/status" method="POST">
+                    <form action="{{ route('admin.intentions.status', $intention->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="status" value="approved">
                         <button type="submit" class="px-6 py-2 rounded-xl bg-accent text-accent-foreground text-[10px] font-black uppercase tracking-widest hover:shadow-lg hover:brightness-110 transition-all active:scale-95 shadow-md flex items-center gap-2">
@@ -129,7 +129,7 @@
                 <h3 class="text-2xl font-black text-primary italic font-heading mb-2">Confirm Rejection</h3>
                 <p class="text-sm text-muted-foreground mb-8 leading-relaxed italic">Please provide a reason why this intention cannot be processed. This will be recorded in the system logs and the user will be notified if an email was provided.</p>
                 
-                <form action="/admin-portal/intentions/{{ $intention->id }}/status" method="POST">
+                <form action="{{ route('admin.intentions.status', $intention->id) }}" method="POST">
                     @csrf
                     <input type="hidden" name="status" value="rejected">
                     <textarea 
