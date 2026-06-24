@@ -3,9 +3,9 @@ FROM php:8.4-cli
 # Install system deps
 RUN apt-get update && apt-get install -y \
     curl unzip git nodejs npm \
-    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev \
+    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev libcurl4-openssl-dev pkg-config \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd \
-       xml dom curl intl openssl opcache
+       xml dom curl intl opcache
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -14,20 +14,17 @@ WORKDIR /var/www
 
 COPY . .
 
-# Install PHP deps (ignore platform reqs to avoid extension mismatch during build)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-
-# Run post-install scripts after extensions are available
-RUN composer dump-autoload --optimize --no-dev
+# Install PHP deps
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
+    && composer dump-autoload --optimize --no-dev
 
 # Install JS deps and build
 RUN npm install && npm run build
 
-# Laravel caches
-RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
-
 EXPOSE 10000
 
-RUN php artisan migrate --force
+# Create startup script (caching + migration at runtime when env vars exist)
+RUN printf '#!/bin/sh\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\nphp artisan migrate --force\nexec php artisan serve --host=0.0.0.0 --port=10000\n' \
+    > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+CMD ["/usr/local/bin/start.sh"]
