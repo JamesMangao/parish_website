@@ -1,4 +1,4 @@
-# Parish Pal - Sto. Rosario Parish
+# Parish Website - Sto. Rosario Parish
 
 A full-featured Catholic parish management web application built for **Sto. Rosario Parish - Pacita**, San Pedro, Laguna. Provides mass schedules, mass intention submissions, event management, gallery, AI-powered chatbot, and a comprehensive admin panel.
 
