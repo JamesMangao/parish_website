@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Inquiry;
 use App\Models\ChatSession;
 use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -74,6 +75,11 @@ class DashboardController extends Controller
             'inquiries' => Inquiry::where('status', 'pending')->count(),
             'chats' => ChatSession::where('status', 'handover')->count(),
         ]);
+    }
+
+    public function dashTest()
+    {
+        return response('dashTest OK: ' . Auth::user()->name . ' role=' . Auth::user()->role);
     }
 
     public function logs()

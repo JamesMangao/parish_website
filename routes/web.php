@@ -66,6 +66,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'throttle:admin'])->group(function () {
     Route::get('/admin-portal/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin-portal/notifications/count', [DashboardController::class, 'getNotifications'])->name('admin.notifications.count');
+    Route::get('/admin-portal/dash-test', [DashboardController::class, 'dashTest']);
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
