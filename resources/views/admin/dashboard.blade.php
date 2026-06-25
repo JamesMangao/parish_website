@@ -525,7 +525,7 @@
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom')
-                    <a href="{{ route('admin.schedules') }}"
+                    <a href="{{ route('admin.schedules.index') }}"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div class="h-10 w-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -539,7 +539,7 @@
                         </div>
                         <div class="text-sm font-bold text-primary">Manage Schedules</div>
                     </a>
-                    <a href="{{ route('admin.gallery') }}"
+                    <a href="{{ route('admin.gallery.index') }}"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100 text-green-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -552,7 +552,7 @@
                         </div>
                         <div class="text-sm font-bold text-primary">Parish Gallery</div>
                     </a>
-                    <a href="{{ route('admin.events') }}"
+                    <a href="{{ route('admin.events.index') }}"
                         class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
                         <div class="h-10 w-10 flex items-center justify-center rounded-full bg-amber-100 text-amber-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
