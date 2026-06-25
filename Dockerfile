@@ -3,8 +3,8 @@ FROM php:8.4-cli
 # Install system deps
 RUN apt-get update && apt-get install -y \
     curl unzip git nodejs npm \
-    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev libcurl4-openssl-dev pkg-config \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd \
+    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev libcurl4-openssl-dev pkg-config libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd \
        xml dom curl intl opcache
 
 # Install Composer
