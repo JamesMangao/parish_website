@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MassIntention;
 use App\Services\LogService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\StoreIntentionRequest;
 
