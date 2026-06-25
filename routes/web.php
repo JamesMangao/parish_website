@@ -56,9 +56,6 @@ Route::middleware('throttle:chat')->group(function () {
 
 Route::get('/api/readings/today', DailyReadingController::class);
 
-Route::permanentRedirect('/admin', '/admin-portal/dashboard');
-Route::permanentRedirect('/admin/{path}', '/admin-portal/{path}')->where('path', '.*');
-
 Route::get('/admin-portal/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/admin-portal/login', [LoginController::class, 'login'])->middleware('throttle:auth')->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
