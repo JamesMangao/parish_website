@@ -354,9 +354,12 @@
                             this.messages.push(this._makeMsg('assistant', data.message, 'handover_prompt'));
                         } else if (data.status === 'waiting_for_agent') {
                             // No bubble added, status already updated to sent
-                        } else if (data.message) {
+                        } else                         if (data.message) {
                             let newMsg = this._makeMsg('assistant', data.message);
-                            if (data.id) newMsg.id = data.id; // Store DB ID to prevent polling dupes
+                            if (data.id) {
+                                newMsg.id = data.id; // Store DB ID to prevent polling dupes
+                                this.lastMessageId = Math.max(this.lastMessageId, data.id);
+                            }
                             if (data.type) newMsg.type = data.type; // E.g., 'readings_card'
                             if (data.readings) newMsg.readings = data.readings;
                             if (data.readings_en) newMsg.readings_en = data.readings_en;
@@ -417,10 +420,13 @@
                             const data = await response.json();
                             if (data.messages && data.messages.length > 0) {
                                 data.messages.forEach(msg => {
-                                    // Prevent duplicate insertion just in case
                                     if (!this.messages.find(m => m.id === msg.id)) {
-                                        let newMsg = this._makeMsg('assistant', msg.message);
-                                        newMsg.id = msg.id; // Store db id to prevent dupes
+                                        let newMsg = this._makeMsg(
+                                            msg.sender === 'user' ? 'user' : 'assistant',
+                                            msg.message
+                                        );
+                                        newMsg.id = msg.id;
+                                        newMsg.time = msg.created_at ? new Date(msg.created_at).getTime() : Date.now();
                                         this.messages.push(newMsg);
                                         this.lastMessageId = Math.max(this.lastMessageId, msg.id);
                                     }

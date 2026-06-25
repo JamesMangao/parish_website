@@ -79,12 +79,11 @@ class InquiryController extends Controller
             'status'         => 'pending',
         ]);
 
-        // Send submission confirmation to the parishioner
+        // Send submission confirmation (queued)
         try {
-            \Illuminate\Support\Facades\Notification::route('mail', $validated['email'])
-                ->notify(new \App\Notifications\InquirySubmitted($inquiry));
+            \App\Jobs\SendInquirySubmittedNotification::dispatch($inquiry);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('InquirySubmitted mail error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Failed to queue InquirySubmitted notification: ' . $e->getMessage());
         }
 
         if ($request->expectsJson()) {

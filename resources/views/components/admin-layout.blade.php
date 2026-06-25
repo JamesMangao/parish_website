@@ -89,8 +89,13 @@
                         :active="request()->is('admin-portal/gallery*')" />
                     <x-admin-nav-link href="{{ route('admin.highlights.index') }}" icon="clapperboard" label="Video Highlights"
                         :active="request()->is('admin-portal/highlights*')" />
-                    <x-admin-nav-link href="{{ route('admin.chats.index') }}" icon="messages-square" label="Live Chat"
-                        :active="request()->is('admin-portal/chats*')" />
+                    <div x-data="{ chatCount: 0 }" x-init="setInterval(async () => { try { const r = await fetch('{{ route('admin.notifications.count') }}'); const d = await r.json(); chatCount = d.chats || 0; } catch(e) {} }, 15000)" class="relative">
+                        <x-admin-nav-link href="{{ route('admin.chats.index') }}" icon="messages-square" label="Live Chat"
+                            :active="request()->is('admin-portal/chats*')" />
+                        <template x-if="chatCount > 0">
+                            <span class="absolute top-1 right-2 h-5 w-5 bg-red-600 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-primary animate-pulse" x-text="chatCount"></span>
+                        </template>
+                    </div>
                 @endif
 
                 @if($role === 'super_admin')

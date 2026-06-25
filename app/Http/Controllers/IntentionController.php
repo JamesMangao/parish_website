@@ -69,11 +69,11 @@ class IntentionController extends Controller
             'payment_method' => $paymentMethod,
         ]);
 
-        // Send confirmation email
+        // Send confirmation email (queued)
         try {
-            Mail::to($validated['email'])->send(new IntentionReceived($intention));
+            Mail::to($validated['email'])->queue(new IntentionReceived($intention));
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send intention email: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Failed to queue intention email: ' . $e->getMessage());
         }
 
         $refId = $refNumber;

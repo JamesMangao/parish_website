@@ -507,9 +507,21 @@
                             <template x-if="formData.paymentMethod === 'GCash'">
                                 <div class="pay-info-box">
                                     <p class="eyebrow mb-3" style="color:rgba(13,42,82,0.40);">Send to GCash</p>
-                                    <p class="font-cinzel font-bold mb-4"
-                                       style="font-size:1.35rem; color:var(--blue-deep); letter-spacing:0.12em;">
+
+                                    @if (!empty($global_settings['qr_code']))
+                                        <div class="flex justify-center mb-4">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['qr_code']) }}"
+                                                 alt="GCash QR Code"
+                                                 style="width:180px; height:180px; object-fit:contain; border-radius:12px; border:1px solid rgba(26,64,128,0.10); background:#FFF;">
+                                        </div>
+                                    @endif
+
+                                    <p class="font-cinzel font-bold"
+                                        style="font-size:1.35rem; color:var(--blue-deep); letter-spacing:0.12em;">
                                         {{ $global_settings['gcash_number'] ?? '09123456789' }}
+                                    </p>
+                                    <p style="font-size:11px; color:rgba(13,42,82,0.35); margin-bottom:12px;">
+                                        {{ $global_settings['gcash_name'] ?? '' }}
                                     </p>
                                     <button @click="copyGCash()" type="button"
                                             class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all"

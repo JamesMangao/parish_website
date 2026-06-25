@@ -111,6 +111,15 @@
             const chatId = @json($chat->id);
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             let lastId = @json($lastId);
+            let lastMessageCount = messagesContainer?.children.length || 0;
+            let isAtBottom = true;
+
+            // Track scroll position
+            if (chatContainer) {
+                chatContainer.addEventListener('scroll', function() {
+                    isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
+                });
+            }
 
             // Typing Indicator
             if (input && csrfToken) {
@@ -158,8 +167,9 @@
                             lastId = Math.max(lastId, msg.id);
                         });
                         
-                        // Scroll to bottom
-                        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                        if (isAtBottom || data.messages.some(m => m.sender !== 'admin')) {
+                            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                        }
                     }
                 } catch (e) {
                     console.error('Polling error:', e);

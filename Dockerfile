@@ -23,8 +23,8 @@ RUN npm install && npm run build
 
 EXPOSE 10000
 
-# Create startup script (caching + migration at runtime when env vars exist)
-RUN printf '#!/bin/sh\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\nphp artisan migrate --force\nexec php artisan serve --host=0.0.0.0 --port=10000\n' \
+# Create startup script (caching + migration + queue worker at runtime)
+RUN printf '#!/bin/sh\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\nphp artisan migrate --force\nphp artisan queue:work --tries=3 --timeout=60 --sleep=3 > /tmp/queue-worker.log 2>&1 &\nexec php artisan serve --host=0.0.0.0 --port=10000\n' \
     > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
 CMD ["/usr/local/bin/start.sh"]
