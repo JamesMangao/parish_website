@@ -19,13 +19,14 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\DailyReadingController;
+use App\Http\Controllers\GoogleAuthController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/about', function () { return view('about'); })->name('about');
+Route::view('/about', 'about')->name('about');
 Route::get('/mass-schedule', [MassScheduleController::class, 'index'])->name('mass-schedule');
 Route::get('/mass-schedule/{id}/ical', [MassScheduleController::class, 'generateICal'])->name('mass-schedule.ical');
-Route::get('/donate', function () { return view('donate'); })->name('donate');
+Route::view('/donate', 'donate')->name('donate');
 
 // Tracking Status
 Route::get('/track', [TrackController::class, 'index'])->name('track');
@@ -64,39 +65,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'throttle:admin'])->group(function () {
     Route::get('/admin-portal/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin-portal/dash-simple', [DashboardController::class, 'dashboardSimple'])->name('admin.dashboard.simple');
-    Route::get('/admin-portal/dash-test', [DashboardController::class, 'dashboardTestLayout'])->name('admin.dashboard.test');
     Route::get('/admin-portal/notifications/count', [DashboardController::class, 'getNotifications'])->name('admin.notifications.count');
-    Route::get('/admin-portal/ping', [DashboardController::class, 'dashboardPing']);
-    Route::get('/admin-portal/ping-closure', function () { return response()->json(['ok' => true]); });
-    Route::get('/admin-portal/diag', function () {
-        $results = [];
-        $models = [
-            'MassIntention' => \App\Models\MassIntention::class,
-            'Inquiry' => \App\Models\Inquiry::class,
-            'Event' => \App\Models\Event::class,
-            'Announcement' => \App\Models\Announcement::class,
-            'MassSchedule' => \App\Models\MassSchedule::class,
-        ];
-        foreach ($models as $name => $class) {
-            try { $results["{$name}_count"] = $class::count(); }
-            catch (\Throwable $e) { $results["{$name}_error"] = $e->getMessage(); }
-        }
-        try {
-            $results['intentionsTrend'] = \App\Models\MassIntention::selectRaw("TO_CHAR(created_at, 'IYYYIW') as week, count(*) as total")
-                ->where('created_at', '>=', now()->subWeeks(8))
-                ->groupBy('week')->orderBy('week')->get();
-        } catch (\Throwable $e) { $results['intentionsTrend_error'] = $e->getMessage(); }
-        try {
-            $results['inquiryTypes'] = \App\Models\Inquiry::selectRaw('inquiry_type as type, count(*) as total')
-                ->groupBy('type')->get();
-        } catch (\Throwable $e) { $results['inquiryTypes_error'] = $e->getMessage(); }
-        try {
-            $user = \Illuminate\Support\Facades\Auth::user();
-            $results['auth_user'] = $user ? ['id' => $user->id, 'name' => $user->name, 'role' => $user->role] : 'no user';
-        } catch (\Throwable $e) { $results['auth_error'] = $e->getMessage(); }
-        return response()->json($results);
-    });
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {
@@ -104,41 +73,8 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::get('/admin-portal/preview-ppt', [PptController::class, 'preview'])->name('admin.preview-ppt');
         Route::post('/admin-portal/create-google-slides', [GoogleSlidesController::class, 'create'])->name('admin.create-google-slides');
 
-        Route::get('/google/auth', function () {
-            $client = new \Google\Client();
-            $client->setHttpClient(new \GuzzleHttp\Client());
-            $client->setAuthConfig(storage_path('app/google_oauth_client.json'));
-            $client->addScope('https://www.googleapis.com/auth/presentations');
-            $client->addScope('https://www.googleapis.com/auth/drive');
-            $client->setRedirectUri(url('/google/callback'));
-            $client->setAccessType('offline');
-            $client->setPrompt('consent');
-
-            $state = bin2hex(random_bytes(16));
-            session(['google_oauth_state' => $state]);
-            $client->setState($state);
-
-            return redirect($client->createAuthUrl());
-        });
-
-        Route::get('/google/callback', function (\Illuminate\Http\Request $request) {
-            if ($request->get('state') !== session('google_oauth_state')) {
-                return 'Invalid state parameter.';
-            }
-
-            $client = new \Google\Client();
-            $client->setHttpClient(new \GuzzleHttp\Client());
-            $client->setAuthConfig(storage_path('app/google_oauth_client.json'));
-            $client->setRedirectUri(url('/google/callback'));
-            $token = $client->fetchAccessTokenWithAuthCode($request->get('code'));
-
-            \App\Models\Setting::updateOrCreate(
-                ['key' => 'google_token'],
-                ['value' => json_encode($token)]
-            );
-
-            return 'Google connected! Token saved. You can close this tab.';
-        });
+        Route::get('/google/auth', [GoogleAuthController::class, 'auth']);
+        Route::get('/google/callback', [GoogleAuthController::class, 'callback']);
     });
 
     // Role: super_admin or staff
