@@ -28,6 +28,39 @@ class ChatbotController extends Controller
         $session = $this->getOrCreateSession();
         $userMessage = $request->input('message');
 
+        // 0. If session was resolved, reset and show welcome message
+        if ($session->status === 'resolved') {
+            $session->update(['status' => 'active', 'admin_id' => null]);
+
+            // Clear old messages so the user starts fresh
+            $session->messages()->delete();
+
+            // Store user's first message
+            ChatMessage::create([
+                'chat_session_id' => $session->id,
+                'sender' => 'user',
+                'message' => $userMessage,
+            ]);
+
+            $welcomeMsg = ChatMessage::create([
+                'chat_session_id' => $session->id,
+                'sender' => 'ai',
+                'message' => 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.',
+            ]);
+
+            return response()->json([
+                'status' => 'resolved_reset',
+                'message' => $welcomeMsg->message,
+                'id' => $welcomeMsg->id,
+                'suggestions' => [
+                    '⛪ Mass Schedules',
+                    '📖 Today\'s Readings',
+                    '🕯️ Offer Mass Intention',
+                    '📝 Sacramental Inquiry',
+                ],
+            ]);
+        }
+
         // 1. Store User Message
         ChatMessage::create([
             'chat_session_id' => $session->id,
@@ -179,6 +212,11 @@ class ChatbotController extends Controller
         $search = $request->input('search');
         
         $sessions = ChatSession::withCount('messages')
+            ->addSelect(['last_message_sender' => ChatMessage::select('sender')
+                ->whereColumn('chat_session_id', 'chat_sessions.id')
+                ->latest('id')
+                ->limit(1)
+            ])
             ->when($status, fn($q) => $q->where('status', $status))
             ->when($search, fn($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
             ->orderBy('live_agent_requested_at', 'desc')
@@ -193,7 +231,7 @@ class ChatbotController extends Controller
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'resolved']);
         
-        return redirect()->route('admin.chats.index')->with('success', 'Conversation marked as resolved.');
+        return redirect()->route('admin.chats.index', ['status' => 'resolved'])->with('success', 'Conversation marked as resolved.');
     }
 
     public function pause($id)

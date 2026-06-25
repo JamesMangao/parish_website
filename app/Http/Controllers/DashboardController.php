@@ -55,10 +55,15 @@ class DashboardController extends Controller
 
     public function getNotifications()
     {
+        $handoverChats = ChatSession::where('status', 'handover')->count();
+        $unreadActiveChats = ChatSession::where('status', 'active')
+            ->whereRaw('(select sender from chat_messages where chat_session_id = chat_sessions.id order by id desc limit 1) = ?', ['user'])
+            ->count();
+
         return response()->json([
             'intentions' => MassIntention::where('status', 'pending')->count(),
             'inquiries' => Inquiry::where('status', 'pending')->count(),
-            'chats' => ChatSession::where('status', 'handover')->count(),
+            'chats' => $handoverChats + $unreadActiveChats,
         ]);
     }
 

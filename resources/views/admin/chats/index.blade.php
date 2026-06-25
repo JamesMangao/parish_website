@@ -50,8 +50,11 @@
                             <tr class="hover:bg-muted/10 transition-colors group">
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-3">
-                                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs">
+                                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs relative">
                                             {{ substr($s->user_ip, -2) }}
+                                            @if(($s->last_message_sender ?? '') === 'user')
+                                                <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-card animate-pulse"></span>
+                                            @endif
                                         </div>
                                         <div>
                                             <p class="font-bold text-primary text-sm">{{ $s->user_ip }}</p>
@@ -118,7 +121,7 @@
             
             @if($sessions->hasPages())
                 <div class="px-6 py-4 bg-muted/20 border-t">
-                    {{ $sessions->links() }}
+                    {{ $sessions->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>

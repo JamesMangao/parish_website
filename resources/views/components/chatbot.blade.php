@@ -250,6 +250,7 @@
                 currentSuggestions: [],
                 isPolling: false,
                 _lastFailedMessage: null,
+                _prevStatus: null,
                 _sessionKey: 'srp_chatbot_state',
 
                 init() {
@@ -349,7 +350,17 @@
                         const userMsg = this.messages.find(m => m._id === currentMsgId);
                         if (userMsg) userMsg.status = 'sent';
 
-                        if (data.status === 'suggest_handover') {
+                        if (data.status === 'resolved_reset') {
+                            this.messages = [];
+                            this.liveAgentStatus = 'none';
+                            this.lastMessageId = data.id || 0;
+                            const welcomeMsg = this._makeMsg('assistant', data.message);
+                            if (data.id) welcomeMsg.id = data.id;
+                            this.messages.push(welcomeMsg);
+                            this.currentSuggestions = data.suggestions || [];
+                            if (this.pollInterval) clearInterval(this.pollInterval);
+                            this.isPolling = false;
+                        } else if (data.status === 'suggest_handover') {
                             this.liveAgentStatus = 'suggesting';
                             this.messages.push(this._makeMsg('assistant', data.message, 'handover_prompt'));
                         } else if (data.status === 'waiting_for_agent') {
@@ -434,19 +445,22 @@
                                 if (!this.open) this.unreadCount += data.messages.length;
                                 this.scrollToBottom();
                             }
-                            if (data.agent_connected && this.liveAgentStatus !== 'connected') {
+                            const prevStatus = this._prevStatus;
+                            this._prevStatus = data.status;
+
+                            if (data.agent_connected && data.status !== 'paused' && this.liveAgentStatus !== 'connected') {
                                 this.liveAgentStatus = 'connected';
                                 this.messages.push(this._makeMsg('assistant', 'A parish representative has connected.', 'system'));
                                 clearInterval(this.waitTimer);
                                 this.scrollToBottom();
                             }
                             // Notify user when admin pauses or resolves the chat
-                            if (data.status === 'paused' && this.liveAgentStatus !== 'none') {
+                            if (data.status === 'paused' && prevStatus !== 'paused') {
                                 this.liveAgentStatus = 'none';
                                 this.messages.push(this._makeMsg('assistant', 'The live agent has paused this conversation. Our AI assistant will now handle your questions. An agent will return shortly.', 'system'));
                                 this.scrollToBottom();
                             }
-                            if (data.status === 'resolved' && this.liveAgentStatus !== 'none') {
+                            if (data.status === 'resolved' && prevStatus !== 'resolved') {
                                 this.liveAgentStatus = 'none';
                                 this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved by our team. Thank you for contacting Sto. Rosario Parish! Feel free to start a new conversation anytime.', 'system'));
                                 this.scrollToBottom();

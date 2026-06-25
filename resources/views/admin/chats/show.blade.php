@@ -1,7 +1,15 @@
 <x-admin-layout>
     <div class="py-8">
         <div class="mb-4">
-            <a href="{{ route('admin.chats.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-all">
+            @php
+                $backStatus = match($chat->status) {
+                    'handover' => 'handover',
+                    'active', 'paused' => 'active',
+                    'resolved' => 'resolved',
+                    default => 'active'
+                };
+            @endphp
+            <a href="{{ route('admin.chats.index', ['status' => $backStatus]) }}" class="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 Back to Active Chats
             </a>
