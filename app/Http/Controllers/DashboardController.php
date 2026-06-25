@@ -84,6 +84,11 @@ class DashboardController extends Controller
             return response('Test dashboard error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), 500);
         }
     }
+
+    public function dashboardPing()
+    {
+        return response()->json(['ok' => true]);
+    }
     }
 
     public function dashboardSimple()

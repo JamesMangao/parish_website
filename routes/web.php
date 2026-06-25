@@ -67,6 +67,8 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
     Route::get('/admin-portal/dash-simple', [DashboardController::class, 'dashboardSimple'])->name('admin.dashboard.simple');
     Route::get('/admin-portal/dash-test', [DashboardController::class, 'dashboardTestLayout'])->name('admin.dashboard.test');
     Route::get('/admin-portal/notifications/count', [DashboardController::class, 'getNotifications'])->name('admin.notifications.count');
+    Route::get('/admin-portal/ping', [DashboardController::class, 'dashboardPing']);
+    Route::get('/admin-portal/ping-closure', function () { return response()->json(['ok' => true]); });
     Route::get('/admin-portal/diag', function () {
         $results = [];
         $models = [
