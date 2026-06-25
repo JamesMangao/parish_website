@@ -17,13 +17,31 @@ class DailyReadingController extends Controller
         $language = Str::upper($request->query('language', 'EN'));
         $language = in_array($language, ['EN', 'TG'], true) ? $language : 'EN';
         $date = now('Asia/Manila')->format('Ymd');
+        $force = $request->boolean('refresh');
 
         try {
+            if ($force) {
+                Cache::forget("daily-readings:db:{$date}:{$language}");
+                DailyReading::withTrashed()
+                    ->where('date', $date)
+                    ->where('language', $language)
+                    ->forceDelete();
+            }
+
             $data = Cache::remember(
                 "daily-readings:db:{$date}:{$language}",
                 now('Asia/Manila')->endOfDay(),
                 fn () => $this->getOrFetchReadings($date, $language)
             );
+
+            if ($this->isStaleReadingData($data['readings'] ?? [], $language)) {
+                Cache::forget("daily-readings:db:{$date}:{$language}");
+                $data = Cache::remember(
+                    "daily-readings:db:{$date}:{$language}",
+                    now('Asia/Manila')->endOfDay(),
+                    fn () => $this->getOrFetchReadings($date, $language)
+                );
+            }
 
             return response()->json($data);
         } catch (\Exception $e) {
@@ -59,7 +77,7 @@ class DailyReadingController extends Controller
             $readingsArr = $record->readings ?? [];
             $readingCount = is_array($readingsArr) ? count($readingsArr) : 0;
 
-            if ($readingCount >= 3) {
+            if ($readingCount >= 3 && !$this->isStaleReadingData($readingsArr, $language)) {
                 return [
                     'title'          => $record->title,
                     'date_displayed' => $record->date_displayed,
@@ -67,7 +85,7 @@ class DailyReadingController extends Controller
                 ];
             }
 
-            $record->delete();
+            $record->forceDelete();
         }
 
         $dateObj = Carbon::createFromFormat('Ymd', $date, 'Asia/Manila');
@@ -85,6 +103,11 @@ class DailyReadingController extends Controller
         if (empty($data) || empty($data['readings'])) {
             throw new \Exception("Could not retrieve valid readings for {$date} ({$language})");
         }
+
+        DailyReading::withTrashed()
+            ->where('date', $date)
+            ->where('language', $language)
+            ->forceDelete();
 
         DailyReading::updateOrCreate(
             ['date' => $date, 'language' => $language],
@@ -104,10 +127,15 @@ class DailyReadingController extends Controller
     {
         try {
             $mdy = $targetDate->format('mdy');
-            $url = "https://bible.usccb.org/bible/readings/{$mdy}.cfm";
             $agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
 
-            $html = $this->fetchWithObolus($url, $agent);
+            $mdUrl = "https://bible.usccb.org/bible/readings/{$mdy}.cfm.md";
+            $md = $this->httpGet($mdUrl, $agent);
+            if ($md && stripos($md, '### Reading') !== false && preg_match('/^##\s/m', $md)) {
+                return $this->parseUsccbMarkdown($md, $targetDate);
+            }
+
+            $html = $this->fetchWithObolus("https://bible.usccb.org/bible/readings/{$mdy}.cfm", $agent);
             if (!$html || stripos($html, 'Checking connection') !== false) {
                 return [];
             }
@@ -187,37 +215,95 @@ class DailyReadingController extends Controller
 
     private function parseUsccbPage(string $html, Carbon $targetDate): array
     {
+        $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
+        $html = preg_replace('/<\/(p|div|h[1-6])>/i', "\n", $html);
+
         $text = strip_tags($html);
         $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
         $text = preg_replace('/[ \t]+/', ' ', $text);
         $text = preg_replace('/\s*\n\s*/', "\n", $text);
 
+        $text = $this->truncateAtFooters($text, [
+            'Lectionary for Mass', 'Get the Daily Readings',
+            'About USCCB', 'Dive into God',
+        ]);
+
         $title = $this->firstMatch($text, '/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[^\n]+/u')
             ?: 'Daily Mass Readings';
         $dateDisplayed = $targetDate->format('l, F j, Y');
 
+        $headingMap = [
+            'Reading 1'          => 'First Reading',
+            'Reading I'          => 'First Reading',
+            'Reading 2'          => 'Second Reading',
+            'Reading II'         => 'Second Reading',
+            'Responsorial Psalm' => 'Responsorial Psalm',
+            'Alleluia'           => 'Alleluia',
+            'Gospel'             => 'Gospel',
+        ];
+
+        $sections = $this->splitByHeadings($text, $headingMap);
+
         $readings = [];
-
-        if ($v = $this->sectionBetween($text, 'Reading I', 'Responsorial Psalm'))
-            $readings[] = $this->makeReading('First Reading', $v, 'en');
-
-        if ($v = $this->sectionBetween($text, 'Responsorial Psalm', 'Reading II'))
-            $readings[] = $this->makeReading('Responsorial Psalm', $v, 'en');
-
-        if ($v = $this->sectionBetween($text, 'Reading II', 'Alleluia'))
-            $readings[] = $this->makeReading('Second Reading', $v, 'en');
-
-        if ($v = $this->sectionBetween($text, 'Alleluia', 'Gospel'))
-            $readings[] = $this->makeReading('Alleluia', $v, 'en');
-
-        if ($v = $this->sectionAfter($text, 'Gospel', ['Prayer of the Faithful', 'Copyright', '©']))
-            $readings[] = $this->makeReading('Gospel', $v, 'en');
+        foreach ($sections as $type => $content) {
+            $readings[] = $this->makeReading($type, $content, 'en');
+        }
 
         if (empty($readings)) {
             return [];
         }
 
         return [
+            'title'          => $title,
+            'date_displayed' => $dateDisplayed,
+            'readings'       => $readings,
+        ];
+    }
+
+    private function parseUsccbMarkdown(string $md, Carbon $targetDate): array
+    {
+        $md = html_entity_decode($md, ENT_QUOTES, 'UTF-8');
+        $md = str_replace("\r\n", "\n", $md);
+        $md = preg_replace('/\[([^\]]+)\]\s*\([^)]*\)/', '$1', $md);
+        $md = preg_replace('/\*\*([^*]+)\*\*/', '$1', $md);
+
+        $title = $this->firstMatch($md, '/^##\s+((?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[^\n]+)/mu')
+            ?: 'Daily Mass Readings';
+        $title = trim($title);
+        $dateDisplayed = $targetDate->format('l, F j, Y');
+
+        $headingMap = [
+            'Reading 1'          => 'First Reading',
+            'Reading I'          => 'First Reading',
+            'Reading 2'          => 'Second Reading',
+            'Reading II'         => 'Second Reading',
+            'Responsorial Psalm' => 'Responsorial Psalm',
+            'Alleluia'           => 'Alleluia',
+            'Gospel'             => 'Gospel',
+        ];
+
+        $pattern = '/^###\s+(' . implode('|', array_map('preg_quote', array_keys($headingMap))) . ')\s*$/mu';
+        preg_match_all($pattern, $md, $matches, PREG_OFFSET_CAPTURE);
+
+        if (empty($matches[1])) {
+            return [];
+        }
+
+        $readings = [];
+        for ($i = 0; $i < count($matches[1]); $i++) {
+            $heading = $matches[1][$i][0];
+            $start = $matches[1][$i][1] + strlen($matches[0][$i][0]);
+            $end = ($i + 1 < count($matches[1]))
+                ? $matches[1][$i + 1][1]
+                : strlen($md);
+
+            $block = trim(substr($md, $start, $end - $start));
+            $block = preg_replace('/^\s*\n/m', '', $block);
+
+            $readings[] = $this->makeReading($headingMap[$heading], $block, 'en');
+        }
+
+        return empty($readings) ? [] : [
             'title'          => $title,
             'date_displayed' => $dateDisplayed,
             'readings'       => $readings,
@@ -253,53 +339,86 @@ class DailyReadingController extends Controller
     {
         $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
         $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
-        $html = strip_tags($html, '');
+        $html = strip_tags($html);
         $html = preg_replace('/[ \t]+/', ' ', $html);
         $html = preg_replace('/\n{3,}/', "\n\n", $html);
+        $html = trim($html);
 
-        $title = $this->firstMatch($html, '/^[^\n]+/u') ?: 'Daily Mass Readings';
+        $lines = array_values(array_filter(
+            preg_split("/\n+/", $html),
+            fn ($l) => trim($l) !== ''
+        ));
+
+        if (empty($lines)) return [];
+
+        $title = $lines[0];
         $dateDisplayed = $targetDate->format('l, F j, Y');
 
-        $sections = array_filter(array_map('trim', preg_split("/\n\n+/", $html)));
-        if (empty($sections)) {
-            return [];
+        $enRefPattern = '/^(?:\d|Book of |First book of |2nd book of |Acts of the Apostles |Psalms |Holy Gospel |Alleluia\b|A reading from )/u';
+        $tlRefPattern = '/^(?:\d|Salmo |Mabuting Balita |Aleluya\b|Unang Pagbasa |Ikalawang Pagbasa |Pagbasa mula sa )/u';
+        $refPattern = $language === 'TG' ? $tlRefPattern : $enRefPattern;
+
+        $refIndices = [];
+        foreach ($lines as $idx => $line) {
+            if ($idx === 0) continue;
+            if (preg_match($refPattern, $line)) {
+                $refIndices[] = $idx;
+            }
         }
+
+        if (empty($refIndices)) return [];
 
         $readings = [];
-        $enTypes = ['First Reading', 'Responsorial Psalm', 'Second Reading', 'Alleluia', 'Gospel'];
-        $tlTypes = ['Unang Pagbasa', 'Salmong Tugunan', 'Ikalawang Pagbasa', 'Aleluya', 'Mabuting Balita'];
-        $types = $language === 'TG' ? $tlTypes : $enTypes;
 
-        $i = 0;
-        foreach ($sections as $section) {
-            if ($i >= count($types)) break;
-            if (strlen($section) < 20) continue;
+        foreach ($refIndices as $i => $refIdx) {
+            $reference = $lines[$refIdx];
+            $nextRefIdx = ($i + 1 < count($refIndices)) ? $refIndices[$i + 1] : count($lines);
+            $textLines = array_slice($lines, $refIdx + 1, $nextRefIdx - $refIdx - 1);
+            $text = trim(implode("\n", $textLines));
 
-            $lines = array_values(array_filter(array_map('trim', preg_split("/\n+/", $section))));
-            $reference = '';
+            $type = $this->detectEvangelizoType($reference, $text, $readings, $language);
 
-            if (!empty($lines[0])) {
-                $refPattern = '/^(?:(?:Book of |First book of |2nd book of |Acts of the Apostles |Psalms |Holy Gospel)[^\n]*|[A-Z][a-z]+ \d)/u';
-                if (preg_match($refPattern, $lines[0])) {
-                    $reference = array_shift($lines);
-                }
-            }
-
-            $readings[] = [
-                'type'      => $types[$i],
-                'reference' => $reference,
-                'text'      => trim(implode("\n", $lines)),
-            ];
-            $i++;
+            $readings[] = compact('type', 'reference', 'text');
         }
 
-        $readings = array_values(array_filter($readings, fn ($r) => !empty($r['text'])));
+        return empty($readings) ? [] : compact('title', 'dateDisplayed', 'readings');
+    }
 
-        return empty($readings) ? [] : [
-            'title'          => $title,
-            'date_displayed' => $dateDisplayed,
-            'readings'       => $readings,
-        ];
+    private function detectEvangelizoType(string $reference, string $text, array $existingReadings, string $language): string
+    {
+        if ($language === 'TG') {
+            if (preg_match('/Mabuting Balita|Ebanghelyo/i', $reference)) {
+                return 'Mabuting Balita';
+            }
+            if (preg_match('/Salmo/i', $reference)) {
+                return 'Salmong Tugunan';
+            }
+            if (preg_match('/^Aleluya/i', $text)) {
+                return 'Aleluya';
+            }
+            $hasFirst = false;
+            foreach ($existingReadings as $r) {
+                if ($r['type'] === 'Unang Pagbasa') $hasFirst = true;
+            }
+            return $hasFirst ? 'Ikalawang Pagbasa' : 'Unang Pagbasa';
+        }
+
+        if (preg_match('/Holy Gospel|Gospel according to/i', $reference)) {
+            return 'Gospel';
+        }
+        if (preg_match('/Psalm/i', $reference)) {
+            return 'Responsorial Psalm';
+        }
+        if (preg_match('/^Alleluia/i', $text)) {
+            return 'Alleluia';
+        }
+
+        $hasFirst = false;
+        foreach ($existingReadings as $r) {
+            if ($r['type'] === 'First Reading') $hasFirst = true;
+        }
+
+        return $hasFirst ? 'Second Reading' : 'First Reading';
     }
 
     // ─── Awit at Papuri (Filipino) ───────────────────────────────────────
@@ -358,7 +477,7 @@ class DailyReadingController extends Controller
         $text = preg_replace('/[ \t]+/', ' ', $text);
         $text = preg_replace('/(\s*\n\s*){2,}/', "\n\n", $text);
 
-        $allHeaders = ['UNANG PAGBASA', 'IKALAWANG PAGBASA', 'SALMONG TUGUNAN', 'ALELUYA', 'MABUTING BALITA'];
+        $allHeaders = ['UNANG PAGBASA', 'PANGALAWANG PAGBASA', 'IKALAWANG PAGBASA', 'SALMONG TUGUNAN', 'ALELUYA', 'MABUTING BALITA'];
 
         foreach ($allHeaders as $header) {
             $text = preg_replace(
@@ -380,22 +499,26 @@ class DailyReadingController extends Controller
             $text = substr($text, $start);
         }
 
+        $text = $this->truncateAtFooters($text, [
+            'PANALANGIN NG BAYAN', 'Pages:', 'Mga Pagbasa Kahapon',
+            'Mga Pagbasa Bukas',
+        ]);
+
+        $headingMap = [
+            'UNANG PAGBASA'     => 'Unang Pagbasa',
+            'SALMONG TUGUNAN'   => 'Salmong Tugunan',
+            'IKALAWANG PAGBASA' => 'Ikalawang Pagbasa',
+            'PANGALAWANG PAGBASA' => 'Ikalawang Pagbasa',
+            'ALELUYA'           => 'Aleluya',
+            'MABUTING BALITA'   => 'Mabuting Balita',
+        ];
+
+        $sections = $this->splitByHeadings($text, $headingMap);
+
         $readings = [];
-
-        if ($v = $this->sectionBetweenExact($text, 'UNANG PAGBASA', 'SALMONG TUGUNAN'))
-            $readings[] = $this->makeReading('Unang Pagbasa', $v, 'tl');
-
-        if ($v = $this->sectionBetweenExact($text, 'SALMONG TUGUNAN', 'IKALAWANG PAGBASA'))
-            $readings[] = $this->makeReading('Salmong Tugunan', $v, 'tl');
-
-        if ($v = $this->sectionBetweenExact($text, 'IKALAWANG PAGBASA', 'ALELUYA'))
-            $readings[] = $this->makeReading('Ikalawang Pagbasa', $v, 'tl');
-
-        if ($v = $this->sectionBetweenExact($text, 'ALELUYA', 'MABUTING BALITA'))
-            $readings[] = $this->makeReading('Aleluya', $v, 'tl');
-
-        if ($v = $this->sectionAfterExact($text, 'MABUTING BALITA', ['PANALANGIN NG BAYAN', 'Pages:', 'Mga Pagbasa']))
-            $readings[] = $this->makeReading('Mabuting Balita', $v, 'tl');
+        foreach ($sections as $type => $content) {
+            $readings[] = $this->makeReading($type, $content, 'tl');
+        }
 
         return [
             'title'          => $title,
@@ -405,6 +528,79 @@ class DailyReadingController extends Controller
     }
 
     // ─── Shared helpers ──────────────────────────────────────────────────
+
+    private function isStaleReadingData(array $readings, string $language): bool
+    {
+        $enFooters = ['Lectionary for Mass', 'Get the Daily Readings', 'About USCCB'];
+        $tgFooters = ['PANALANGIN NG BAYAN', 'Mga Pagbasa Kahapon', 'Mga Pagbasa Bukas'];
+        $markers = $language === 'TG' ? $tgFooters : $enFooters;
+
+        foreach ($readings as $reading) {
+            $text = $reading['text'] ?? '';
+
+            if ($language === 'EN' && !empty($readings[0]['text'] ?? '')) {
+                $firstText = $readings[0]['text'];
+                $dayPattern = '/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/i';
+                if (preg_match($dayPattern, $firstText)) {
+                    return true;
+                }
+            }
+
+            foreach ($markers as $marker) {
+                if (stripos($text, $marker) !== false) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function truncateAtFooters(string $text, array $markers): string
+    {
+        $earliest = false;
+        foreach ($markers as $marker) {
+            $pos = stripos($text, $marker);
+            if ($pos !== false && ($earliest === false || $pos < $earliest)) {
+                $earliest = $pos;
+            }
+        }
+        return $earliest !== false ? trim(substr($text, 0, $earliest)) : $text;
+    }
+
+    private function splitByHeadings(string $text, array $headingMap): array
+    {
+        $found = [];
+        foreach (array_keys($headingMap) as $heading) {
+            $pos = stripos($text, $heading);
+            if ($pos !== false) {
+                $found[$heading] = $pos;
+            }
+        }
+
+        if (empty($found)) return [];
+
+        uasort($found, fn($a, $b) => $a - $b);
+
+        $result = [];
+        $headings = array_keys($found);
+
+        for ($i = 0; $i < count($headings); $i++) {
+            $type = $headingMap[$headings[$i]];
+            if (isset($result[$type])) continue;
+
+            $startPos = $found[$headings[$i]] + strlen($headings[$i]);
+            $endPos = ($i + 1 < count($headings))
+                ? $found[$headings[$i + 1]]
+                : strlen($text);
+
+            $content = trim(substr($text, $startPos, $endPos - $startPos));
+            if (!empty($content)) {
+                $result[$type] = $content;
+            }
+        }
+
+        return $result;
+    }
 
     private function httpGet(string $url, string $agent, ?string $proofCookie = null): string
     {

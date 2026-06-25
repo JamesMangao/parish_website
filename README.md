@@ -11,7 +11,7 @@ A full-featured Catholic parish management web application built for **Sto. Rosa
 - **Intention Tracking** - Look up intention status by reference number
 - **Events** - Event listing with calendar view and detail pages
 - **Gallery** - Photo/video album browsing with video highlights
-- **Daily Readings** - Auto-preloaded daily Catholic readings (English & Tagalog)
+- **Daily Readings** - Auto-preloaded daily Catholic readings (English & Tagalog) via USCCB (primary) or Evangelizo (fallback), with `GET /api/readings/today?language=EN|TG&refresh=true`
 - **Bulletin Board** - Downloadable parish bulletins
 - **Inquiry Form** - Contact/inquiry submission with accept/decline workflow
 - **Donation Page** - GCash, Maya, and bank transfer information
