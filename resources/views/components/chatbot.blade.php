@@ -202,7 +202,17 @@
                 <span class="text-[11px] text-amber-700 font-medium">Waiting for a parish representative to connect…</span>
             </div>
 
-            <form @submit.prevent="sendMessage" class="flex gap-2">
+            <!-- Start new chat after resolved -->
+            <div x-show="_resolved" x-cloak class="flex flex-col gap-2">
+                <p class="text-[10px] text-muted-foreground text-center font-medium">This conversation has ended.</p>
+                <button @click="startNewChat()" :disabled="loading"
+                    class="w-full py-2.5 bg-accent text-accent-foreground rounded-xl text-xs font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                    Start New Chat
+                </button>
+            </div>
+
+            <form x-show="!_resolved" @submit.prevent="sendMessage" class="flex gap-2">
                 <div class="flex-1 relative">
                     <input 
                         x-model="userInput" 
@@ -251,6 +261,7 @@
                 isPolling: false,
                 _lastFailedMessage: null,
                 _prevStatus: null,
+                _resolved: false,
                 _sessionKey: 'srp_chatbot_state',
 
                 init() {
@@ -300,17 +311,18 @@
                 },
 
                 get inputPlaceholder() {
+                    if (this._resolved) return 'Conversation ended — start a new chat';
                     if (this.loading) return 'Processing…';
                     if (this.liveAgentStatus === 'waiting') return 'Waiting for agent to connect…';
                     return 'Ask something…';
                 },
 
                 get inputDisabled() {
-                    return this.loading || this.liveAgentStatus === 'waiting';
+                    return this._resolved || this.loading || this.liveAgentStatus === 'waiting';
                 },
 
                 get canSend() {
-                    return this.userInput.trim().length > 0 && !this.loading && this.liveAgentStatus !== 'waiting';
+                    return !this._resolved && this.userInput.trim().length > 0 && !this.loading && this.liveAgentStatus !== 'waiting';
                 },
 
                 _makeMsg(role, content, type = null) {
@@ -353,6 +365,7 @@
                         if (data.status === 'resolved_reset') {
                             this.messages = [];
                             this.liveAgentStatus = 'none';
+                            this._resolved = false;
                             this.lastMessageId = data.id || 0;
                             const welcomeMsg = this._makeMsg('assistant', data.message);
                             if (data.id) welcomeMsg.id = data.id;
@@ -384,6 +397,34 @@
                         this._lastFailedMessage = null;
                     } catch (e) {
                         this.messages.push(this._makeMsg('assistant', 'I am sorry, I am having trouble connecting to the parish servers right now.', 'error'));
+                    } finally {
+                        this.loading = false;
+                        this.scrollToBottom();
+                    }
+                },
+
+                async startNewChat() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/chatbot/start-new-chat', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }
+                        });
+                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                        const data = await response.json();
+                        this.messages = [];
+                        this.liveAgentStatus = 'none';
+                        this._resolved = false;
+                        this.lastMessageId = data.id || 0;
+                        const welcomeMsg = this._makeMsg('assistant', data.message);
+                        if (data.id) welcomeMsg.id = data.id;
+                        this.messages.push(welcomeMsg);
+                        this.currentSuggestions = data.suggestions || [];
+                        if (this.pollInterval) clearInterval(this.pollInterval);
+                        this.isPolling = false;
+                        this.scrollToBottom();
+                    } catch (e) {
+                        this.messages.push(this._makeMsg('assistant', 'Could not start a new chat. Please try again.', 'error'));
                     } finally {
                         this.loading = false;
                         this.scrollToBottom();
@@ -462,6 +503,7 @@
                             }
                             if (data.status === 'resolved' && prevStatus !== 'resolved') {
                                 this.liveAgentStatus = 'none';
+                                this._resolved = true;
                                 this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved by our team. Thank you for contacting Sto. Rosario Parish! Feel free to start a new conversation anytime.', 'system'));
                                 this.scrollToBottom();
                                 if (this.pollInterval) clearInterval(this.pollInterval);
@@ -529,6 +571,7 @@
                             liveAgentStatus: this.liveAgentStatus,
                             lastMessageId: this.lastMessageId,
                             _msgId: _msgId,
+                            _resolved: this._resolved,
                             currentSuggestions: this.currentSuggestions
                         };
                         sessionStorage.setItem(this._sessionKey, JSON.stringify(state));
@@ -545,6 +588,7 @@
                             this.lastMessageId = state.lastMessageId || 0;
                             _msgId = state._msgId || 0;
                             this.currentSuggestions = state.currentSuggestions || [];
+                            this._resolved = state._resolved || false;
                         }
                     } catch (e) {}
                 }

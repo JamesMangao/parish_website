@@ -93,18 +93,25 @@
                 </div>
 
                 <div class="p-6 bg-white border-t">
-                    <form action="{{ route('admin.chats.reply', $chat->id) }}" method="POST" onsubmit="this.querySelector('button[type=submit]').disabled = true; this.querySelector('button[type=submit]').innerHTML = 'Sending...';">
-                        @csrf
-                        <div class="flex gap-4">
-                            <input name="message" required placeholder="Type your reply to the parishioner..." 
-                                   id="adminReplyInput" autocomplete="off"
-                                   class="flex-1 bg-muted/20 border-none rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary font-medium">
-                            <button type="submit" class="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal"><path d="m3 3 3 9-3 9 19-9Z"/><path d="M6 12h16"/></svg>
-                                Send Reply
-                            </button>
+                    @if($chat->status === 'paused')
+                        <div class="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 font-medium flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Chat paused — resume to reply
                         </div>
-                    </form>
+                    @else
+                        <form action="{{ route('admin.chats.reply', $chat->id) }}" method="POST" onsubmit="this.querySelector('button[type=submit]').disabled = true; this.querySelector('button[type=submit]').innerHTML = 'Sending...';">
+                            @csrf
+                            <div class="flex gap-4">
+                                <input name="message" required placeholder="Type your reply to the parishioner..." 
+                                       id="adminReplyInput" autocomplete="off"
+                                       class="flex-1 bg-muted/20 border-none rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-primary font-medium">
+                                <button type="submit" class="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal"><path d="m3 3 3 9-3 9 19-9Z"/><path d="M6 12h16"/></svg>
+                                    Send Reply
+                                </button>
+                            </div>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

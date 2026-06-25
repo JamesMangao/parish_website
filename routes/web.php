@@ -53,6 +53,7 @@ Route::middleware('throttle:chat')->group(function () {
     Route::post('/api/chatbot', [ChatbotController::class, 'chat'])->name('chatbot.chat');
     Route::get('/api/chatbot/poll', [ChatbotController::class, 'poll'])->name('chatbot.poll');
     Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
+    Route::post('/api/chatbot/start-new-chat', [ChatbotController::class, 'startNewChat'])->name('chatbot.start-new-chat');
 });
 
 Route::get('/api/readings/today', DailyReadingController::class);

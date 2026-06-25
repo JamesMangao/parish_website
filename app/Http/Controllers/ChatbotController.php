@@ -186,6 +186,34 @@ class ChatbotController extends Controller
     }
 
     /**
+     * Reset a resolved session and start fresh.
+     */
+    public function startNewChat()
+    {
+        $session = $this->getOrCreateSession();
+        $session->update(['status' => 'active', 'admin_id' => null]);
+        $session->messages()->delete();
+
+        $welcomeMsg = ChatMessage::create([
+            'chat_session_id' => $session->id,
+            'sender' => 'ai',
+            'message' => 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $welcomeMsg->message,
+            'id' => $welcomeMsg->id,
+            'suggestions' => [
+                '⛪ Mass Schedules',
+                '📖 Today\'s Readings',
+                '🕯️ Offer Mass Intention',
+                '📝 Sacramental Inquiry',
+            ],
+        ]);
+    }
+
+    /**
      * Poll for new messages (especially from admin).
      */
     public function poll(Request $request)
