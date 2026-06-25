@@ -264,10 +264,20 @@
                 _resolved: false,
                 _sessionKey: 'srp_chatbot_state',
 
-                init() {
+                async init() {
                     this.loadState();
-                    // If no saved messages, show welcome
+
                     if (this.messages.length === 0) {
+                        // Check session status BEFORE showing welcome
+                        try {
+                            const res = await fetch('/api/chatbot/session-status');
+                            const d = await res.json();
+                            if (d.status === 'resolved') {
+                                this._resolved = true;
+                                this.saveState();
+                                return;
+                            }
+                        } catch (e) {}
                         this.messages.push(this._makeMsg('assistant', 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.'));
                         this.currentSuggestions = [
                             '⛪ Mass Schedules',
@@ -285,7 +295,7 @@
                     if (this.liveAgentStatus === 'waiting') {
                         this.startTimeout();
                     }
-                    // Watch for state changes to persist
+
                     this.$watch('messages', () => this.saveState(), { deep: true });
                     this.$watch('liveAgentStatus', () => this.saveState());
                     this.$watch('lastMessageId', () => this.saveState());
@@ -362,17 +372,12 @@
                         const userMsg = this.messages.find(m => m._id === currentMsgId);
                         if (userMsg) userMsg.status = 'sent';
 
-                        if (data.status === 'resolved_reset') {
-                            this.messages = [];
-                            this.liveAgentStatus = 'none';
-                            this._resolved = false;
-                            this.lastMessageId = data.id || 0;
-                            const welcomeMsg = this._makeMsg('assistant', data.message);
-                            if (data.id) welcomeMsg.id = data.id;
-                            this.messages.push(welcomeMsg);
-                            this.currentSuggestions = data.suggestions || [];
+                        if (data.status === 'conversation_ended') {
+                            this._resolved = true;
                             if (this.pollInterval) clearInterval(this.pollInterval);
                             this.isPolling = false;
+                            const systemMsg = this._makeMsg('assistant', data.message || 'This conversation has ended.', 'system');
+                            this.messages.push(systemMsg);
                         } else if (data.status === 'suggest_handover') {
                             this.liveAgentStatus = 'suggesting';
                             this.messages.push(this._makeMsg('assistant', data.message, 'handover_prompt'));

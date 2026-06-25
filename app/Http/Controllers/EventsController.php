@@ -16,23 +16,26 @@ class EventsController extends Controller
             ->orderBy('event_date', 'asc')
             ->get();
 
-        if ($view === 'calendar') {
-            $month = $request->get('month', now()->month);
-            $year = $request->get('year', now()->year);
-            
-            $calendarEvents = Event::where('is_published', true)
-                ->whereMonth('event_date', $month)
-                ->whereYear('event_date', $year)
-                ->get();
-                
-            return view('events-calendar', [
-                'events' => $calendarEvents,
-                'month' => $month,
-                'year' => $year,
-            ]);
-        }
+        $month = $request->get('month', now()->month);
+        $year = $request->get('year', now()->year);
 
-        return view('events', compact('events'));
+        $calendarEvents = Event::where('is_published', true)
+            ->whereMonth('event_date', $month)
+            ->whereYear('event_date', $year)
+            ->get();
+
+        $allEvents = Event::where('is_published', true)->orderBy('event_date', 'asc')->get();
+
+        $eventsJson = $allEvents->map(fn($e) => [
+            'id'          => $e->id,
+            'title'       => $e->title,
+            'event_date'  => $e->event_date->format('Y-m-d'),
+            'description' => $e->description,
+            'event_time'  => $e->event_time,
+            'url'         => $e->url ?? $e->link ?? null,
+        ]);
+
+        return view('events', compact('events', 'calendarEvents', 'month', 'year', 'view', 'allEvents', 'eventsJson'));
     }
 
     public function publicShow(Event $event)

@@ -30,6 +30,9 @@ class SettingController extends Controller
             'priest_image' => 'nullable|image|max:10240',
             'priest_name' => 'nullable|string|max:255',
             'gallery_highlights_video' => 'nullable|string|max:500',
+            'email_greeting' => 'nullable|string|max:500',
+            'email_closing' => 'nullable|string|max:500',
+            'email_signoff' => 'nullable|string|max:500',
         ]);
 
         if ($request->hasFile('qr_code')) {

@@ -633,11 +633,11 @@
     @endif
 
     {{-- ═══════════════ STAY CONNECTED ═══════════════ --}}
-    <section class="reveal" style="padding:4rem 1.5rem; max-width:860px; margin:0 auto;">
+    <section class="reveal" style="padding:5rem 1.5rem; max-width:900px; margin:0 auto; position:relative;">
+        <div style="position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(245,197,24,0.04) 0%, transparent 70%); pointer-events:none;"></div>
 
-        <div style="text-align:center; margin-bottom:3rem;">
-            <div class="font-cinzel" style="font-size:2rem; margin-bottom:1.5rem;
-                        opacity:0.55; color:var(--gold);">✝</div>
+        <div style="text-align:center; margin-bottom:3rem; position:relative; z-index:1;">
+            <div style="width:48px; height:2px; margin:0 auto 1.5rem; background:var(--gold); border-radius:1px;"></div>
             <div class="divider-ornament mb-5">
                 <span class="eyebrow">Social Feed</span>
             </div>
@@ -646,33 +646,31 @@
                        color:var(--blue-deep); letter-spacing:-0.01em; margin-bottom:1rem;">
                 Stay Connected
             </h2>
-            <div style="width:48px; height:1px; margin:0 auto 1.25rem;
-                        background:linear-gradient(90deg,transparent,rgba(245,197,24,0.6),transparent);"></div>
-            <p style="font-size:0.875rem; font-style:italic; color:rgba(13,42,82,0.45);">
+            <p style="font-size:0.95rem; font-style:italic; color:rgba(13,42,82,0.5); max-width:480px; margin:0 auto; line-height:1.7;">
                 Follow our latest updates and community announcements live from Facebook.
             </p>
         </div>
 
         {{-- FB TABS --}}
-        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; justify-content:center;">
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem; justify-content:center; position:relative; z-index:1;">
             <button id="tab-timeline" onclick="switchFbTab('timeline')"
                     class="fb-tab"
-                    style="padding:8px 20px; border-radius:100px; border:1.5px solid var(--gold);
+                    style="padding:10px 24px; border-radius:100px; border:1.5px solid var(--gold);
                            background:var(--gold); color:var(--blue-deep); font-size:10px;
                            font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
-                           cursor:pointer; transition:all 0.2s;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px; vertical-align:middle;">
+                           cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12"/>
                 </svg>
                 Posts
             </button>
             <button id="tab-events" onclick="switchFbTab('events')"
                     class="fb-tab"
-                    style="padding:8px 20px; border-radius:100px; border:1.5px solid rgba(26,64,128,0.2);
+                    style="padding:10px 24px; border-radius:100px; border:1.5px solid rgba(26,64,128,0.2);
                            background:transparent; color:rgba(13,42,82,0.5); font-size:10px;
                            font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
-                           cursor:pointer; transition:all 0.2s;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;">
+                           cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
                     <line x1="3" y1="10" x2="21" y2="10"/>
@@ -682,7 +680,7 @@
         </div>
 
         {{-- FB EMBED --}}
-        <div class="card-sacred" style="overflow:hidden; margin-bottom:2rem; padding:0; position:relative;">
+        <div class="card-sacred" style="overflow:hidden; margin-bottom:2rem; padding:0; position:relative; border-radius:24px; box-shadow:0 8px 40px rgba(13,42,82,0.08);">
             <div id="fb-root"></div>
             <script async defer crossorigin="anonymous"
                     src="https://connect.facebook.net/en_PH/sdk.js#xfbml=1&version=v19.0"></script>
@@ -779,7 +777,7 @@
             }
             </script>
 
-            <div id="fb-page-container" style="min-height:350px;">
+            <div id="fb-page-container" style="min-height:400px;">
                 <div class="fb-page"
                      data-href="https://www.facebook.com/storosarioparishpacita1"
                      data-tabs="timeline"
@@ -798,8 +796,8 @@
         </div>
 
         {{-- BUTTONS --}}
-        <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
-            <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank"
+        <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; position:relative; z-index:1;">
+            <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
                class="gold-btn"
                style="display:inline-flex; align-items:center; gap:0.5rem;
                       padding:14px 28px; border-radius:100px;

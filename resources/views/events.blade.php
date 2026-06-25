@@ -205,7 +205,40 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- EVENT LIST                                         --}}
 {{-- ═══════════════════════════════════════════════════ --}}
+<script>window.__events = @json($eventsJson); window.__view = @json($view); window.__calMonth = {{ (int) $month }}; window.__calYear = {{ (int) $year }};</script>
 <div x-data="{
+    viewMode: window.__view,
+    selectedEvent: null,
+    calMonth: window.__calMonth,
+    calYear: window.__calYear,
+    events: window.__events,
+    get calendarEvents() {
+        return this.events.filter(e => {
+            const d = new Date(e.event_date + 'T00:00:00');
+            return d.getMonth() + 1 === this.calMonth && d.getFullYear() === this.calYear;
+        });
+    },
+    get monthName() {
+        return new Date(this.calYear, this.calMonth - 1, 1)
+            .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    },
+    get daysInMonth() {
+        return new Date(this.calYear, this.calMonth, 0).getDate();
+    },
+    get firstDayOfWeek() {
+        return new Date(this.calYear, this.calMonth - 1, 1).getDay();
+    },
+    prevMonth() {
+        if (this.calMonth === 1) { this.calMonth = 12; this.calYear--; }
+        else { this.calMonth--; }
+    },
+    nextMonth() {
+        if (this.calMonth === 12) { this.calMonth = 1; this.calYear++; }
+        else { this.calMonth++; }
+    },
+    eventsForDate(dateStr) {
+        return this.calendarEvents.filter(e => e.event_date === dateStr);
+    },
     downloadICS(title, desc, start, end, loc) {
         const ics = [
             'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sto. Rosario Parish//EN',
@@ -224,7 +257,26 @@
     }
 }">
 
-<section class="py-20 max-w-[900px] mx-auto px-6 space-y-6">
+{{-- View Toggle Tabs --}}
+<div class="max-w-[900px] mx-auto px-6 pt-14 pb-2">
+    <div class="flex items-center gap-2 bg-white rounded-2xl p-1.5 border shadow-sm w-fit mx-auto">
+        <button @click="viewMode = 'list'"
+                class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                :class="viewMode === 'list' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground hover:text-primary hover:bg-muted/30'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline mr-1.5 -mt-0.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            List View
+        </button>
+        <button @click="viewMode = 'calendar'"
+                class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                :class="viewMode === 'calendar' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground hover:text-primary hover:bg-muted/30'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline mr-1.5 -mt-0.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Calendar View
+        </button>
+    </div>
+</div>
+
+{{-- ── LIST VIEW ── --}}
+<section x-show="viewMode === 'list'" class="py-16 max-w-[900px] mx-auto px-6 space-y-6">
 
     @forelse($events as $event)
     @php
@@ -346,6 +398,122 @@
 
     @endforelse
 </section>
+
+{{-- ── CALENDAR VIEW ── --}}
+<section x-show="viewMode === 'calendar'" x-cloak class="py-16 max-w-[900px] mx-auto px-6">
+    <div class="bg-card border rounded-[2rem] md:rounded-[3rem] shadow-2xl overflow-x-auto md:overflow-hidden">
+        <div class="min-w-[700px] md:min-w-full font-serif">
+            {{-- Calendar Header --}}
+            <div class="grid grid-cols-7 border-b bg-primary">
+                @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $day)
+                    <div class="py-6 text-center text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
+                        <span class="hidden sm:inline">{{ $day }}</span>
+                        <span class="sm:hidden">{{ substr($day, 0, 1) }}</span>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Month Nav --}}
+            <div class="flex items-center justify-between px-6 py-4 bg-muted/5 border-b">
+                <button @click="prevMonth()" class="p-3 hover:bg-white rounded-xl transition-all text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <span class="font-black uppercase text-sm tracking-widest text-primary" x-text="monthName"></span>
+                <button @click="nextMonth()" class="p-3 hover:bg-white rounded-xl transition-all text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </div>
+
+            {{-- Calendar Grid --}}
+            <div class="grid grid-cols-7 bg-muted/10">
+                <template x-for="i in firstDayOfWeek" :key="'empty-' + i">
+                    <div class="aspect-square border-r border-b bg-muted/5"></div>
+                </template>
+                <template x-for="day in daysInMonth" :key="'day-' + day">
+                    <div class="aspect-square border-r border-b p-4 relative group hover:bg-white transition-colors">
+                        <span class="text-sm font-black text-primary"
+                              x-text="day"></span>
+                        <div class="mt-2 space-y-1">
+                            <template x-for="ev in eventsForDate(calYear + '-' + String(calMonth).padStart(2,'0') + '-' + String(day).padStart(2,'0'))" :key="ev.id">
+                                <div class="px-2 py-1 rounded-md bg-primary/5 border-l-2 border-primary text-[10px] font-bold text-primary truncate hover:whitespace-normal hover:bg-primary hover:text-white transition-all cursor-pointer"
+                                     @click="selectedEvent = ev">
+                                    <span x-text="ev.title"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    {{-- Calendar legend --}}
+    <div class="mt-8 p-6 bg-accent/5 rounded-[2.5rem] border border-accent/10 flex items-center gap-6 italic">
+        <div class="h-12 w-12 rounded-2xl bg-accent flex items-center justify-center text-white shrink-0 shadow-lg shadow-accent/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <p class="text-sm text-primary font-medium leading-relaxed">
+            <span class="font-black uppercase tracking-widest mr-2">Note:</span> 
+            All events are subject to change. Please follow our social media pages for real-time updates and live stream announcements.
+        </p>
+    </div>
+</section>
+
+{{-- Event Details Modal --}}
+<template x-teleport="body">
+    <div x-show="selectedEvent" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition duration-300 ease-out"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition duration-200 ease-in"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="selectedEvent = null"></div>
+        <div class="relative bg-white rounded-[2rem] shadow-2xl max-w-lg w-full p-8"
+             x-transition:enter="transition duration-300 ease-out"
+             x-transition:enter-start="scale-95 opacity-0 translate-y-4"
+             x-transition:enter-end="scale-100 opacity-100 translate-y-0"
+             x-transition:leave="transition duration-200 ease-in"
+             x-transition:leave-start="scale-100 opacity-100 translate-y-0"
+             x-transition:leave-end="scale-95 opacity-0 translate-y-4">
+            <button @click="selectedEvent = null" class="absolute top-4 right-4 p-2 rounded-xl hover:bg-muted/30 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-heading text-2xl font-black text-primary" x-text="selectedEvent?.title"></h3>
+                    <div class="h-1 w-16 bg-accent mt-3 rounded-full"></div>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-primary/60">
+                    <span class="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <span x-text="selectedEvent?.event_date ? new Date(selectedEvent.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : ''"></span>
+                    </span>
+                </div>
+                <template x-if="selectedEvent?.event_time && selectedEvent.event_time.length > 0">
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="slot in selectedEvent.event_time" :key="slot.time">
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/5 border text-[11px] font-bold text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span x-text="slot.title ? slot.title + ' · ' : ''"></span>
+                                <span x-text="new Date('2000-01-01T' + slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })"></span>
+                            </span>
+                        </template>
+                    </div>
+                </template>
+                <p class="text-primary/70 leading-relaxed" x-text="selectedEvent?.description || 'No description available.'"></p>
+                <template x-if="selectedEvent?.url">
+                    <a :href="selectedEvent.url" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-primary/90 transition-all">
+                        View Details
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M7 7h10v10"/><path d="M7 17 21 3"/></svg>
+                    </a>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>
 
 </div>{{-- /x-data --}}
 

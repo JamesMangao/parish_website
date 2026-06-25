@@ -20,6 +20,7 @@ use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\DailyReadingController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\CalendarFeedController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -57,6 +58,10 @@ Route::middleware('throttle:chat')->group(function () {
 });
 
 Route::get('/api/readings/today', DailyReadingController::class);
+
+Route::get('/api/chatbot/session-status', [ChatbotController::class, 'sessionStatus'])->name('chatbot.session-status');
+
+Route::get('/calendar.ics', [CalendarFeedController::class, 'ical'])->name('calendar.ics');
 
 Route::get('/admin-portal/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/admin-portal/login', [LoginController::class, 'login'])->middleware('throttle:auth')->name('login.submit');
@@ -117,6 +122,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
 
         // Live Chat Admin
         Route::get('/admin-portal/chats', [ChatbotController::class, 'adminIndex'])->name('admin.chats.index');
+        Route::get('/admin-portal/chats/sessions-html', [ChatbotController::class, 'adminSessionsHtml'])->name('admin.chats.sessions-html');
         Route::get('/admin-portal/chats/{id}', [ChatbotController::class, 'adminShow'])->name('admin.chats.show');
         Route::post('/admin-portal/chats/{id}/reply', [ChatbotController::class, 'adminReply'])->name('admin.chats.reply');
         Route::post('/admin-portal/chats/{id}/resolve', [ChatbotController::class, 'resolve'])->name('admin.chats.resolve');

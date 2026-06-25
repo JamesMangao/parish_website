@@ -60,10 +60,18 @@ class DashboardController extends Controller
             ->whereRaw('(select sender from chat_messages where chat_session_id = chat_sessions.id order by id desc limit 1) = ?', ['user'])
             ->count();
 
+        $latestUserMsg = ChatMessage::whereIn('chat_session_id', function ($q) {
+            $q->select('id')->from('chat_sessions')->whereIn('status', ['handover', 'active']);
+        })
+            ->where('sender', 'user')
+            ->latest('id')
+            ->first();
+
         return response()->json([
             'intentions' => MassIntention::where('status', 'pending')->count(),
             'inquiries' => Inquiry::where('status', 'pending')->count(),
             'chats' => $handoverChats + $unreadActiveChats,
+            'last_user_message_id' => $latestUserMsg?->id ?? 0,
         ]);
     }
 

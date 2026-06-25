@@ -30,6 +30,7 @@
         confirmModal: { show: false, title: '', message: '', onConfirm: null, confirmText: 'Confirm', type: 'danger' },
         chatCount: 0,
         _chatNotified: false,
+        _lastCheckedMsgId: 0,
         desktopNotifEnabled: true,
         notifPermission: ('Notification' in window) ? Notification.permission : 'denied',
         showNotification(msg, type = 'success') {
@@ -100,7 +101,7 @@
                         :active="request()->is('admin-portal/gallery*')" />
                     <x-admin-nav-link href="{{ route('admin.highlights.index') }}" icon="clapperboard" label="Video Highlights"
                         :active="request()->is('admin-portal/highlights*')" />
-                    <div x-init="setInterval(async () => { try { const r = await fetch('{{ route('admin.notifications.count') }}'); const d = await r.json(); const total = d.chats || 0; if (_chatNotified && total > chatCount) { showNotification('New message from a parishioner', 'success'); if (desktopNotifEnabled && 'Notification' in window && Notification.permission === 'granted') { new Notification('Sto. Rosario Parish', { body: 'New message from a parishioner' }) } } _chatNotified = true; chatCount = total; } catch(e) {} }, 15000)" class="relative">
+                    <div x-init="setInterval(async () => { try { const r = await fetch('{{ route('admin.notifications.count') }}'); const d = await r.json(); const total = d.chats || 0; const latestMsgId = d.last_user_message_id || 0; if (_chatNotified && latestMsgId > _lastCheckedMsgId) { showNotification('New message from a parishioner', 'success'); if (desktopNotifEnabled && 'Notification' in window && Notification.permission === 'granted') { new Notification('Sto. Rosario Parish', { body: 'New message from a parishioner' }) } } _chatNotified = true; if (latestMsgId > _lastCheckedMsgId) _lastCheckedMsgId = latestMsgId; chatCount = total; } catch(e) {} }, 15000)" class="relative">
                         <x-admin-nav-link href="{{ route('admin.chats.index') }}" icon="messages-square" label="Live Chat"
                             :active="request()->is('admin-portal/chats*')" />
                         <template x-if="chatCount > 0">

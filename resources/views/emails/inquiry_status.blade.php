@@ -33,7 +33,7 @@ Your inquiry is currently under review.
 Track Status Online
 </x-mail::button>
 
-Thank you for using Parish Portal!<br>
+{{ \App\Models\Setting::getValue('email_closing', 'Thank you for using Parish Portal!') }}<br>
 God bless,<br>
-**Sto. Rosario Parish**
+**{{ \App\Models\Setting::getValue('email_signoff', 'Sto. Rosario Parish') }}**
 </x-mail::message>

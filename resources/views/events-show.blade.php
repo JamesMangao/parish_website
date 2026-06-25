@@ -40,22 +40,59 @@
             </div>
 
             <div class="p-8 md:p-12">
-                <div class="grid md:grid-cols-3 gap-12">
+                <div class="grid md:grid-cols-3 gap-8 md:gap-12 items-stretch">
                     <!-- Main Content -->
-                    <div class="md:col-span-2 space-y-8">
-                        <div>
-                            <h2 class="text-xs font-black uppercase tracking-widest text-accent mb-4">About this Event</h2>
-                            <div class="prose prose-lg max-w-none text-muted-foreground leading-relaxed whitespace-pre-line">
+                    <div class="md:col-span-2 flex">
+                        <div class="bg-muted/30 rounded-3xl p-6 md:p-8 border border-muted w-full flex flex-col">
+                            <h2 class="text-xs font-black uppercase tracking-widest text-accent mb-6">About this Event</h2>
+
+                            <div class="prose prose-lg max-w-none text-muted-foreground leading-relaxed whitespace-pre-line flex-1">
                                 {{ $event->description }}
                             </div>
+
+                            @if(strlen(strip_tags($event->description)) < 100)
+                            <div class="mt-6 p-4 rounded-2xl bg-primary/[0.02] border border-dashed border-primary/10 text-center">
+                                <p class="text-[11px] font-medium text-muted-foreground italic">More details coming soon — stay tuned for updates.</p>
+                            </div>
+                            @endif
+
+                            <div class="mt-8 pt-6 border-t border-muted space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] uppercase font-black text-muted-foreground tracking-wider">Date</span>
+                                        <span class="text-sm font-bold text-primary">{{ $event->event_date->format('l, F j, Y') }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] uppercase font-black text-muted-foreground tracking-wider">Location</span>
+                                        <span class="text-sm font-bold text-primary">Sto. Rosario Parish</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] uppercase font-black text-muted-foreground tracking-wider">Sessions</span>
+                                        <span class="text-sm font-bold text-primary">{{ count($event->event_time ?? []) }} session{{ count($event->event_time ?? []) !== 1 ? 's' : '' }} scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-
                     </div>
 
                     <!-- Sidebar Info -->
-                    <div class="space-y-8">
-                        <div class="bg-muted/30 rounded-3xl p-6 border border-muted">
+                    <div class="flex flex-col gap-8">
+                        <div class="bg-muted/30 rounded-3xl p-6 md:p-8 border border-muted">
                             <h2 class="text-xs font-black uppercase tracking-widest text-primary mb-6">Schedule Details</h2>
                             
                             @if(!empty($event->event_time))

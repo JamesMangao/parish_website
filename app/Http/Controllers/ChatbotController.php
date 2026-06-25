@@ -28,36 +28,11 @@ class ChatbotController extends Controller
         $session = $this->getOrCreateSession();
         $userMessage = $request->input('message');
 
-        // 0. If session was resolved, reset and show welcome message
+        // If session was resolved, reject — user must click "Start New Chat"
         if ($session->status === 'resolved') {
-            $session->update(['status' => 'active', 'admin_id' => null]);
-
-            // Clear old messages so the user starts fresh
-            $session->messages()->delete();
-
-            // Store user's first message
-            ChatMessage::create([
-                'chat_session_id' => $session->id,
-                'sender' => 'user',
-                'message' => $userMessage,
-            ]);
-
-            $welcomeMsg = ChatMessage::create([
-                'chat_session_id' => $session->id,
-                'sender' => 'ai',
-                'message' => 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.',
-            ]);
-
             return response()->json([
-                'status' => 'resolved_reset',
-                'message' => $welcomeMsg->message,
-                'id' => $welcomeMsg->id,
-                'suggestions' => [
-                    '⛪ Mass Schedules',
-                    '📖 Today\'s Readings',
-                    '🕯️ Offer Mass Intention',
-                    '📝 Sacramental Inquiry',
-                ],
+                'status' => 'conversation_ended',
+                'message' => 'This conversation has ended. Please start a new chat.',
             ]);
         }
 
@@ -231,6 +206,45 @@ class ChatbotController extends Controller
             'agent_connected' => $session->admin_id !== null,
             'agent_typing' => Cache::has('chat_typing_' . $session->id),
             'status' => $session->status,
+        ]);
+    }
+
+    /**
+     * Get the current session status (used by frontend to detect resolved state).
+     */
+    public function sessionStatus()
+    {
+        $session = $this->getOrCreateSession();
+        return response()->json([
+            'status' => $session->status,
+        ]);
+    }
+
+    public function adminSessionsHtml(Request $request)
+    {
+        $status = $request->input('status', 'handover');
+        $search = $request->input('search');
+
+        $sessions = ChatSession::withCount('messages')
+            ->addSelect(['last_message_sender' => ChatMessage::select('sender')
+                ->whereColumn('chat_session_id', 'chat_sessions.id')
+                ->latest('id')
+                ->limit(1)
+            ])
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->when($search, fn($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
+            ->orderBy('live_agent_requested_at', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(15);
+
+        $html = view('admin.chats._sessions_rows', compact('sessions'))->render();
+        $pagination = $sessions->hasPages()
+            ? $sessions->appends(request()->query())->links()->toHtml()
+            : '';
+
+        return response()->json([
+            'html' => $html,
+            'pagination' => $pagination,
         ]);
     }
 

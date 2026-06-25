@@ -3,7 +3,7 @@
 
 Dear {{ $intention->full_name }},
 
-Peace be with you!
+{{ \App\Models\Setting::getValue('email_greeting', 'Peace be with you!') }}
 
 We have successfully received your mass intention submission. Our parish office will review the details and include it in our scheduled masses once validated.
 
@@ -23,9 +23,9 @@ We have successfully received your mass intention submission. Our parish office 
 
 Please quote the reference number above if you need to follow up with the parish office via email or phone.
 
-Thank you for your faith and support.
+{{ \App\Models\Setting::getValue('email_closing', 'Thank you for your faith and support.') }}
 
 God bless,
 
-**{{ config('app.name') }} Team**
+**{{ \App\Models\Setting::getValue('email_signoff', config('app.name') . ' Team') }}**
 </x-mail::message>

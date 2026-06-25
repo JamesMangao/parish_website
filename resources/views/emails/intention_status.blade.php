@@ -25,7 +25,7 @@ Your intention is currently pending review.
 Track Status Online
 </x-mail::button>
 
-Thank you for your faith and patience.<br>
+{{ \App\Models\Setting::getValue('email_closing', 'Thank you for your faith and patience.') }}<br>
 God bless,<br>
-**Sto. Rosario Parish**
+**{{ \App\Models\Setting::getValue('email_signoff', 'Sto. Rosario Parish') }}**
 </x-mail::message>
