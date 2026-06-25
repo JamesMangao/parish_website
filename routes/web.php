@@ -65,6 +65,34 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'throttle:admin'])->group(function () {
     Route::get('/admin-portal/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin-portal/notifications/count', [DashboardController::class, 'getNotifications'])->name('admin.notifications.count');
+    Route::get('/admin-portal/diag', function () {
+        $results = [];
+        $models = [
+            'MassIntention' => \App\Models\MassIntention::class,
+            'Inquiry' => \App\Models\Inquiry::class,
+            'Event' => \App\Models\Event::class,
+            'Announcement' => \App\Models\Announcement::class,
+            'MassSchedule' => \App\Models\MassSchedule::class,
+        ];
+        foreach ($models as $name => $class) {
+            try { $results["{$name}_count"] = $class::count(); }
+            catch (\Throwable $e) { $results["{$name}_error"] = $e->getMessage(); }
+        }
+        try {
+            $results['intentionsTrend'] = \App\Models\MassIntention::selectRaw("TO_CHAR(created_at, 'IYYYIW') as week, count(*) as total")
+                ->where('created_at', '>=', now()->subWeeks(8))
+                ->groupBy('week')->orderBy('week')->get();
+        } catch (\Throwable $e) { $results['intentionsTrend_error'] = $e->getMessage(); }
+        try {
+            $results['inquiryTypes'] = \App\Models\Inquiry::selectRaw('inquiry_type as type, count(*) as total')
+                ->groupBy('type')->get();
+        } catch (\Throwable $e) { $results['inquiryTypes_error'] = $e->getMessage(); }
+        try {
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $results['auth_user'] = $user ? ['id' => $user->id, 'name' => $user->name, 'role' => $user->role] : 'no user';
+        } catch (\Throwable $e) { $results['auth_error'] = $e->getMessage(); }
+        return response()->json($results);
+    });
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {

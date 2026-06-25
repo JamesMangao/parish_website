@@ -15,11 +15,14 @@ class DashboardController extends Controller
 {
     public function dashboard()
     {
+        \Illuminate\Support\Facades\Log::info('Dashboard::dashboard() started');
+        
         $stats = [];
         $intentionsTrend = collect();
         $inquiryTypes = collect();
 
         try {
+            \Illuminate\Support\Facades\Log::info('Dashboard::stats query start');
             $stats = [
                 'total_intentions' => MassIntention::count(),
                 'pending_intentions' => MassIntention::where('status', 'pending')->count(),
@@ -29,29 +32,42 @@ class DashboardController extends Controller
                 'total_announcements' => Announcement::count(),
                 'active_schedules' => MassSchedule::where('is_active', true)->count(),
             ];
+            \Illuminate\Support\Facades\Log::info('Dashboard::stats query done', $stats);
         } catch (\Throwable $e) {
             Log::error('Dashboard stats query failed: ' . $e->getMessage());
         }
 
         try {
+            \Illuminate\Support\Facades\Log::info('Dashboard::trend query start');
             $intentionsTrend = MassIntention::selectRaw("TO_CHAR(created_at, 'IYYYIW') as week, count(*) as total")
                 ->where('created_at', '>=', now()->subWeeks(8))
                 ->groupBy('week')
                 ->orderBy('week')
                 ->get();
+            \Illuminate\Support\Facades\Log::info('Dashboard::trend query done', ['count' => $intentionsTrend->count()]);
         } catch (\Throwable $e) {
             Log::error('Dashboard intentions trend query failed: ' . $e->getMessage());
         }
 
         try {
+            \Illuminate\Support\Facades\Log::info('Dashboard::inquiry types query start');
             $inquiryTypes = Inquiry::selectRaw('inquiry_type as type, count(*) as total')
                 ->groupBy('type')
                 ->get();
+            \Illuminate\Support\Facades\Log::info('Dashboard::inquiry types query done', ['count' => $inquiryTypes->count()]);
         } catch (\Throwable $e) {
             Log::error('Dashboard inquiry types query failed: ' . $e->getMessage());
         }
 
-        return view('admin.dashboard', compact('stats', 'intentionsTrend', 'inquiryTypes'));
+        \Illuminate\Support\Facades\Log::info('Dashboard::about to render view');
+        try {
+            $result = view('admin.dashboard', compact('stats', 'intentionsTrend', 'inquiryTypes'));
+            \Illuminate\Support\Facades\Log::info('Dashboard::view rendered');
+            return $result;
+        } catch (\Throwable $e) {
+            Log::error('Dashboard view rendering failed: ' . $e->getMessage());
+            return response('Dashboard error: ' . $e->getMessage(), 500);
+        }
     }
 
     public function getNotifications()
