@@ -9,30 +9,47 @@ use App\Models\Event;
 use App\Models\Inquiry;
 use App\Models\ChatSession;
 use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
     public function dashboard()
     {
-        $stats = [
-            'total_intentions' => MassIntention::count(),
-            'pending_intentions' => MassIntention::where('status', 'pending')->count(),
-            'total_inquiries' => Inquiry::count(),
-            'pending_inquiries' => Inquiry::where('status', 'pending')->count(),
-            'upcoming_events' => Event::where('event_date', '>=', now())->count(),
-            'total_announcements' => Announcement::count(),
-            'active_schedules' => MassSchedule::where('is_active', true)->count(),
-        ];
+        $stats = [];
+        $intentionsTrend = collect();
+        $inquiryTypes = collect();
 
-        $intentionsTrend = MassIntention::selectRaw("TO_CHAR(created_at, 'IYYYIW') as week, count(*) as total")
-            ->where('created_at', '>=', now()->subWeeks(8))
-            ->groupBy('week')
-            ->orderBy('week')
-            ->get();
+        try {
+            $stats = [
+                'total_intentions' => MassIntention::count(),
+                'pending_intentions' => MassIntention::where('status', 'pending')->count(),
+                'total_inquiries' => Inquiry::count(),
+                'pending_inquiries' => Inquiry::where('status', 'pending')->count(),
+                'upcoming_events' => Event::where('event_date', '>=', now())->count(),
+                'total_announcements' => Announcement::count(),
+                'active_schedules' => MassSchedule::where('is_active', true)->count(),
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Dashboard stats query failed: ' . $e->getMessage());
+        }
 
-        $inquiryTypes = Inquiry::selectRaw('inquiry_type as type, count(*) as total')
-            ->groupBy('type')
-            ->get();
+        try {
+            $intentionsTrend = MassIntention::selectRaw("TO_CHAR(created_at, 'IYYYIW') as week, count(*) as total")
+                ->where('created_at', '>=', now()->subWeeks(8))
+                ->groupBy('week')
+                ->orderBy('week')
+                ->get();
+        } catch (\Throwable $e) {
+            Log::error('Dashboard intentions trend query failed: ' . $e->getMessage());
+        }
+
+        try {
+            $inquiryTypes = Inquiry::selectRaw('inquiry_type as type, count(*) as total')
+                ->groupBy('type')
+                ->get();
+        } catch (\Throwable $e) {
+            Log::error('Dashboard inquiry types query failed: ' . $e->getMessage());
+        }
 
         return view('admin.dashboard', compact('stats', 'intentionsTrend', 'inquiryTypes'));
     }

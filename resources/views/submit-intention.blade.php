@@ -179,6 +179,31 @@
         .flatpickr-current-month { color: #FFF !important; }
         .flatpickr-weekday { color: rgba(13,42,82,0.45) !important; font-weight: 700 !important; }
         .numInputWrapper:hover { background: transparent !important; }
+
+        .flatpickr-monthDropdown-months {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            background: var(--blue-deep) !important;
+            color: #FFF !important;
+            border: none !important;
+            outline: none !important;
+            font-family: 'Jost', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            padding: 0 4px !important;
+            cursor: pointer !important;
+        }
+
+        .flatpickr-monthDropdown-months option {
+            background: #0D2A52 !important;
+            color: #FFFFFF !important;
+        }
+
+        .flatpickr-monthDropdown-months option:hover,
+        .flatpickr-monthDropdown-months option:checked {
+            background: #1A4080 !important;
+            color: #FFFFFF !important;
+        }
     </style>
 </x-slot>
 

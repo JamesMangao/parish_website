@@ -653,42 +653,147 @@
             </p>
         </div>
 
-        {{-- STAT ROW --}}
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2.5rem;">
-            @foreach([
-                ['val'=>'4K+',   'label'=>'Followers'],
-                ['val'=>'Daily', 'label'=>'Mass Intentions'],
-                ['val'=>'Live',  'label'=>'Streamed Masses'],
-            ] as $stat)
-            <div class="card-sacred" style="text-align:center; padding:1.25rem 0.5rem;">
-                <p class="font-heading" style="font-size:1.5rem; font-weight:700;
-                           color:var(--blue-deep);">{{ $stat['val'] }}</p>
-                <p class="font-cinzel" style="font-size:9px; letter-spacing:0.2em;
-                           color:rgba(13,42,82,0.35); margin-top:4px; text-transform:uppercase;">
-                    {{ $stat['label'] }}
-                </p>
-            </div>
-            @endforeach
+        {{-- FB TABS --}}
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem; justify-content:center;">
+            <button id="tab-timeline" onclick="switchFbTab('timeline')"
+                    class="fb-tab"
+                    style="padding:8px 20px; border-radius:100px; border:1.5px solid var(--gold);
+                           background:var(--gold); color:var(--blue-deep); font-size:10px;
+                           font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
+                           cursor:pointer; transition:all 0.2s;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px; vertical-align:middle;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12"/>
+                </svg>
+                Posts
+            </button>
+            <button id="tab-events" onclick="switchFbTab('events')"
+                    class="fb-tab"
+                    style="padding:8px 20px; border-radius:100px; border:1.5px solid rgba(26,64,128,0.2);
+                           background:transparent; color:rgba(13,42,82,0.5); font-size:10px;
+                           font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
+                           cursor:pointer; transition:all 0.2s;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle;">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Events
+            </button>
         </div>
 
         {{-- FB EMBED --}}
-        <div class="card-sacred" style="overflow:hidden; margin-bottom:2rem; padding:0;">
+        <div class="card-sacred" style="overflow:hidden; margin-bottom:2rem; padding:0; position:relative;">
             <div id="fb-root"></div>
             <script async defer crossorigin="anonymous"
                     src="https://connect.facebook.net/en_PH/sdk.js#xfbml=1&version=v19.0"></script>
-            <div class="fb-page"
-                 data-href="https://www.facebook.com/storosarioparishpacita1"
-                 data-tabs="timeline"
-                 data-width="800"
-                 data-height="500"
-                 data-small-header="true"
-                 data-adapt-container-width="true"
-                 data-hide-cover="false"
-                 data-show-facepile="false">
-                <blockquote cite="https://www.facebook.com/storosarioparishpacita1"
-                            class="fb-xfbml-parse-ignore">
-                    <a href="https://www.facebook.com/storosarioparishpacita1">Sto. Rosario Parish - Pacita</a>
-                </blockquote>
+
+            {{-- Loading skeleton --}}
+            <div id="fb-skeleton"
+                 style="position:absolute; inset:0; z-index:10; background:#fff;
+                        display:flex; flex-direction:column; gap:1rem; padding:1.5rem;">
+                @for($skelIdx = 0; $skelIdx < 4; $skelIdx++)
+                <div style="display:flex; gap:0.875rem; align-items:flex-start;">
+                    <div class="skeleton" style="width:44px; height:44px; border-radius:50%; flex-shrink:0;"></div>
+                    <div style="flex:1;">
+                        <div class="skeleton" style="height:12px; width:55%; margin-bottom:0.625rem;"></div>
+                        <div class="skeleton" style="height:10px; width:85%; margin-bottom:6px;"></div>
+                        <div class="skeleton" style="height:10px; width:65%;"></div>
+                    </div>
+                </div>
+                @endfor
+            </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const container = document.querySelector('#fb-page-container');
+                const skeleton = document.getElementById('fb-skeleton');
+
+                const fadeSkeleton = () => {
+                    if (!skeleton) return;
+                    skeleton.style.transition = 'opacity 0.3s';
+                    skeleton.style.opacity = '0';
+                    setTimeout(() => { if (skeleton) skeleton.style.display = 'none'; }, 300);
+                };
+
+                if (container) {
+                    const obs = new MutationObserver(() => {
+                        if (container.querySelector('.fb_iframe_widget')) {
+                            fadeSkeleton();
+                            obs.disconnect();
+                        }
+                    });
+                    obs.observe(container, { childList: true, subtree: true });
+                }
+                setTimeout(fadeSkeleton, 8000);
+            });
+
+            function switchFbTab(tab) {
+                const container = document.querySelector('#fb-page-container');
+                const skeleton = document.getElementById('fb-skeleton');
+                if (!container) return;
+
+                if (skeleton) skeleton.style.display = 'flex';
+
+                ['timeline', 'events'].forEach(t => {
+                    const btn = document.getElementById(`tab-${t}`);
+                    if (!btn) return;
+                    if (t === tab) {
+                        btn.style.background = 'var(--gold)';
+                        btn.style.color = 'var(--blue-deep)';
+                        btn.style.borderColor = 'var(--gold)';
+                    } else {
+                        btn.style.background = 'transparent';
+                        btn.style.color = 'rgba(13,42,82,0.5)';
+                        btn.style.borderColor = 'rgba(26,64,128,0.2)';
+                    }
+                });
+
+                container.innerHTML = '';
+
+                const fbPage = document.createElement('div');
+                fbPage.className = 'fb-page';
+                fbPage.setAttribute('data-href', 'https://www.facebook.com/storosarioparishpacita1');
+                fbPage.setAttribute('data-tabs', tab);
+                fbPage.setAttribute('data-width', '800');
+                fbPage.setAttribute('data-height', '500');
+                fbPage.setAttribute('data-small-header', 'true');
+                fbPage.setAttribute('data-adapt-container-width', 'true');
+                fbPage.setAttribute('data-hide-cover', 'false');
+                fbPage.setAttribute('data-show-facepile', 'true');
+                container.appendChild(fbPage);
+
+                if (typeof FB !== 'undefined') {
+                    FB.XFBML.parse(container);
+                }
+
+                setTimeout(() => {
+                    const obs = new MutationObserver(() => {
+                        if (container.querySelector('.fb_iframe_widget')) {
+                            if (skeleton) { skeleton.style.transition = 'opacity 0.3s'; skeleton.style.opacity = '0'; setTimeout(() => { if (skeleton) skeleton.style.display = 'none'; }, 300); }
+                            obs.disconnect();
+                        }
+                    });
+                    obs.observe(container, { childList: true, subtree: true });
+                    setTimeout(() => { if (skeleton) skeleton.style.display = 'none'; obs.disconnect(); }, 8000);
+                }, 100);
+            }
+            </script>
+
+            <div id="fb-page-container" style="min-height:350px;">
+                <div class="fb-page"
+                     data-href="https://www.facebook.com/storosarioparishpacita1"
+                     data-tabs="timeline"
+                     data-width="800"
+                     data-height="500"
+                     data-small-header="true"
+                     data-adapt-container-width="true"
+                     data-hide-cover="false"
+                     data-show-facepile="true">
+                    <blockquote cite="https://www.facebook.com/storosarioparishpacita1"
+                                class="fb-xfbml-parse-ignore">
+                        <a href="https://www.facebook.com/storosarioparishpacita1">Sto. Rosario Parish - Pacita</a>
+                    </blockquote>
+                </div>
             </div>
         </div>
 
