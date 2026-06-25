@@ -28,6 +28,8 @@
         sidebarOpen: true,
         notification: { show: false, message: '', type: 'success' },
         confirmModal: { show: false, title: '', message: '', onConfirm: null, confirmText: 'Confirm', type: 'danger' },
+        chatCount: 0,
+        notifPermission: ('Notification' in window) ? Notification.permission : 'denied',
         showNotification(msg, type = 'success') {
             this.notification.message = msg;
             this.notification.type = type;
@@ -41,6 +43,13 @@
             this.confirmModal.confirmText = confirmText;
             this.confirmModal.type = type;
             this.confirmModal.show = true;
+        },
+        requestNotifPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    this.notifPermission = perm;
+                });
+            }
         }
     }">
     
@@ -89,7 +98,7 @@
                         :active="request()->is('admin-portal/gallery*')" />
                     <x-admin-nav-link href="{{ route('admin.highlights.index') }}" icon="clapperboard" label="Video Highlights"
                         :active="request()->is('admin-portal/highlights*')" />
-                    <div x-data="{ chatCount: 0 }" x-init="setInterval(async () => { try { const r = await fetch('{{ route('admin.notifications.count') }}'); const d = await r.json(); chatCount = d.chats || 0; } catch(e) {} }, 15000)" class="relative">
+                    <div x-init="setInterval(async () => { try { const r = await fetch('{{ route('admin.notifications.count') }}'); const d = await r.json(); const total = d.chats || 0; if (total > chatCount && chatCount > 0) { showNotification('New message from a parishioner', 'success'); if ('Notification' in window && Notification.permission === 'granted') { new Notification('Sto. Rosario Parish', { body: 'New message from a parishioner' }) } } chatCount = total; } catch(e) {} }, 15000)" class="relative">
                         <x-admin-nav-link href="{{ route('admin.chats.index') }}" icon="messages-square" label="Live Chat"
                             :active="request()->is('admin-portal/chats*')" />
                         <template x-if="chatCount > 0">
@@ -146,6 +155,17 @@
                 </button>
 
                 <div class="flex items-center gap-6">
+                    <!-- Desktop Notification Toggle -->
+                    <template x-if="'Notification' in window && notifPermission !== 'denied'">
+                        <button @click="requestNotifPermission()"
+                            class="p-2 rounded-lg hover:bg-muted text-muted-foreground transition-all relative group"
+                            :title="notifPermission === 'granted' ? 'Desktop notifications enabled' : 'Enable desktop notifications'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                            <span class="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white"
+                                  :class="notifPermission === 'granted' ? 'bg-green-500' : 'bg-muted-foreground/40'"></span>
+                        </button>
+                    </template>
+
                     <!-- Notification Bell -->
                     <div x-data="{ 
                         open: false,
