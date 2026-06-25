@@ -37,6 +37,19 @@ class AdminIntentionController extends Controller
     {
         $validated = $request->validated();
 
+        $duplicate = MassIntention::where('full_name', $validated['fullName'])
+            ->where('intention_type', $validated['intentionType'])
+            ->where('status', 'pending')
+            ->first();
+
+        if ($duplicate && !$request->input('force_submit')) {
+            return back()->with([
+                'duplicate_warning' => true,
+                'duplicate_ref' => $duplicate->reference_number,
+                'duplicate_type' => $validated['intentionType'],
+            ])->withInput();
+        }
+
         MassIntention::create([
             'full_name' => $validated['fullName'],
             'intention_type' => $validated['intentionType'],

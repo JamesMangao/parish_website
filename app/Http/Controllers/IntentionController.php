@@ -28,6 +28,27 @@ class IntentionController extends Controller
             'paymentMethod' => 'nullable|string',
         ]);
 
+        $duplicate = MassIntention::where('email', $validated['email'])
+            ->where('intention_type', $validated['intentionType'])
+            ->where('status', 'pending')
+            ->first();
+
+        if ($duplicate && !$request->input('force_submit')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'duplicate_warning' => true,
+                    'duplicate_ref' => $duplicate->reference_number,
+                    'duplicate_type' => $validated['intentionType'],
+                ]);
+            }
+            return back()->with([
+                'duplicate_warning' => true,
+                'duplicate_ref' => $duplicate->reference_number,
+                'duplicate_type' => $validated['intentionType'],
+                'old_input' => $validated,
+            ])->withInput();
+        }
+
         $year = date('Y');
         $count = MassIntention::whereYear('created_at', $year)->count() + 1;
         $refNumber = 'SRP-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);

@@ -329,6 +329,53 @@
     {{-- ── FORM STATE ── --}}
     <div x-show="!submitted" class="reveal active">
 
+        {{-- Duplicate Warning Modal --}}
+        <div x-show="dupWarning" x-cloak
+             class="fixed inset-0 z-[100] flex items-center justify-center p-6"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="dupWarning = false"></div>
+            <div class="relative bg-white max-w-md w-full rounded-3xl shadow-2xl p-8 text-center"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+                <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                     style="background:rgba(245,197,24,0.10); border:2px solid rgba(245,197,24,0.30);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <h2 class="font-heading text-2xl font-bold italic mb-2" style="color:var(--blue-deep);">Duplicate Intention Detected</h2>
+                <p class="text-sm" style="color:rgba(13,42,82,0.55);">
+                    You already have a pending <strong x-text="dupType"></strong> intention (Ref: <strong x-text="dupRef"></strong>).
+                </p>
+                <p class="text-xs mt-3 mb-6" style="color:rgba(13,42,82,0.40);">
+                    Submitting a duplicate may cause delays. You may track your existing intention instead.
+                </p>
+                <div class="flex flex-col gap-3">
+                    <a :href="'/track-intention/' + dupRef"
+                       class="gold-btn w-full h-12 rounded-2xl inline-flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest"
+                       style="text-decoration:none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Track Existing Intention
+                    </a>
+                    <button @click="forceSubmit()" type="button"
+                            class="w-full h-12 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all duration-200"
+                            style="border:1.5px solid rgba(26,64,128,0.18); color:rgba(13,42,82,0.50); background:transparent;">
+                        Submit Anyway
+                    </button>
+                    <button @click="dupWarning = false" type="button"
+                            class="text-[10px] font-bold uppercase tracking-widest transition-all"
+                            style="color:rgba(13,42,82,0.30);">Cancel</button>
+                </div>
+            </div>
+        </div>
+
         <div class="form-card">
             {{-- Card header --}}
             <div class="px-8 py-6" style="border-bottom:1px solid rgba(26,64,128,0.08); background:var(--cream-deep);">
@@ -539,6 +586,9 @@ function intentionForm() {
         gcashCopied: false,
         refCopied: false,
         refId: '',
+        dupWarning: false,
+        dupRef: '',
+        dupType: '',
         intentionTypes: [
             'Thanksgiving','Birthday','Wedding Anniversary','Healing',
             'Repose of the Soul','Special Intention','Other'
@@ -573,10 +623,13 @@ function intentionForm() {
             else if (!this.massTimes.includes(this.formData.massTime)) this.formData.massTime = '';
         },
 
-        async submitForm() {
+        async submitForm(force = false) {
             if (this.loading) return;
             this.loading = true;
             try {
+                const body = { ...this.formData };
+                if (force) body.force_submit = true;
+
                 const res = await fetch('{{ route('submit-intention') }}', {
                     method: 'POST',
                     headers: {
@@ -584,9 +637,18 @@ function intentionForm() {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify(this.formData)
+                    body: JSON.stringify(body)
                 });
                 const data = await res.json();
+
+                if (data.duplicate_warning) {
+                    this.dupWarning = true;
+                    this.dupRef = data.duplicate_ref;
+                    this.dupType = data.duplicate_type;
+                    this.loading = false;
+                    return;
+                }
+
                 if (!res.ok) throw new Error('Submission failed');
                 this.refId = data.refId || '';
                 this.submitted = true;
@@ -596,6 +658,11 @@ function intentionForm() {
             } finally {
                 this.loading = false;
             }
+        },
+
+        forceSubmit() {
+            this.dupWarning = false;
+            this.submitForm(true);
         },
 
         copyGCash() {

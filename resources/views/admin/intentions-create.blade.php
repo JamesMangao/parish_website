@@ -6,6 +6,26 @@
     submitLabel="Create Intention"
 >
     <div class="space-y-4">
+        @if(session('duplicate_warning'))
+        <div class="p-4 rounded-xl border-2 border-amber-200 bg-amber-50/80 flex items-start gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" class="shrink-0 mt-0.5">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div class="flex-1">
+                <p class="text-sm font-bold text-amber-800">Duplicate intention detected</p>
+                <p class="text-xs text-amber-600/70 mt-1">
+                    A pending <strong>{{ session('duplicate_type') }}</strong> intention already exists for this name (Ref: {{ session('duplicate_ref') }}).
+                    You may create it anyway, but consider reviewing the existing one first.
+                </p>
+                <div class="flex gap-2 mt-3">
+                    <a href="{{ route('admin.intentions', ['status' => 'pending']) }}" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-300 text-amber-700 hover:bg-amber-100 transition-all" style="text-decoration:none;">View Pending</a>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="force_submit" value="1">
+        @endif
+
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Full Name</label>
             <input type="text" name="fullName" value="{{ old('fullName') }}" required
