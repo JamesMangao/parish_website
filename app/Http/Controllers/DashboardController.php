@@ -65,9 +65,31 @@ class DashboardController extends Controller
             \Illuminate\Support\Facades\Log::info('Dashboard::view rendered');
             return $result;
         } catch (\Throwable $e) {
-            Log::error('Dashboard view rendering failed: ' . $e->getMessage());
-            return response('Dashboard error: ' . $e->getMessage(), 500);
+            Log::error('Dashboard view rendering failed: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response('Dashboard view error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), 500);
         }
+    }
+
+    public function dashboardSimple()
+    {
+        return response('Dashboard simple OK');
+    }
+
+    public function dashboardTestLayout()
+    {
+        $data = ['stats' => ['total_intentions' => 0, 'pending_intentions' => 0, 'total_inquiries' => 0, 'pending_inquiries' => 0, 'upcoming_events' => 0, 'total_announcements' => 0, 'active_schedules' => 0], 'intentionsTrend' => collect(), 'inquiryTypes' => collect()];
+        try {
+            return view('admin.test-dashboard', $data);
+        } catch (\Throwable $e) {
+            return response('Test dashboard error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(), 500);
+        }
+    }
+    }
+
+    public function dashboardSimple()
+    {
+        return response('Dashboard simple OK');
+    }
     }
 
     public function getNotifications()
