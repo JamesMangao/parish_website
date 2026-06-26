@@ -46,7 +46,7 @@ Route::post('/inquiry', [InquiryController::class, 'store'])->middleware('thrott
 
 Route::get('/events', [EventsController::class, 'publicIndex'])->name('events');
 Route::get('/events/{event}', [EventsController::class, 'publicShow'])->name('events.show');
-Route::get('/gallery', [GalleryController::class, 'publicIndex'])->name('gallery');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 Route::get('/gallery/{album}', [GalleryController::class, 'publicAlbum'])->name('gallery.album');
 
 // API Proxies

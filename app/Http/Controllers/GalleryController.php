@@ -9,6 +9,16 @@ use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
+    public function index()
+    {
+        $albums = GalleryAlbum::where('is_published', true)
+            ->withCount('images')
+            ->orderByDesc('created_at')
+            ->paginate(12);
+
+        return view('gallery.index', compact('albums'));
+    }
+
     public function publicIndex()
     {
         $albums = GalleryAlbum::where('is_published', true)

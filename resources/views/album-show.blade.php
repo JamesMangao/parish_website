@@ -147,7 +147,7 @@
     <div style="max-width:1100px; margin:0 auto; position:relative; z-index:5;">
 
         {{-- Back link --}}
-        <a href="{{ route('gallery') }}"
+        <a href="{{ route('gallery.index') }}"
            style="display:inline-flex; align-items:center; gap:8px; margin-bottom:2rem;
                   font-size:11.5px; font-weight:600; letter-spacing:0.28em; text-transform:uppercase;
                   color:rgba(235,242,255,0.45); text-decoration:none; transition:color 0.2s;"
