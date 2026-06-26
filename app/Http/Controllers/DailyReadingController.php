@@ -104,6 +104,7 @@ class DailyReadingController extends Controller
                 if (!empty($data['readings'])) {
                     $data['source'] = 'evangelizo';
                     $data = $this->supplementFromUsccbMarkdown($data, $dateObj);
+                    $data = $this->injectPsalmRefrains($data);
                     $data = $this->addMissingReadings($data);
                 }
             }
@@ -224,7 +225,18 @@ class DailyReadingController extends Controller
                 $usccbType = strtolower($usccbReading['type'] ?? '');
 
                 if (stripos($usccbType, 'alleluia') !== false && !$hasAlleluia) {
-                    $data['readings'][] = $usccbReading;
+                    $gospelIdx = -1;
+                    foreach ($data['readings'] as $gi => $gr) {
+                        if (stripos(strtolower($gr['type'] ?? ''), 'gospel') !== false) {
+                            $gospelIdx = $gi;
+                            break;
+                        }
+                    }
+                    if ($gospelIdx >= 0) {
+                        array_splice($data['readings'], $gospelIdx, 0, [$usccbReading]);
+                    } else {
+                        $data['readings'][] = $usccbReading;
+                    }
                     $data['source'] = 'evangelizo+usccb_alleluia';
                     Log::info('Supplemented Alleluia from USCCB markdown');
                 }
@@ -261,14 +273,16 @@ class DailyReadingController extends Controller
         $hasGospel = false;
         $gospelText = '';
         $gospelRef = '';
+        $gospelIndex = -1;
 
-        foreach ($readings as $r) {
+        foreach ($readings as $i => $r) {
             $type = strtolower($r['type'] ?? '');
             if (stripos($type, 'alleluia') !== false) $hasAlleluia = true;
             if (stripos($type, 'gospel') !== false) {
                 $hasGospel = true;
                 $gospelText = $r['text'] ?? '';
                 $gospelRef = $r['reference'] ?? '';
+                $gospelIndex = $i;
             }
         }
 
@@ -286,17 +300,196 @@ class DailyReadingController extends Controller
             $alleluiaText .= ($alleluiaVerse ?: 'Alleluia, alleluia.') . "\n";
             $alleluiaText .= "R. Alleluia, alleluia.";
 
-            $readings[] = [
+            $alleluiaReading = [
                 'type'      => 'Alleluia',
                 'reference' => $gospelRef,
                 'text'      => $alleluiaText,
             ];
+
+            if ($gospelIndex >= 0) {
+                array_splice($readings, $gospelIndex, 0, [$alleluiaReading]);
+            } else {
+                $readings[] = $alleluiaReading;
+            }
+
             $data['source'] = ($data['source'] ?? 'evangelizo') . '+constructed_alleluia';
             Log::info("Constructed Alleluia from Gospel: " . substr($alleluiaVerse, 0, 80));
         }
 
         $data['readings'] = $readings;
         return $data;
+    }
+
+    /**
+     * When Evangelizo lacks R. refrain lines in the psalm, inject them
+     * from the known USCCB psalm refrain lookup table.
+     */
+    private function injectPsalmRefrains(array $data): array
+    {
+        $refrains = $this->getPsalmRefrains();
+        $changed = false;
+
+        foreach ($data['readings'] as &$r) {
+            if (stripos(strtolower($r['type'] ?? ''), 'psalm') === false) continue;
+            if (preg_match('/\bR\.\s/', $r['text'] ?? '')) continue;
+
+            $psalmNum = $this->extractPsalmNumber($r['reference'] ?? '');
+            if ($psalmNum && isset($refrains[$psalmNum])) {
+                $refrain = $refrains[$psalmNum];
+                $r['text'] = "R. {$refrain}\n" . $r['text'] . "\nR. {$refrain}";
+                $data['source'] = ($data['source'] ?? 'evangelizo') . '+psalm_refrain';
+                $changed = true;
+                Log::info("Injected psalm refrain for Psalm {$psalmNum}: " . substr($refrain, 0, 60));
+            }
+        }
+        unset($r);
+
+        return $data;
+    }
+
+    private function extractPsalmNumber(string $reference): ?string
+    {
+        if (preg_match('/(?:Psalms?|Salmo)\s+(\d+)/i', $reference, $m)) {
+            return $m[1];
+        }
+        return null;
+    }
+
+    private function getPsalmRefrains(): array
+    {
+        return [
+            '6'    => 'The Lord will not reject his people.',
+            '10'   => 'The Lord will not reject his people.',
+            '11'   => 'The Lord uproots the city of the arrogant.',
+            '13'   => 'A light shining on me, O Lord.',
+            '14'   => 'Everyone who does good enters the kingdom of heaven.',
+            '16'   => 'You are my inheritance, O Lord.',
+            '18'   => 'The judgments of the Lord are true and all of them just.',
+            '19'   => 'The judgments of the Lord are true and all of them just.',
+            '20'   => 'The Lord answers you in a time of distress.',
+            '22'   => 'I will praise you, Lord, among the nations.',
+            '23'   => 'The Lord is my shepherd; there is nothing I shall want.',
+            '24'   => 'This is the generation of those who seek the Lord.',
+            '25'   => 'Remember your mercies, O Lord.',
+            '26'   => 'Your ways, O Lord, are love and truth.',
+            '27'   => 'The Lord is my light and my salvation.',
+            '28'   => 'The Lord is my strength and my shield.',
+            '29'   => 'The Lord will bless his people with peace.',
+            '30'   => 'I will praise you, Lord, for you have rescued me.',
+            '31'   => 'I will praise you, Lord, for you have rescued me.',
+            '32'   => 'Blessed is he whose fault is taken away.',
+            '33'   => 'Taste and see the goodness of the Lord.',
+            '34'   => 'I will bless the Lord at all times.',
+            '36'   => 'With you is the fountain of life, O Lord.',
+            '37'   => 'The salvation of the just comes from the Lord.',
+            '38'   => 'Be not delayed, O Lord.',
+            '39'   => 'O Lord, hear my prayer.',
+            '40'   => 'Here am I, Lord; I come to do your will.',
+            '41'   => 'My soul is thirsting for the living God.',
+            '42'   => 'My soul is thirsting for the living God.',
+            '43'   => 'Send your light and your fidelity, that they may guide me.',
+            '44'   => 'Redeem us, O God, because of your mercy.',
+            '45'   => 'The queen takes her place at your right hand.',
+            '46'   => 'The Lord of hosts is with us.',
+            '47'   => 'God is king of all the earth.',
+            '48'   => 'God is in his city; it cannot be shaken.',
+            '49'   => 'Blessed are the poor in spirit.',
+            '50'   => 'A clean heart create for me, O God.',
+            '51'   => 'A clean heart create for me, O God.',
+            '52'   => 'The fool says in his heart: There is no God.',
+            '53'   => 'Everyone who does good enters the kingdom of heaven.',
+            '54'   => 'Save me, O God, by your name.',
+            '55'   => 'The Lord will hear me in the evening.',
+            '56'   => 'In God I trust; I shall not be afraid.',
+            '57'   => 'The Lord reigns; let the earth rejoice.',
+            '59'   => 'God shows his power at night.',
+            '60'   => 'Have pity on us, O Lord.',
+            '61'   => 'In God alone is my soul at rest.',
+            '62'   => 'My soul is thirsting for you, O Lord my God.',
+            '63'   => 'My soul is thirsting for you, O Lord my God.',
+            '65'   => 'The Lord has done marvels for us.',
+            '66'   => 'Let all the earth cry out to God with joy.',
+            '67'   => 'The Lord has done marvels for us.',
+            '68'   => 'Show forth, O God, your might.',
+            '69'   => 'Seek the Lord and be strengthened.',
+            '70'   => 'You are my help and my deliverer, O Lord.',
+            '71'   => 'You are my hope, O Lord.',
+            '72'   => 'Justice shall flower in his days.',
+            '73'   => 'God is king of all the earth.',
+            '74'   => 'Remember your people, O Lord.',
+            '75'   => 'We praise your name, which bears great name.',
+            '76'   => 'Who can climb the mountain of the Lord?',
+            '77'   => 'His works proclaim his justice.',
+            '78'   => 'Remember the marvelous deeds of the Lord.',
+            '79'   => 'Lord, let us see your kindness.',
+            '80'   => 'Lord, let us see your kindness.',
+            '81'   => 'Sing joyfully to God our help.',
+            '82'   => 'Let God arise and his enemies be scattered.',
+            '83'   => 'Let us see your face, Lord, and we shall be saved.',
+            '84'   => 'The Lord speaks of peace to his people.',
+            '85'   => 'The Lord speaks of peace to his people.',
+            '86'   => 'Teach me your ways, O Lord.',
+            '87'   => 'Among nations, his glory.',
+            '89'   => 'From age to age you are.',
+            '90'   => 'From age to age you are.',
+            '91'   => 'You who dwell in the shelter of the Most High.',
+            '92'   => 'It is good to give thanks to the Lord.',
+            '93'   => 'The Lord is king, the Most High over all the earth.',
+            '95'   => 'If today you hear his voice, harden not your hearts.',
+            '96'   => 'Proclaim his marvelous deeds to all the nations.',
+            '97'   => 'The Lord has revealed to the nations his saving power.',
+            '98'   => 'The Lord has revealed to the nations his saving power.',
+            '99'   => 'We are his people, the sheep of his flock.',
+            '100'  => 'We are his people, the sheep of his flock.',
+            '101'  => 'The Lord will build up Zion again.',
+            '102'  => 'The Lord hears the cry of the poor.',
+            '103'  => 'The Lord is kind and merciful.',
+            '104'  => 'The Lord is kind and merciful.',
+            '105'  => 'The Lord remembers his covenant for ever.',
+            '106'  => 'Save us, O Lord, and gather us from among the nations.',
+            '107'  => 'Give thanks to the Lord, for he is good.',
+            '108'  => 'God uprises and his enemies are scattered.',
+            '109'  => 'You are a priest for ever.',
+            '110'  => 'You are a priest for ever.',
+            '111'  => 'The just one shall be in everlasting remembrance.',
+            '112'  => 'The just one shall be in everlasting remembrance.',
+            '113'  => 'The Lord remembers us and will bless us.',
+            '114'  => 'The sea beheld and fled.',
+            '115'  => 'Not to us, O Lord, but to your name give glory.',
+            '116'  => 'I will walk in the presence of the Lord in the land of the living.',
+            '117'  => 'Go out to all the world and tell the Good News.',
+            '118'  => 'I will give thanks to the Lord, for he is good.',
+            '119'  => 'A light for revelation to the Gentiles.',
+            '121'  => 'Our help is in the name of the Lord.',
+            '122'  => 'Our help is in the name of the Lord.',
+            '123'  => 'Our eyes are fixed on the Lord.',
+            '124'  => 'Our help is in the name of the Lord.',
+            '125'  => 'Those who trust in the Lord are like Mount Zion.',
+            '126'  => 'The Lord has done great things for us.',
+            '128'  => 'Blessed are those who fear the Lord.',
+            '129'  => 'Often have they fought against me from my youth.',
+            '130'  => 'With the Lord there is mercy and fullness of redemption.',
+            '131'  => 'In you, Lord, I have found my peace.',
+            '132'  => 'Lord, remember your people.',
+            '133'  => 'Behold, how good it is when brothers dwell together in unity.',
+            '134'  => 'Blessed be the Lord by night.',
+            '135'  => 'Praise the Lord, for he is good.',
+            '136'  => 'His mercy endures for ever.',
+            '137'  => 'Let my tongue be silenced, if I ever forget you!',
+            '138'  => 'On the day I called, you answered me, O Lord.',
+            '139'  => 'Guiding me always, O Lord.',
+            '140'  => 'Lord, let my prayer come before you.',
+            '141'  => 'O Lord, hear my prayer.',
+            '142'  => 'To you I cry; O Lord, hear my voice.',
+            '143'  => 'Teach me to do your will.',
+            '144'  => 'I will praise your name for ever, my king and my God.',
+            '145'  => 'I will praise your name for ever, my king and my God.',
+            '146'  => 'Praise the Lord, my soul.',
+            '147'  => 'Praise the Lord, Jerusalem.',
+            '148'  => 'Let all the earth cry out to God with joy.',
+            '149'  => 'The Lord takes delight in his people.',
+            '150'  => 'Let everything that breathes give praise to the Lord!',
+        ];
     }
 
     private function fetchWithObolus(string $url, string $agent): string
