@@ -417,7 +417,7 @@ const renderReadingText = text => {
             <div class="card-event card-event-featured relative">
                 <div class="event-badge-today">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style="font-size:11px;font-weight:700;letter-spacing:.18em;color:#C9A200;text-transform:uppercase;">TODAY</span>
+                    <span style="font-size:11px;font-weight:700;letter-spacing:.18em;color:#C9A200;text-transform:uppercase;">{{ strtoupper($nextMass->calculated_day) }}</span>
                 </div><br>
                 <div class="flex flex-col items-center text-center pt-14 pb-5 px-6" style="flex:1;">
                     <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:rgba(245,197,24,.07);border:1.5px solid rgba(201,162,0,.28);">

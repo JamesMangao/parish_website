@@ -19,7 +19,7 @@ class HomeController extends Controller
         });
 
         // Enhanced "Next Mass" logic: find the closest mass by searching through the week
-        $now = now();
+        $now = Carbon::now('Asia/Manila');
         $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         
         $nextMass = null;
@@ -49,11 +49,12 @@ class HomeController extends Controller
 
                 foreach (array_filter($times) as $t) {
                     try {
+                        // Force Asia/Manila timezone to avoid UTC offset bugs on Render
                         if (str_contains($t, 'AM') || str_contains($t, 'PM')) {
-                             $massTime = Carbon::createFromFormat('g:i A', trim($t));
+                             $massTime = Carbon::createFromFormat('g:i A', trim($t), 'Asia/Manila');
                         } else {
                              // Handle H:i (e.g. 18:00)
-                             $massTime = Carbon::createFromFormat('H:i', trim($t));
+                             $massTime = Carbon::createFromFormat('H:i', trim($t), 'Asia/Manila');
                         }
                         
                         // Set base date to today then add $i days
@@ -101,7 +102,15 @@ class HomeController extends Controller
             if ($nextMass) {
                 $times = is_array($nextMass->time) ? $nextMass->time : (is_string($nextMass->time) ? json_decode($nextMass->time, true) : []);
                 $fallbackTime = $times[0] ?? '6:00 AM';
-                $nextMass->calculated_time = Carbon::parse($fallbackTime)->format('g:i A');
+                try {
+                    if (str_contains($fallbackTime, 'AM') || str_contains($fallbackTime, 'PM')) {
+                        $nextMass->calculated_time = Carbon::createFromFormat('g:i A', $fallbackTime, 'Asia/Manila')->format('g:i A');
+                    } else {
+                        $nextMass->calculated_time = Carbon::createFromFormat('H:i', $fallbackTime, 'Asia/Manila')->format('g:i A');
+                    }
+                } catch (\Exception $e) {
+                    $nextMass->calculated_time = $fallbackTime;
+                }
                 $nextMass->calculated_day = 'Sunday';
             }
         }
