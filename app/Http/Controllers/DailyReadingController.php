@@ -97,6 +97,10 @@ class DailyReadingController extends Controller
             $data = $this->fetchUsccbReadings($dateObj);
             if (empty($data['readings'])) {
                 $data = $this->fetchEvangelizoReadings($dateObj, 'EN');
+
+                if (!empty($data['readings'])) {
+                    $data = $this->supplementFromUsccbMarkdown($data, $dateObj);
+                }
             }
         }
 
@@ -145,6 +149,63 @@ class DailyReadingController extends Controller
             Log::warning('USCCB fetch failed: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * When Evangelizo is used as fallback, it often lacks the Alleluia
+     * reading and the psalm R. refrain lines. Try USCCB markdown to
+     * patch those missing sections.
+     */
+    private function supplementFromUsccbMarkdown(array $data, Carbon $targetDate): array
+    {
+        try {
+            $mdy = $targetDate->format('mdy');
+            $agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+            $mdUrl = "https://bible.usccb.org/bible/readings/{$mdy}.cfm.md";
+            $md = $this->httpGet($mdUrl, $agent);
+
+            if (!$md || stripos($md, '### Reading') === false || !preg_match('/^##\s/m', $md)) {
+                return $data;
+            }
+
+            $usccbData = $this->parseUsccbMarkdown($md, $targetDate);
+            if (empty($usccbData['readings'])) {
+                return $data;
+            }
+
+            $hasAlleluia = false;
+            $hasPsalmRefrain = false;
+            foreach ($data['readings'] as $r) {
+                $type = strtolower($r['type'] ?? '');
+                if (stripos($type, 'alleluia') !== false) $hasAlleluia = true;
+                if (stripos($type, 'psalm') !== false && preg_match('/\bR\.\s/', $r['text'] ?? '')) $hasPsalmRefrain = true;
+            }
+
+            foreach ($usccbData['readings'] as $usccbReading) {
+                $usccbType = strtolower($usccbReading['type'] ?? '');
+
+                if (stripos($usccbType, 'alleluia') !== false && !$hasAlleluia) {
+                    $data['readings'][] = $usccbReading;
+                    Log::info('Supplemented Alleluia from USCCB markdown');
+                }
+
+                if (stripos($usccbType, 'psalm') !== false && !$hasPsalmRefrain) {
+                    foreach ($data['readings'] as &$r) {
+                        if (stripos(strtolower($r['type'] ?? ''), 'psalm') !== false) {
+                            $r['text'] = $usccbReading['text'];
+                            $r['reference'] = $usccbReading['reference'] ?: $r['reference'];
+                            Log::info('Supplemented psalm refrain from USCCB markdown');
+                        }
+                    }
+                    unset($r);
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::warning('USCCB supplement failed: ' . $e->getMessage());
+        }
+
+        return $data;
     }
 
     private function fetchWithObolus(string $url, string $agent): string
