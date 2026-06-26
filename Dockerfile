@@ -45,10 +45,13 @@ WORKDIR /var/www
 # Copy only what's needed for composer install
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
-    && composer dump-autoload --optimize --no-dev
+    && composer dump-autoload --optimize --no-dev --no-scripts
 
 # Copy application code
 COPY . .
+
+# Re-run package discovery now that artisan exists
+RUN php artisan package:discover --ansi
 
 # Copy built frontend assets from stage 1
 COPY --from=frontend-build /app/public/build/ ./public/build/
