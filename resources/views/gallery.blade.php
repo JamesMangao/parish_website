@@ -582,12 +582,17 @@
             }
 
             // ── Controls visibility: push overlay text UP ──
+            var mouseOverCinema = false;
+
             function showControls() {
                 cinema.classList.add('controls-visible');
                 clearTimeout(controlsTimer);
-                controlsTimer = setTimeout(hideControls, 3000);
+                if (mouseOverCinema) {
+                    controlsTimer = setTimeout(hideControls, 3000);
+                }
             }
             function hideControls() {
+                clearTimeout(controlsTimer);
                 if (!vid.paused) {
                     cinema.classList.remove('controls-visible');
                 }
@@ -595,14 +600,13 @@
 
             cinema.addEventListener('mousemove',  showControls);
             cinema.addEventListener('touchstart', showControls, { passive: true });
-            cinema.addEventListener('mouseleave', function () {
-                clearTimeout(controlsTimer);
-                if (!vid.paused) {
-                    controlsTimer = setTimeout(hideControls, 500);
-                }
-            });
             cinema.addEventListener('mouseenter', function () {
+                mouseOverCinema = true;
                 if (!vid.paused) showControls();
+            });
+            cinema.addEventListener('mouseleave', function () {
+                mouseOverCinema = false;
+                hideControls();
             });
 
             /* ── Play / Pause ── */
