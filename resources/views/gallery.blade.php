@@ -268,7 +268,10 @@
             @endif
 
             {{-- BOTTOM OVERLAY TEXT CONTENT --}}
-            <div id="hl-info-bar" style="position:absolute; bottom:0; left:0; right:0; z-index:3; padding:40px 44px 36px;">
+            <div id="hl-info-bar" class="cinema-overlay-text"
+                 style="position:absolute; bottom:0; left:0; right:0; z-index:3; padding:40px 44px 36px;
+                        transition:transform 0.3s cubic-bezier(0.22,1,0.36,1), padding 0.3s ease;
+                        will-change:transform;">
                 <div style="max-width:720px;">
                     <p style="font-family:'Jost',sans-serif; font-size:10px; font-weight:700;
                               letter-spacing:0.32em; text-transform:uppercase;
@@ -300,7 +303,7 @@
                     @endphp
                     <p style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
                               font-size:clamp(0.95rem, 1.5vw, 1.1rem); color:rgba(255,255,255,0.68);
-                              line-height:1.7; max-width:580px;
+                              line-height:1.7; max-width:580px; margin-top:6px;
                               display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                         {{ $videoDesc }}
                     </p>
@@ -436,11 +439,15 @@
                 transition: opacity 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease !important;
             }
 
+            /* ── Controls-visible: push overlay text UP ── */
+            .highlight-cinema.controls-visible .cinema-overlay-text {
+                transform: translateY(-56px);
+            }
+
             /* ── Control bar ── */
             .hl-controls {
                 background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 70%, transparent 100%);
             }
-            .highlight-cinema:not(:hover):not(.hl-playing) .hl-controls { opacity: 1; }
             .highlight-cinema.hl-controls-hidden .hl-controls {
                 opacity: 0 !important;
                 transform: translateY(8px) !important;
@@ -522,6 +529,9 @@
                     margin-left: 16px !important;
                     margin-right: 16px !important;
                 }
+                .highlight-cinema.controls-visible .cinema-overlay-text {
+                    transform: translateY(-48px);
+                }
                 #hl-info-bar { padding: 24px 20px 20px !important; }
                 .hl-ctrl-btn { width: 30px; height: 30px; }
                 #hl-time { font-size: 10px; display: none; }
@@ -532,14 +542,15 @@
             }
         </style>
 
-        {{-- JavaScript: full video controls --}}
+        {{-- JavaScript: full video controls with overlay push --}}
         @if(!$isYT)
         <script>
         (function () {
-            var vid   = document.getElementById('highlight-vid');
+            var vid    = document.getElementById('highlight-vid');
             var cinema = document.getElementById('highlight-cinema');
             if (!vid || !cinema) return;
 
+            var overlay    = cinema.querySelector('.cinema-overlay-text');
             var controls   = document.getElementById('hl-controls');
             var playBtn    = document.getElementById('hl-play-btn');
             var playIcon   = document.getElementById('hl-play-icon');
@@ -549,7 +560,6 @@
             var cPauseIcon = document.getElementById('hl-center-pause-icon');
             var progFill   = document.getElementById('hl-prog-fill');
             var progBuf    = document.getElementById('hl-prog-buffered');
-            var progHandle = document.getElementById('hl-prog-handle');
             var timeEl     = document.getElementById('hl-time');
             var volIcon    = document.getElementById('hl-vol-icon');
             var volWave1   = document.getElementById('hl-vol-wave1');
@@ -561,7 +571,8 @@
             var fsIcon     = document.getElementById('hl-fs-icon');
             var fsExitIcon = document.getElementById('hl-fs-exit-icon');
 
-            var hideTimer  = null;
+            var hideTimer    = null;
+            var controlsTimer = null;
 
             function fmt(s) {
                 if (!s || isNaN(s)) return '0:00';
@@ -569,6 +580,30 @@
                 var sec = Math.floor(s % 60);
                 return m + ':' + (sec < 10 ? '0' : '') + sec;
             }
+
+            // ── Controls visibility: push overlay text UP ──
+            function showControls() {
+                cinema.classList.add('controls-visible');
+                clearTimeout(controlsTimer);
+                controlsTimer = setTimeout(hideControls, 3000);
+            }
+            function hideControls() {
+                if (!vid.paused) {
+                    cinema.classList.remove('controls-visible');
+                }
+            }
+
+            cinema.addEventListener('mousemove',  showControls);
+            cinema.addEventListener('touchstart', showControls, { passive: true });
+            cinema.addEventListener('mouseleave', function () {
+                clearTimeout(controlsTimer);
+                if (!vid.paused) {
+                    controlsTimer = setTimeout(hideControls, 500);
+                }
+            });
+            cinema.addEventListener('mouseenter', function () {
+                if (!vid.paused) showControls();
+            });
 
             /* ── Play / Pause ── */
             window.hlTogglePlay = function () {
@@ -582,7 +617,7 @@
                 if (cPlayIcon) cPlayIcon.style.display = 'none';
                 if (cPauseIcon) cPauseIcon.style.display = 'block';
                 cinema.classList.add('hl-playing');
-                resetHideTimer();
+                showControls();
             });
 
             vid.addEventListener('pause', function () {
@@ -592,8 +627,8 @@
                 if (cPlayIcon) cPlayIcon.style.display = 'block';
                 if (cPauseIcon) cPauseIcon.style.display = 'none';
                 cinema.classList.remove('hl-playing');
-                showControls();
-                clearTimeout(hideTimer);
+                cinema.classList.add('controls-visible');
+                clearTimeout(controlsTimer);
             });
 
             vid.addEventListener('ended', function () {
@@ -603,7 +638,8 @@
                 if (cPlayIcon) cPlayIcon.style.display = 'block';
                 if (cPauseIcon) cPauseIcon.style.display = 'none';
                 cinema.classList.remove('hl-playing');
-                cinema.classList.remove('hl-controls-hidden');
+                cinema.classList.add('controls-visible');
+                vid.currentTime = 0;
             });
 
             /* ── Time / Progress ── */
@@ -686,6 +722,13 @@
                 var isFs = !!document.fullscreenElement;
                 fsIcon.style.display     = isFs ? 'none' : '';
                 fsExitIcon.style.display = isFs ? '' : 'none';
+                if (!isFs) {
+                    if (vid.paused) {
+                        cinema.classList.add('controls-visible');
+                    } else {
+                        showControls();
+                    }
+                }
             });
 
             /* ── Picture-in-Picture ── */
@@ -702,37 +745,18 @@
             /* ── Captions placeholder ── */
             window.hlToggleCaptions = function () {};
 
-            /* ── Auto-hide controls ── */
-            function showControls() {
-                cinema.classList.remove('hl-controls-hidden');
-            }
-            function hideControls() {
-                if (!vid.paused) cinema.classList.add('hl-controls-hidden');
-            }
-            function resetHideTimer() {
-                showControls();
-                clearTimeout(hideTimer);
-                hideTimer = setTimeout(hideControls, 3000);
-            }
-
-            cinema.addEventListener('mousemove', resetHideTimer);
-            cinema.addEventListener('mouseleave', function () {
-                if (!vid.paused) hideTimer = setTimeout(hideControls, 1200);
-            });
-            cinema.addEventListener('mouseenter', showControls);
-
             /* ── Keyboard shortcuts ── */
             document.addEventListener('keydown', function (e) {
                 if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
                 if (!document.contains(vid)) return;
                 switch (e.key) {
                     case ' ': case 'k': e.preventDefault(); hlTogglePlay(); break;
-                    case 'ArrowLeft':  e.preventDefault(); hlSkip(-5); resetHideTimer(); break;
-                    case 'ArrowRight': e.preventDefault(); hlSkip(5);  resetHideTimer(); break;
+                    case 'ArrowLeft':  e.preventDefault(); hlSkip(-5); showControls(); break;
+                    case 'ArrowRight': e.preventDefault(); hlSkip(5);  showControls(); break;
                     case 'f': e.preventDefault(); hlToggleFullscreen(); break;
                     case 'm': e.preventDefault(); hlToggleMute(); break;
-                    case ',': e.preventDefault(); hlSkip(-10); resetHideTimer(); break;
-                    case '.': e.preventDefault(); hlSkip(10);  resetHideTimer(); break;
+                    case ',': e.preventDefault(); hlSkip(-10); showControls(); break;
+                    case '.': e.preventDefault(); hlSkip(10);  showControls(); break;
                 }
             });
 
@@ -741,6 +765,9 @@
                 e.preventDefault();
                 hlToggleFullscreen();
             });
+
+            /* ── Initial state: show controls (video is paused) ── */
+            cinema.classList.add('controls-visible');
         })();
         </script>
         @endif
