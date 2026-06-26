@@ -93,12 +93,16 @@ class DailyReadingController extends Controller
 
         if ($language === 'TG') {
             $data = $this->fetchAwitAtPapuriReadings($dateObj);
+            $data['source'] = 'awit-at-papuri';
         } else {
             $data = $this->fetchUsccbReadings($dateObj);
-            if (empty($data['readings'])) {
+            if (!empty($data['readings'])) {
+                $data['source'] = 'usccb';
+            } else {
                 $data = $this->fetchEvangelizoReadings($dateObj, 'EN');
 
                 if (!empty($data['readings'])) {
+                    $data['source'] = 'evangelizo';
                     $data = $this->supplementFromUsccbMarkdown($data, $dateObj);
                 }
             }
@@ -134,9 +138,29 @@ class DailyReadingController extends Controller
             $agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
 
             $mdUrl = "https://bible.usccb.org/bible/readings/{$mdy}.cfm.md";
+
+            // Try raw curl first
             $md = $this->httpGet($mdUrl, $agent);
             if ($md && stripos($md, '### Reading') !== false && preg_match('/^##\s/m', $md)) {
                 return $this->parseUsccbMarkdown($md, $targetDate);
+            }
+
+            // Try Laravel Http facade (different TLS fingerprint may bypass Cloudflare)
+            try {
+                $res = Http::timeout(15)
+                    ->withoutVerifying()
+                    ->withHeaders([
+                        'Accept'          => 'text/markdown,text/html,text/plain,*/*',
+                        'Accept-Language' => 'en-US,en;q=0.9',
+                    ])
+                    ->get($mdUrl);
+                $md = $res->successful() ? $res->body() : '';
+                if ($md && stripos($md, '### Reading') !== false && preg_match('/^##\s/m', $md)) {
+                    return $this->parseUsccbMarkdown($md, $targetDate);
+                }
+                Log::info("USCCB fetch: Guzzle also failed, status=" . $res->status() . ", preview=" . substr($md, 0, 200));
+            } catch (\Exception $httpEx) {
+                Log::warning('USCCB Guzzle fetch failed: ' . $httpEx->getMessage());
             }
 
             $html = $this->fetchWithObolus("https://bible.usccb.org/bible/readings/{$mdy}.cfm", $agent);
@@ -160,16 +184,28 @@ class DailyReadingController extends Controller
     {
         try {
             $mdy = $targetDate->format('mdy');
-            $agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
             $mdUrl = "https://bible.usccb.org/bible/readings/{$mdy}.cfm.md";
-            $md = $this->httpGet($mdUrl, $agent);
+
+            $res = Http::timeout(15)
+                ->withoutVerifying()
+                ->withHeaders([
+                    'Accept'          => 'text/markdown,text/html,text/plain,*/*',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'Cache-Control'   => 'no-cache',
+                ])
+                ->get($mdUrl);
+
+            $md = $res->successful() ? $res->body() : '';
+            Log::info("USCCB supplement: url={$mdUrl}, status=" . $res->status() . ", length=" . strlen($md));
 
             if (!$md || stripos($md, '### Reading') === false || !preg_match('/^##\s/m', $md)) {
+                Log::warning("USCCB supplement: markdown validation failed for {$mdy}, preview=" . substr($md, 0, 300));
                 return $data;
             }
 
             $usccbData = $this->parseUsccbMarkdown($md, $targetDate);
             if (empty($usccbData['readings'])) {
+                Log::warning("USCCB supplement: parseUsccbMarkdown returned empty");
                 return $data;
             }
 
@@ -181,11 +217,14 @@ class DailyReadingController extends Controller
                 if (stripos($type, 'psalm') !== false && preg_match('/\bR\.\s/', $r['text'] ?? '')) $hasPsalmRefrain = true;
             }
 
+            Log::info("USCCB supplement: hasAlleluia=" . ($hasAlleluia ? 'yes' : 'no') . ", hasPsalmRefrain=" . ($hasPsalmRefrain ? 'yes' : 'no') . ", usccbReadings=" . count($usccbData['readings']));
+
             foreach ($usccbData['readings'] as $usccbReading) {
                 $usccbType = strtolower($usccbReading['type'] ?? '');
 
                 if (stripos($usccbType, 'alleluia') !== false && !$hasAlleluia) {
                     $data['readings'][] = $usccbReading;
+                    $data['source'] = 'evangelizo+usccb_alleluia';
                     Log::info('Supplemented Alleluia from USCCB markdown');
                 }
 
@@ -194,6 +233,7 @@ class DailyReadingController extends Controller
                         if (stripos(strtolower($r['type'] ?? ''), 'psalm') !== false) {
                             $r['text'] = $usccbReading['text'];
                             $r['reference'] = $usccbReading['reference'] ?: $r['reference'];
+                            $data['source'] = 'evangelizo+usccb_psalm';
                             Log::info('Supplemented psalm refrain from USCCB markdown');
                         }
                     }
@@ -672,6 +712,12 @@ class DailyReadingController extends Controller
             CURLOPT_TIMEOUT        => 15,
             CURLOPT_USERAGENT      => $agent,
             CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTPHEADER     => [
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language: en-US,en;q=0.9',
+                'Accept-Encoding: gzip, deflate',
+                'Cache-Control: no-cache',
+            ],
         ]);
 
         if ($proofCookie) {
