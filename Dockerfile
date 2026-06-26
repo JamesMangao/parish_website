@@ -26,17 +26,17 @@ RUN apk add --no-cache \
     unzip \
     libzip-dev \
     libpng-dev \
-    libjpeg-turbo-dev \
-    libonig-dev \
+    jpeg-dev \
+    oniguruma-dev \
     libxml2-dev \
-    libicu-dev \
-    libcurl4-openssl-dev \
+    icu-dev \
+    curl-dev \
     freetype-dev \
     pkgconfig \
     postgresql-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd xml dom curl intl opcache \
-    && apk del --purge freetype-dev libjpeg-turbo-dev
+    && apk del --purge freetype-dev jpeg-dev
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
