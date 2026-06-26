@@ -11,7 +11,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $announcements = \Illuminate\Support\Facades\Cache::remember('home_announcements', now()->addMinutes(30), function() {
+        $announcements = \Illuminate\Support\Facades\Cache::remember('home_announcements', now()->addMinutes(15), function() {
             return Announcement::active()
                 ->orderBy('created_at', 'desc')
                 ->take(3)
@@ -106,7 +106,7 @@ class HomeController extends Controller
             }
         }
 
-        $upcomingEvents = \Illuminate\Support\Facades\Cache::remember('home_upcoming_events', now()->addMinutes(60), function() use ($now) {
+        $upcomingEvents = \Illuminate\Support\Facades\Cache::remember('home_upcoming_events', now()->addMinutes(30), function() use ($now) {
             return \App\Models\Event::where('is_published', true)
                 ->whereDate('event_date', '>=', $now->toDateString())
                 ->orderBy('event_date', 'asc')

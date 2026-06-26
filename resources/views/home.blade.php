@@ -8,28 +8,28 @@
 </x-slot>
 
 <section class="hero-section" style="position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
-    <div class="hero-bg-wrap">
-        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}" alt="Sto. Rosario Parish" fetchpriority="high" decoding="async" width="1920" height="1080" class="hero-bg-img">
+    <div style="position:absolute;inset:0;z-index:0;">
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}" alt="Sto. Rosario Parish" fetchpriority="high" decoding="async" width="1920" height="1080" style="width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.85);transform:scale(1.04);">
         <div class="hero-overlay" style="position:absolute;inset:0;"></div>
     </div>
-    <div class="hero-radial-overlay"></div>
-    <div class="hero-noise-overlay"></div>
+    <div style="position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(26,64,128,.22) 0%,transparent 70%);"></div>
+    <div style="position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.03;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.75%22 stitchTiles=%22stitch%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>');"></div>
 
-    <div class="hero-content-wrap">
+    <div style="position:relative;z-index:10;text-align:center;display:flex;flex-direction:column;align-items:center;padding:80px 24px 0;width:100%;max-width:960px;">
         <div class="hero-badge animate-fade-in-down" style="margin-bottom:24px;animation-delay:.1s;">
-            <span class="hero-dot"></span>
-            <span class="hero-est-text">Est. · Diocese of San Pablo · Pacita</span>
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);display:block;box-shadow:0 0 8px rgba(245,197,24,.8);"></span>
+            <span style="font-size:11.5px;font-weight:600;letter-spacing:.38em;text-transform:uppercase;color:rgba(255,248,180,.85);">Est. · Diocese of San Pablo · Pacita</span>
         </div>
 
-        <h1 class="hero-title animate-fade-in-up" style="animation-delay:.2s;">
+        <h1 class="animate-fade-in-up" style="font-family:'Canterbury',serif;font-weight:400;line-height:1.1;letter-spacing:.01em;margin-bottom:20px;text-shadow:0 4px 48px rgba(0,0,0,.55);font-size:clamp(2.2rem,8vw,5.5rem);color:#fff;animation-delay:.2s;">
             <span class="hero-title-accent">Sto. Rosario Parish</span>
         </h1>
 
-        <p class="hero-subtitle font-heading animate-fade-in-up" style="animation-delay:.3s;">Pacita Complex 1, San Pedro, Laguna</p>
-        <div class="hero-divider"></div>
-        <p class="hero-desc animate-fade-in-up" style="animation-delay:.4s;">Home to the Queen of the Most Holy Rosary — a beacon of faith, community, and service for over four decades.</p>
+        <p class="font-heading animate-fade-in-up" style="font-style:italic;color:rgba(255,215,64,.82);margin-bottom:14px;font-size:clamp(.9rem,1.8vw,1.15rem);font-weight:300;text-shadow:0 2px 12px rgba(0,0,0,.4);animation-delay:.3s;">Pacita Complex 1, San Pedro, Laguna</p>
+        <div style="width:56px;height:1px;margin-bottom:22px;background:linear-gradient(90deg,transparent,rgba(245,197,24,.65),transparent);"></div>
+        <p class="animate-fade-in-up" style="color:rgba(220,232,255,.78);font-size:clamp(.85rem,1.4vw,1rem);line-height:1.78;max-width:430px;font-weight:300;letter-spacing:.01em;margin-bottom:36px;animation-delay:.4s;">Home to the Queen of the Most Holy Rosary — a beacon of faith, community, and service for over four decades.</p>
 
-        <div class="hero-cta-wrap animate-fade-in-up" style="animation-delay:.5s;">
+        <div class="hero-cta-wrap animate-fade-in-up" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:20px;margin-bottom:40px;animation-delay:.5s;">
             <a href="{{ route('mass-schedule') }}" class="ghost-btn inline-flex items-center gap-2 rounded-full font-bold uppercase" style="padding:13px 30px;font-size:12.5px;letter-spacing:.18em;text-decoration:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 Mass Schedule
@@ -44,11 +44,11 @@
             </a>
         </div>
 
-        <div class="hero-stats-strip animate-fade-in-up" style="animation-delay:.6s;">
+        <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:40px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
             @foreach([['40+','Years of Service'],['7','Weekly Masses'],['1','Community']] as $stat)
             <div style="text-align:center;">
-                <div class="font-heading hero-stat-val">{{ $stat[0] }}</div>
-                <div class="hero-stat-label">{{ $stat[1] }}</div>
+                <div class="font-heading stat-val" style="font-size:1.75rem;font-weight:700;font-style:italic;color:var(--gold-light);line-height:1;">{{ $stat[0] }}</div>
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:.3em;color:rgb(255, 255, 255);margin-top:5px;">{{ $stat[1] }}</div>
             </div>
             @endforeach
         </div>
@@ -56,18 +56,19 @@
 </section>
 
 <section class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile"><br><br>
-    <div class="next-mass-card">
-        <div class="next-mass-banner">
-            <div class="next-mass-banner-bg">
-                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/mass.webp') }}" alt="Mass" loading="lazy" width="1200" height="800">
+    <div class="rounded-3xl overflow-hidden" style="background:#fff;border:1px solid rgba(201,162,0,.22);box-shadow:0 12px 50px rgba(13,42,82,.09);">
+        <div class="relative overflow-hidden" style="min-height:215px;background:#0d2a52;">
+            <div class="absolute inset-0">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/mass.webp') }}" alt="Mass" loading="lazy" width="1200" height="800" style="width:100%;height:100%;object-fit:cover;opacity:.35;">
+                <div class="absolute inset-0" style="background:linear-gradient(90deg,#0d2a52 0%,rgba(13,42,82,.4) 50%,#0d2a52 100%);"></div>
             </div>
 
-            <div class="next-mass-inner">
-                <div class="next-mass-icon-wrap">
+            <div class="next-mass-inner relative z-10 flex items-center gap-8 px-10 py-8 flex-1" style="min-height:215px;">
+                <div class="relative shrink-0 flex items-center justify-center" style="width:82px;height:82px;">
                     <svg width="82" height="82" viewBox="0 0 82 82" style="position:absolute;inset:0;" fill="none" aria-hidden="true">
                         <line x1="41" y1="3" x2="41" y2="13" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="69" x2="41" y2="79" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="41" x2="13" y2="41" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="69" y1="41" x2="79" y2="41" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="11" x2="18" y2="18" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="64" y1="64" x2="71" y2="71" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="71" y1="11" x2="64" y2="18" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="71" x2="18" y2="64" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
-                    <div class="next-mass-icon-ring">
+                    <div class="rounded-full flex items-center justify-center" style="width:62px;height:62px;background:rgba(245,197,24,.1);border:1.5px solid rgba(245,197,24,.4);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F5C518" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 22h8"/><path d="M12 11v11"/><path d="M5 3h14L18 9a6 6 0 0 1-12 0L5 3z"/><path d="M3 3h18"/></svg>
                     </div>
                 </div>
@@ -79,46 +80,47 @@
                         <span style="display:inline-block;height:1px;width:32px;background:linear-gradient(90deg,rgba(245,197,24,.6),transparent);"></span>
                     </div>
                     @if($nextMass)
-                    <h2 class="font-heading font-bold italic leading-none next-mass-title">{{ $nextMass->calculated_day }}</h2>
-                    <p class="font-heading font-bold italic next-mass-time">{{ $nextMass->calculated_time }}</p>
-                    <p class="next-mass-type">{{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}</p>
+                    <h2 class="font-heading font-bold italic leading-none" style="font-size:clamp(2.2rem,4vw,3.6rem);color:#fff;letter-spacing:-.01em;">{{ $nextMass->calculated_day }}</h2>
+                    <p class="font-heading font-bold italic" style="font-size:clamp(1.8rem,3.5vw,3rem);color:#F5C518;line-height:1.1;">{{ $nextMass->calculated_time }}</p>
+                    <p style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(235,242,255,.5);margin-top:6px;">{{ strtoupper($nextMass->title ?? ($nextMass->mass_type === 'sunday' ? 'Sunday Mass' : 'Weekday Mass')) }}</p>
                     @else
-                    <h2 class="font-heading font-bold italic leading-none next-mass-title">Sunday</h2>
-                    <p class="font-heading font-bold italic next-mass-time">6:00 AM</p>
-                    <p class="next-mass-type">SUNDAY MASS</p>
+                    <h2 class="font-heading font-bold italic leading-none" style="font-size:3.6rem;color:#fff;">Sunday</h2>
+                    <p class="font-heading font-bold italic" style="font-size:3rem;color:#F5C518;line-height:1.1;">6:00 AM</p>
+                    <p style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(235,242,255,.5);margin-top:6px;">SUNDAY MASS</p>
                     @endif
                 </div>
             </div>
         </div>
 
-        <div class="next-mass-divider"></div>
+        <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,0,.2),transparent);"></div>
 
         <div class="px-8 pt-7 pb-0 section-px-mobile"><br>
-            <div class="office-hours-header mb-2">
+            <div class="flex items-center gap-3 mb-2">
                 <span style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,0,.3));"></span>
                 <div class="flex items-center gap-2">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span class="font-cinzel office-hours-label">OFFICE HOURS</span>
+                    <span class="font-cinzel" style="font-size:12.5px;letter-spacing:.3em;color:var(--blue-deep);font-weight:600;">OFFICE HOURS</span>
                 </div>
                 <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(201,162,0,.3),transparent);"></span>
             </div>
 
-            <div class="office-cols grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="office-cols grid grid-cols-1 md:grid-cols-3 gap-5" style="border-radius:16px;">
                 @foreach([
                     ['icon'=>'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>','day'=>'· TUE – SAT ·','hours'=>['6:00 AM – 12:00 NN','1:30 PM – 6:00 PM'],'closed'=>false],
                     ['icon'=>'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>','day'=>'· SUNDAY ·','hours'=>['6:00 AM – 12:00 NN','3:00 PM – 6:00 PM'],'closed'=>false],
                     ['icon'=>'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>','day'=>'· MONDAY ·','hours'=>[],'closed'=>true],
                 ] as $ohCol)
-                <div class="office-col"><br>
-                    <div class="office-col-icon">
+                <div class="office-col flex flex-col items-center py-7 px-4 text-center bg-white rounded-2xl shadow-sm border border-[rgba(26,64,128,0.07)]">
+                    <br>
+                    <div class="w-11 h-11 rounded-full flex items-center justify-center mb-4" style="background:var(--blue-deep);">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $ohCol['icon'] !!}</svg>
                     </div>
-                    <p class="office-col-day">{{ $ohCol['day'] }}</p>
+                    <p style="font-size:11.5px;letter-spacing:.2em;color:rgba(13,42,82,.45);font-weight:500;margin-bottom:10px;">{{ $ohCol['day'] }}</p>
                     @if($ohCol['closed'])
-                    <p class="font-cinzel font-semibold office-col-closed">CLOSED</p>
+                    <p class="font-cinzel font-semibold" style="color:#C9A200;font-size:.8rem;letter-spacing:.08em;">CLOSED</p>
                     @else
                     @foreach($ohCol['hours'] as $ohHour)
-                    <p class="office-col-hours">{{ $ohHour }}</p>
+                    <p style="font-size:14.5px;color:var(--blue-deep);line-height:1.9;">{{ $ohHour }}</p>
                     @endforeach
                     @endif
                 </div>
@@ -126,15 +128,15 @@
             </div>
         </div>
 
-        <a href="{{ route('mass-schedule') }}" class="group relative flex flex-col items-center justify-center overflow-hidden mt-6 office-hours-cta" aria-label="View Full Mass Schedule">
+        <a href="{{ route('mass-schedule') }}" class="group relative flex flex-col items-center justify-center overflow-hidden mt-6 events-cta-banner" style="background:var(--blue-deep);text-decoration:none;padding:22px 24px;border-radius:0 0 24px 24px;display:flex;min-height:82px;" aria-label="View Full Mass Schedule">
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
             <div class="flex items-center gap-2.5 mb-1.5">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M11 2v3M9 3h4"/></svg>
-                <span class="font-cinzel office-hours-cta-label">FULL SCHEDULE</span>
+                <span class="font-cinzel" style="font-size:12.5px;letter-spacing:.32em;color:#fff;font-weight:600;">FULL SCHEDULE</span>
             </div>
-            <span class="office-hours-cta-arrow block" aria-hidden="true">→</span>
+            <span class="transition-transform duration-300 group-hover:translate-x-1 block" style="color:#C9A200;font-size:16px;line-height:1;" aria-hidden="true">→</span>
         </a>
     </div>
 </section>
@@ -183,6 +185,8 @@
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
     }[c]));
 
+    // FIX: slug must match exact controller type strings
+    // e.g. "Salmong Tugunan" → "salmong-tugunan", "Mabuting Balita" → "mabuting-balita"
     const slug = v => String(v ?? '')
         .toLowerCase()
         .normalize('NFD')
@@ -193,7 +197,9 @@
 const renderReadingText = text => {
     if (!text) return '';
 
+    // The DB stores newlines as literal \n string sequences — unwrap all variants
     let normalized = String(text);
+    // Handle JSON-encoded unicode smart quotes (already decoded by browser, but just in case)
     normalized = normalized
         .replace(/\\u2019/g, '\u2019')
         .replace(/\\u2018/g, '\u2018')
@@ -202,6 +208,7 @@ const renderReadingText = text => {
         .replace(/\\u2013/g, '\u2013')
         .replace(/\\u2014/g, '\u2014');
 
+    // Split on ALL possible newline representations
     const lines = normalized.split(/\\n|\n|\r\n|\r/);
 
     let inResponse = false;
@@ -241,6 +248,9 @@ const renderReadingText = text => {
         tab.style.color      = isActive ? 'var(--blue-deep)' : 'rgba(13,42,82,0.55)';
     });
 
+    // FIX: normalize() no longer injects hardcoded psalm/alleluia text.
+    // Backend (DailyReadingController) is the single source of truth for reading content.
+    // Frontend only structures the data for display.
     const normalize = data => {
         const readings    = data?.readings || data?.data?.readings || [];
         let liturgy       = data?.liturgic_title || data?.data?.liturgic_title || data?.title || 'Daily Mass Readings';
@@ -366,13 +376,13 @@ const renderReadingText = text => {
             ];
             @endphp
             @foreach($actions as $a)
-            <a href="{{ $a['href'] }}" class="card-sacred group quick-action-card"><br><br>
-                <div class="quick-action-icon">
+            <a href="{{ $a['href'] }}" class="card-sacred group flex flex-col items-center gap-5 p-9 text-center" style="text-decoration:none;"><br><br>
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110" style="background:linear-gradient(135deg,rgba(245,197,24,.14),rgba(245,197,24,.04));border:1px solid rgba(245,197,24,.32);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">{!! $a['icon'] !!}</svg>
                 </div>
                 <div>
-                    <p class="font-heading font-bold text-lg italic quick-action-label">{{ $a['label'] }}</p>
-                    <p class="text-sm mt-1 tracking-wide quick-action-sub">{{ $a['sub'] }}</p>
+                    <p class="font-heading font-bold text-lg italic transition-colors duration-200 group-hover:text-[#C9A200]" style="color:var(--blue-deep);">{{ $a['label'] }}</p>
+                    <p class="text-sm mt-1 tracking-wide" style="color:rgba(13,42,82,.4);">{{ $a['sub'] }}</p>
                 </div><br><br>
             </a>
             @endforeach
@@ -381,9 +391,9 @@ const renderReadingText = text => {
 </section>
 
 <section class="relative pt-12 pb-24 overflow-hidden reveal reveal-up section-pad-mobile section-pad-tablet">
-    <div class="events-section-bg" aria-hidden="true">
-        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}" alt="">
-        <div class="events-section-bg-overlay"></div>
+    <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}" alt="" class="w-full h-full object-cover" style="filter:saturate(.2) brightness(1.2) blur(4px);transform:scale(1.06);">
+        <div style="position:absolute;inset:0;background:rgba(247,249,255,.89);"></div>
     </div>
 
     <div class="relative z-10 max-w-5xl mx-auto px-6 section-px-mobile">
@@ -397,9 +407,9 @@ const renderReadingText = text => {
                 </div>
             </div>
             <div class="eyebrow mb-3">UPCOMING EVENTS</div>
-            <h2 class="font-heading font-bold italic events-section-title">What's Happening</h2>
+            <h2 class="font-heading font-bold italic" style="font-size:clamp(2.4rem,5vw,4rem);color:var(--blue-deep);line-height:1.1;margin-bottom:12px;">What's Happening</h2>
             <div class="flex justify-center mb-4"><div style="width:7px;height:7px;background:rgba(201,162,0,.42);transform:rotate(45deg);"></div></div>
-            <p class="events-section-desc">Stay connected. Join us in our liturgical celebrations and events.</p>
+            <p style="color:rgba(13,42,82,.45);font-size:16px;max-width:480px;margin:0 auto;line-height:1.7;">Stay connected. Join us in our liturgical celebrations and events.</p>
         </div>
 
         <div class="events-grid grid md:grid-cols-3 gap-8 mb-8 reveal reveal-stagger">
@@ -472,25 +482,25 @@ const renderReadingText = text => {
             @endfor
         </div>
 
-        <a href="{{ route('events') }}" class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl events-cta-banner" aria-label="View full events schedule">
+        <a href="{{ route('events') }}" class="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl events-cta-banner" style="background:#0A2342;text-decoration:none;padding:24px;min-height:100px;transition:all .35s ease;" aria-label="View full events schedule">
             <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
             <div class="relative z-10 flex flex-col items-center gap-2">
                 <div class="flex items-center gap-3">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span class="font-cinzel events-cta-label">View Full Schedule</span>
+                    <span class="font-cinzel" style="font-size:13px;letter-spacing:.35em;color:#fff;font-weight:700;text-transform:uppercase;">View Full Schedule</span>
                 </div>
-                <span class="events-cta-arrow block" aria-hidden="true">→</span>
+                <span class="transition-all duration-300 group-hover:translate-x-2" style="color:#C9A200;font-size:18px;line-height:1;" aria-hidden="true">→</span>
             </div>
         </a>
     </div><br><br>
 </section>
 
 <section class="relative py-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
-    <div class="ann-section-bg" aria-hidden="true">
-        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}" alt="" loading="lazy" width="1200" height="800">
-        <div class="ann-section-bg-overlay"></div>
+    <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}" alt="" loading="lazy" width="1200" height="800" class="w-full h-full object-cover" style="filter:saturate(.18) brightness(1.15) blur(4px);transform:scale(1.06);">
+        <div style="position:absolute;inset:0;background:rgba(246,243,238,.91);"></div>
     </div>
 
     @php
@@ -511,8 +521,8 @@ const renderReadingText = text => {
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/><line x1="12" y1="2" x2="12" y2="0"/><line x1="10" y1="1" x2="14" y2="1"/></svg>
                     <span style="display:block;flex:1;max-width:60px;height:1px;background:linear-gradient(90deg,rgba(201,162,0,.4),transparent);"></span>
                 </div>
-                <h2 class="font-cinzel font-semibold ann-title">LATEST ANNOUNCEMENTS</h2>
-                <p class="ann-desc">Stay informed. Be involved. Grow in faith together.</p>
+                <h2 class="font-cinzel font-semibold" style="font-size:clamp(1.25rem,3vw,2.15rem);color:var(--blue-deep);letter-spacing:.16em;margin-bottom:8px;">LATEST ANNOUNCEMENTS</h2>
+                <p style="color:rgba(13,42,82,.4);font-size:15.5px;max-width:480px;margin:0 auto 14px;">Stay informed. Be involved. Grow in faith together.</p>
                 <div class="flex justify-center"><div style="width:6px;height:6px;background:rgba(201,162,0,.42);transform:rotate(45deg);"></div></div>
             </div>
             <div class="ann-nav-btns hidden sm:flex items-center gap-2 shrink-0 pt-1">
@@ -535,27 +545,27 @@ const renderReadingText = text => {
             @php $aIdx = $loop->index; $aIsFirst = $loop->first; @endphp
             <article class="card-sacred overflow-hidden flex flex-col group/ann">
                 <div class="relative overflow-hidden shrink-0" style="height:196px;">
-                    <img src="{{ $annImgs[$aIdx % 3] }}" alt="{{ $ann->title }}" class="ann-card-img">
+                    <img src="{{ $annImgs[$aIdx % 3] }}" alt="{{ $ann->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover/ann:scale-105">
                     @if($aIsFirst)
-                    <div class="ann-featured-badge">
+                    <div class="absolute top-0 left-0 flex items-center gap-1.5 px-3 py-2" style="background:rgba(162,118,0,.92);border-bottom-right-radius:14px;">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="#FFFFFF" stroke="none" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span class="ann-featured-text">FEATURED</span>
+                        <span style="font-size:8.5px;font-weight:700;letter-spacing:.18em;color:#fff;text-transform:uppercase;">FEATURED</span>
                     </div>
                     @endif
                 </div>
                 <div class="p-5 flex-1 flex flex-col">
                     <div class="flex items-start gap-3 mb-3">
-                        <div class="shrink-0 text-center ann-date-badge">
-                            <div class="ann-date-month">{{ ($ann->published_at ?? $ann->created_at)->format('M') }}</div>
-                            <div class="font-heading font-bold ann-date-day">{{ ($ann->published_at ?? $ann->created_at)->format('d') }}</div>
+                        <div class="shrink-0 text-center rounded-lg overflow-hidden" style="border:1px solid rgba(201,162,0,.3);min-width:44px;">
+                            <div style="background:rgba(201,162,0,.09);padding:2px 6px;font-size:8px;font-weight:700;letter-spacing:.1em;color:#C9A200;text-transform:uppercase;">{{ ($ann->published_at ?? $ann->created_at)->format('M') }}</div>
+                            <div class="font-heading font-bold" style="font-size:1.1rem;color:var(--blue-deep);padding:2px 6px;line-height:1.15;">{{ ($ann->published_at ?? $ann->created_at)->format('d') }}</div>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="eyebrow mb-1" style="font-size:8.5px;">{{ strtoupper($annCats[$aIdx % 3]) }}</p>
-                            <h3 class="font-heading font-bold italic leading-snug ann-card-title">{{ $ann->title }}</h3>
+                            <h3 class="font-heading font-bold italic leading-snug" style="font-size:1.08rem;color:var(--blue-deep);">{{ $ann->title }}</h3>
                         </div>
                     </div>
                     @if($ann->content)
-                    <p class="text-sm leading-relaxed flex-1 ann-card-excerpt">{{ mb_substr(strip_tags($ann->content), 0, 130) }}</p>
+                    <p class="text-sm leading-relaxed flex-1" style="color:rgba(13,42,82,.48);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">{{ mb_substr(strip_tags($ann->content), 0, 130) }}</p>
                     @endif
                 </div>
                 @if($ann->is_recruitment && $ann->registration_link)
@@ -573,10 +583,10 @@ const renderReadingText = text => {
     </div>
 </section>
 
-<section class="py-28 relative overflow-hidden reveal reveal-up section-pad-mobile section-pad-tablet services-section">
-    <div class="services-section-bg-cross">✝</div>
-    <div class="services-section-glow"></div>
-    <div class="services-section-top-line"></div>
+<section class="py-28 relative overflow-hidden reveal reveal-up section-pad-mobile section-pad-tablet" style="background:var(--blue-deep);">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none font-cinzel leading-none" style="font-size:420px;color:rgba(255,255,255,.018);">✝</div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none" style="width:600px;height:300px;background:radial-gradient(ellipse,rgba(245,197,24,.08) 0%,transparent 70%);"></div>
+    <div class="absolute top-0 left-0 right-0 h-px" style="background:linear-gradient(90deg,transparent,rgba(245,197,24,.4),transparent);"></div>
 
     <div class="max-w-[1200px] mx-auto px-6 section-px-mobile relative z-10"><br><br>
         <div class="text-center mb-16">
@@ -597,35 +607,35 @@ const renderReadingText = text => {
             ];
             @endphp
             @foreach($services as $s)
-            <a href="{{ $s['href'] }}" class="group service-card">
-                <div class="service-card-icon">
+            <a href="{{ $s['href'] }}" class="group flex flex-col items-center gap-4 p-6 rounded-2xl text-center transition-all duration-300 hover:-translate-y-1" style="border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);text-decoration:none;" onmouseover="this.style.borderColor='rgba(245,197,24,0.50)';this.style.background='rgba(245,197,24,0.06)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)';">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110" style="border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(235,242,255,.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="transition-all duration-300">{!! $s['svg'] !!}</svg>
                 </div>
-                <span class="service-card-label">{{ $s['label'] }}</span>
+                <span class="text-[10.5px] font-semibold uppercase tracking-wider transition-colors duration-200" style="color:rgba(235,242,255,.55);">{{ $s['label'] }}</span>
             </a>
             @endforeach
         </div>
     </div><br><br>
 
-    <div class="services-section-bottom-line"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-px" style="background:linear-gradient(90deg,transparent,rgba(245,197,24,.25),transparent);"></div>
 </section>
 
 <section class="py-28 relative overflow-hidden bg-[var(--cream)] reveal reveal-up section-pad-mobile section-pad-tablet">
-    <div class="intention-section-bg-glow"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(26,64,128,.05) 0%,transparent 70%);"></div>
 
     <div class="max-w-[1200px] mx-auto px-6 section-px-mobile relative z-10">
         <div class="max-w-2xl mx-auto text-center">
             <div class="font-cinzel text-4xl mb-8 opacity-60" style="color:var(--gold);">✝</div>
             <div class="divider-ornament mb-6"><span class="eyebrow">Unite Your Prayers</span></div>
-            <h2 class="font-heading text-4xl md:text-6xl font-bold italic leading-[1.05] mb-6 intention-section-title">Offer a Mass<br>Intention</h2>
-            <p class="text-lg leading-relaxed mb-12 font-light intention-section-desc">Unite your prayers with the Holy Sacrifice of the Mass. Submit your intention online and our staff will include it in the upcoming liturgy.</p>
+            <h2 class="font-heading text-4xl md:text-6xl font-bold italic leading-[1.05] mb-6" style="color:var(--blue-deep);">Offer a Mass<br>Intention</h2>
+            <p class="text-lg leading-relaxed mb-12 font-light" style="color:rgba(13,42,82,.55);">Unite your prayers with the Holy Sacrifice of the Mass. Submit your intention online and our staff will include it in the upcoming liturgy.</p>
 
-            <div class="intention-btns">
+            <div class="intention-btns flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="{{ route('submit-intention') }}" class="gold-btn inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest" style="text-decoration:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                     Submit Intention
                 </a>
-                <a href="{{ route('track') }}" class="inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest border-2 transition-all duration-300 hover:-translate-y-0.5" style="border-color:rgba(26,64,128,.25);color:var(--blue-deep);background:transparent;text-decoration:none;">
+                <a href="{{ route('track') }}" class="inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[11px] font-bold uppercase tracking-widest border-2 transition-all duration-300 hover:-translate-y-0.5" style="border-color:rgba(26,64,128,.25);color:var(--blue-deep);background:transparent;text-decoration:none;" onmouseover="this.style.borderColor='var(--blue-mid)';this.style.background='rgba(26,64,128,0.05)';" onmouseout="this.style.borderColor='rgba(26,64,128,0.25)';this.style.background='transparent';">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     Track Status
                 </a>

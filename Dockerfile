@@ -1,91 +1,30 @@
-# ==============================================================================
-# Stage 1: Build Frontend Assets (Node)
-# ==============================================================================
-FROM node:20-alpine AS frontend-build
+FROM php:8.4-cli
 
-WORKDIR /app
+# Install system deps
+RUN apt-get update && apt-get install -y \
+    curl unzip git nodejs npm \
+    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev libcurl4-openssl-dev pkg-config libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd \
+       xml dom curl intl opcache
 
-COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
-
-COPY vite.config.js ./
-COPY resources/css/ ./resources/css/
-COPY resources/js/ ./resources/js/
-
-RUN npm run build
-
-# ==============================================================================
-# Stage 2: Production (PHP-FPM + Nginx)
-# ==============================================================================
-FROM php:8.4-fpm-alpine AS production
-
-# Install system dependencies + PHP extensions first (before Composer)
-RUN apk add --no-cache \
-    nginx \
-    curl \
-    unzip \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    oniguruma-dev \
-    libxml2-dev \
-    icu-dev \
-    curl-dev \
-    freetype-dev \
-    pkgconfig \
-    postgresql-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd xml dom curl intl opcache
-
-# Install Composer (after PHP extensions are ready)
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www
 
-# Copy only what's needed for composer install
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
-    && composer dump-autoload --optimize --no-dev --no-scripts
-
-# Copy application code
 COPY . .
 
-# Re-run package discovery now that artisan exists
-RUN php artisan package:discover --ansi
+# Install PHP deps
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
+    && composer dump-autoload --optimize --no-dev
 
-# Copy built frontend assets from stage 1
-COPY --from=frontend-build /app/public/build/ ./public/build/
+# Install JS deps and build
+RUN npm install && npm run build
 
-# Create required directories
-RUN mkdir -p storage/framework/{cache,sessions,views} \
-    && mkdir -p storage/logs \
-    && mkdir -p bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+EXPOSE 10000
 
-# Copy nginx config
-COPY docker/nginx.conf /etc/nginx/http.d/default.conf
-
-# Copy opcache config
-COPY docker/php-opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-
-# Remove docker directory from production
-RUN rm -rf docker/
-
-EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/up || exit 1
-
-# Startup script
-RUN printf '#!/bin/sh\n\
-php artisan config:cache\n\
-php artisan route:cache\n\
-php artisan view:cache\n\
-php artisan migrate --force 2>/dev/null || true\n\
-php-fpm -D\n\
-nginx -g "daemon off;"\n' \
-> /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
+# Create startup script (caching + migration + queue worker at runtime)
+RUN printf '#!/bin/sh\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\nphp artisan migrate --force\nphp artisan queue:work --tries=3 --timeout=60 --sleep=3 > /tmp/queue-worker.log 2>&1 &\nexec php artisan serve --host=0.0.0.0 --port=10000\n' \
+    > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
 CMD ["/usr/local/bin/start.sh"]
