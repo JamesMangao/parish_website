@@ -6,15 +6,24 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Sto. Rosario Parish') }}</title>
 
-    <!-- Fonts Preload -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" as="style">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" as="style">
-
-    <!-- Fonts -->
+    <!-- Preconnect for external origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    @php
+        $supabaseUrl = config('filesystems.disks.supabase.url', '');
+        $supabaseOrigin = preg_replace('#/storage/v1/object/public/.*#', '', $supabaseUrl);
+    @endphp
+    @if($supabaseOrigin)
+    <link rel="preconnect" href="{{ $supabaseOrigin }}">
+    @endif
+
+    <!-- Critical fonts: Cinzel (used in hero/eyebrow above the fold) -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" as="style" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Non-critical fonts: lazy-load via media swap trick -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" as="style" crossorigin onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet"></noscript>
 
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/css/parish-public.css', 'resources/js/app.js'])
