@@ -178,6 +178,7 @@ html { scroll-behavior: smooth; }
 .reading-marker { font-weight: 800; color: rgba(13,42,82,.8); }
 .reading-response { font-weight: 800; color: rgba(13,42,82,.85); }
 .reading-line--or { margin: .45rem 0 .15rem; }
+.reading-line--refrain { margin: .35rem 0; }
 
 /* ── Skip Link ── */
 .skip-link {

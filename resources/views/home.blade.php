@@ -211,6 +211,21 @@ const renderReadingText = text => {
     // Split on ALL possible newline representations
     const lines = normalized.split(/\\n|\n|\r\n|\r/);
 
+    // Pre-scan: find lines that appear 2+ times (auto-detect Filipino psalm refrains)
+    const lineCounts = new Map();
+    for (const raw of lines) {
+        const l = raw.trim();
+        if (!l) continue;
+        if (/^(or|o kaya):?$/i.test(l)) continue;
+        if (/^(Ang Mabuting Balita ng Panginoon|Ang Salita ng Diyos|Pagbasa mula sa|A reading from|The holy Gospel|The word of the Lord|Aleluya!)/i.test(l)) continue;
+        if (/^(R\.|A\.|S\.|Response:|Refrain:|Tugon:|Tugon)$/i.test(l)) continue;
+        lineCounts.set(l, (lineCounts.get(l) || 0) + 1);
+    }
+    const repeatedLines = new Set();
+    for (const [line, count] of lineCounts) {
+        if (count >= 2) repeatedLines.add(line);
+    }
+
     let inResponse = false;
 
     return lines.map(rawLine => {
@@ -236,6 +251,10 @@ const renderReadingText = text => {
         }
         if (inResponse) {
             return `<div class="reading-line--response"><span class="reading-marker">&nbsp;</span><strong class="reading-response">${esc(line)}</strong></div>`;
+        }
+        // Auto-detect: bold repeated lines (implicit Filipino psalm refrains)
+        if (repeatedLines.has(line)) {
+            return `<div class="reading-line reading-line--refrain"><strong class="reading-response">${esc(line)}</strong></div>`;
         }
         return `<div class="reading-line">${esc(line)}</div>`;
     }).join('');
