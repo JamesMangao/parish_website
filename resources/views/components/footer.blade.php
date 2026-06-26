@@ -25,7 +25,7 @@
                     <a href="{{ route('submit-intention') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Submit Intention</a>
                     <a href="{{ route('inquiry') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Sacramental Inquiry</a>
                     <a href="{{ route('events') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Parish Events</a>
-                    <a href="{{ route('gallery.index') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Photo Gallery</a>
+                    <a href="{{ route('gallery') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Photo Gallery</a>
 
                     <a href="{{ route('track') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Track Submission</a>
                     <a href="{{ route('about') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">About Us</a>
