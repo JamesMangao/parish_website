@@ -184,271 +184,206 @@
 
     {{-- ═══════════════ PARISH HIGHLIGHTS ═══════════════ --}}
     @if($highlights->isNotEmpty())
-    <section class="reveal" style="padding:4rem 1.5rem 0; max-width:1100px; margin:0 auto 4rem;">
-        <div class="divider-ornament mb-10" style="justify-content:flex-start;">
-            <span class="eyebrow">Parish Highlights</span>
-            <div style="flex:1; height:1px; background:linear-gradient(90deg,rgba(245,197,24,0.35),transparent);"></div>
+    @php $v = $highlights->first(); @endphp
+    @php
+        $isYT = Str::contains($v->video_url, ['youtube.com', 'youtu.be']);
+        if ($isYT) {
+            $videoId = Str::contains($v->video_url, 'youtu.be')
+                ? Str::afterLast($v->video_url, '/')
+                : Str::after(Str::after($v->video_url, 'v='), '&');
+            if (Str::contains($videoId, '&')) $videoId = Str::before($videoId, '&');
+            if (Str::contains($videoId, '?')) $videoId = Str::before($videoId, '?');
+        }
+    @endphp
+
+    <section class="parish-highlights reveal" style="padding:5rem 0 0; background:var(--cream, #F7F9FF);">
+
+        {{-- Section eyebrow header --}}
+        <div style="text-align:center; margin-bottom:32px; padding:0 1.5rem;">
+            <div class="divider-ornament" style="justify-content:center; display:flex; align-items:center; gap:12px; margin-bottom:0;">
+                <span style="height:1px; width:48px; display:block; background:linear-gradient(90deg,transparent,rgba(245,197,24,0.5));"></span>
+                <span style="font-size:10px; font-weight:700; letter-spacing:0.32em; text-transform:uppercase; color:#F5C518; font-family:'Cinzel',serif;">
+                    Parish Highlights
+                </span>
+                <span style="height:1px; width:48px; display:block; background:linear-gradient(90deg,rgba(245,197,24,0.5),transparent);"></span>
+            </div>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:4rem;">
-            @foreach($highlights as $v)
-            @php
-                $isYT = Str::contains($v->video_url, ['youtube.com', 'youtu.be']);
-                if ($isYT) {
-                    $videoId = Str::contains($v->video_url, 'youtu.be')
-                        ? Str::afterLast($v->video_url, '/')
-                        : Str::after(Str::after($v->video_url, 'v='), '&');
-                    if (Str::contains($videoId, '&')) $videoId = Str::before($videoId, '&');
-                    if (Str::contains($videoId, '?')) $videoId = Str::before($videoId, '?');
-                }
-            @endphp
+        {{-- Cinematic video container --}}
+        <div class="highlight-cinema"
+             style="position:relative; width:100%; max-width:1200px; margin:0 auto; border-radius:28px; overflow:hidden;
+                    box-shadow:0 24px 80px rgba(13,42,82,0.22); background:#000; aspect-ratio:16/9;">
 
-            <div id="card-{{ $loop->index }}"
-                 class="card-sacred highlight-card-outer overflow-hidden"
-                 style="background:#fff; border:1px solid rgba(245,197,24,0.18);
-                        box-shadow:0 24px 72px rgba(13,42,82,0.14); border-radius:20px;">
+            {{-- THE VIDEO --}}
+            @if($isYT)
+                <iframe class="highlight-video"
+                        src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&color=white&enablejsapi=1"
+                        style="width:100%; height:100%; border:0; display:block; position:relative; z-index:1;"
+                        frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            @else
+                <video class="highlight-video"
+                       src="{{ $v->video_url }}"
+                       playsinline
+                       preload="metadata"
+                       style="width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1;">
+                </video>
+            @endif
 
-                {{-- TWO-COL: video left · info right --}}
-                <div style="display:grid; grid-template-columns:1fr 1fr; min-height:360px;">
+            {{-- BOTTOM GRADIENT OVERLAY --}}
+            <div style="position:absolute; inset:0; z-index:2; pointer-events:none;
+                        background:linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(13,42,82,0.40) 55%, rgba(13,42,82,0.85) 78%, rgba(13,42,82,0.96) 100%);">
+            </div>
 
-                    {{-- ── LEFT: Video Pane ── --}}
-                    <div style="position:relative; background:#080f20; overflow:hidden; border-radius:20px 0 0 20px;">
+            {{-- TOP-LEFT BADGE --}}
+            <div style="position:absolute; top:24px; left:28px; z-index:4; display:flex; align-items:center; gap:8px;">
+                <span style="display:flex; align-items:center; gap:6px;
+                             background:rgba(13,42,82,0.60); backdrop-filter:blur(12px);
+                             border:1px solid rgba(255,255,255,0.15); border-radius:999px; padding:6px 14px;">
+                    <span style="width:7px; height:7px; border-radius:50%; background:#F5C518;
+                                 box-shadow:0 0 8px rgba(245,197,24,0.80); display:inline-block;"></span>
+                    <span style="font-family:'Jost',sans-serif; font-size:9px; font-weight:700;
+                                 letter-spacing:0.28em; text-transform:uppercase; color:#FFFFFF;">
+                        Highlight Video
+                    </span>
+                </span>
+            </div>
 
-                        {{-- HIGHLIGHT VIDEO badge --}}
-                        <div style="position:absolute; top:16px; left:16px; z-index:20;
-                                    display:flex; align-items:center; gap:8px;
-                                    background:rgba(8,15,32,0.72); backdrop-filter:blur(8px);
-                                    border:1px solid rgba(245,197,24,0.3); border-radius:100px;
-                                    padding:5px 13px;">
-                            <span style="width:7px; height:7px; border-radius:50%;
-                                         background:var(--gold); display:inline-block;
-                                         box-shadow:0 0 0 3px rgba(245,197,24,0.25);
-                                         animation:pulse-dot 2s infinite;"></span>
-                            <span class="font-cinzel"
-                                  style="font-size:10px; letter-spacing:0.28em; color:rgba(235,242,255,0.95);
-                                         font-weight:700; text-transform:uppercase;">Highlight Video</span>
-                        </div>
+            {{-- BOTTOM OVERLAY TEXT CONTENT --}}
+            <div style="position:absolute; bottom:0; left:0; right:0; z-index:3; padding:40px 44px 36px;">
+                <div style="max-width:720px;">
 
-                        {{-- Action icons top-right --}}
-                        <div style="position:absolute; top:14px; right:14px; z-index:20;
-                                    display:flex; align-items:center; gap:8px;">
-                            {{-- Favourite --}}
-                            <button class="video-btn" style="width:34px; height:34px; border-radius:50%; backdrop-filter:blur(6px);"
-                                    title="Favourite"
-                                    onclick="this.querySelector('svg').style.fill=(this.querySelector('svg').style.fill==='#F5C518'?'none':'#F5C518')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                            </button>
-                            {{-- Share --}}
-                            <button class="video-btn" style="width:34px; height:34px; border-radius:50%; backdrop-filter:blur(6px);"
-                                    title="Share"
-                                    onclick="shareVideo('{{ $v->title }}', '{{ $v->video_url }}')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>
-                                    <circle cx="18" cy="19" r="3"/>
-                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                                </svg>
-                            </button>
-                        </div>
+                    {{-- Eyebrow --}}
+                    <p style="font-family:'Jost',sans-serif; font-size:10px; font-weight:700;
+                              letter-spacing:0.32em; text-transform:uppercase;
+                              color:rgba(245,197,24,0.85); margin-bottom:10px;">
+                        Featured Highlight
+                    </p>
 
-                        {{-- Video / iframe --}}
-                        <div style="position:relative; width:100%; height:100%; min-height:360px;">
-                            @if($isYT)
-                                <iframe src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&color=white"
-                                        style="position:absolute; inset:0; width:100%; height:100%; border:0;"
-                                        frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-                            @else
-                                <video id="hv-{{ $loop->index }}"
-                                       style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; cursor:pointer;"
-                                       preload="metadata"
-                                       onclick="toggleVideoPlay('{{ $loop->index }}')"
-                                       onplay="syncVideoUI('{{ $loop->index }}', true)"
-                                       onpause="syncVideoUI('{{ $loop->index }}', false)"
-                                       ontimeupdate="updateVideoProgress('{{ $loop->index }}')"
-                                       onended="onVideoEnded('{{ $loop->index }}')">
-                                    <source src="{{ $v->video_url }}" type="video/mp4">
-                                </video>
+                    {{-- Title --}}
+                    <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:700;
+                               font-size:clamp(1.8rem, 3.5vw, 3rem); color:#FFFFFF; line-height:1.05;
+                               letter-spacing:-0.01em; text-shadow:0 2px 20px rgba(0,0,0,0.40); margin-bottom:10px;">
+                        @php
+                            $cleanVideoTitle = preg_replace('/[\x{1D400}-\x{1D7FF}]/u', '', $v->title ?? 'Parish Highlight');
+                        @endphp
+                        {{ trim($cleanVideoTitle) }}
+                    </h2>
 
-                                {{-- Big gold play overlay --}}
-                                <div id="play-overlay-{{ $loop->index }}"
-                                     style="position:absolute; inset:0; display:flex; align-items:center;
-                                            justify-content:center; z-index:10; cursor:pointer;
-                                            background:rgba(0,0,0,0.3);"
-                                     onclick="const vid=document.getElementById('hv-{{ $loop->index }}');
-                                              const ov=document.getElementById('play-overlay-{{ $loop->index }}');
-                                              if(vid.paused){vid.play();ov.style.opacity='0';ov.style.pointerEvents='none';}
-                                              else{vid.pause();ov.style.opacity='1';ov.style.pointerEvents='auto';}">
-                                    <div style="width:72px; height:72px; border-radius:50%;
-                                                background:linear-gradient(135deg,#FFD740,#F5C518);
-                                                display:flex; align-items:center; justify-content:center;
-                                                box-shadow:0 8px 40px rgba(245,197,24,0.55), 0 0 0 12px rgba(245,197,24,0.15);
-                                                transition:transform 0.2s ease;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="#0D2A52">
-                                            <path d="M8 5v14l11-7z"/>
-                                        </svg>
-                                    </div>
-                                </div>
+                    {{-- Gold divider line --}}
+                    <span style="display:block; width:56px; height:3px; background:linear-gradient(90deg,#FFD740,#F5C518);
+                                 border-radius:999px; margin-bottom:14px;"></span>
 
+                    {{-- Date --}}
+                    @if($v->event_date ?? null)
+                    <p style="font-family:'Jost',sans-serif; font-size:11px; font-weight:600;
+                              letter-spacing:0.18em; text-transform:uppercase;
+                              color:rgba(255,255,255,0.55); margin-bottom:10px;">
+                        {{ $v->event_date }}
+                    </p>
+                    @endif
 
-                                {{-- Progress bar --}}
-                                <div style="position:absolute; bottom:0; left:0; right:0; z-index:15;
-                                            padding:0 12px 10px;
-                                            background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);">
-                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                                        <span id="time-curr-{{ $loop->index }}"
-                                              style="color:#fff; font-size:10px; font-weight:600;
-                                                     letter-spacing:0.05em; white-space:nowrap; min-width:30px;">0:00</span>
-                                        <div class="progress-container" style="flex:1;"
-                                             onclick="seekVideo('{{ $loop->index }}', event)">
-                                            <div id="prog-fill-{{ $loop->index }}" class="progress-fill">
-                                                <div class="progress-handle"></div>
-                                            </div>
-                                        </div>
-                                        <span style="color:rgba(255,255,255,0.55); font-size:10px;">
-                                            {{ $v->duration ?? '4:00' }}
-                                        </span>
-                                    </div>
-                                    <div style="display:flex; align-items:center; justify-content:space-between;">
-                                        {{-- Left controls --}}
-                                        <div style="display:flex; align-items:center; gap:14px;">
-                                            <button class="video-btn" style="background:none; border:none; padding:0; width:auto; height:auto;"
-                                                    onclick="toggleVideoPlay('{{ $loop->index }}')">
-                                                <svg id="play-icon-{{ $loop->index }}" width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
-                                                <svg id="pause-icon-{{ $loop->index }}" width="14" height="14" viewBox="0 0 24 24" fill="#fff" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                                            </button>
-                                            <button class="video-btn" style="background:none; border:none; padding:0; width:auto; height:auto;"
-                                                    title="Back 5s" onclick="skipVideo('{{ $loop->index }}', -5)">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
-                                                    <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
-                                                </svg>
-                                            </button>
-                                            <button class="video-btn" style="background:none; border:none; padding:0; width:auto; height:auto;"
-                                                    title="Forward 5s" onclick="skipVideo('{{ $loop->index }}', 5)">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
-                                                    <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
-                                                </svg>
-                                            </button>
-                                            <button class="video-btn" style="background:none; border:none; padding:0; width:auto; height:auto;"
-                                                    onclick="toggleVideoMute('{{ $loop->index }}')">
-                                                <svg id="vol-icon-{{ $loop->index }}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
-                                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                                                </svg>
-                                                <svg id="mute-icon-{{ $loop->index }}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" style="display:none;">
-                                                    <line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v6h4l5 5V5l-5 5H9z"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        {{-- Right controls --}}
-                                        <div style="display:flex; align-items:center; gap:14px;">
-                                            <button class="video-btn" style="background:none; border:none; padding:0; width:auto; height:auto;"
-                                                    title="Fullscreen" onclick="toggleFullscreen('hv-{{ $loop->index }}')">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
-                                                    <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-                                                    <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-                                                </svg>
-                                            </button>
-                                            <div style="position:relative;">
-                                                <button class="video-btn" style="background:none; border:none; padding:0; width:auto; height:auto;"
-                                                        title="More Options" onclick="toggleSettingsMenu('{{ $loop->index }}')">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
-                                                        <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
-                                                    </svg>
-                                                </button>
-                                                <div id="settings-{{ $loop->index }}"
-                                                     style="position:absolute; bottom:30px; right:0; background:rgba(13,42,82,0.95);
-                                                            backdrop-filter:blur(10px); border-radius:8px; border:1px solid rgba(255,255,255,0.1);
-                                                            padding:8px 0; display:none; flex-direction:column; min-width:140px; z-index:100;
-                                                            box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-                                                    <div style="padding:6px 16px; font-size:9px; color:rgba(255,255,255,0.4);
-                                                                text-transform:uppercase; letter-spacing:0.1em;
-                                                                border-bottom:1px solid rgba(255,255,255,0.05);">Playback Speed</div>
-                                                    @foreach([0.5, 1, 1.25, 1.5, 2] as $speed)
-                                                    <button onclick="setVideoSpeed('{{ $loop->parent->index }}', {{ $speed }}, this)"
-                                                            style="background:none; border:none; color:{{ $speed == 1 ? 'var(--gold)' : '#fff' }};
-                                                                   padding:8px 16px; text-align:left; font-size:11px; cursor:pointer; transition:background 0.2s;"
-                                                            onmouseover="this.style.background='rgba(255,255,255,0.05)'"
-                                                            onmouseout="this.style.background='none'">
-                                                        {{ $speed == 1 ? 'Normal' : $speed.'x' }}
-                                                    </button>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
+                    {{-- Description --}}
+                    @if($v->description ?? null)
+                    @php
+                        $videoDesc = preg_replace('/^(NASA LARAWAN:|IN PHOTOS:|TINGNAN:|IN VIDEO:|WATCH:)\s*/iu', '', $v->description);
+                        $videoDesc = preg_replace('/#\w+/u', '', $videoDesc);
+                        $videoDesc = trim(preg_replace('/\s+/', ' ', $videoDesc));
+                    @endphp
+                    <p style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
+                              font-size:clamp(0.95rem, 1.5vw, 1.1rem); color:rgba(255,255,255,0.68);
+                              line-height:1.7; max-width:580px;
+                              display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                        {{ $videoDesc }}
+                    </p>
+                    @endif
+                </div>
 
-                        {{-- Gold bottom rule on video pane --}}
-                        <div style="position:absolute; bottom:0; left:0; right:0; height:2px;
-                                    background:linear-gradient(90deg,transparent,rgba(245,197,24,0.5),transparent);
-                                    pointer-events:none; z-index:5;"></div>
-                    </div>
-
-                    {{-- ── RIGHT: Info Pane ── --}}
-                    <div style="padding:3.5rem 3rem 3.5rem 48px; display:flex; flex-direction:column;
-                                justify-content:center; text-align:left; position:relative; overflow:hidden;
-                                background:transparent; border-radius:0 20px 20px 0;">
-
-                        {{-- Watermark cross --}}
-                        <div class="font-cinzel"
-                             style="position:absolute; font-size:260px; right:-20px; bottom:-40px;
-                                    color:rgba(13,42,82,0.03); line-height:1;
-                                    pointer-events:none; user-select:none;">✝</div>
-
-                        <div style="position:relative; z-index:1;">
-                            {{-- Eyebrow --}}
-                            <p class="eyebrow" style="color:var(--gold); margin-bottom:1rem; letter-spacing:0.25em;">
-                                Featured Highlight
-                            </p>
-
-                            {{-- Title --}}
-                            <h3 class="font-heading"
-                                style="font-family:'Cormorant Garamond',Georgia,serif;
-                                       font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:700; font-style:italic;
-                                       color:#0D2A52; line-height:1.1; margin-bottom:1.25rem;
-                                       letter-spacing:-0.01em; text-transform:none;">
-                                {{ $v->title }}
-                            </h3>
-
-                            {{-- Gold rule --}}
-                            <div style="width:64px; height:3px;
-                                        background:linear-gradient(90deg,#F5C518,#FFD740);
-                                        margin:16px 0 20px 0; border-radius:999px;
-                                        display:block;"></div>
-
-                            {{-- Date --}}
-                            @if($v->event_date ?? null)
-                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:1.25rem;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                     stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                                    <line x1="16" y1="2" x2="16" y2="6"/>
-                                    <line x1="8" y1="2" x2="8" y2="6"/>
-                                    <line x1="3" y1="10" x2="21" y2="10"/>
-                                </svg>
-                                <span style="font-size:0.9rem; font-weight:500; color:rgba(13,42,82,0.65);">
-                                    {{ $v->event_date }}
-                                </span>
-                            </div>
-                            @endif
-
-                            {{-- Description --}}
-                            @if($v->description)
-                            <p style="font-size:0.95rem; color:rgba(13,42,82,0.62); line-height:1.78;
-                                      font-style:italic; margin-top:0.75rem; margin-bottom:0;">
-                                {!! nl2br(e(trim($v->description))) !!}
-                            </p>
-                            @endif
-                        </div>
-                    </div>
+                {{-- Duration badge --}}
+                <div style="position:absolute; bottom:36px; right:44px;">
+                    <span style="font-family:'Jost',sans-serif; font-size:11px; font-weight:700;
+                                 letter-spacing:0.15em; color:rgba(255,255,255,0.60);
+                                 background:rgba(13,42,82,0.55); backdrop-filter:blur(8px);
+                                 border:1px solid rgba(255,255,255,0.12); padding:6px 14px; border-radius:999px;">
+                        ▶ {{ $v->duration ?? '4:00' }}
+                    </span>
                 </div>
             </div>
-            @endforeach
+
+            {{-- PLAY BUTTON OVERLAY --}}
+            @if(!$isYT)
+            <button class="cinema-play-btn"
+                    onclick="toggleHighlightVideo(this)"
+                    style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                           z-index:4; width:72px; height:72px; border-radius:50%; border:none; cursor:pointer;
+                           background:rgba(245,197,24,0.92);
+                           box-shadow:0 0 0 12px rgba(245,197,24,0.18), 0 8px 32px rgba(245,197,24,0.40);
+                           display:flex; align-items:center; justify-content:center;
+                           transition:all 0.25s ease;"
+                    aria-label="Play highlight video"
+                    onmouseover="this.style.transform='translate(-50%,-50%) scale(1.08)'; this.style.boxShadow='0 0 0 16px rgba(245,197,24,0.22), 0 8px 40px rgba(245,197,24,0.55)';"
+                    onmouseout="this.style.transform='translate(-50%,-50%) scale(1)'; this.style.boxShadow='0 0 0 12px rgba(245,197,24,0.18), 0 8px 32px rgba(245,197,24,0.40)';">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#0D2A52" aria-hidden="true">
+                    <polygon points="5,3 19,12 5,21"/>
+                </svg>
+            </button>
+            @endif
+
         </div>
+
+        {{-- JavaScript: play/pause toggle --}}
+        @if(!$isYT)
+        <script>
+        function toggleHighlightVideo(btn) {
+            var cinema = btn.closest('.highlight-cinema');
+            var video  = cinema.querySelector('.highlight-video');
+            if (video.paused) {
+                video.play();
+                btn.style.opacity = '0';
+                btn.style.pointerEvents = 'none';
+            } else {
+                video.pause();
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var video = document.querySelector('.highlight-cinema .highlight-video');
+            var btn   = document.querySelector('.cinema-play-btn');
+            if (!video || !btn) return;
+            video.addEventListener('ended', function () {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                video.currentTime = 0;
+            });
+            video.addEventListener('pause', function () {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            });
+            video.addEventListener('play', function () {
+                btn.style.opacity = '0';
+                btn.style.pointerEvents = 'none';
+            });
+        });
+        </script>
+        @endif
+
+        {{-- Responsive styles --}}
+        <style>
+            @media (max-width: 768px) {
+                .highlight-cinema {
+                    border-radius: 20px !important;
+                    margin-left: 16px !important;
+                    margin-right: 16px !important;
+                }
+                .highlight-cinema > div:last-of-type {
+                    padding: 24px 20px 20px !important;
+                }
+            }
+            .cinema-play-btn {
+                transition: opacity 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease !important;
+            }
+        </style>
+
     </section>
     @endif
 
