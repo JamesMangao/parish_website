@@ -247,10 +247,10 @@ const renderReadingText = text => {
             inResponse = true;
             const raw = responseMatch[1];
             const marker = /^(Response|Refrain|Tugon)/i.test(raw) ? 'R.' : raw;
-            return `<div class="reading-line--response"><span class="reading-marker">${esc(marker)}</span><strong class="reading-response">${esc(responseMatch[2])}</strong></div>`;
+            return `<div class="reading-line--response"><span class="reading-marker">${esc(marker)}</span><strong class="reading-response" style="font-weight:800;color:rgba(13,42,82,.88);">${esc(responseMatch[2])}</strong></div>`;
         }
         if (inResponse) {
-            return `<div class="reading-line--response"><span class="reading-marker">&nbsp;</span><strong class="reading-response">${esc(line)}</strong></div>`;
+            return `<div class="reading-line--response"><span class="reading-marker">&nbsp;</span><strong class="reading-response" style="font-weight:800;color:rgba(13,42,82,.88);">${esc(line)}</strong></div>`;
         }
         // Auto-detect: bold repeated lines (implicit Filipino psalm refrains)
         if (repeatedLines.has(line)) {

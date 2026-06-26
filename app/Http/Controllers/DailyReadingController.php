@@ -393,7 +393,7 @@ class DailyReadingController extends Controller
             if (preg_match('/Salmo/i', $reference)) {
                 return 'Salmong Tugunan';
             }
-            if (preg_match('/^Aleluya/i', $text)) {
+            if (preg_match('/^Aleluya/i', $text) || preg_match('/^Aleluya/i', $reference)) {
                 return 'Aleluya';
             }
             $hasFirst = false;
@@ -409,7 +409,7 @@ class DailyReadingController extends Controller
         if (preg_match('/Psalm/i', $reference)) {
             return 'Responsorial Psalm';
         }
-        if (preg_match('/^Alleluia/i', $text)) {
+        if (preg_match('/^Alleluia/i', $text) || preg_match('/^Alleluia/i', $reference)) {
             return 'Alleluia';
         }
 
