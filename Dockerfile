@@ -11,7 +11,7 @@ RUN npm run build
 FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
-    curl-dev icu-dev oniguruma-dev libzip-dev libpng-dev \
+    nginx curl-dev icu-dev oniguruma-dev libzip-dev libpng-dev \
     libjpeg-turbo-dev libxml2-dev postgresql-dev \
     libpq-dev git unzip
 
@@ -41,21 +41,26 @@ RUN php artisan config:cache \
     && php artisan view:cache
 
 # PHP-FPM config
-RUN mkdir -p /usr/local/etc/php/conf.d \
-    && echo "opcache.enable=1" > /usr/local/etc/php/conf.d/opcache.ini \
+RUN echo "opcache.enable=1" > /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.interned_strings_buffer=8" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.save_comments=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.jit=1255" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.jit_buffer_size=64M" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+    && echo "opcache.jit_buffer_size=64M" >> /usr/local/etc/php/conf.d/opcache.ini
 
-# Startup script
-RUN printf '#!/bin/sh\nphp artisan migrate --force\nexec php-fpm\n' \
+# PHP-FPM listen on 9000 for nginx
+RUN sed -i 's|listen = /run/nginx-v8.sock|listen = 127.0.0.1:9000|' /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Nginx config
+RUN mkdir -p /var/log/nginx /var/cache/nginx /etc/nginx/http.d
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+# Startup script: run both nginx + php-fpm
+RUN printf '#!/bin/sh\nphp artisan migrate --force\nphp-fpm -D\nnginx -g "daemon off;"\n' \
     > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
-EXPOSE 9000
+EXPOSE 80
 
 CMD ["/usr/local/bin/start.sh"]
