@@ -35,8 +35,13 @@ RUN php artisan package:discover --ansi
 # Copy built frontend assets from stage 1
 COPY --from=frontend /app/public/build ./public/build
 
-# Ensure storage and bootstrap/cache are writable
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+# Create required cache/session directories (empty in git, excluded by .dockerignore)
+RUN mkdir -p /var/www/storage/framework/views \
+             /var/www/storage/framework/sessions \
+             /var/www/storage/framework/cache/data \
+             /var/www/storage/logs \
+             /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # PHP-FPM config
