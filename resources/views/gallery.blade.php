@@ -658,7 +658,7 @@
 
             {{-- View All link --}}
             <div style="text-align:center; margin-top:28px;">
-                <a href="{{ route('gallery.index') }}"
+                <a href="{{ route('gallery') }}"
                    style="display:inline-flex; align-items:center; gap:8px;
                           height:44px; padding:0 28px; border-radius:999px;
                           border:1.5px solid rgba(255,255,255,0.25);
