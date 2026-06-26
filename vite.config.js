@@ -10,6 +10,18 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    build: {
+        target: 'es2020',
+        cssCodeSplit: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-axios': ['axios'],
+                    'vendor-alpine': ['alpinejs'],
+                }
+            }
+        }
+    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

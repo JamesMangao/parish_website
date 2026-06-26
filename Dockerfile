@@ -1,30 +1,61 @@
-FROM php:8.4-cli
+# Stage 1: Build frontend assets
+FROM node:20-alpine AS frontend
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY vite.config.js ./
+COPY resources/ ./resources/
+RUN npm run build
 
-# Install system deps
-RUN apt-get update && apt-get install -y \
-    curl unzip git nodejs npm \
-    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev libcurl4-openssl-dev pkg-config libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd \
-       xml dom curl intl opcache
+# Stage 2: Production image
+FROM php:8.4-fpm-alpine
+
+RUN apk add --no-cache \
+    curl-dev icu-dev oniguruma-dev libzip-dev libpng-dev \
+    libjpeg-turbo-dev libxml2-dev postgresql-dev \
+    libpq-dev git unzip
+
+RUN docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif bcmath gd opcache intl
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
+    && composer dump-autoload --optimize --no-dev --no-scripts
+
 COPY . .
 
-# Install PHP deps
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
-    && composer dump-autoload --optimize --no-dev
+# Discover packages after full source is available
+RUN php artisan package:discover --ansi
 
-# Install JS deps and build
-RUN npm install && npm run build
+# Copy built frontend assets from stage 1
+COPY --from=frontend /app/public/build ./public/build
 
-EXPOSE 10000
+# Cache configs
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
-# Create startup script (caching + migration + queue worker at runtime)
-RUN printf '#!/bin/sh\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\nphp artisan migrate --force\nphp artisan queue:work --tries=3 --timeout=60 --sleep=3 > /tmp/queue-worker.log 2>&1 &\nexec php artisan serve --host=0.0.0.0 --port=10000\n' \
+# PHP-FPM config
+RUN mkdir -p /usr/local/etc/php/conf.d \
+    && echo "opcache.enable=1" > /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.interned_strings_buffer=8" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.save_comments=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.jit=1255" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.jit_buffer_size=64M" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Startup script
+RUN printf '#!/bin/sh\nphp artisan migrate --force\nexec php-fpm\n' \
     > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
+
+EXPOSE 9000
 
 CMD ["/usr/local/bin/start.sh"]
