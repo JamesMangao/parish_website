@@ -104,6 +104,7 @@ class DailyReadingController extends Controller
                 if (!empty($data['readings'])) {
                     $data['source'] = 'evangelizo';
                     $data = $this->supplementFromUsccbMarkdown($data, $dateObj);
+                    $data = $this->addMissingReadings($data);
                 }
             }
         }
@@ -245,6 +246,56 @@ class DailyReadingController extends Controller
             Log::warning('USCCB supplement failed: ' . $e->getMessage());
         }
 
+        return $data;
+    }
+
+    /**
+     * Last-resort: construct missing readings that neither USCCB nor
+     * Evangelizo provided. This handles the case where Cloudflare blocks
+     * USCCB from Render AND Evangelizo lacks Alleluia entirely.
+     */
+    private function addMissingReadings(array $data): array
+    {
+        $readings = $data['readings'] ?? [];
+        $hasAlleluia = false;
+        $hasGospel = false;
+        $gospelText = '';
+        $gospelRef = '';
+
+        foreach ($readings as $r) {
+            $type = strtolower($r['type'] ?? '');
+            if (stripos($type, 'alleluia') !== false) $hasAlleluia = true;
+            if (stripos($type, 'gospel') !== false) {
+                $hasGospel = true;
+                $gospelText = $r['text'] ?? '';
+                $gospelRef = $r['reference'] ?? '';
+            }
+        }
+
+        if (!$hasAlleluia && $hasGospel) {
+            $alleluiaVerse = '';
+            $sentences = preg_split('/(?<=[.!?])\s+/', $gospelText, 2);
+            if (!empty($sentences[0])) {
+                $alleluiaVerse = trim($sentences[0]);
+                if (strlen($alleluiaVerse) > 120) {
+                    $alleluiaVerse = substr($alleluiaVerse, 0, strrpos(substr($alleluiaVerse, 0, 120), ' ')) . '...';
+                }
+            }
+
+            $alleluiaText = "R. Alleluia, alleluia.\n";
+            $alleluiaText .= ($alleluiaVerse ?: 'Alleluia, alleluia.') . "\n";
+            $alleluiaText .= "R. Alleluia, alleluia.";
+
+            $readings[] = [
+                'type'      => 'Alleluia',
+                'reference' => $gospelRef,
+                'text'      => $alleluiaText,
+            ];
+            $data['source'] = ($data['source'] ?? 'evangelizo') . '+constructed_alleluia';
+            Log::info("Constructed Alleluia from Gospel: " . substr($alleluiaVerse, 0, 80));
+        }
+
+        $data['readings'] = $readings;
         return $data;
     }
 
