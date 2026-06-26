@@ -633,7 +633,7 @@
     @endif
 
     {{-- ═══════════════ STAY CONNECTED / SOCIAL FEED ═══════════════ --}}
-    <section class="social-feed-section reveal" style="padding:6rem 1.5rem; background:var(--cream); position:relative;">
+    <section class="social-feed-section reveal" style="background:var(--cream, #F7F9FF); position:relative;">
         {{-- Background cross motif --}}
         <div class="social-feed-bg-cross" aria-hidden="true">✝</div>
         {{-- Gold radial glow --}}
@@ -642,69 +642,54 @@
         <div style="max-width:1100px; margin:0 auto; position:relative; z-index:1;">
 
             {{-- Section Header --}}
-            <div style="text-align:center; margin-bottom:3.5rem;">
-                <div style="width:48px; height:2px; margin:0 auto 1.5rem; background:var(--gold); border-radius:1px;"></div>
+            <div style="text-align:center; margin-bottom:3rem;">
                 <div class="divider-ornament mb-5">
                     <span class="eyebrow">Social Feed</span>
                 </div>
                 <h2 class="font-heading"
-                    style="font-size:clamp(2rem,4vw,3.5rem); font-weight:700; font-style:italic;
-                           color:var(--blue-deep); letter-spacing:-0.01em; margin-bottom:1rem;">
+                    style="font-size:clamp(2.8rem,6vw,5rem); font-weight:700; font-style:italic;
+                           color:#0D2A52; letter-spacing:-0.01em; margin-bottom:1rem;">
                     Stay Connected
                 </h2>
-                <p style="font-size:0.95rem; font-style:italic; color:rgba(13,42,82,0.5); max-width:480px; margin:0 auto; line-height:1.7;">
-                    Follow our latest updates and community announcements on social media.
+                <p class="font-heading" style="font-size:1.1rem; font-style:italic;
+                   color:rgba(13,42,82,0.48); max-width:520px; margin:0 auto; line-height:1.7;">
+                    Follow our latest updates and community announcements live from Facebook.
                 </p>
             </div>
 
-            {{-- Post Preview Cards --}}
-            <div class="social-feed-grid">
-                @php
-                    $posts = [
-                        [
-                            'excerpt' => 'Join us this Sunday for a special celebration of the Holy Eucharist as we gather in faith and fellowship.',
-                            'date' => 'June 22, 2026',
-                        ],
-                        [
-                            'excerpt' => 'Our parish youth ministry invites all young adults to a night of praise, worship, and community building.',
-                            'date' => 'June 18, 2026',
-                        ],
-                        [
-                            'excerpt' => 'Thank you to all our generous volunteers who made the community outreach program a resounding success.',
-                            'date' => 'June 14, 2026',
-                        ],
-                    ];
-                @endphp
+            {{-- Facebook Embed Wrapper --}}
+            <div class="fb-embed-wrapper" style="margin-bottom:2.5rem;">
+                <div class="fb-embed-card">
+                    {{-- Shimmer loader --}}
+                    <div class="fb-shimmer"></div>
 
-                @foreach($posts as $i => $post)
-                <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
-                   class="social-feed-card">
-                    <div class="social-feed-card-img">
-                        {{-- Placeholder image area --}}
-                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.12)" stroke-width="1.5">
-                                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <path d="M21 15l-5-5L5 21"/>
-                            </svg>
-                        </div>
-                        {{-- Facebook icon watermark --}}
-                        <div class="social-feed-card-fb-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </div>
+                    {{-- Facebook Page Plugin --}}
+                    <div id="fb-root"></div>
+                    <!-- 
+                        TODO: Once Meta rate limit clears, register domain at 
+                        developers.facebook.com → Settings → Basic → App Domains
+                        and add appId parameter to the SDK script src for 
+                        better reliability.
+                    -->
+                    <script async defer crossorigin="anonymous"
+                            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0"></script>
+
+                    <div class="fb-page"
+                         data-href="https://www.facebook.com/storosarioparishpacita1"
+                         data-tabs="timeline"
+                         data-width="500"
+                         data-height="700"
+                         data-small-header="false"
+                         data-adapt-container-width="true"
+                         data-hide-cover="false"
+                         data-show-facepile="true"
+                         style="position:relative; z-index:1;">
                     </div>
-                    <div class="social-feed-card-body">
-                        <p class="social-feed-card-excerpt">{{ $post['excerpt'] }}</p>
-                        <span class="social-feed-card-date">{{ $post['date'] }}</span>
-                    </div>
-                </a>
-                @endforeach
+                </div>
             </div>
 
             {{-- CTA Buttons --}}
-            <div class="social-feed-cta-row" style="margin-top:3rem;">
+            <div class="social-feed-cta-row" style="gap:0.75rem;">
                 <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
                    class="social-feed-cta-gold">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -712,12 +697,34 @@
                     </svg>
                     Follow on Facebook
                 </a>
-                <a href="{{ route('about') }}" class="social-feed-cta-ghost">
+                <a href="{{ route('inquiry') }}" class="social-feed-cta-ghost">
                     Contact the Office
                 </a>
             </div>
 
         </div>
+
+        {{-- Responsive width fix + shimmer dismiss --}}
+        <script>
+        function resizeFbPlugin() {
+            var wrapper = document.querySelector('.fb-embed-wrapper');
+            var fbEl = document.querySelector('.fb-page');
+            if (!wrapper || !fbEl) return;
+            var w = Math.min(wrapper.offsetWidth - 48, 500);
+            if (w < 280) w = 280;
+            fbEl.setAttribute('data-width', w);
+            if (window.FB) FB.XFBML.parse();
+        }
+        window.addEventListener('resize', resizeFbPlugin);
+        window.fbAsyncInit = function() {
+            FB.init({ version: 'v19.0', xfbml: true });
+            FB.Event.subscribe('xfbml.render', function() {
+                var shimmer = document.querySelector('.fb-shimmer');
+                if (shimmer) shimmer.style.display = 'none';
+            });
+            resizeFbPlugin();
+        };
+        </script>
     </section>
 
 </div>
