@@ -269,9 +269,7 @@
 
             {{-- BOTTOM OVERLAY TEXT CONTENT --}}
             <div id="hl-info-bar" class="cinema-overlay-text"
-                 style="position:absolute; bottom:0; left:0; right:0; z-index:3; padding:40px 44px 36px;
-                        transition:transform 0.3s cubic-bezier(0.22,1,0.36,1), padding 0.3s ease;
-                        will-change:transform;">
+                 style="position:absolute; bottom:0; left:0; right:0; z-index:3; padding:40px 44px 36px;">
                 <div style="max-width:720px;">
                     <p style="font-family:'Jost',sans-serif; font-size:10px; font-weight:700;
                               letter-spacing:0.32em; text-transform:uppercase;
@@ -440,18 +438,12 @@
             }
 
             /* ── Controls-visible: push overlay text UP ── */
-            .highlight-cinema.controls-visible .cinema-overlay-text {
-                transform: translateY(-56px);
-            }
+            /* Handled by direct inline styles in JS for bulletproof reliability */
 
             /* ── Control bar ── */
             .hl-controls {
                 background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 70%, transparent 100%);
-            }
-            .highlight-cinema.hl-controls-hidden .hl-controls {
-                opacity: 0 !important;
-                transform: translateY(8px) !important;
-                pointer-events: none !important;
+                transition: opacity 0.35s ease, transform 0.35s ease;
             }
 
             .hl-ctrl-btn {
@@ -529,9 +521,6 @@
                     margin-left: 16px !important;
                     margin-right: 16px !important;
                 }
-                .highlight-cinema.controls-visible .cinema-overlay-text {
-                    transform: translateY(-48px);
-                }
                 #hl-info-bar { padding: 24px 20px 20px !important; }
                 .hl-ctrl-btn { width: 30px; height: 30px; }
                 #hl-time { font-size: 10px; display: none; }
@@ -552,12 +541,11 @@
 
             var overlay    = cinema.querySelector('.cinema-overlay-text');
             var controls   = document.getElementById('hl-controls');
-            var playBtn    = document.getElementById('hl-play-btn');
-            var playIcon   = document.getElementById('hl-play-icon');
-            var pauseIcon  = document.getElementById('hl-pause-icon');
             var cPlayBtn   = document.getElementById('hl-center-play');
             var cPlayIcon  = document.getElementById('hl-center-play-icon');
             var cPauseIcon = document.getElementById('hl-center-pause-icon');
+            var playIcon   = document.getElementById('hl-play-icon');
+            var pauseIcon  = document.getElementById('hl-pause-icon');
             var progFill   = document.getElementById('hl-prog-fill');
             var progBuf    = document.getElementById('hl-prog-buffered');
             var timeEl     = document.getElementById('hl-time');
@@ -571,8 +559,8 @@
             var fsIcon     = document.getElementById('hl-fs-icon');
             var fsExitIcon = document.getElementById('hl-fs-exit-icon');
 
-            var hideTimer    = null;
-            var controlsTimer = null;
+            var hideTimer = null;
+            var isMouseOver = false;
 
             function fmt(s) {
                 if (!s || isNaN(s)) return '0:00';
@@ -581,33 +569,43 @@
                 return m + ':' + (sec < 10 ? '0' : '') + sec;
             }
 
-            // ── Controls visibility: push overlay text UP ──
-            var mouseOverCinema = false;
-
+            /* ════════════════════════════════════════════════════════
+               SHOW / HIDE — direct style manipulation (bulletproof)
+               ════════════════════════════════════════════════════════ */
             function showControls() {
-                cinema.classList.add('controls-visible');
-                clearTimeout(controlsTimer);
-                if (mouseOverCinema) {
-                    controlsTimer = setTimeout(hideControls, 3000);
-                }
-            }
-            function hideControls() {
-                clearTimeout(controlsTimer);
-                if (!vid.paused) {
-                    cinema.classList.remove('controls-visible');
+                if (overlay) overlay.style.cssText += ';transform:translateY(-56px)!important;transition:transform 0.3s cubic-bezier(0.22,1,0.36,1)!important;will-change:transform;';
+                if (controls) controls.style.cssText += ';opacity:1!important;transform:translateY(0)!important;pointer-events:auto!important;';
+                clearTimeout(hideTimer);
+                if (isMouseOver && !vid.paused) {
+                    hideTimer = setTimeout(hideControls, 3000);
                 }
             }
 
-            cinema.addEventListener('mousemove',  showControls);
-            cinema.addEventListener('touchstart', showControls, { passive: true });
+            function hideControls() {
+                clearTimeout(hideTimer);
+                if (vid.paused) return;
+                if (overlay) overlay.style.cssText += ';transform:translateY(0)!important;transition:transform 0.3s cubic-bezier(0.22,1,0.36,1)!important;';
+                if (controls) controls.style.cssText += ';opacity:0!important;transform:translateY(8px)!important;pointer-events:none!important;';
+            }
+
+            /* ── Mouse tracking on cinema container ── */
             cinema.addEventListener('mouseenter', function () {
-                mouseOverCinema = true;
+                isMouseOver = true;
+                if (!vid.paused) showControls();
+            });
+            cinema.addEventListener('mousemove', function () {
                 if (!vid.paused) showControls();
             });
             cinema.addEventListener('mouseleave', function () {
-                mouseOverCinema = false;
+                isMouseOver = false;
                 hideControls();
             });
+
+            /* ── Touch support ── */
+            cinema.addEventListener('touchstart', function () {
+                isMouseOver = true;
+                if (!vid.paused) showControls();
+            }, { passive: true });
 
             /* ── Play / Pause ── */
             window.hlTogglePlay = function () {
@@ -620,7 +618,6 @@
                 if (cPlayBtn) { cPlayBtn.style.opacity = '0'; cPlayBtn.style.pointerEvents = 'none'; }
                 if (cPlayIcon) cPlayIcon.style.display = 'none';
                 if (cPauseIcon) cPauseIcon.style.display = 'block';
-                cinema.classList.add('hl-playing');
                 showControls();
             });
 
@@ -630,9 +627,8 @@
                 if (cPlayBtn) { cPlayBtn.style.opacity = '1'; cPlayBtn.style.pointerEvents = 'auto'; }
                 if (cPlayIcon) cPlayIcon.style.display = 'block';
                 if (cPauseIcon) cPauseIcon.style.display = 'none';
-                cinema.classList.remove('hl-playing');
-                cinema.classList.add('controls-visible');
-                clearTimeout(controlsTimer);
+                clearTimeout(hideTimer);
+                showControls();
             });
 
             vid.addEventListener('ended', function () {
@@ -641,9 +637,8 @@
                 if (cPlayBtn) { cPlayBtn.style.opacity = '1'; cPlayBtn.style.pointerEvents = 'auto'; }
                 if (cPlayIcon) cPlayIcon.style.display = 'block';
                 if (cPauseIcon) cPauseIcon.style.display = 'none';
-                cinema.classList.remove('hl-playing');
-                cinema.classList.add('controls-visible');
                 vid.currentTime = 0;
+                showControls();
             });
 
             /* ── Time / Progress ── */
@@ -727,11 +722,8 @@
                 fsIcon.style.display     = isFs ? 'none' : '';
                 fsExitIcon.style.display = isFs ? '' : 'none';
                 if (!isFs) {
-                    if (vid.paused) {
-                        cinema.classList.add('controls-visible');
-                    } else {
-                        showControls();
-                    }
+                    if (vid.paused) showControls();
+                    else if (isMouseOver) showControls();
                 }
             });
 
@@ -771,7 +763,7 @@
             });
 
             /* ── Initial state: show controls (video is paused) ── */
-            cinema.classList.add('controls-visible');
+            showControls();
         })();
         </script>
         @endif
