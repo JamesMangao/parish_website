@@ -632,198 +632,92 @@
     @endif
     @endif
 
-    {{-- ═══════════════ STAY CONNECTED ═══════════════ --}}
-    <section class="reveal" style="padding:5rem 1.5rem; max-width:900px; margin:0 auto; position:relative;">
-        <div style="position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%, rgba(245,197,24,0.04) 0%, transparent 70%); pointer-events:none;"></div>
+    {{-- ═══════════════ STAY CONNECTED / SOCIAL FEED ═══════════════ --}}
+    <section class="social-feed-section reveal" style="padding:6rem 1.5rem; background:var(--cream); position:relative;">
+        {{-- Background cross motif --}}
+        <div class="social-feed-bg-cross" aria-hidden="true">✝</div>
+        {{-- Gold radial glow --}}
+        <div class="social-feed-glow"></div>
 
-        <div style="text-align:center; margin-bottom:3rem; position:relative; z-index:1;">
-            <div style="width:48px; height:2px; margin:0 auto 1.5rem; background:var(--gold); border-radius:1px;"></div>
-            <div class="divider-ornament mb-5">
-                <span class="eyebrow">Social Feed</span>
+        <div style="max-width:1100px; margin:0 auto; position:relative; z-index:1;">
+
+            {{-- Section Header --}}
+            <div style="text-align:center; margin-bottom:3.5rem;">
+                <div style="width:48px; height:2px; margin:0 auto 1.5rem; background:var(--gold); border-radius:1px;"></div>
+                <div class="divider-ornament mb-5">
+                    <span class="eyebrow">Social Feed</span>
+                </div>
+                <h2 class="font-heading"
+                    style="font-size:clamp(2rem,4vw,3.5rem); font-weight:700; font-style:italic;
+                           color:var(--blue-deep); letter-spacing:-0.01em; margin-bottom:1rem;">
+                    Stay Connected
+                </h2>
+                <p style="font-size:0.95rem; font-style:italic; color:rgba(13,42,82,0.5); max-width:480px; margin:0 auto; line-height:1.7;">
+                    Follow our latest updates and community announcements on social media.
+                </p>
             </div>
-            <h2 class="font-heading"
-                style="font-size:clamp(2rem,4vw,3.5rem); font-weight:700; font-style:italic;
-                       color:var(--blue-deep); letter-spacing:-0.01em; margin-bottom:1rem;">
-                Stay Connected
-            </h2>
-            <p style="font-size:0.95rem; font-style:italic; color:rgba(13,42,82,0.5); max-width:480px; margin:0 auto; line-height:1.7;">
-                Follow our latest updates and community announcements live from Facebook.
-            </p>
-        </div>
 
-        {{-- FB TABS --}}
-        <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem; justify-content:center; position:relative; z-index:1;">
-            <button id="tab-timeline" onclick="switchFbTab('timeline')"
-                    class="fb-tab"
-                    style="padding:10px 24px; border-radius:100px; border:1.5px solid var(--gold);
-                           background:var(--gold); color:var(--blue-deep); font-size:10px;
-                           font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
-                           cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5-5 5 5m-5-5v12"/>
-                </svg>
-                Posts
-            </button>
-            <button id="tab-events" onclick="switchFbTab('events')"
-                    class="fb-tab"
-                    style="padding:10px 24px; border-radius:100px; border:1.5px solid rgba(26,64,128,0.2);
-                           background:transparent; color:rgba(13,42,82,0.5); font-size:10px;
-                           font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
-                           cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                Events
-            </button>
-        </div>
+            {{-- Post Preview Cards --}}
+            <div class="social-feed-grid">
+                @php
+                    $posts = [
+                        [
+                            'excerpt' => 'Join us this Sunday for a special celebration of the Holy Eucharist as we gather in faith and fellowship.',
+                            'date' => 'June 22, 2026',
+                        ],
+                        [
+                            'excerpt' => 'Our parish youth ministry invites all young adults to a night of praise, worship, and community building.',
+                            'date' => 'June 18, 2026',
+                        ],
+                        [
+                            'excerpt' => 'Thank you to all our generous volunteers who made the community outreach program a resounding success.',
+                            'date' => 'June 14, 2026',
+                        ],
+                    ];
+                @endphp
 
-        {{-- FB EMBED --}}
-        <div class="card-sacred" style="overflow:hidden; margin-bottom:2rem; padding:0; position:relative; border-radius:24px; box-shadow:0 8px 40px rgba(13,42,82,0.08);">
-            <div id="fb-root"></div>
-            <script async defer crossorigin="anonymous"
-                    src="https://connect.facebook.net/en_PH/sdk.js#xfbml=1&version=v19.0"></script>
-
-            {{-- Loading skeleton --}}
-            <div id="fb-skeleton"
-                 style="position:absolute; inset:0; z-index:10; background:#fff;
-                        display:flex; flex-direction:column; gap:1rem; padding:1.5rem;">
-                @for($skelIdx = 0; $skelIdx < 4; $skelIdx++)
-                <div style="display:flex; gap:0.875rem; align-items:flex-start;">
-                    <div class="skeleton" style="width:44px; height:44px; border-radius:50%; flex-shrink:0;"></div>
-                    <div style="flex:1;">
-                        <div class="skeleton" style="height:12px; width:55%; margin-bottom:0.625rem;"></div>
-                        <div class="skeleton" style="height:10px; width:85%; margin-bottom:6px;"></div>
-                        <div class="skeleton" style="height:10px; width:65%;"></div>
+                @foreach($posts as $i => $post)
+                <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
+                   class="social-feed-card">
+                    <div class="social-feed-card-img">
+                        {{-- Placeholder image area --}}
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.12)" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <path d="M21 15l-5-5L5 21"/>
+                            </svg>
+                        </div>
+                        {{-- Facebook icon watermark --}}
+                        <div class="social-feed-card-fb-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
                     </div>
-                </div>
-                @endfor
+                    <div class="social-feed-card-body">
+                        <p class="social-feed-card-excerpt">{{ $post['excerpt'] }}</p>
+                        <span class="social-feed-card-date">{{ $post['date'] }}</span>
+                    </div>
+                </a>
+                @endforeach
             </div>
 
-            <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const container = document.querySelector('#fb-page-container');
-                const skeleton = document.getElementById('fb-skeleton');
-
-                const fadeSkeleton = () => {
-                    if (!skeleton) return;
-                    skeleton.style.transition = 'opacity 0.3s';
-                    skeleton.style.opacity = '0';
-                    setTimeout(() => { if (skeleton) skeleton.style.display = 'none'; }, 300);
-                };
-
-                if (container) {
-                    const obs = new MutationObserver(() => {
-                        if (container.querySelector('.fb_iframe_widget')) {
-                            fadeSkeleton();
-                            obs.disconnect();
-                        }
-                    });
-                    obs.observe(container, { childList: true, subtree: true });
-                }
-                setTimeout(fadeSkeleton, 8000);
-            });
-
-            function switchFbTab(tab) {
-                const container = document.querySelector('#fb-page-container');
-                const skeleton = document.getElementById('fb-skeleton');
-                if (!container) return;
-
-                if (skeleton) skeleton.style.display = 'flex';
-
-                ['timeline', 'events'].forEach(t => {
-                    const btn = document.getElementById(`tab-${t}`);
-                    if (!btn) return;
-                    if (t === tab) {
-                        btn.style.background = 'var(--gold)';
-                        btn.style.color = 'var(--blue-deep)';
-                        btn.style.borderColor = 'var(--gold)';
-                    } else {
-                        btn.style.background = 'transparent';
-                        btn.style.color = 'rgba(13,42,82,0.5)';
-                        btn.style.borderColor = 'rgba(26,64,128,0.2)';
-                    }
-                });
-
-                container.innerHTML = '';
-
-                const fbPage = document.createElement('div');
-                fbPage.className = 'fb-page';
-                fbPage.setAttribute('data-href', 'https://www.facebook.com/storosarioparishpacita1');
-                fbPage.setAttribute('data-tabs', tab);
-                fbPage.setAttribute('data-width', '800');
-                fbPage.setAttribute('data-height', '500');
-                fbPage.setAttribute('data-small-header', 'true');
-                fbPage.setAttribute('data-adapt-container-width', 'true');
-                fbPage.setAttribute('data-hide-cover', 'false');
-                fbPage.setAttribute('data-show-facepile', 'true');
-                container.appendChild(fbPage);
-
-                if (typeof FB !== 'undefined') {
-                    FB.XFBML.parse(container);
-                }
-
-                setTimeout(() => {
-                    const obs = new MutationObserver(() => {
-                        if (container.querySelector('.fb_iframe_widget')) {
-                            if (skeleton) { skeleton.style.transition = 'opacity 0.3s'; skeleton.style.opacity = '0'; setTimeout(() => { if (skeleton) skeleton.style.display = 'none'; }, 300); }
-                            obs.disconnect();
-                        }
-                    });
-                    obs.observe(container, { childList: true, subtree: true });
-                    setTimeout(() => { if (skeleton) skeleton.style.display = 'none'; obs.disconnect(); }, 8000);
-                }, 100);
-            }
-            </script>
-
-            <div id="fb-page-container" style="min-height:400px;">
-                <div class="fb-page"
-                     data-href="https://www.facebook.com/storosarioparishpacita1"
-                     data-tabs="timeline"
-                     data-width="800"
-                     data-height="500"
-                     data-small-header="true"
-                     data-adapt-container-width="true"
-                     data-hide-cover="false"
-                     data-show-facepile="true">
-                    <blockquote cite="https://www.facebook.com/storosarioparishpacita1"
-                                class="fb-xfbml-parse-ignore">
-                        <a href="https://www.facebook.com/storosarioparishpacita1">Sto. Rosario Parish - Pacita</a>
-                    </blockquote>
-                </div>
+            {{-- CTA Buttons --}}
+            <div class="social-feed-cta-row" style="margin-top:3rem;">
+                <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
+                   class="social-feed-cta-gold">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    Follow on Facebook
+                </a>
+                <a href="{{ route('about') }}" class="social-feed-cta-ghost">
+                    Contact the Office
+                </a>
             </div>
-        </div>
 
-        {{-- BUTTONS --}}
-        <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; position:relative; z-index:1;">
-            <a href="https://www.facebook.com/storosarioparishpacita1" target="_blank" rel="noopener noreferrer"
-               class="gold-btn"
-               style="display:inline-flex; align-items:center; gap:0.5rem;
-                      padding:14px 28px; border-radius:100px;
-                      font-size:10px; letter-spacing:0.2em; text-transform:uppercase;
-                      text-decoration:none;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                Follow on Facebook
-            </a>
-            <a href="{{ route('about') }}"
-               style="display:inline-flex; align-items:center; padding:14px 28px;
-                      border-radius:100px; font-size:10px; letter-spacing:0.2em;
-                      text-transform:uppercase; font-weight:700; text-decoration:none;
-                      border:1.5px solid rgba(26,64,128,0.25); color:var(--blue-deep);
-                      transition:all 0.25s ease;"
-               onmouseover="this.style.borderColor='var(--blue-mid)'; this.style.background='rgba(26,64,128,0.05)';"
-               onmouseout="this.style.borderColor='rgba(26,64,128,0.25)'; this.style.background='transparent';">
-                Contact the Office
-            </a>
         </div>
-
-        <p style="text-align:center; margin-top:4rem; font-size:9px; letter-spacing:0.4em;
-                  text-transform:uppercase; color:rgba(13,42,82,0.2); font-family:'Cinzel',serif;">
-            Sto. Rosario Parish · Pacita, San Pedro, Laguna
-        </p>
     </section>
 
 </div>
