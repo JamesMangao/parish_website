@@ -29,16 +29,15 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 COPY . .
 
-# Discover packages after full source is available
+# Discover packages (needs artisan to exist, but no .env needed)
 RUN php artisan package:discover --ansi
 
 # Copy built frontend assets from stage 1
 COPY --from=frontend /app/public/build ./public/build
 
-# Cache configs
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# Ensure storage and bootstrap/cache are writable
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # PHP-FPM config
 RUN echo "opcache.enable=1" > /usr/local/etc/php/conf.d/opcache.ini \
@@ -57,8 +56,8 @@ RUN sed -i 's|listen = /run/nginx-v8.sock|listen = 127.0.0.1:9000|' /usr/local/e
 RUN mkdir -p /var/log/nginx /var/cache/nginx /etc/nginx/http.d
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
-# Startup script: run both nginx + php-fpm
-RUN printf '#!/bin/sh\nphp artisan migrate --force\nphp-fpm -D\nnginx -g "daemon off;"\n' \
+# Startup script: migrate + cache (with real env vars) + start services
+RUN printf '#!/bin/sh\nphp artisan migrate --force\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\nphp-fpm -D\nnginx -g "daemon off;"\n' \
     > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
 EXPOSE 80

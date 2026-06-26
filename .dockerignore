@@ -1,0 +1,13 @@
+node_modules
+vendor
+.git
+.gitignore
+.env
+.env.*
+render.yaml
+storage/framework/views
+storage/framework/sessions
+storage/framework/cache/data
+storage/logs
+bootstrap/cache/*.php
+*.md
