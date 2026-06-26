@@ -19,14 +19,14 @@ RUN npm run build
 # ==============================================================================
 FROM php:8.4-fpm-alpine AS production
 
-# Install system dependencies
+# Install system dependencies + PHP extensions first (before Composer)
 RUN apk add --no-cache \
     nginx \
     curl \
     unzip \
     libzip-dev \
     libpng-dev \
-    jpeg-dev \
+    libjpeg-turbo-dev \
     oniguruma-dev \
     libxml2-dev \
     icu-dev \
@@ -35,10 +35,9 @@ RUN apk add --no-cache \
     pkgconfig \
     postgresql-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd xml dom curl intl opcache \
-    && apk del --purge freetype-dev jpeg-dev
+    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath gd xml dom curl intl opcache
 
-# Install Composer
+# Install Composer (after PHP extensions are ready)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
