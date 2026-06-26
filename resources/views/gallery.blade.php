@@ -389,10 +389,9 @@
                     </div>
 
                     {{-- ── RIGHT: Info Pane ── --}}
-                    <div style="padding:3.5rem 3rem; display:flex; flex-direction:column;
+                    <div style="padding:3.5rem 3rem 3.5rem 48px; display:flex; flex-direction:column;
                                 justify-content:center; text-align:left; position:relative; overflow:hidden;
-                                background:linear-gradient(135deg, #FEFDF7 0%, #F7F9FF 60%, #EDF2FC 100%);
-                                border-radius:0 20px 20px 0;">
+                                background:transparent; border-radius:0 20px 20px 0;">
 
                         {{-- Watermark cross --}}
                         <div class="font-cinzel"
@@ -408,15 +407,18 @@
 
                             {{-- Title --}}
                             <h3 class="font-heading"
-                                style="font-size:clamp(1.8rem,3vw,3rem); font-weight:700; font-style:normal;
-                                       color:var(--blue-deep); line-height:1.05; margin-bottom:1.25rem;
-                                       letter-spacing:-0.01em; text-transform:uppercase;">
+                                style="font-family:'Cormorant Garamond',Georgia,serif;
+                                       font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:700; font-style:italic;
+                                       color:#0D2A52; line-height:1.1; margin-bottom:1.25rem;
+                                       letter-spacing:-0.01em; text-transform:none;">
                                 {{ $v->title }}
                             </h3>
 
                             {{-- Gold rule --}}
-                            <div style="width:48px; height:2.5px; background:var(--gold);
-                                        margin-bottom:1.5rem; border-radius:1px;"></div>
+                            <div style="width:64px; height:3px;
+                                        background:linear-gradient(90deg,#F5C518,#FFD740);
+                                        margin:16px 0 20px 0; border-radius:999px;
+                                        display:block;"></div>
 
                             {{-- Date --}}
                             @if($v->event_date ?? null)
@@ -484,12 +486,13 @@
                         justify-content:flex-end; padding:2.5rem;">
                 <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
                     <span class="gold-btn"
-                          style="font-size:9px; font-weight:700; letter-spacing:0.25em;
-                                 text-transform:uppercase; padding:4px 14px; border-radius:100px;">
+                          style="font-size:10px; font-weight:700; letter-spacing:0.25em;
+                                 text-transform:uppercase; padding:8px 18px; border-radius:100px;">
                         Featured
                     </span>
-                    <span style="font-size:10px; font-weight:700; letter-spacing:0.2em;
-                                 text-transform:uppercase; color:rgba(235,242,255,0.55);">
+                    <span style="font-size:10px; font-weight:700; letter-spacing:0.25em;
+                                 text-transform:uppercase; padding:8px 18px; border-radius:100px;
+                                 color:rgba(235,242,255,0.55); border:1px solid rgba(235,242,255,0.2);">
                         {{ $featured->images_count }} Items
                     </span>
                 </div>
@@ -502,7 +505,16 @@
                 <p style="font-size:0.875rem; font-style:italic; max-width:600px;
                           color:rgba(235,242,255,0.5); line-height:1.6;
                           display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                    {{ $featured->description }}
+                    @php
+                        $cleanDesc = preg_replace(
+                            '/^(NASA LARAWAN:|IN PHOTOS:|TINGNAN:|IN VIDEO:|WATCH:)\s*/i',
+                            '',
+                            $featured->description ?? ''
+                        );
+                        $cleanDesc = preg_replace('/#\w+/u', '', $cleanDesc);
+                        $cleanDesc = trim($cleanDesc);
+                    @endphp
+                    {{ Str::limit($cleanDesc, 160) }}
                 </p>
             </div>
         </a>
@@ -601,9 +613,10 @@
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:0.75rem;">
                 @foreach($latestItems->take(6) as $item)
                 <a href="{{ route('gallery.album', $item->album_id) }}"
-                   style="position:relative; aspect-ratio:1; border-radius:12px; overflow:hidden;
+                   class="highlight-thumb"
+                   style="position:relative; aspect-ratio:4/3; border-radius:12px; overflow:hidden;
                           display:block; background:rgba(255,255,255,0.05);
-                          border:1px solid rgba(255,255,255,0.06);">
+                          border:1px solid rgba(255,255,255,0.06); cursor:pointer;">
 
                     @if($item->type === 'video')
                         <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5;">
@@ -616,16 +629,53 @@
                     <div x-data="{ loaded: false }" class="relative w-full h-full">
                         <div x-show="!loaded" class="absolute inset-0 skeleton-dark z-10"></div>
                         <img src="{{ $item->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $item->url }}"
-                             alt="Recent highlight"
-                             class="recent-photo"
-                             style="width:100%; height:100%; object-fit:cover;"
+                             alt="{{ $item->album->title ?? 'Recent highlight' }}"
+                             style="width:100%; height:100%; object-fit:cover; object-position:center;
+                                    transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);"
                              loading="lazy"
                              @load="loaded = true">
                     </div>
-                    <div style="position:absolute; inset:0; opacity:0; background:rgba(245,197,24,0.08);
-                                transition:opacity 0.5s;" class="group-hover:opacity-100"></div>
+
+                    {{-- Hover overlay --}}
+                    <div style="position:absolute; inset:0;
+                                background:rgba(13,42,82,0.25); opacity:0;
+                                transition:opacity 0.3s ease; border-radius:inherit; pointer-events:none;"></div>
+
+                    {{-- Caption overlay --}}
+                    <div class="thumb-caption"
+                         style="position:absolute; bottom:0; left:0; right:0;
+                                padding:28px 12px 10px;
+                                background:linear-gradient(to top, rgba(13,42,82,0.75), transparent);
+                                color:#FFFFFF; font-family:'Jost',sans-serif;
+                                font-size:10px; font-weight:600; letter-spacing:0.15em;
+                                text-transform:uppercase; border-radius:0 0 12px 12px;
+                                opacity:0; transition:opacity 0.3s ease; z-index:3;">
+                        <span>{{ Str::limit(strip_tags($item->album->title ?? ''), 40) }}</span>
+                    </div>
                 </a>
                 @endforeach
+            </div>
+
+            {{-- View All link --}}
+            <div style="text-align:center; margin-top:28px;">
+                <a href="{{ route('gallery.index') }}"
+                   style="display:inline-flex; align-items:center; gap:8px;
+                          height:44px; padding:0 28px; border-radius:999px;
+                          border:1.5px solid rgba(255,255,255,0.25);
+                          color:rgba(255,255,255,0.70);
+                          font-family:'Jost',sans-serif;
+                          font-size:10px; font-weight:700;
+                          letter-spacing:0.25em; text-transform:uppercase;
+                          text-decoration:none; transition:all 0.2s ease;"
+                   onmouseover="this.style.background='rgba(255,255,255,0.10)'; this.style.borderColor='rgba(255,255,255,0.45)'; this.style.color='#FFFFFF';"
+                   onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(255,255,255,0.25)'; this.style.color='rgba(255,255,255,0.70)';">
+                    View All Galleries
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
@@ -633,7 +683,7 @@
     @endif
 
     {{-- ═══════════════ STAY CONNECTED / SOCIAL FEED ═══════════════ --}}
-    <section class="social-feed-section reveal" style="background:var(--cream, #F7F9FF); position:relative;">
+    <section class="social-feed-section reveal" style="background:var(--cream, #F7F9FF); position:relative; padding-top:64px; padding-bottom:80px;">
         {{-- Background cross motif --}}
         <div class="social-feed-bg-cross" aria-hidden="true">✝</div>
         {{-- Gold radial glow --}}
@@ -647,7 +697,7 @@
                     <span class="eyebrow">Social Feed</span>
                 </div>
                 <h2 class="font-heading"
-                    style="font-size:clamp(2.8rem,6vw,5rem); font-weight:700; font-style:italic;
+                    style="font-size:clamp(2.2rem,4vw,3.6rem); font-weight:700; font-style:italic;
                            color:#0D2A52; letter-spacing:-0.01em; margin-bottom:1rem;">
                     Stay Connected
                 </h2>
@@ -659,7 +709,7 @@
 
             {{-- Facebook Embed Wrapper --}}
             <div class="fb-embed-wrapper" style="margin-bottom:2.5rem;">
-                <div class="fb-embed-card">
+                <div class="fb-embed-card" style="display:flex; justify-content:center; align-items:flex-start;">
                     {{-- Shimmer loader --}}
                     <div class="fb-shimmer"></div>
 
@@ -683,7 +733,7 @@
                          data-adapt-container-width="true"
                          data-hide-cover="false"
                          data-show-facepile="true"
-                         style="position:relative; z-index:1;">
+                         style="position:relative; z-index:1; margin:0 auto !important;">
                     </div>
                 </div>
             </div>
@@ -697,7 +747,10 @@
                     </svg>
                     Follow on Facebook
                 </a>
-                <a href="{{ route('inquiry') }}" class="social-feed-cta-ghost">
+                <a href="{{ route('inquiry') }}" class="social-feed-cta-ghost"
+                   style="border:1.5px solid rgba(13,42,82,0.30); color:rgba(13,42,82,0.65);"
+                   onmouseover="this.style.background='rgba(13,42,82,0.06)'; this.style.borderColor='rgba(13,42,82,0.50)'; this.style.color='rgba(13,42,82,0.85)';"
+                   onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(13,42,82,0.30)'; this.style.color='rgba(13,42,82,0.65)';">
                     Contact the Office
                 </a>
             </div>
