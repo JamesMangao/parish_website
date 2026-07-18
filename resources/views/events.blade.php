@@ -1,27 +1,11 @@
 <x-public-layout>
 <x-slot name="meta">
     <meta name="description" content="Stay updated with the latest events and celebrations at Sto. Rosario Parish. Join our community activities and spiritual gatherings.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gold:       #F5C518;
-            --gold-light: #FFD740;
-            --blue-deep:  #0D2A52;
-            --blue-mid:   #1A4080;
-            --blue-soft:  #2255A4;
-            --blue-pale:  #EBF2FF;
-            --cream:      #F7F9FF;
-            --cream-deep: #EDF2FC;
-        }
-        body { background: var(--cream); font-family: 'Jost', sans-serif; }
-        .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
-
         .eyebrow {
             font-size: 10px; font-weight: 600;
             letter-spacing: 0.32em; text-transform: uppercase;
-            color: var(--gold);
+            color: var(--color-gold-dark);
         }
         .divider-ornament {
             display: flex; align-items: center; gap: 12px; justify-content: center;
@@ -74,7 +58,7 @@
             flex-shrink: 0;
             width: 88px; height: 88px;
             border-radius: 18px;
-            background: var(--blue-pale);
+            background: var(--color-blue-pale);
             border: 1px solid rgba(26,64,128,0.14);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -93,7 +77,7 @@
         .date-badge .day {
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-size: 2.6rem; font-weight: 700; font-style: italic;
-            line-height: 1; color: var(--blue-deep);
+            line-height: 1; color: var(--color-blue-deep);
             transition: color 0.3s;
         }
         .date-badge .year {
@@ -122,13 +106,13 @@
         /* ── Time slot pill ── */
         .time-pill {
             display: inline-flex; align-items: center; gap: 6px;
-            background: var(--blue-pale);
+            background: var(--color-blue-pale);
             border: 1px solid rgba(26,64,128,0.14);
             border-radius: 100px;
             padding: 5px 14px;
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-size: 1rem; font-weight: 700; font-style: italic;
-            color: var(--blue-deep);
+            color: var(--color-blue-deep);
             transition: all 0.2s ease;
         }
         .event-card:hover .time-pill {
@@ -140,7 +124,7 @@
         /* ── Gold btn (CTA section) ── */
         .gold-btn {
             background: linear-gradient(135deg, #FFD740 0%, #F5C518 55%, #E0A800 100%);
-            color: var(--blue-deep);
+            color: var(--color-blue-deep);
             box-shadow: 0 4px 20px rgba(245,197,24,0.40), 0 1px 0 rgba(255,255,255,0.35) inset;
             transition: all 0.25s ease; font-weight: 700;
         }
@@ -175,7 +159,7 @@
                     <line x1="44" y1="8"  x2="39" y2="13" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
                     <line x1="8"  y1="44" x2="13" y2="39" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
-                <span class="font-cinzel relative z-10" style="color:var(--gold);font-size:1.5rem;" aria-hidden="true">✝</span>
+                <span class="font-cinzel relative z-10" style="color:var(--color-gold);font-size:1.5rem;" aria-hidden="true">✝</span>
             </div>
         </div>
 

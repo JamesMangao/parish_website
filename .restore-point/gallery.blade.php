@@ -186,7 +186,14 @@
     @if($highlights->isNotEmpty())
     @php $v = $highlights->first(); @endphp
     @php
-        $isExternal = Str::startsWith($v->video_url, ['http://', 'https://', 'www.']);
+        $isYT = Str::contains($v->video_url, ['youtube.com', 'youtu.be']);
+        if ($isYT) {
+            $videoId = Str::contains($v->video_url, 'youtu.be')
+                ? Str::afterLast($v->video_url, '/')
+                : Str::after(Str::after($v->video_url, 'v='), '&');
+            if (Str::contains($videoId, '&')) $videoId = Str::before($videoId, '&');
+            if (Str::contains($videoId, '?')) $videoId = Str::before($videoId, '?');
+        }
     @endphp
 
     <section class="parish-highlights reveal" style="padding:5rem 0 0; background:var(--cream, #F7F9FF);">
@@ -208,19 +215,17 @@
                     box-shadow:0 24px 80px rgba(13,42,82,0.22); background:#000; aspect-ratio:16/9;">
 
             {{-- THE VIDEO --}}
-            @if($isExternal)
+            @if($isYT)
                 <iframe class="highlight-video"
-                        src="{{ $v->video_url }}"
+                        src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&color=white&enablejsapi=1"
                         style="width:100%; height:100%; border:0; display:block; position:relative; z-index:1;"
-                        frameborder="0" allowfullscreen
-                        allow="accelerometer autoplay clipboard-write encrypted-media gyroscope web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        title="{{ $v->title }}"></iframe>
+                        frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
             @else
                 <video id="highlight-vid" class="highlight-video"
                        src="{{ $v->video_url }}"
                        playsinline preload="metadata"
-                       style="width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1;">
+                       onclick="hlTogglePlay()"
+                       style="width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1; cursor:pointer;">
                 </video>
             @endif
 
@@ -243,6 +248,24 @@
                 </span>
             </div>
 
+            {{-- CENTER PLAY BUTTON --}}
+            @if(!$isYT)
+            <button class="cinema-play-btn" id="hl-center-play" onclick="hlTogglePlay()"
+                    style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                           z-index:6; width:72px; height:72px; border-radius:50%; border:none; cursor:pointer;
+                           background:rgba(245,197,24,0.92);
+                           box-shadow:0 0 0 12px rgba(245,197,24,0.18), 0 8px 32px rgba(245,197,24,0.40);
+                           display:flex; align-items:center; justify-content:center;
+                           transition:all 0.25s ease;"
+                    aria-label="Play highlight video">
+                <svg id="hl-center-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="#0D2A52" aria-hidden="true">
+                    <polygon points="5,3 19,12 5,21"/>
+                </svg>
+                <svg id="hl-center-pause-icon" width="22" height="22" viewBox="0 0 24 24" fill="#0D2A52" aria-hidden="true" style="display:none;">
+                    <rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>
+                </svg>
+            </button>
+            @endif
 
             {{-- BOTTOM OVERLAY TEXT CONTENT --}}
             <div id="hl-info-bar" class="cinema-overlay-text"
@@ -287,11 +310,210 @@
             </div>
 
             {{-- ═══ VIDEO CONTROL BAR (local videos only) ═══ --}}
+            @if(!$isYT)
+            <div id="hl-controls" class="hl-controls"
+                 style="position:absolute; bottom:0; left:0; right:0; z-index:8;
+                        padding:0 20px 14px; pointer-events:none;
+                        transition:opacity 0.35s ease, transform 0.35s ease;
+                        opacity:1; transform:translateY(0);">
+
+                {{-- Progress / seek bar --}}
+                <div class="hl-progress-wrap" onclick="hlSeek(event)" style="pointer-events:auto; cursor:pointer;
+                     margin-bottom:10px; padding:6px 0;">
+                    <div class="hl-progress-track">
+                        <div id="hl-prog-buffered" class="hl-progress-buffered"></div>
+                        <div id="hl-prog-fill" class="hl-progress-fill">
+                            <div id="hl-prog-handle" class="hl-progress-handle"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Controls row --}}
+                <div style="display:flex; align-items:center; justify-content:space-between; pointer-events:auto;">
+
+                    {{-- Left controls --}}
+                    <div style="display:flex; align-items:center; gap:6px;">
+
+                        {{-- Play / Pause --}}
+                        <button id="hl-play-btn" class="hl-ctrl-btn" onclick="hlTogglePlay()" aria-label="Play">
+                            <svg id="hl-play-icon" width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="6,3 20,12 6,21"/></svg>
+                            <svg id="hl-pause-icon" width="16" height="16" viewBox="0 0 24 24" fill="#fff" style="display:none;"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+                        </button>
+
+                        {{-- Skip back 10s --}}
+                        <button class="hl-ctrl-btn" onclick="hlSkip(-10)" aria-label="Skip back 10 seconds" title="Back 10s">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                                <path d="M12.5 8.5l-4 3.5 4 3.5"/><path d="M2 12a10 10 0 1 1 2.5 6.6"/>
+                                <text x="8" y="13.5" fill="#fff" stroke="none" font-size="7" font-family="Jost,sans-serif" font-weight="700">10</text>
+                            </svg>
+                        </button>
+
+                        {{-- Skip forward 10s --}}
+                        <button class="hl-ctrl-btn" onclick="hlSkip(10)" aria-label="Skip forward 10 seconds" title="Forward 10s">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                                <path d="M11.5 8.5l4 3.5-4 3.5"/><path d="M22 12a10 10 0 1 0-2.5 6.6"/>
+                                <text x="8" y="13.5" fill="#fff" stroke="none" font-size="7" font-family="Jost,sans-serif" font-weight="700">10</text>
+                            </svg>
+                        </button>
+
+                        {{-- Volume --}}
+                        <div class="hl-volume-group" style="display:flex; align-items:center; gap:4px;">
+                            <button id="hl-mute-btn" class="hl-ctrl-btn" onclick="hlToggleMute()" aria-label="Toggle mute">
+                                <svg id="hl-vol-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none"/>
+                                    <path id="hl-vol-wave1" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                    <path id="hl-vol-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14" style="display:none;"/>
+                                </svg>
+                                <svg id="hl-mute-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" style="display:none;">
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                    <path d="M9 9v6h4l5 5V5l-5 5H9z" fill="none"/>
+                                </svg>
+                            </button>
+                            <input id="hl-volume-slider" type="range" min="0" max="1" step="0.05" value="1"
+                                   class="hl-volume-slider" oninput="hlSetVolume(this.value)" aria-label="Volume">
+                        </div>
+
+                        {{-- Time --}}
+                        <span id="hl-time" style="font-family:'Jost',sans-serif; font-size:11px; font-weight:600;
+                             color:rgba(255,255,255,0.75); letter-spacing:0.04em; margin-left:6px; white-space:nowrap; user-select:none;">
+                            0:00 / 0:00
+                        </span>
+                    </div>
+
+                    {{-- Right controls --}}
+                    <div style="display:flex; align-items:center; gap:6px;">
+
+                        {{-- Playback speed --}}
+                        <div class="hl-speed-group" style="position:relative;">
+                            <button id="hl-speed-btn" class="hl-ctrl-btn hl-ctrl-text" onclick="hlToggleSpeedMenu()" aria-label="Playback speed" title="Speed">
+                                1x
+                            </button>
+                            <div id="hl-speed-menu" class="hl-speed-menu" style="display:none;">
+                                @foreach([0.5, 0.75, 1, 1.25, 1.5, 2] as $speed)
+                                <button class="hl-speed-opt {{ $speed === 1 ? 'active' : '' }}" onclick="hlSetSpeed({{ $speed }}, this)">
+                                    {{ $speed === 1 ? 'Normal' : $speed . 'x' }}
+                                </button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Captions (placeholder) --}}
+                        <button class="hl-ctrl-btn" onclick="hlToggleCaptions()" aria-label="Toggle captions" title="Captions" style="opacity:0.45; pointer-events:none;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2"/>
+                                <text x="12" y="15" text-anchor="middle" fill="#fff" stroke="none" font-size="8" font-family="Jost,sans-serif" font-weight="700">CC</text>
+                            </svg>
+                        </button>
+
+                        {{-- Picture-in-picture --}}
+                        <button class="hl-ctrl-btn" onclick="hlTogglePiP()" aria-label="Picture in picture" title="Picture-in-Picture">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <rect x="11" y="9" width="9" height="7" rx="1" fill="rgba(255,255,255,0.15)"/>
+                            </svg>
+                        </button>
+
+                        {{-- Fullscreen --}}
+                        <button class="hl-ctrl-btn" onclick="hlToggleFullscreen()" aria-label="Toggle fullscreen" title="Fullscreen">
+                            <svg id="hl-fs-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                                <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                            </svg>
+                            <svg id="hl-fs-exit-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+                                <line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @endif
 
         </div>
 
         {{-- Responsive styles --}}
         <style>
+            .cinema-play-btn {
+                transition: opacity 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease !important;
+            }
+
+            /* ── Controls-visible: push overlay text UP ── */
+            /* Handled by direct inline styles in JS for bulletproof reliability */
+
+            /* ── Control bar ── */
+            .hl-controls {
+                background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 70%, transparent 100%);
+                transition: opacity 0.35s ease, transform 0.35s ease;
+            }
+
+            .hl-ctrl-btn {
+                width: 34px; height: 34px; border-radius: 8px; border: none; cursor: pointer;
+                background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;
+                transition: background 0.2s, transform 0.15s;
+            }
+            .hl-ctrl-btn:hover { background: rgba(255,255,255,0.18); transform: scale(1.06); }
+            .hl-ctrl-btn:active { transform: scale(0.95); }
+            .hl-ctrl-text {
+                width: auto; padding: 0 10px; font-family: 'Jost', sans-serif;
+                font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.04em;
+            }
+
+            /* ── Progress bar ── */
+            .hl-progress-track {
+                height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
+                position: relative; transition: height 0.2s;
+            }
+            .hl-progress-wrap:hover .hl-progress-track { height: 6px; }
+            .hl-progress-buffered {
+                position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+                background: rgba(255,255,255,0.25); border-radius: 2px;
+            }
+            .hl-progress-fill {
+                position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+                background: linear-gradient(90deg, #FFD740, #F5C518); border-radius: 2px;
+            }
+            .hl-progress-handle {
+                position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+                width: 12px; height: 12px; background: #F5C518; border-radius: 50%;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.2s;
+            }
+            .hl-progress-wrap:hover .hl-progress-handle { opacity: 1; }
+
+            /* ── Volume slider ── */
+            .hl-volume-slider {
+                width: 0; max-width: 0; opacity: 0; overflow: hidden;
+                transition: width 0.25s ease, max-width 0.25s ease, opacity 0.25s ease;
+                -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+                background: rgba(255,255,255,0.3); cursor: pointer;
+            }
+            .hl-volume-group:hover .hl-volume-slider {
+                width: 70px; max-width: 70px; opacity: 1;
+            }
+            .hl-volume-slider::-webkit-slider-thumb {
+                -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+                background: #F5C518; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            }
+            .hl-volume-slider::-moz-range-thumb {
+                width: 12px; height: 12px; border-radius: 50%; border: none;
+                background: #F5C518; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            }
+
+            /* ── Speed menu ── */
+            .hl-speed-menu {
+                position: absolute; bottom: 42px; right: 0; min-width: 100px;
+                background: rgba(13,42,82,0.95); backdrop-filter: blur(12px);
+                border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+                padding: 6px 0; display: flex; flex-direction: column;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
+            }
+            .hl-speed-opt {
+                background: none; border: none; color: rgba(255,255,255,0.7);
+                padding: 7px 16px; text-align: left; font-size: 12px; font-family: 'Jost', sans-serif;
+                font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s;
+            }
+            .hl-speed-opt:hover { background: rgba(255,255,255,0.08); color: #fff; }
+            .hl-speed-opt.active { color: #F5C518; font-weight: 700; }
+
             /* ── Mobile ── */
             @media (max-width: 768px) {
                 .highlight-cinema {
@@ -300,9 +522,251 @@
                     margin-right: 16px !important;
                 }
                 #hl-info-bar { padding: 24px 20px 20px !important; }
+                .hl-ctrl-btn { width: 30px; height: 30px; }
+                #hl-time { font-size: 10px; display: none; }
+                .hl-volume-group { display: none; }
+            }
+            @media (max-width: 480px) {
+                #hl-controls { padding: 0 10px 10px !important; }
             }
         </style>
 
+        {{-- JavaScript: full video controls with overlay push --}}
+        @if(!$isYT)
+        <script>
+        (function () {
+            var vid    = document.getElementById('highlight-vid');
+            var cinema = document.getElementById('highlight-cinema');
+            if (!vid || !cinema) return;
+
+            var overlay    = cinema.querySelector('.cinema-overlay-text');
+            var controls   = document.getElementById('hl-controls');
+            var cPlayBtn   = document.getElementById('hl-center-play');
+            var cPlayIcon  = document.getElementById('hl-center-play-icon');
+            var cPauseIcon = document.getElementById('hl-center-pause-icon');
+            var playIcon   = document.getElementById('hl-play-icon');
+            var pauseIcon  = document.getElementById('hl-pause-icon');
+            var progFill   = document.getElementById('hl-prog-fill');
+            var progBuf    = document.getElementById('hl-prog-buffered');
+            var timeEl     = document.getElementById('hl-time');
+            var volIcon    = document.getElementById('hl-vol-icon');
+            var volWave1   = document.getElementById('hl-vol-wave1');
+            var volWave2   = document.getElementById('hl-vol-wave2');
+            var muteIcon   = document.getElementById('hl-mute-icon');
+            var volSlider  = document.getElementById('hl-volume-slider');
+            var speedBtn   = document.getElementById('hl-speed-btn');
+            var speedMenu  = document.getElementById('hl-speed-menu');
+            var fsIcon     = document.getElementById('hl-fs-icon');
+            var fsExitIcon = document.getElementById('hl-fs-exit-icon');
+
+            var hideTimer = null;
+            var isMouseOver = false;
+
+            function fmt(s) {
+                if (!s || isNaN(s)) return '0:00';
+                var m = Math.floor(s / 60);
+                var sec = Math.floor(s % 60);
+                return m + ':' + (sec < 10 ? '0' : '') + sec;
+            }
+
+            /* ════════════════════════════════════════════════════════
+               SHOW / HIDE — direct style manipulation (bulletproof)
+               ════════════════════════════════════════════════════════ */
+            function showControls() {
+                if (overlay) overlay.style.cssText += ';transform:translateY(-56px)!important;transition:transform 0.3s cubic-bezier(0.22,1,0.36,1)!important;will-change:transform;';
+                if (controls) controls.style.cssText += ';opacity:1!important;transform:translateY(0)!important;pointer-events:auto!important;';
+                clearTimeout(hideTimer);
+                if (isMouseOver && !vid.paused) {
+                    hideTimer = setTimeout(hideControls, 3000);
+                }
+            }
+
+            function hideControls() {
+                clearTimeout(hideTimer);
+                if (vid.paused) return;
+                if (overlay) overlay.style.cssText += ';transform:translateY(0)!important;transition:transform 0.3s cubic-bezier(0.22,1,0.36,1)!important;';
+                if (controls) controls.style.cssText += ';opacity:0!important;transform:translateY(8px)!important;pointer-events:none!important;';
+            }
+
+            /* ── Mouse tracking on cinema container ── */
+            cinema.addEventListener('mouseenter', function () {
+                isMouseOver = true;
+                if (!vid.paused) showControls();
+            });
+            cinema.addEventListener('mousemove', function () {
+                if (!vid.paused) showControls();
+            });
+            cinema.addEventListener('mouseleave', function () {
+                isMouseOver = false;
+                hideControls();
+            });
+
+            /* ── Touch support ── */
+            cinema.addEventListener('touchstart', function () {
+                isMouseOver = true;
+                if (!vid.paused) showControls();
+            }, { passive: true });
+
+            /* ── Play / Pause ── */
+            window.hlTogglePlay = function () {
+                if (vid.paused) vid.play(); else vid.pause();
+            };
+
+            vid.addEventListener('play', function () {
+                playIcon.style.display  = 'none';
+                pauseIcon.style.display = 'block';
+                if (cPlayBtn) { cPlayBtn.style.opacity = '0'; cPlayBtn.style.pointerEvents = 'none'; }
+                if (cPlayIcon) cPlayIcon.style.display = 'none';
+                if (cPauseIcon) cPauseIcon.style.display = 'block';
+                showControls();
+            });
+
+            vid.addEventListener('pause', function () {
+                playIcon.style.display  = 'block';
+                pauseIcon.style.display = 'none';
+                if (cPlayBtn) { cPlayBtn.style.opacity = '1'; cPlayBtn.style.pointerEvents = 'auto'; }
+                if (cPlayIcon) cPlayIcon.style.display = 'block';
+                if (cPauseIcon) cPauseIcon.style.display = 'none';
+                clearTimeout(hideTimer);
+                showControls();
+            });
+
+            vid.addEventListener('ended', function () {
+                playIcon.style.display  = 'block';
+                pauseIcon.style.display = 'none';
+                if (cPlayBtn) { cPlayBtn.style.opacity = '1'; cPlayBtn.style.pointerEvents = 'auto'; }
+                if (cPlayIcon) cPlayIcon.style.display = 'block';
+                if (cPauseIcon) cPauseIcon.style.display = 'none';
+                vid.currentTime = 0;
+                showControls();
+            });
+
+            /* ── Time / Progress ── */
+            vid.addEventListener('timeupdate', function () {
+                if (!vid.duration) return;
+                var pct = (vid.currentTime / vid.duration) * 100;
+                progFill.style.width = pct + '%';
+                timeEl.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+            });
+
+            vid.addEventListener('progress', function () {
+                if (!vid.duration || !vid.buffered.length) return;
+                var buf = (vid.buffered.end(vid.buffered.length - 1) / vid.duration) * 100;
+                progBuf.style.width = buf + '%';
+            });
+
+            vid.addEventListener('loadedmetadata', function () {
+                timeEl.textContent = fmt(0) + ' / ' + fmt(vid.duration);
+            });
+
+            /* ── Seek ── */
+            window.hlSeek = function (e) {
+                var rect = e.currentTarget.getBoundingClientRect();
+                vid.currentTime = ((e.clientX - rect.left) / rect.width) * vid.duration;
+            };
+
+            /* ── Skip ±10s ── */
+            window.hlSkip = function (sec) {
+                vid.currentTime = Math.max(0, Math.min(vid.duration || 0, vid.currentTime + sec));
+            };
+
+            /* ── Volume ── */
+            window.hlToggleMute = function () {
+                vid.muted = !vid.muted;
+                updateVolUI();
+            };
+            window.hlSetVolume = function (val) {
+                vid.volume = parseFloat(val);
+                vid.muted = (vid.volume === 0);
+                updateVolUI();
+            };
+            function updateVolUI() {
+                if (vid.muted || vid.volume === 0) {
+                    volIcon.style.display = 'none'; muteIcon.style.display = 'block';
+                    volWave1.style.display = 'none'; volWave2.style.display = 'none';
+                } else {
+                    volIcon.style.display = 'block'; muteIcon.style.display = 'none';
+                    volWave1.style.display = '';
+                    volWave2.style.display = vid.volume > 0.5 ? '' : 'none';
+                }
+                volSlider.value = vid.muted ? 0 : vid.volume;
+            }
+
+            /* ── Speed ── */
+            window.hlToggleSpeedMenu = function () {
+                speedMenu.style.display = speedMenu.style.display === 'flex' ? 'none' : 'flex';
+            };
+            window.hlSetSpeed = function (s, el) {
+                vid.playbackRate = s;
+                speedBtn.textContent = s === 1 ? '1x' : s + 'x';
+                speedMenu.querySelectorAll('.hl-speed-opt').forEach(function (b) { b.classList.remove('active'); });
+                el.classList.add('active');
+                speedMenu.style.display = 'none';
+            };
+            document.addEventListener('click', function (e) {
+                if (!speedBtn.contains(e.target) && !speedMenu.contains(e.target)) {
+                    speedMenu.style.display = 'none';
+                }
+            });
+
+            /* ── Fullscreen ── */
+            window.hlToggleFullscreen = function () {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    cinema.requestFullscreen();
+                }
+            };
+            document.addEventListener('fullscreenchange', function () {
+                var isFs = !!document.fullscreenElement;
+                fsIcon.style.display     = isFs ? 'none' : '';
+                fsExitIcon.style.display = isFs ? '' : 'none';
+                if (!isFs) {
+                    if (vid.paused) showControls();
+                    else if (isMouseOver) showControls();
+                }
+            });
+
+            /* ── Picture-in-Picture ── */
+            window.hlTogglePiP = async function () {
+                try {
+                    if (document.pictureInPictureElement) {
+                        await document.exitPictureInPicture();
+                    } else if (document.pictureInPictureEnabled) {
+                        await vid.requestPictureInPicture();
+                    }
+                } catch (err) {}
+            };
+
+            /* ── Captions placeholder ── */
+            window.hlToggleCaptions = function () {};
+
+            /* ── Keyboard shortcuts ── */
+            document.addEventListener('keydown', function (e) {
+                if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+                if (!document.contains(vid)) return;
+                switch (e.key) {
+                    case ' ': case 'k': e.preventDefault(); hlTogglePlay(); break;
+                    case 'ArrowLeft':  e.preventDefault(); hlSkip(-5); showControls(); break;
+                    case 'ArrowRight': e.preventDefault(); hlSkip(5);  showControls(); break;
+                    case 'f': e.preventDefault(); hlToggleFullscreen(); break;
+                    case 'm': e.preventDefault(); hlToggleMute(); break;
+                    case ',': e.preventDefault(); hlSkip(-10); showControls(); break;
+                    case '.': e.preventDefault(); hlSkip(10);  showControls(); break;
+                }
+            });
+
+            /* ── Double-click fullscreen ── */
+            vid.addEventListener('dblclick', function (e) {
+                e.preventDefault();
+                hlToggleFullscreen();
+            });
+
+            /* ── Initial state: show controls (video is paused) ── */
+            showControls();
+        })();
+        </script>
+        @endif
 
     </section>
     @endif

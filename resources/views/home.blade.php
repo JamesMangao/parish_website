@@ -44,8 +44,8 @@
             </a>
         </div>
 
-        <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:40px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
-            @foreach([['40+','Years of Service'],['7','Weekly Masses'],['1','Community']] as $stat)
+        <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:60px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
+            @foreach([['40+','Years of Service'],['7','Weekly Masses']] as $stat)
             <div style="text-align:center;">
                 <div class="font-heading stat-val" style="font-size:1.75rem;font-weight:700;font-style:italic;color:var(--gold-light);line-height:1;">{{ $stat[0] }}</div>
                 <div style="font-size:11px;text-transform:uppercase;letter-spacing:.3em;color:rgb(255, 255, 255);margin-top:5px;">{{ $stat[1] }}</div>

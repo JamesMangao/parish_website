@@ -5,14 +5,14 @@
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
     style="padding-top: 8px; padding-bottom: 8px;">
 
-    {{-- Scrolled background --}}
+{{-- Scrolled background --}}
     <div class="absolute inset-0 transition-all duration-500 pointer-events-none shadow-sm"
          :class="scrolled ? 'opacity-100' : 'opacity-0'"
          style="background:rgba(255,255,255,0.96); backdrop-filter:blur(20px);
                 -webkit-backdrop-filter:blur(20px);
                 border-bottom:1px solid rgba(0,0,0,0.05);"></div>
 
-    {{-- ── Top bar ── --}}
+    {{-- Top bar --}}
     <div class="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-10
                 h-[72px] flex items-center justify-between gap-2 pt-2">
 
@@ -22,7 +22,7 @@
         <span
             class="w-8 h-8 transition-all duration-300"
             :style="scrolled
-              ? `background:#08142D;-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`
+              ? `background:var(--color-primary);-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`
               : `background:#fff;-webkit-mask:url('/images/parish-logo.png') center/contain no-repeat;mask:url('/images/parish-logo.png') center/contain no-repeat;`"
             aria-label="Sto. Rosario Parish Logo"
             role="img"
@@ -30,12 +30,12 @@
     </div>
     <div>
         <div class="text-[15px] font-bold tracking-[0.1em] leading-none transition-colors duration-300"
-            :style="`font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; color:${scrolled ? '#0B1F3B' : '#fff'};`">
+            :style="`font-family:var(--font-heading); font-style:italic; color:${scrolled ? 'var(--color-primary)' : '#fff'};`">
             Sto. Rosario Parish
         </div>
 
         <div class="text-[9.5px] tracking-[0.3em] font-medium uppercase mt-0.5 transition-colors duration-300"
-            :style="`color:${scrolled ? 'rgba(11,31,59,0.6)' : 'rgba(255,255,255,0.6)'};`">
+            :style="`color:${scrolled ? 'rgba(13,42,82,0.6)' : 'rgba(255,255,255,0.6)'};`">
             Pacita 1
         </div>
     </div>
@@ -56,7 +56,7 @@
                         class="h-10 px-4 rounded-full flex items-center gap-1.5
                                text-[13px] font-semibold uppercase tracking-widest
                                transition-all duration-150 outline-none"
-                        :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
+                        :class="scrolled ? 'text-primary/80 hover:text-primary hover:bg-primary/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
                     Parish Services
                     <svg class="w-3 h-3 transition-transform duration-150"
                          :class="isOpen ? 'rotate-180' : ''"
@@ -77,7 +77,7 @@
                      :class="edgeFlip ? 'right-0' : 'left-0'">
                     <div class="w-56 rounded-2xl border transition-colors duration-300
                                 backdrop-blur-xl p-1.5 shadow-[0_16px_48px_rgba(0,0,0,0.2)]"
-                         :class="scrolled ? 'bg-white border-black/5 shadow-xl' : 'border-white/10 bg-[rgba(8,20,45,0.97)]'">
+                         :class="scrolled ? 'bg-white border-black/5 shadow-xl' : 'border-white/10 bg-[rgba(13,42,82,0.97)]'">
                         @foreach([
                             ['Mass Schedule',      '/mass-schedule',    'View all Mass times'],
                             ['Submit Intention',   '/submit-intention', 'Offer a prayer intention'],
@@ -91,12 +91,12 @@
                                   transition-colors duration-150 group/item outline-none"
                            :class="scrolled ? 'hover:bg-gray-50 focus:bg-gray-50' : 'hover:bg-white/8 focus:bg-white/8'">
                             <span class="w-1 h-1 rounded-full mt-2 shrink-0 transition-colors"
-                                  :class="scrolled ? 'bg-[#F5C518]' : 'bg-[#F5C518]/40 group-hover/item:bg-[#F5C518]'"></span>
+                                  :class="scrolled ? 'bg-gold' : 'bg-gold/40 group-hover/item:bg-gold'"></span>
                             <div>
                                 <div class="text-[13px] font-bold uppercase tracking-wider transition-colors duration-150"
-                                     :class="scrolled ? 'text-[#08142D] group-hover/item:text-black' : 'text-white/90 group-hover/item:text-white'">{{ $label }}</div>
+                                     :class="scrolled ? 'text-primary group-hover/item:text-black' : 'text-white/90 group-hover/item:text-white'">{{ $label }}</div>
                                 <div class="text-xs mt-0.5 transition-colors duration-150"
-                                     :class="scrolled ? 'text-[#08142D]/60' : 'text-white/80'">{{ $sub }}</div>
+                                     :class="scrolled ? 'text-primary/60' : 'text-white/80'">{{ $sub }}</div>
                             </div>
                         </a>
                         @endforeach
@@ -116,7 +116,7 @@
                         class="h-10 px-4 rounded-full flex items-center gap-1.5
                                text-[13px] font-semibold uppercase tracking-widest
                                transition-all duration-150 outline-none"
-                        :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
+                        :class="scrolled ? 'text-primary/80 hover:text-primary hover:bg-primary/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
                     Community
                     <svg class="w-3 h-3 transition-transform duration-150"
                          :class="isOpen ? 'rotate-180' : ''"
@@ -137,7 +137,7 @@
                      :class="edgeFlip ? 'right-0' : 'left-0'">
                     <div class="w-56 rounded-2xl border transition-colors duration-300
                                 backdrop-blur-xl p-1.5 shadow-[0_16px_48px_rgba(0,0,0,0.2)]"
-                         :class="scrolled ? 'bg-white border-black/5 shadow-xl' : 'border-white/10 bg-[rgba(8,20,45,0.97)]'">
+                         :class="scrolled ? 'bg-white border-black/5 shadow-xl' : 'border-white/10 bg-[rgba(13,42,82,0.97)]'">
                         @foreach([
                             ['Parish Events',   '/events',  'Liturgical & community events'],
                             ['Gallery',         '/gallery', 'Memories & celebrations'],
@@ -151,12 +151,12 @@
                                   transition-colors duration-150 group/item outline-none"
                            :class="scrolled ? 'hover:bg-gray-50 focus:bg-gray-50' : 'hover:bg-white/8 focus:bg-white/8'">
                             <span class="w-1 h-1 rounded-full mt-2 shrink-0 transition-colors"
-                                  :class="scrolled ? 'bg-[#F5C518]' : 'bg-[#F5C518]/40 group-hover/item:bg-[#F5C518]'"></span>
+                                  :class="scrolled ? 'bg-gold' : 'bg-gold/40 group-hover/item:bg-gold'"></span>
                             <div>
                                 <div class="text-[13px] font-bold uppercase tracking-wider transition-colors duration-150"
-                                     :class="scrolled ? 'text-[#08142D] group-hover/item:text-black' : 'text-white/90 group-hover/item:text-white'">{{ $label }}</div>
+                                     :class="scrolled ? 'text-primary group-hover/item:text-black' : 'text-white/90 group-hover/item:text-white'">{{ $label }}</div>
                                 <div class="text-xs mt-0.5 transition-colors duration-150"
-                                     :class="scrolled ? 'text-[#08142D]/60' : 'text-white/80'">{{ $sub }}</div>
+                                     :class="scrolled ? 'text-primary/60' : 'text-white/80'">{{ $sub }}</div>
                             </div>
                         </a>
                         @endforeach
@@ -167,16 +167,16 @@
             <a href="{{ route('track') }}"
                class="h-10 px-4 rounded-full flex items-center text-[13px] font-semibold uppercase tracking-widest
                       transition-all duration-150"
-               :class="scrolled ? 'text-[#08142D]/80 hover:text-[#08142D] hover:bg-[#08142D]/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
+               :class="scrolled ? 'text-primary/80 hover:text-primary hover:bg-primary/5' : 'text-white/80 hover:text-white hover:bg-white/10'">
                 Track
             </a>
 
             <div class="w-px h-5 mx-1 transition-colors duration-300"
-                 :class="scrolled ? 'bg-[#08142D]/15' : 'bg-white/15'"></div>
+                 :class="scrolled ? 'bg-primary/15' : 'bg-white/15'"></div>
 
             <a href="{{ route('donate') }}"
                class="relative overflow-hidden h-10 px-5 rounded-full text-xs font-bold
-                      uppercase tracking-widest text-[#1A0E00] hover:scale-[1.03]
+                      uppercase tracking-widest text-accent-foreground hover:scale-[1.03]
                       active:scale-95 transition-all duration-150 flex items-center"
                style="background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
                       box-shadow:0 2px 16px rgba(245,197,24,0.4);">
@@ -187,7 +187,7 @@
         {{-- Hamburger --}}
         <button class="md:hidden w-10 h-10 flex items-center justify-center
                        rounded-full transition-all duration-200 flex-shrink-0 self-center"
-                :class="scrolled ? 'text-[#08142D] hover:bg-[#08142D]/5' : 'text-white hover:bg-white/10'"
+                :class="scrolled ? 'text-primary hover:bg-primary/5' : 'text-white hover:bg-white/10'"
                 @click="open = !open"
                 :aria-expanded="open"
                 aria-label="Toggle menu">
@@ -213,7 +213,7 @@
          x-transition:enter-end="opacity-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 -translate-y-3"
+         x-transition:leave-end="opacity-0 -translate_y-3"
          class="md:hidden fixed inset-0 z-40 flex flex-col"
          style="top:72px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
                 -webkit-backdrop-filter:blur(24px);">

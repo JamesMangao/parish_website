@@ -5,22 +5,17 @@
 
     {{-- ───────────── STYLES + ANIMATIONS ───────────── --}}
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
-
-        /* ── Reset ── */
-        *, *::before, *::after { box-sizing: border-box; }
-
         /* ── Tokens ── */
         :root {
-            --maroon: #0D2A52;
-            --gold:   #F5C518;
-            --cream:  #F7F9FF;
+            --maroon: var(--color-primary);
+            --gold:   var(--color-gold);
+            --cream:  var(--color-cream);
             --border: rgba(26,64,128,0.12);
             --text:   #4A5568;
             --muted:  rgba(13,42,82,0.45);
         }
 
-        .font-heading { font-family: 'Playfair Display', Georgia, serif; font-style: italic; }
+        /* .font-heading now comes from app.css (Cormorant Garamond) */
 
         /* ════════════════════════════════════════
            KEYFRAMES

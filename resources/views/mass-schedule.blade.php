@@ -1,31 +1,11 @@
 <x-public-layout>
 <x-slot name="meta">
     <meta name="description" content="Mass schedule at Sto. Rosario Parish – Pacita, San Pedro, Laguna. View weekly and special Mass times.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gold:       #F5C518;
-            --gold-light: #FFD740;
-            --gold-pale:  #FFF8DC;
-            --blue-deep:  #0D2A52;
-            --blue-mid:   #1A4080;
-            --blue-soft:  #2255A4;
-            --blue-pale:  #EBF2FF;
-            --cream:      #F5F5DC;
-            --cream-deep: #EDF2FC;
-            --stone-text: #1E3254;
-            --yellowish:  #fdf8acff; 
-        }
-        body, .bg-background { background-color: #FFFFFF !important; }
-        body { font-family: 'Jost', sans-serif; }
-        .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
-
         .eyebrow {
             font-size: 10px; font-weight: 600;
             letter-spacing: 0.32em; text-transform: uppercase;
-            color: var(--gold);
+            color: var(--color-gold-dark);
         }
         .divider-ornament {
             display: flex; align-items: center; gap: 12px; justify-content: center;

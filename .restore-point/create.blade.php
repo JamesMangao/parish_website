@@ -34,9 +34,9 @@
 
                     <div class="space-y-4">
                         <div class="p-4 bg-muted/20 border border-border rounded-2xl">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4 block">Option B: Embed URL</label>
-                            <input type="text" name="video_url" placeholder="YouTube, Vimeo, Facebook, or Embed URL..." class="w-full bg-background border-border rounded-lg px-4 py-2 text-xs focus:ring-accent focus:border-accent">
-                            <p class="mt-3 text-[10px] text-muted-foreground italic">Paste a link from YouTube, Vimeo, Facebook, or any embeddable video source.</p>
+                            <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4 block">Option B: Video URL</label>
+                            <input type="text" name="video_url" placeholder="YouTube or Cloud Link..." class="w-full bg-background border-border rounded-lg px-4 py-2 text-xs focus:ring-accent focus:border-accent">
+                            <p class="mt-3 text-[10px] text-muted-foreground italic">Paste a link to YouTube, Vimeo, or a cloud file.</p>
                         </div>
                     </div>
                 </div>

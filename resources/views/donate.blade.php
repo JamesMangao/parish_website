@@ -1,18 +1,7 @@
 <x-public-layout>
     <x-slot name="meta">
         <meta name="description" content="Support Sto. Rosario Parish. Give your tithes, digital offerings, and donations to help our church maintenance and community programs.">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
         <style>
-            :root {
-                --gold: #F5C518; --gold-light: #FFD740;
-                --blue-deep: #0D2A52; --blue-mid: #1A4080;
-                --blue-pale: #EBF2FF; --cream: #F7F9FF;
-            }
-            body { background: var(--cream); font-family: 'Jost', sans-serif; color: var(--blue-deep); }
-            .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-            .font-cinzel  { font-family: 'Cinzel', Georgia, serif; }
-
             @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
             @keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
             .hero-accent {
@@ -20,18 +9,17 @@
                 background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
                 -webkit-text-fill-color: transparent; animation: shimmer 4s linear infinite;
             }
-
         </style>
     </x-slot>
 
     {{-- ═══════════ HERO ═══════════ --}}
-    <section style="background:var(--blue-deep);position:relative;overflow:hidden;padding:100px 24px 80px;text-align:center;">
+<section style="background:var(--color-blue-deep);position:relative;overflow:hidden;padding:100px 24px 80px;text-align:center;">
         <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 110%,rgba(245,197,24,0.10) 0%,transparent 70%);pointer-events:none;"></div>
         <div style="position:absolute;width:520px;height:520px;border-radius:50%;border:1px solid rgba(245,197,24,0.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin-slow 60s linear infinite;pointer-events:none;"></div>
         <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,197,24,0.4),transparent);"></div>
         <div style="position:relative;z-index:10;max-width:600px;margin:0 auto;">
-            <div class="animate-fade-in-down" style="font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:rgba(245,197,24,0.8);margin-bottom:18px;">Stewardship &amp; Giving</div>
-            <div class="font-cinzel" style="color:var(--gold);font-size:1.35rem;opacity:.65;margin-bottom:16px;text-shadow:0 0 20px rgba(245,197,24,0.5);">✝</div>
+            <div class="animate-fade-in-down" style="font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:rgba(245,197,24,0.8);margin-bottom:18px;">Stewardship & Giving</div>
+            <div class="font-cinzel" style="color:var(--color-gold);font-size:1.35rem;opacity:.65;margin-bottom:16px;text-shadow:0 0 20px rgba(245,197,24,0.5);">✝</div>
             <h1 class="font-heading animate-fade-in-up" style="font-weight:700;font-style:italic;font-size:clamp(2.4rem,6vw,4.5rem);line-height:1.05;color:#fff;letter-spacing:-0.02em;margin-bottom:16px; animation-delay: 0.2s;">
                 Support <em class="hero-accent">Our Parish</em>
             </h1>

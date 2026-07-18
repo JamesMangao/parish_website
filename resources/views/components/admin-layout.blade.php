@@ -8,18 +8,8 @@
     <title>Admin - Sto. Rosario Parish</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
-        @keyframes pageFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .page-animate {
-            animation: pageFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
     </style>
 </head>
 
