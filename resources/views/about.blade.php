@@ -667,7 +667,7 @@
     {{-- ═══════════════ STATS ═══════════════ --}}
     <section class="stats-bar">
         <div class="stat-cell">
-            <p class="stat-number" data-target="40" data-suffix="+">40+</p>
+            <p class="stat-number" data-target="42" data-suffix="+">42+</p>
             <p class="stat-label">Years of Service</p>
         </div>
         <div class="stat-cell">
