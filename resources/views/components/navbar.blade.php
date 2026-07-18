@@ -175,11 +175,9 @@
                  :class="scrolled ? 'bg-primary/15' : 'bg-white/15'"></div>
 
             <a href="{{ route('donate') }}"
-               class="relative overflow-hidden h-10 px-5 rounded-full text-xs font-bold
-                      uppercase tracking-widest text-accent-foreground hover:scale-[1.03]
-                      active:scale-95 transition-all duration-150 flex items-center"
-               style="background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
-                      box-shadow:0 2px 16px rgba(245,197,24,0.4);">
+               class="gold-btn relative overflow-hidden h-10 px-5 rounded-full text-xs font-bold
+                      uppercase tracking-widest hover:scale-[1.03]
+                      active:scale-95 transition-all duration-150 flex items-center">
                 Donate
             </a>
         </div>
@@ -375,12 +373,10 @@
         <div class="px-5 py-4"
              style="border-top:1px solid rgba(255,255,255,0.06);">
             <a href="{{ route('donate') }}" @click="open = false"
-               class="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
+               class="gold-btn w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
                       font-bold uppercase tracking-widest active:scale-95
                       transition-transform duration-150"
-               style="font-size:12.5px; color:#1A0E00;
-                      background:linear-gradient(135deg,#FFD740 0%,#F5C518 55%,#E0A800 100%);
-                      box-shadow:0 4px 24px rgba(245,197,24,0.35);">
+               style="font-size:12.5px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2.5"
                      stroke-linecap="round" stroke-linejoin="round">
