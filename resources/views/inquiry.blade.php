@@ -553,12 +553,18 @@
                     <input type="hidden" name="force_submit" value="1">
                     @endif
 
-                    {{-- Full Name --}}
+{{-- Full Name --}}
                     <div>
                         <label class="field-label" for="fullName">Full Name</label>
                         <input name="fullName" id="fullName" required
                                placeholder="Juan Dela Cruz"
-                               class="sacred-input">
+                               class="sacred-input @error('fullName') error @enderror"
+                               aria-invalid="@error('fullName') true @else false @enderror"
+                               aria-describedby="fullName-error"
+                               value="{{ old('fullName') }}">
+                        @error('fullName')
+                            <p id="fullName-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- Email + Phone --}}
@@ -567,13 +573,25 @@
                             <label class="field-label" for="email">Email</label>
                             <input type="email" name="email" id="email" required
                                    placeholder="juan@example.com"
-                                   class="sacred-input">
+                                   class="sacred-input @error('email') error @enderror"
+                                   aria-invalid="@error('email') true @else false @enderror"
+                                   aria-describedby="email-error"
+                                   value="{{ old('email') }}">
+                            @error('email')
+                                <p id="email-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="field-label" for="phone">Phone <span style="opacity:0.45;">(Optional)</span></label>
                             <input name="phone" id="phone"
                                    placeholder="0912 345 6789"
-                                   class="sacred-input">
+                                   class="sacred-input @error('phone') error @enderror"
+                                   aria-invalid="@error('phone') true @else false @enderror"
+                                   aria-describedby="phone-error"
+                                   value="{{ old('phone') }}">
+                            @error('phone')
+                                <p id="phone-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
