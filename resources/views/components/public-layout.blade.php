@@ -96,6 +96,9 @@
                 x-transition:leave-end="opacity-0 translate-y-8 scale-95"
                 class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white border-l-4 shadow-2xl rounded-xl p-5 flex items-start gap-4 animate-in slide-in-from-right-10"
                 :class="notification.type === 'success' ? 'border-green-500' : 'border-red-500'"
+                :role="notification.type === 'error' ? 'alert' : 'status'"
+                :aria-live="notification.type === 'error' ? 'assertive' : 'polite'"
+                aria-atomic="true"
                 x-cloak
             >
                 <div :class="notification.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'" 

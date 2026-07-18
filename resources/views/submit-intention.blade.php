@@ -69,9 +69,21 @@
             appearance: none;
         }
         .sacred-input:focus {
-            border-color: rgba(245,197,24,0.60);
+            border-color: var(--color-blue-deep);
             background: #FFFFFF;
-            box-shadow: 0 0 0 3px rgba(245,197,24,0.10);
+            box-shadow: 
+                0 0 0 2px var(--color-blue-deep),
+                0 0 0 4px rgba(245,197,24,0.35);
+        }
+
+        /* Error state */
+        .sacred-input.error {
+            border-color: #DC2626;
+        }
+        .sacred-input.error:focus {
+            box-shadow:
+                0 0 0 2px #DC2626,
+                0 0 0 4px rgba(220,38,38,0.25);
         }
         .sacred-input::placeholder { color: rgba(13,42,82,0.28); }
         textarea.sacred-input { height: auto; padding: 14px 16px; resize: none; }
@@ -379,14 +391,24 @@
                             <input x-model="formData.fullName"
                                    id="fullName" name="fullName"
                                    placeholder="Juan Dela Cruz" required
-                                   class="sacred-input">
+                                   class="sacred-input"
+                                   :class="{ error: fieldErrors.fullName }"
+                                   :aria-invalid="!!fieldErrors.fullName"
+                                   aria-describedby="fullName-error">
+                            <p x-show="fieldErrors.fullName" id="fullName-error" class="text-red-600 text-sm mt-1" role="alert"
+                               x-text="fieldErrors.fullName[0]"></p>
                         </div>
                         <div>
                             <label class="field-label" for="email">Email Address</label>
                             <input x-model="formData.email"
                                    id="email" name="email" type="email"
                                    placeholder="juan@example.com" required
-                                   class="sacred-input">
+                                   class="sacred-input"
+                                   :class="{ error: fieldErrors.email }"
+                                   :aria-invalid="!!fieldErrors.email"
+                                   aria-describedby="email-error">
+                            <p x-show="fieldErrors.email" id="email-error" class="text-red-600 text-sm mt-1" role="alert"
+                               x-text="fieldErrors.email[0]"></p>
                         </div>
                     </div>
 
@@ -396,12 +418,17 @@
                         <div class="relative">
                             <select x-model="formData.intentionType"
                                     id="intentionType" name="intentionType" required
-                                    class="sacred-input" style="padding-right:42px;">
+                                    class="sacred-input" style="padding-right:42px;"
+                                    :class="{ error: fieldErrors.intentionType }"
+                                    :aria-invalid="!!fieldErrors.intentionType"
+                                    aria-describedby="intentionType-error">
                                 <option value="" disabled selected>Select category…</option>
                                 <template x-for="type in intentionTypes" :key="type">
                                     <option :value="type" x-text="type"></option>
                                 </template>
                             </select>
+                            <p x-show="fieldErrors.intentionType" id="intentionType-error" class="text-red-600 text-sm mt-1" role="alert"
+                               x-text="fieldErrors.intentionType[0]"></p>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.38)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             </div>
@@ -417,7 +444,13 @@
                                        x-model="formData.preferredDate"
                                        id="preferredDate" name="preferredDate"
                                        placeholder="Select date" required readonly
-                                       class="sacred-input" style="cursor:pointer; padding-right:42px;">
+                                       class="sacred-input"
+                                       :class="{ error: fieldErrors.preferredDate }"
+                                       :aria-invalid="!!fieldErrors.preferredDate"
+                                       aria-describedby="preferredDate-error"
+                                       style="cursor:pointer; padding-right:42px;">
+                                <p x-show="fieldErrors.preferredDate" id="preferredDate-error" class="text-red-600 text-sm mt-1" role="alert"
+                                   x-text="fieldErrors.preferredDate[0]"></p>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.38)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                                 </div>
@@ -428,12 +461,17 @@
                             <div class="relative">
                                 <select x-model="formData.massTime"
                                         id="massTime" name="massTime" required
-                                        class="sacred-input" style="padding-right:42px;">
+                                        class="sacred-input" style="padding-right:42px;"
+                                        :class="{ error: fieldErrors.massTime }"
+                                        :aria-invalid="!!fieldErrors.massTime"
+                                        aria-describedby="massTime-error">
                                     <option value="" disabled selected>Select time…</option>
                                     <template x-for="time in massTimes" :key="time">
                                         <option :value="time" x-text="time"></option>
                                     </template>
                                 </select>
+                                <p x-show="fieldErrors.massTime" id="massTime-error" class="text-red-600 text-sm mt-1" role="alert"
+                                   x-text="fieldErrors.massTime[0]"></p>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(13,42,82,0.38)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 </div>
@@ -448,7 +486,12 @@
                                   id="description" name="description"
                                   rows="4" required
                                   placeholder="Enter names or specific prayer requests…"
-                                  class="sacred-input"></textarea>
+                                  class="sacred-input"
+                                  :class="{ error: fieldErrors.description }"
+                                  :aria-invalid="!!fieldErrors.description"
+                                  aria-describedby="description-error"></textarea>
+                        <p x-show="fieldErrors.description" id="description-error" class="text-red-600 text-sm mt-1" role="alert"
+                           x-text="fieldErrors.description[0]"></p>
                     </div>
 
                     {{-- Donation accordion --}}
@@ -583,6 +626,7 @@ function intentionForm() {
         dupWarning: false,
         dupRef: '',
         dupType: '',
+        fieldErrors: {},
         intentionTypes: [
             'Thanksgiving','Birthday','Wedding Anniversary','Healing',
             'Repose of the Soul','Special Intention','Other'
@@ -620,6 +664,7 @@ function intentionForm() {
         async submitForm(force = false) {
             if (this.loading) return;
             this.loading = true;
+            this.fieldErrors = {}; // clear
             try {
                 const body = { ...this.formData };
                 if (force) body.force_submit = true;
@@ -643,7 +688,14 @@ function intentionForm() {
                     return;
                 }
 
+                if (res.status === 422) {
+                    this.fieldErrors = data.errors || {};
+                    this.loading = false;
+                    return;
+                }
+
                 if (!res.ok) throw new Error('Submission failed');
+                this.fieldErrors = {};
                 this.refId = data.refId || '';
                 this.submitted = true;
                 window.scrollTo({ top: 0, behavior: 'smooth' });

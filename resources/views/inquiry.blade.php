@@ -87,9 +87,21 @@
             outline: none; appearance: none;
         }
         .sacred-input:focus {
-            border-color: rgba(245,197,24,0.60);
+            border-color: var(--color-blue-deep);
             background: #FFF;
-            box-shadow: 0 0 0 3px rgba(245,197,24,0.10);
+            box-shadow: 
+                0 0 0 2px var(--color-blue-deep),
+                0 0 0 4px rgba(245,197,24,0.35);
+        }
+
+        /* Error state */
+        .sacred-input.error {
+            border-color: #DC2626;
+        }
+        .sacred-input.error:focus {
+            box-shadow:
+                0 0 0 2px #DC2626,
+                0 0 0 4px rgba(220,38,38,0.25);
         }
         .sacred-input::placeholder { color: rgba(13,42,82,0.28); }
         textarea.sacred-input { height: auto; padding: 14px 16px; resize: none; }
@@ -451,7 +463,7 @@
             <div class="md:col-span-3 p-8 md:p-10" style="background:#FFF;"
                  x-data="{ 
             loading: false, 
-            inquiryType: '',
+            inquiryType: '{{ old('inquiryType', '') }}',
             serviceRequirements: {
                 'Baptism': [
                     'Birth Certificate with Registry Number (Original & Photocopy)',
@@ -572,29 +584,34 @@
                         <div>
                             <label class="field-label" for="inquiryType">Inquiry Type</label>
                             <div class="relative">
-                                <select name="inquiryType" id="inquiryType" required
-                                        x-model="inquiryType"
-                                        class="sacred-input" style="padding-right:42px;">
-                                    <option value="" disabled selected>Select a service…</option>
-                                    <optgroup label="Sacramental Rites">
-                                        <option value="Baptism">Baptism</option>
-                                        <option value="First Communion">First Communion</option>
-                                        <option value="Confirmation">Confirmation</option>
-                                        <option value="Wedding">Wedding</option>
-                                        <option value="Funeral Mass">Funeral Mass</option>
-                                    </optgroup>
-                                    <optgroup label="Document Requests">
-                                        <option value="Baptismal Certificate">Baptismal Certificate</option>
-                                        <option value="Confirmation Certificate">Confirmation Certificate</option>
-                                        <option value="Marriage Certificate">Marriage Certificate</option>
-                                    </optgroup>
-                                    <optgroup label="Blessings & Others">
-                                        <option value="Car Blessing">Car Blessing</option>
-                                        <option value="House Blessing">House Blessing</option>
-                                        <option value="Other">Others</option>
-                                    </optgroup>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+<select name="inquiryType" id="inquiryType" required
+        x-model="inquiryType"
+        class="sacred-input @error('inquiryType') error @enderror" style="padding-right:42px;"
+        aria-invalid="@error('inquiryType') true @else false @enderror"
+        aria-describedby="inquiryType-error">
+    <option value="" disabled selected>Select a service…</option>
+    <optgroup label="Sacramental Rites">
+        <option value="Baptism">Baptism</option>
+        <option value="First Communion">First Communion</option>
+        <option value="Confirmation">Confirmation</option>
+        <option value="Wedding">Wedding</option>
+        <option value="Funeral Mass">Funeral Mass</option>
+    </optgroup>
+    <optgroup label="Document Requests">
+        <option value="Baptismal Certificate">Baptismal Certificate</option>
+        <option value="Confirmation Certificate">Confirmation Certificate</option>
+        <option value="Marriage Certificate">Marriage Certificate</option>
+    </optgroup>
+    <optgroup label="Blessings & Others">
+        <option value="Car Blessing">Car Blessing</option>
+        <option value="House Blessing">House Blessing</option>
+        <option value="Other">Others</option>
+    </optgroup>
+</select>
+@error('inquiryType')
+    <p id="inquiryType-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+@enderror
+<div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
                                          stroke="rgba(13,42,82,0.38)" stroke-width="2.5"
                                          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -709,7 +726,13 @@
                                 <input type="date" name="preferredDate" id="preferredDate"
                                        :required="['Baptism','Wedding','Funeral Mass'].includes(inquiryType)"
                                        min="{{ date('Y-m-d') }}"
-                                       class="sacred-input" style="padding-right:42px;">
+                                       value="{{ old('preferredDate') }}"
+                                       class="sacred-input @error('preferredDate') error @enderror" style="padding-right:42px;"
+                                       aria-invalid="@error('preferredDate') true @else false @enderror"
+                                       aria-describedby="preferredDate-error">
+                                @error('preferredDate')
+                                    <p id="preferredDate-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+                                @enderror
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
                                          stroke="rgba(13,42,82,0.38)" stroke-width="2"
@@ -740,7 +763,12 @@
                             <textarea name="message" id="message" rows="4"
                                       :required="true"
                                       placeholder="Provide details about your request (e.g. occasion, names)…"
-                                      class="sacred-input"></textarea>
+                                      class="sacred-input @error('message') error @enderror"
+                                      aria-invalid="@error('message') true @else false @enderror"
+                                      aria-describedby="message-error"></textarea>
+                            @error('message')
+                                <p id="message-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+                            @enderror
                         </template>
 
                         {{-- Structured inputs for Baptism / Baptismal Certificate --}}
@@ -748,6 +776,10 @@
                             <div class="space-y-4">
                                 {{-- Single hidden input — only present in DOM for these types --}}
                                 <input type="hidden" name="message" :value="getCombinedMessage()">
+
+                                @error('message')
+                                    <p id="message-error" class="text-red-600 text-sm mt-1 mb-4" role="alert">{{ $message }}</p>
+                                @enderror
 
                                 {{-- Baptism-specific guidelines --}}
                                 <template x-if="inquiryType === 'Baptism'">
