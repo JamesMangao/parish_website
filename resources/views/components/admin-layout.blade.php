@@ -19,7 +19,6 @@
         @if(session('success')) $store.toast.trigger('{{ session('success') }}', 'success'); @endif
         @if(session('error')) $store.toast.trigger('{{ session('error') }}', 'error'); @endif
         $store.ui._notifUrl = '{{ route('admin.notifications.count') }}';
-        $store.ui.init();
     "></div>
 
     <div class="min-h-screen flex">

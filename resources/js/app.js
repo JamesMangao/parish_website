@@ -67,7 +67,10 @@ Alpine.store('ui', {
     _chatNotified: false,
     _pollTimer: null,
     _notifUrl: null,
+    _initialized: false,
     init() {
+        if (this._initialized) return;
+        this._initialized = true;
         if (this.isMobile) this.sidebarOpen = false;
         if (typeof window !== 'undefined') {
             window.addEventListener('resize', () => {
