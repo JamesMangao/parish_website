@@ -1,10 +1,22 @@
-export const settingsForm = (initialPreviews = {}) => ({
+export const settingsForm = () => ({
     MAX_CONTACTS: 10,
     MAX_TIMELINE: 30,
-    qrPreview: initialPreviews.qrUrl || null,
-    priestPreview: initialPreviews.priestUrl || null,
-    assistantPriestPreview: initialPreviews.assistantPriestUrl || null,
+    qrPreview: null,
+    priestPreview: null,
+    assistantPriestPreview: null,
     _previewUrls: {},
+
+    init() {
+        const el = document.getElementById('settings-previews-data');
+        if (el) {
+            try {
+                const d = JSON.parse(el.textContent);
+                this.qrPreview = d.qrUrl || null;
+                this.priestPreview = d.priestUrl || null;
+                this.assistantPriestPreview = d.assistantPriestUrl || null;
+            } catch {}
+        }
+    },
 
     handleFileUpload(e, key, label) {
         const file = e.target.files[0];
@@ -24,8 +36,18 @@ export const settingsForm = (initialPreviews = {}) => ({
     }
 });
 
-export const contactNumbers = (initialNumbers = ['']) => ({
-    numbers: initialNumbers,
+export const contactNumbers = () => ({
+    numbers: [''],
+
+    init() {
+        const el = document.getElementById('contact-numbers-data');
+        if (el) {
+            try {
+                const parsed = JSON.parse(el.textContent);
+                this.numbers = Array.isArray(parsed) && parsed.length ? parsed : [''];
+            } catch {}
+        }
+    },
 
     addNumber() {
         if (this.numbers.length < 10) this.numbers.push('');
@@ -36,8 +58,18 @@ export const contactNumbers = (initialNumbers = ['']) => ({
     }
 });
 
-export const timelineManager = (initialEntries = []) => ({
-    entries: initialEntries,
+export const timelineManager = () => ({
+    entries: [],
+
+    init() {
+        const el = document.getElementById('timeline-entries-data');
+        if (el) {
+            try {
+                const parsed = JSON.parse(el.textContent);
+                this.entries = Array.isArray(parsed) && parsed.length ? parsed : [{ year: '', badge: '', title: '', short: '', full: '' }];
+            } catch {}
+        }
+    },
 
     addEntry() {
         if (this.entries.length >= 30) {

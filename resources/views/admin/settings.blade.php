@@ -4,11 +4,8 @@
         $priestUrl = isset($settings['priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['priest_image']) : null;
         $assistantPriestUrl = isset($settings['assistant_priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['assistant_priest_image']) : null;
     @endphp
-    <div class="max-w-4xl" x-data="settingsForm({
-        qrUrl: {{ json_encode($qrUrl) }},
-        priestUrl: {{ json_encode($priestUrl) }},
-        assistantPriestUrl: {{ json_encode($assistantPriestUrl) }}
-    })">
+    <script type="application/json" id="settings-previews-data">{!! json_encode(['qrUrl' => $qrUrl, 'priestUrl' => $priestUrl, 'assistantPriestUrl' => $assistantPriestUrl]) !!}</script>
+    <div class="max-w-4xl" x-data="settingsForm()">
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="font-heading text-3xl font-bold text-primary italic">General Settings</h1>
@@ -36,7 +33,8 @@
                                 : (is_array($contactRaw) ? $contactRaw : ['']);
                         @endphp
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contact Numbers</label>
-                        <div x-data="contactNumbers({{ json_encode($contactNumbers) }})">
+                        <script type="application/json" id="contact-numbers-data">{!! json_encode($contactNumbers) !!}</script>
+                        <div x-data="contactNumbers()">
                             <template x-for="(number, index) in numbers" :key="index">
                                 <div class="flex gap-2 mb-2">
                                     <input type="text" :name="'parish_contact['+index+']'" x-model="numbers[index]" placeholder="+63 2 8869 2742"
@@ -196,7 +194,8 @@
                         $timelineEntries = \App\Data\DefaultTimeline::entries();
                     }
                 @endphp
-                <div x-data="timelineManager({{ json_encode($timelineEntries) }})">
+                <script type="application/json" id="timeline-entries-data">{!! json_encode($timelineEntries) !!}</script>
+                <div x-data="timelineManager()">
                     <template x-for="(entry, index) in entries" :key="index">
                         <div class="border border-border rounded-lg p-4 mb-4 bg-background/50">
                             <div class="flex items-center justify-between mb-3">
