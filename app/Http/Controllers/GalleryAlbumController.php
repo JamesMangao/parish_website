@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GalleryAlbum;
 use App\Models\GalleryImage;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -49,6 +50,7 @@ class GalleryAlbumController extends Controller
                 $this->uploadMany($album, $request->file('images'));
             }
 
+            LogService::log('create_album', $album, ['title' => $album->title]);
             return redirect()->route('admin.gallery.index')->with('success', 'Album created successfully!');
         } catch (\Exception $e) {
             if (isset($album)) $album->delete(); // Cleanup if failed partway
@@ -78,11 +80,13 @@ class GalleryAlbumController extends Controller
             'is_published' => $request->has('is_published'),
         ]);
 
+        LogService::log('update_album', $gallery, ['title' => $gallery->title]);
         return redirect()->route('admin.gallery.index')->with('success', 'Album updated!');
     }
 
     public function destroy(GalleryAlbum $gallery)
     {
+        LogService::log('delete_album', $gallery, ['title' => $gallery->title]);
         $gallery->delete(); // Images cascade delete via DB
         return back()->with('success', 'Album removed.');
     }
@@ -97,11 +101,14 @@ class GalleryAlbumController extends Controller
             $this->uploadMany($album, $request->file('images'));
         }
 
+        LogService::log('add_album_images', $album, ['title' => $album->title, 'count' => $request->file('images') ? count($request->file('images')) : 0]);
         return back()->with('success', 'Images added to album!');
     }
 
     public function removeImage(GalleryImage $image)
     {
+        $album = $image->album;
+        LogService::log('remove_album_image', $album, ['image_title' => $image->title, 'image_id' => $image->id]);
         $image->delete();
         return back()->with('success', 'Image removed from album.');
     }

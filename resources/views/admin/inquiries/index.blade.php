@@ -3,7 +3,7 @@
     description="Review and validate sacramental inquiries from parishioners."
     :headers="['Name', 'Type', 'Status', 'Date']"
 >
-    @foreach($inquiries as $i)
+    @forelse($inquiries as $i)
         <tr class="hover:bg-muted/20 transition-colors">
             <td class="px-6 py-4 font-bold text-primary">{{ $i->full_name }}</td>
             <td class="px-6 py-4 capitalize">{{ $i->inquiry_type }}</td>
@@ -24,5 +24,7 @@
                 </div>
             </td>
         </tr>
-    @endforeach
+    @empty
+        <x-admin-empty title="No inquiries yet" description="Service inquiries from parishioners will appear here." icon="inbox" />
+    @endforelse
 </x-admin-index>

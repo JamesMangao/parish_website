@@ -132,9 +132,9 @@
                                         </div>
                                     @endif
                                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <form action="{{ route('admin.gallery.remove-image', $img) }}" method="POST" onsubmit="return confirm('Delete this image?')">
+                                        <form action="{{ route('admin.gallery.remove-image', $img) }}" method="POST" x-data @submit.prevent="$store.confirm.open({ title: 'Delete Media', message: 'Delete this image?', confirmText: 'Delete', type: 'danger', onConfirm: () => $el.submit() })">
                                             @csrf @method('DELETE')
-                                            <button class="p-1.5 bg-destructive text-white rounded-full hover:scale-110 active:scale-95 transition-all shadow-lg">
+                                            <button aria-label="Delete image" class="p-1.5 bg-destructive text-white rounded-full hover:scale-110 active:scale-95 transition-all shadow-lg">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                             </button>
                                         </form>

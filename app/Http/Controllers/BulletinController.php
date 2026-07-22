@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bulletin;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -43,11 +44,13 @@ class BulletinController extends Controller
             'published_date' => $request->published_date,
         ]);
 
+        LogService::log('upload_bulletin', null, ['title' => $request->title, 'published_date' => $request->published_date]);
         return back()->with('success', 'Bulletin uploaded successfully.');
     }
 
     public function destroy(Bulletin $bulletin)
     {
+        LogService::log('delete_bulletin', $bulletin, ['title' => $bulletin->title]);
         Storage::disk('public')->delete($bulletin->file_path);
         $bulletin->delete();
         return back()->with('success', 'Bulletin deleted successfully.');

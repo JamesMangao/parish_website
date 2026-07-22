@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <div class="p-8">
+    <div class="p-8" x-data>
         <div class="flex items-center justify-between mb-12">
             <div>
                 <h1 class="text-4xl font-black text-primary uppercase font-heading">Weekly Bulletins</h1>
@@ -16,22 +16,25 @@
                 </h2>
                 <form action="{{ route('admin.bulletins.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
-                    <div>
+                    <div class="space-y-2">
                         <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">Bulletin Title</label>
                         <input type="text" name="title" required 
                             class="w-full px-4 py-3 rounded-xl border-muted bg-muted/20 focus:border-accent focus:ring-0 transition-all text-sm font-bold"
                             placeholder="e.g. Easter Sunday 2026">
+                        @error('title') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
-                    <div>
+                    <div class="space-y-2">
                         <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">Publish Date</label>
                         <input type="date" name="published_date" required 
                             class="w-full px-4 py-3 rounded-xl border-muted bg-muted/20 focus:border-accent focus:ring-0 transition-all text-sm font-bold"
                             value="{{ date('Y-m-d') }}">
+                        @error('published_date') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
-                    <div>
+                    <div class="space-y-2">
                         <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">PDF or Image File</label>
                         <input type="file" name="file" accept="application/pdf,image/*" required 
                             class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer">
+                        @error('file') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-black py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95 uppercase text-xs tracking-widest">
                         Upload Bulletin
@@ -41,7 +44,7 @@
 
             <!-- List -->
             <div class="lg:col-span-2 space-y-4">
-                @foreach($bulletins as $bulletin)
+                @forelse($bulletins as $bulletin)
                     <div class="bg-card border rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent transition-colors">
                         <div class="flex items-center gap-4">
                             @php
@@ -63,16 +66,24 @@
                              <a href="{{ Storage::url($bulletin->file_path) }}" target="_blank" class="p-2 text-muted-foreground hover:text-primary transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c-1.8 0-4.5 2.7-4.5 4.5V20"/><path d="M3 12c1.8 0 4.5-2.7 4.5-4.5V4"/><path d="M12 3v18"/><path d="M3 12h18"/></svg>
                             </a>
-                            <form action="{{ route('admin.bulletins.destroy', $bulletin) }}" method="POST" onsubmit="return confirm('Delete this bulletin?')">
+                            <form :id="'delete-bulletin-{{ $bulletin->id }}" action="{{ route('admin.bulletins.destroy', $bulletin) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="p-2 text-muted-foreground hover:text-destructive transition-colors">
+                                <button type="button" aria-label="Delete bulletin"
+                                    @click="$store.confirm.open('Delete Bulletin', 'Are you sure you want to permanently remove this bulletin? This action cannot be undone.', () => document.getElementById('delete-bulletin-{{ $bulletin->id }}').submit())"
+                                    class="p-2 text-muted-foreground hover:text-destructive transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                 </button>
                             </form>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <x-admin-empty
+                        title="No bulletins uploaded"
+                        description="Upload your first weekly bulletin using the form on the left."
+                        icon="empty"
+                    />
+                @endforelse
                 {{ $bulletins->links() }}
             </div>
         </div>

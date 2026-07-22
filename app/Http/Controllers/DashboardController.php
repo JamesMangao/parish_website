@@ -7,8 +7,10 @@ use App\Models\MassSchedule;
 use App\Models\Announcement;
 use App\Models\Event;
 use App\Models\Inquiry;
+use App\Models\ChatMessage;
 use App\Models\ChatSession;
 use App\Models\ActivityLog;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -75,9 +77,32 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function logs()
+    public function logs(Request $request)
     {
-        $logs = ActivityLog::with('user')->latest()->paginate(50);
+        $query = ActivityLog::with('user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('action', 'like', "%{$search}%")
+                  ->orWhere('ip_address', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn($q) => $q->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($request->filled('action') && $request->action !== 'all') {
+            $query->where('action', 'like', "%{$request->action}%");
+        }
+
+        if ($request->filled('from')) {
+            $query->where('created_at', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->where('created_at', '<=', $request->to . ' 23:59:59');
+        }
+
+        $logs = $query->latest()->paginate(50)->appends($request->query());
         return view('admin.logs', compact('logs'));
     }
 }

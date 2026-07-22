@@ -105,7 +105,7 @@
             </svg>
         @endif
     </div>
-    <span x-show="sidebarOpen" class="font-bold tracking-tight" x-transition:enter="transition ease-out duration-300"
+    <span x-show="$store.ui.sidebarOpen" class="font-bold tracking-tight" x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 -translate-x-2" x-transition:enter-end="opacity-100 translate-x-0">
         {{ $label }}
     </span>

@@ -18,7 +18,6 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\TrackController;
-use App\Http\Controllers\DailyReadingController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\CalendarFeedController;
 
@@ -57,8 +56,6 @@ Route::middleware('throttle:chat')->group(function () {
     Route::post('/api/chatbot/request-agent', [ChatbotController::class, 'requestAgent'])->name('chatbot.request-agent');
     Route::post('/api/chatbot/start-new-chat', [ChatbotController::class, 'startNewChat'])->name('chatbot.start-new-chat');
 });
-
-Route::get('/api/readings/today', DailyReadingController::class);
 
 Route::get('/api/chatbot/session-status', [ChatbotController::class, 'sessionStatus'])->name('chatbot.session-status');
 

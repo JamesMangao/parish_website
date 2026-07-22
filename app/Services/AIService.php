@@ -141,6 +141,7 @@ class AIService
         $gcashNumber = Setting::where('key', 'gcash_number')->value('value') ?? '09123456789';
         $gcashName = Setting::where('key', 'gcash_name')->value('value') ?? 'Sto. Rosario Parish';
         $priestName = Setting::where('key', 'priest_name')->value('value') ?? 'Rev. Fr. Parish Priest';
+        $assistantPriestName = Setting::where('key', 'assistant_priest_name')->value('value');
         $ctx .= "### DONATION INFO:\n";
         $ctx .= "- GCash Number: {$gcashNumber} (Account Name: {$gcashName})\n";
         $ctx .= "- Donations are voluntary; used for parish operations and outreach.\n\n";
@@ -183,13 +184,23 @@ class AIService
         $ctx .= "- 2021: Hermandad del Santo Rosario (Rosary Confraternity of Pacita) was established.\n";
         $ctx .= "- 2024: The image was declared an Important Cultural Property of San Pedro City.\n";
         $ctx .= "- 2025: Our Lady was accorded the honorific title 'Queen of the City of San Pedro'.\n";
-        $ctx .= "- Leadership: {$priestName} (Parish Priest, serving since 2019 to Present).\n";
+        $ctx .= "- Parish Priest: {$priestName} (serving since 2019 to Present).\n";
+        if ($assistantPriestName) {
+            $ctx .= "- Assistant Parish Priest: {$assistantPriestName}.\n";
+        }
 
         return $ctx;
     }
 
     protected function getSystemPrompt($context = ''): string
     {
+        $contactRaw = Setting::where('key', 'parish_contact')->value('value') ?? '+63 2 8869 2742';
+        $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
+            ? (json_decode($contactRaw, true) ?: [$contactRaw])
+            : (is_array($contactRaw) ? $contactRaw : ['+63 2 8869 2742']);
+        $contactLine = implode(' | ', $contactNumbers);
+        $email = Setting::where('key', 'parish_email')->value('value') ?? 'officestorosarioparish@gmail.com';
+
         return "You are the official digital assistant of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines).
 You are a warm, helpful, and knowledgeable 'Parish Concierge'. Your goal is to assist parishioners and visitors with accurate information about parish life and basic Catholic teachings.
 
@@ -199,7 +210,7 @@ You are a warm, helpful, and knowledgeable 'Parish Concierge'. Your goal is to a
 ### GENERAL INFO:
 - Location: 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna, Philippines 4023.
 - Iconic Image: Queen of The Most Holy Rosary.
-- Contact: +63 2 8869 2742 | officestorosarioparish@gmail.com
+- Contact: {$contactLine} | {$email}
 - Website: https://storosario.ph
 
 ### SYSTEM INSTRUCTIONS:
@@ -253,10 +264,6 @@ Vibrant, polite, and faith-filled. Maintain a respectful Catholic tone. Use [Lin
             'mass_schedule' => [
                 'mass', 'schedule', 'misa', 'oras', 'time', 'service',
                 'scheduled', 'kailan', 'anong oras', 'simba', 'banal',
-            ],
-            'readings' => [
-                'reading', 'readings', 'pagbasa', 'ewanghelyo', 'gospel',
-                'ebanghelyo', 'unang pagbasa', 'ikalawang pagbasa',
             ],
             'intention' => [
                 'intention', 'alay', 'panalangin', 'offering', 'offer mass',
@@ -332,17 +339,20 @@ Vibrant, polite, and faith-filled. Maintain a respectful Catholic tone. Use [Lin
         $topIntent = key($scores) ?: 'unknown';
 
         $name = Setting::where('key', 'parish_name')->value('value') ?? 'Sto. Rosario Parish';
-        $contact = Setting::where('key', 'parish_contact')->value('value') ?? '+63 2 8869 2742';
+        $contactRaw = Setting::where('key', 'parish_contact')->value('value') ?? '+63 2 8869 2742';
+        $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
+            ? (json_decode($contactRaw, true) ?: [$contactRaw])
+            : (is_array($contactRaw) ? $contactRaw : ['+63 2 8869 2742']);
+        $contact = implode(' | ', $contactNumbers);
         $email = Setting::where('key', 'parish_email')->value('value') ?? 'officestorosarioparish@gmail.com';
         $gcashNum = Setting::where('key', 'gcash_number')->value('value') ?? '09123456789';
         $priest = Setting::where('key', 'priest_name')->value('value') ?? 'our Parish Priest';
+        $assistantPriest = Setting::where('key', 'assistant_priest_name')->value('value');
 
         $responses = [
-            'greeting' => "Peace be with you! 🙏 I am the digital concierge of {$name}. How may I assist you today? You can ask me about:\n\n- ⛪ Mass Schedules\n- 📖 Daily Readings\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n\nHow can I help?",
+            'greeting' => "Peace be with you! 🙏 I am the digital concierge of {$name}. How may I assist you today? You can ask me about:\n\n- ⛪ Mass Schedules\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n\nHow can I help?",
 
             'mass_schedule' => $this->buildMassScheduleResponse(),
-
-            'readings' => "You can view today's Daily Mass Readings right here in chat! Just type or click: 📖 Today's Readings",
 
             'intention' => "You can offer a Mass Intention through our online form:\n👉 [Submit Mass Intention](/submit-intention)\n\nAfter submission, you'll receive a reference number to [track your intention status](/track).\n\nMass offerings are ₱500.00 per intention. Thank you for your support! 🕯️",
 
@@ -364,13 +374,13 @@ Vibrant, polite, and faith-filled. Maintain a respectful Catholic tone. Use [Lin
 
             'contact' => "📞 **Contact Information:**\n- Phone: {$contact}\n- Email: {$email}\n- Facebook: [Sto. Rosario Parish Pacita](https://facebook.com/storosarioparish)\n- Messenger: [m.me/storosarioparishpacita1](https://m.me/storosarioparishpacita1)\n\n**Office Hours:**\n- Tue–Sat: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM\n- Sun: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM\n- Mon: Closed",
 
-            'about' => "{$name} is a Catholic parish located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our patroness is the **Queen of the Most Holy Rosary of Pacita**, whose image was carved in Paete, Laguna in 1982.\n\n⛪ **Key Milestones:**\n- 1983 (Oct 16): Canonical erection of the parish\n- 1986 (Dec 6): Church dedication\n- 2024: Image declared Important Cultural Property of San Pedro\n- 2025: Our Lady accorded the title 'Queen of the City of San Pedro'\n\nOur Parish Priest is {$priest}.\n\nLearn more: [About Us](/about)",
+            'about' => "{$name} is a Catholic parish located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our patroness is the **Queen of the Most Holy Rosary of Pacita**, whose image was carved in Paete, Laguna in 1982.\n\n⛪ **Key Milestones:**\n- 1983 (Oct 16): Canonical erection of the parish\n- 1986 (Dec 6): Church dedication\n- 2024: Image declared Important Cultural Property of San Pedro\n- 2025: Our Lady accorded the title 'Queen of the City of San Pedro'\n\nOur Parish Priest is {$priest}" . ($assistantPriest ? " and our Assistant Parish Priest is {$assistantPriest}" : "") . ".\n\nLearn more: [About Us](/about)",
 
             'faith' => "That's a beautiful question about our Catholic faith! 🙏\n\nI'd be happy to help with basic questions about prayers, sacraments, and Catholic traditions. For more complex spiritual guidance, I recommend speaking with {$priest} after Mass or scheduling a pastoral appointment.\n\nIs there something specific about our faith you'd like to know?",
 
             'thank_you' => "You're most welcome! 🙏 It is my joy to assist you. If you ever need anything else, feel free to ask. God bless you and your family! ✝️",
 
-            'unknown' => "I'm not sure I understand. Could you please rephrase your question? You can ask me about:\n\n- ⛪ Mass Schedules\n- 📖 Daily Readings\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n- 📍 Location & Contact Info\n- 📜 Parish History",
+            'unknown' => "I'm not sure I understand. Could you please rephrase your question? You can ask me about:\n\n- ⛪ Mass Schedules\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n- 📍 Location & Contact Info\n- 📜 Parish History",
         ];
 
         return $responses[$topIntent] ?? $responses['unknown'];

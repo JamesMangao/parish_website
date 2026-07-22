@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ChatSession;
 use App\Models\ChatMessage;
 use App\Services\AIService;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -57,51 +58,6 @@ class ChatbotController extends Controller
                 'status' => 'suggest_handover',
                 'message' => "I understand you'd like to speak with a person. For formal requests (Baptism, Wedding, etc.), please [Submit an Inquiry](/inquiry). You can also message us directly on [Facebook Messenger](https://m.me/storosarioparishpacita1) or wait for a Live Agent here.",
             ]);
-        }
-
-        // 3b. Smart Intent Interception: Daily Mass Readings
-        $lowerMessage = strtolower($userMessage);
-        $isReadingsRequest = preg_match('/\b(reading|readings|pagbasa|ewanghelyo|gospel)\b/i', $lowerMessage);
-
-        if ($isReadingsRequest) {
-            $initialLanguage = preg_match('/\b(pagbasa|ewanghelyo|tagalog|filipino|ngayon|bukas)\b/i', $lowerMessage) ? 'TG' : 'EN';
-            $date = now('Asia/Manila')->format('Ymd');
-
-            try {
-                $dailyReadingController = app(DailyReadingController::class);
-                
-                // Fetch both languages so UI can toggle
-                $readingDataEN = $dailyReadingController->getOrFetchReadings($date, 'EN');
-                $readingDataTG = $dailyReadingController->getOrFetchReadings($date, 'TG');
-
-                $intro = $initialLanguage === 'TG' 
-                    ? "Narito ang mga Pagbasa sa Araw na ito (" . $readingDataTG['date_displayed'] . "):"
-                    : "Here are the Daily Mass Readings for today (" . $readingDataEN['date_displayed'] . "):";
-
-                $aiMsg = ChatMessage::create([
-                    'chat_session_id' => $session->id,
-                    'sender' => 'ai',
-                    'message' => $intro,
-                ]);
-
-                $suggestions = $this->getDynamicSuggestions($userMessage, 'readings');
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => $intro,
-                    'id' => $aiMsg->id,
-                    'type' => 'readings_card',
-                    'readings' => $readingDataEN['readings'], // legacy fallback
-                    'readings_en' => $readingDataEN['readings'],
-                    'readings_tg' => $readingDataTG['readings'],
-                    'initial_lang' => $initialLanguage,
-                    'title_en' => $readingDataEN['title'],
-                    'title_tg' => $readingDataTG['title'],
-                    'suggestions' => $suggestions,
-                ]);
-            } catch (\Exception $e) {
-                Log::error("Chatbot Readings Interception failed: " . $e->getMessage());
-            }
         }
 
         // 4. AIService Response
@@ -181,7 +137,6 @@ class ChatbotController extends Controller
             'id' => $welcomeMsg->id,
             'suggestions' => [
                 '⛪ Mass Schedules',
-                '📖 Today\'s Readings',
                 '🕯️ Offer Mass Intention',
                 '📝 Sacramental Inquiry',
             ],
@@ -272,7 +227,7 @@ class ChatbotController extends Controller
     {
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'resolved']);
-        
+        LogService::log('chat_resolved', $chat, ['session_id' => $chat->session_id]);
         return redirect()->route('admin.chats.index', ['status' => 'resolved'])->with('success', 'Conversation marked as resolved.');
     }
 
@@ -280,7 +235,7 @@ class ChatbotController extends Controller
     {
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'paused']);
-        
+        LogService::log('chat_paused', $chat, ['session_id' => $chat->session_id]);
         return back()->with('success', 'Conversation paused. AI will now handle responses.');
     }
 
@@ -288,7 +243,7 @@ class ChatbotController extends Controller
     {
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'active']);
-        
+        LogService::log('chat_resumed', $chat, ['session_id' => $chat->session_id]);
         return back()->with('success', 'Conversation resumed. AI is now disabled.');
     }
 
@@ -302,6 +257,7 @@ class ChatbotController extends Controller
                 'admin_id' => auth()->id(),
                 'status' => 'active'
             ]);
+            LogService::log('chat_assigned', $chat, ['session_id' => $chat->session_id]);
         }
 
         return view('admin.chats.show', compact('chat'));
@@ -321,6 +277,7 @@ class ChatbotController extends Controller
             'message' => $request->message,
         ]);
 
+        LogService::log('chat_admin_reply', $chat, ['session_id' => $chat->session_id, 'message_length' => strlen($request->message)]);
         return back()->with('success', 'Reply sent!');
     }
 
@@ -369,14 +326,6 @@ class ChatbotController extends Controller
     {
         $lower = strtolower($message);
 
-        if ($detectedTopic === 'readings' || Str::contains($lower, ['reading', 'readings', 'pagbasa', 'ewanghelyo', 'gospel'])) {
-            return [
-                '⛪ Mass Schedules',
-                '🕯️ Offer Mass Intention',
-                '📅 Upcoming Parish Events'
-            ];
-        }
-
         if (Str::contains($lower, ['intention', 'alay', 'panalangin', 'offering'])) {
             return [
                 '🔍 Track Intention Status',
@@ -389,7 +338,7 @@ class ChatbotController extends Controller
             return [
                 '🕯️ Offer Mass Intention',
                 '📝 Sacramental Inquiry',
-                '📖 Today\'s Readings'
+                '📅 Upcoming Parish Events'
             ];
         }
 
@@ -404,16 +353,16 @@ class ChatbotController extends Controller
         if (Str::contains($lower, ['donate', 'donation', 'ambag', 'tulong'])) {
             return [
                 '⛪ Mass Schedules',
-                '📖 Today\'s Readings',
-                '🕯️ Offer Mass Intention'
+                '🕯️ Offer Mass Intention',
+                '📅 Upcoming Parish Events'
             ];
         }
 
         // Default follow-up suggestions
         return [
             '⛪ Mass Schedules',
-            '📖 Today\'s Readings',
-            '🕯️ Offer Mass Intention'
+            '🕯️ Offer Mass Intention',
+            '📝 Sacramental Inquiry'
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MassSchedule;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -36,6 +37,7 @@ class ScheduleController extends Controller
         ]);
 
         MassSchedule::create($validated);
+        LogService::log('create_schedule', null, ['mass_type' => $validated['mass_type'], 'day_of_week' => $validated['day_of_week'] ?? null, 'time' => $validated['time'] ?? null]);
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule created.');
     }
 
@@ -57,11 +59,13 @@ class ScheduleController extends Controller
             'is_active' => 'boolean',
         ]);
         $schedule->update($validated);
+        LogService::log('update_schedule', $schedule, ['mass_type' => $validated['mass_type'] ?? null]);
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule updated.');
     }
 
     public function destroy(MassSchedule $schedule)
     {
+        LogService::log('delete_schedule', $schedule, ['mass_type' => $schedule->mass_type]);
         $schedule->delete();
         return back()->with('success', 'Schedule deleted.');
     }

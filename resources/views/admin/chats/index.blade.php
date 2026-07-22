@@ -1,21 +1,8 @@
 <x-admin-layout>
-    <div class="px-8 py-10" x-data="{
-        status: '{{ $status }}',
-        search: '{{ request('search') }}',
-        init() {
-            setInterval(() => {
-                fetch('{{ route('admin.chats.sessions-html') }}?status=' + encodeURIComponent(this.status) + '&search=' + encodeURIComponent(this.search || ''))
-                    .then(r => r.json())
-                    .then(d => {
-                        const oldTbody = document.getElementById('sessions-tbody');
-                        if (oldTbody) oldTbody.outerHTML = d.html;
-                        const pagWrap = document.getElementById('sessions-pagination-wrap');
-                        if (pagWrap) pagWrap.outerHTML = '<div id=\"sessions-pagination-wrap\">' + d.pagination + '</div>';
-                    })
-                    .catch(() => {});
-            }, 15000);
-        }
-    }">
+    <div class="px-8 py-10" x-data="chatList"
+         data-status="{{ $status }}"
+         data-search="{{ request('search') }}"
+         data-url="{{ route('admin.chats.sessions-html') }}">
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div>
                 <h1 class="font-heading text-4xl font-black text-primary italic">Live Chat Management</h1>

@@ -434,7 +434,7 @@
             border-radius: 18px;
             padding: 36px 32px;
             max-width: 380px;
-            margin: 0 auto;
+            width: 100%;
             transition: transform .4s ease, box-shadow .4s ease;
         }
         .leader-card:hover {
@@ -759,57 +759,10 @@
                     <div class="tl-spine" id="tl-spine"></div>
 
                     @php
-                    $timeline = [
-                        [
-                            'year'  => '1982',
-                            'badge' => null,
-                            'title' => 'The image is carved',
-                            'short' => 'Carved in Paete, Laguna through funds gathered by Mrs. Delia Sanchez and Mrs. Fely Canta.',
-                            'full'  => 'Blessed by Rev. Fr. Rey Amante, the image was first housed at the Canta residence, then transferred in procession to the make-shift chapel.',
-                        ],
-                        [
-                            'year'  => '1983',
-                            'badge' => null,
-                            'title' => 'Canonical erection',
-                            'short' => 'The parish was canonically erected on October 16, 1983.',
-                            'full'  => 'On the same day, the Queen of the Most Holy Rosary of Pacita was officially declared patroness of the parish community.',
-                        ],
-                        [
-                            'year'  => '1986',
-                            'badge' => null,
-                            'title' => 'Church dedication',
-                            'short' => 'The Sto. Rosario Parish Church was blessed and dedicated on December 6.',
-                            'full'  => 'Jointly officiated by Msgr. Bruno Torpigliani (Papal Nuncio), Bishop Pedro Bantigue, and Auxiliary Bishop Gabriel Reyes.',
-                        ],
-                        [
-                            'year'  => '2009',
-                            'badge' => null,
-                            'title' => 'Our Lady of Pacita',
-                            'short' => "Rev. Fr. Mario P. Rivera began promoting the endearing title 'Our Lady of Pacita.'",
-                            'full'  => "This title integrated the community's deep sense of belonging with the Blessed Mother.",
-                        ],
-                        [
-                            'year'  => '2021',
-                            'badge' => null,
-                            'title' => 'Hermandad established',
-                            'short' => 'The Hermandad del Santo Rosario — the Rosary Confraternity of Pacita — was formally established.',
-                            'full'  => 'Established to propagate devotion to Our Lady. The Perpetual Novena is held every Saturday.',
-                        ],
-                        [
-                            'year'  => '2024',
-                            'badge' => 'Cultural Heritage',
-                            'title' => 'Important Cultural Property',
-                            'short' => 'The image was declared an Important Cultural Property of the City of San Pedro.',
-                            'full'  => 'Via Sangguniang Panlungsod Resolution No. 2024-198, adopted October 1, 2024.',
-                        ],
-                        [
-                            'year'  => '2025',
-                            'badge' => 'Royal Honor',
-                            'title' => 'Queen of the City',
-                            'short' => "Our Lady was accorded the honorific title 'Queen of the City of San Pedro.'",
-                            'full'  => 'Via Sangguniang Panlungsod Resolution No. 2025-93, adopted June 10, 2025.',
-                        ],
-                    ];
+                    $timelineRaw = $global_settings['parish_timeline'] ?? '';
+                    $timeline = is_string($timelineRaw) && $timelineRaw !== ''
+                        ? (json_decode($timelineRaw, true) ?: \App\Data\DefaultTimeline::entries())
+                        : (is_array($timelineRaw) && !empty($timelineRaw) ? $timelineRaw : \App\Data\DefaultTimeline::entries());
                     @endphp
 
                     @foreach($timeline as $i => $e)
@@ -883,16 +836,35 @@
     <section class="leadership-section">
         <p class="section-eyebrow" data-reveal>Our Leadership</p>
         <h2 class="leadership-title" data-reveal>Shepherds of<br>the flock</h2>
-        <div class="leader-card" data-reveal="scale">
-            @if(isset($global_settings['priest_image']))
-                <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
-            @else
-                <div class="leader-avatar">FV</div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; max-width:820px; margin:0 auto;">
+            <div class="leader-card" data-reveal="scale">
+                @if(isset($global_settings['priest_image']))
+                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                @else
+                    <div class="leader-avatar">FV</div>
+                @endif
+                <h3 class="leader-name">{{ $global_settings['priest_name'] ?? 'Rev. Fr. Parish Priest' }}</h3>
+                <p class="leader-role">{{ $global_settings['priest_role'] ?? 'Parish Priest' }}</p>
+                <div class="leader-rule"></div>
+                @if(!empty($global_settings['priest_quote']))
+                    <p class="leader-quote">"{{ $global_settings['priest_quote'] }}"</p>
+                @endif
+            </div>
+            @if(!empty($global_settings['assistant_priest_name']))
+            <div class="leader-card" data-reveal="scale">
+                @if(isset($global_settings['assistant_priest_image']))
+                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['assistant_priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                @else
+                    <div class="leader-avatar">AP</div>
+                @endif
+                <h3 class="leader-name">{{ $global_settings['assistant_priest_name'] }}</h3>
+                <p class="leader-role">{{ $global_settings['assistant_priest_role'] ?? 'Assistant Parish Priest' }}</p>
+                <div class="leader-rule"></div>
+                @if(!empty($global_settings['assistant_priest_quote']))
+                    <p class="leader-quote">"{{ $global_settings['assistant_priest_quote'] }}"</p>
+                @endif
+            </div>
             @endif
-            <h3 class="leader-name">{{ $global_settings['priest_name'] ?? 'Rev. Fr. Parish Priest' }}</h3>
-            <p class="leader-role">Parish Priest · 2019–Present</p>
-            <div class="leader-rule"></div>
-            <p class="leader-quote">"Feeding the sheep and tending the flock of the Lord with love and devotion."</p>
         </div>
     </section>
 
@@ -916,8 +888,15 @@
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C9.39 21 3 14.61 3 7a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.01l-2.2 2.21z" fill="#F5C518"/></svg>
                     </div>
                     <p class="info-card-label">Contact</p>
-                    <p>(02) 8869 2742</p>
-                    <p>0906 099 2324</p>
+                    @php
+                        $contactRaw = $global_settings['parish_contact'] ?? '';
+                        $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
+                            ? (json_decode($contactRaw, true) ?: [$contactRaw])
+                            : (is_array($contactRaw) ? $contactRaw : ['(02) 8869 2742', '0906 099 2324']);
+                    @endphp
+                    @foreach($contactNumbers as $number)
+                    <p>{{ $number }}</p>
+                    @endforeach
                     <small>{{ config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}</small>
                 </div>
 

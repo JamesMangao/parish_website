@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -31,6 +32,12 @@ class UserController extends Controller
             'role' => $validated['role'],
         ]);
 
+        LogService::log('create_user', null, [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+        ]);
+
         return back()->with('success', 'User created successfully!');
     }
 
@@ -44,6 +51,7 @@ class UserController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        $oldRole = $user->role;
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
@@ -55,6 +63,22 @@ class UserController extends Controller
 
         $user->save();
 
+        LogService::log('update_user', $user, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'is_active' => $user->is_active,
+            'old_role' => $oldRole,
+            'password_changed' => (bool) $validated['password'],
+        ]);
+
+        if ($oldRole !== $validated['role']) {
+            LogService::log('role_change', $user, [
+                'old_role' => $oldRole,
+                'new_role' => $validated['role'],
+            ]);
+        }
+
         return back()->with('success', 'User updated successfully!');
     }
 
@@ -65,6 +89,10 @@ class UserController extends Controller
         }
         
         $user->update(['is_active' => false]);
+        LogService::log('deactivate_user', $user, [
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
         return back()->with('success', 'User deactivated successfully!');
     }
 }

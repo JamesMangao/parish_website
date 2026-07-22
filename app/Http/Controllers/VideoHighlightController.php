@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\VideoHighlight;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -52,6 +53,7 @@ class VideoHighlightController extends Controller
             'sort_order' => VideoHighlight::count(),
         ]);
 
+        LogService::log('create_highlight', null, ['title' => $request->title]);
         return redirect()->route('admin.highlights.index')->with('success', 'Video Highlight created successfully!');
     }
 
@@ -92,11 +94,13 @@ class VideoHighlightController extends Controller
             'is_published' => $request->has('is_published'),
         ]);
 
+        LogService::log('update_highlight', $highlight, ['title' => $highlight->title]);
         return redirect()->route('admin.highlights.index')->with('success', 'Video Highlight updated successfully!');
     }
 
     public function destroy(VideoHighlight $highlight)
     {
+        LogService::log('delete_highlight', $highlight, ['title' => $highlight->title]);
         $oldPath = $highlight->getRawOriginal('video_path');
         if ($oldPath && !Str::startsWith($oldPath, ['http', 'www'])) {
             Storage::delete('highlights/' . $oldPath);
@@ -111,6 +115,7 @@ class VideoHighlightController extends Controller
         foreach ($orders as $id => $order) {
             VideoHighlight::where('id', $id)->update(['sort_order' => $order]);
         }
+        LogService::log('reorder_highlights', null, ['order' => $orders]);
         return response()->json(['status' => 'success']);
     }
 }

@@ -1,5 +1,50 @@
 <x-admin-layout>
-    <div class="max-w-4xl">
+    @php
+        $qrUrl = isset($settings['qr_code']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['qr_code']) : null;
+        $priestUrl = isset($settings['priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['priest_image']) : null;
+        $assistantPriestUrl = isset($settings['assistant_priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['assistant_priest_image']) : null;
+    @endphp
+    <div class="max-w-4xl" x-data="{
+        qrPreview: {{ $qrUrl ? "'" . addslashes($qrUrl) . "'" : 'null' }},
+        priestPreview: {{ $priestUrl ? "'" . addslashes($priestUrl) . "'" : 'null' }},
+        assistantPriestPreview: {{ $assistantPriestUrl ? "'" . addslashes($assistantPriestUrl) . "'" : 'null' }},
+        handleQrUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 1.8 * 1024 * 1024) {
+                this.$store.toast.trigger('QR Code image is too large. Maximum size is 1.8MB.', 'error');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => { this.qrPreview = ev.target.result; };
+            reader.readAsDataURL(file);
+        },
+        handlePriestUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 1.8 * 1024 * 1024) {
+                this.$store.toast.trigger('Priest image is too large. Maximum size is 1.8MB.', 'error');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => { this.priestPreview = ev.target.result; };
+            reader.readAsDataURL(file);
+        },
+        handleAssistantPriestUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 1.8 * 1024 * 1024) {
+                this.$store.toast.trigger('Assistant priest image is too large. Maximum size is 1.8MB.', 'error');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => { this.assistantPriestPreview = ev.target.result; };
+            reader.readAsDataURL(file);
+        }
+    }">
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="font-heading text-3xl font-bold text-primary italic">General Settings</h1>
@@ -7,145 +52,299 @@
             </div>
         </div>
 
-
         <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
-            @if ($errors->any())
-                <div class="p-4 bg-red-100 text-red-700 border border-red-200 rounded-xl text-sm">
-                    <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-            
-            <!-- Parish Information -->
-            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden">
-                <div class="p-6 border-b bg-muted/30">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Parish Information</h3>
-                </div>
-                <div class="p-6 grid gap-6 md:grid-cols-2">
+            {{-- Parish Information --}}
+            <x-admin-card>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Parish Information</h3>
+                <div class="grid gap-6 md:grid-cols-2">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Parish Name</label>
                         <input type="text" name="parish_name" value="{{ $settings['parish_name'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('parish_name') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contact Number</label>
-                        <input type="text" name="parish_contact" value="{{ $settings['parish_contact'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @php
+                            $contactRaw = $settings['parish_contact'] ?? '';
+                            $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
+                                ? (json_decode($contactRaw, true) ?: [$contactRaw])
+                                : (is_array($contactRaw) ? $contactRaw : ['']);
+                        @endphp
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contact Numbers</label>
+                        <div x-data="{ numbers: {{ json_encode($contactNumbers) }} }">
+                            <template x-for="(number, index) in numbers" :key="index">
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" :name="'parish_contact['+index+']'" x-model="numbers[index]" placeholder="+63 2 8869 2742"
+                                        class="flex-1 bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                                    <button type="button" @click="numbers.splice(index, 1)" x-show="numbers.length > 1"
+                                        class="px-3 py-2 bg-destructive/10 text-destructive rounded-md hover:bg-destructive hover:text-white transition-colors" title="Remove Number">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                    </button>
+                                </div>
+                            </template>
+                            <button type="button" @click="numbers.push('')" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                                Add Another Number
+                            </button>
+                        </div>
+                        @error('parish_contact') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Full Address</label>
                         <textarea name="parish_address" rows="2" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">{{ $settings['parish_address'] ?? '' }}</textarea>
+                        @error('parish_address') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Official Email</label>
                         <input type="email" name="parish_email" value="{{ $settings['parish_email'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('parish_email') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                 </div>
-            </div>
+            </x-admin-card>
 
-            <!-- Donation Settings -->
-            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden">
-                <div class="p-6 border-b bg-muted/30">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Donation & Payments (GCash)</h3>
-                </div>
-                <div class="p-6 grid gap-6 md:grid-cols-2">
+            {{-- Donation Settings --}}
+            <x-admin-card>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Donation & Payments (GCash)</h3>
+                <div class="grid gap-6 md:grid-cols-2">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">GCash Number</label>
                         <input type="text" name="gcash_number" value="{{ $settings['gcash_number'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('gcash_number') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">GCash Account Name</label>
                         <input type="text" name="gcash_name" value="{{ $settings['gcash_name'] ?? '' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('gcash_name') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payment QR Code</label>
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
-                            @if(isset($settings['qr_code']))
-                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['qr_code']) }}" class="h-32 w-32 object-contain border rounded bg-white shadow-sm" />
-                            @else
-                                <div class="h-32 w-32 flex items-center justify-center bg-white border rounded text-muted-foreground text-[10px] uppercase font-black text-center px-4">No QR Uploaded</div>
-                            @endif
+                            <div class="h-32 w-32 shrink-0 rounded bg-white border shadow-sm flex items-center justify-center overflow-hidden">
+                                <template x-if="qrPreview">
+                                    <img :src="qrPreview" class="h-full w-full object-contain" />
+                                </template>
+                                <template x-if="!qrPreview">
+                                    <span class="text-muted-foreground text-[10px] uppercase font-black text-center px-4">No QR Uploaded</span>
+                                </template>
+                            </div>
                             <div class="flex-1">
-                                <input type="file" name="qr_code" class="text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
-                                <p class="mt-2 text-[10px] text-muted-foreground">Upload your GCash QR code for easier donations. Max 2MB (JPG/PNG).</p>
+                                <input type="file" name="qr_code" accept="image/*" @change="handleQrUpload($event)"
+                                    class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
+                                <p class="mt-2 text-[10px] text-muted-foreground">Upload your GCash QR code. Max 1.8MB (JPG/PNG).</p>
                             </div>
                         </div>
+                        @error('qr_code') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                 </div>
-            </div>
+            </x-admin-card>
 
-            <!-- Leadership Settings -->
-            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden">
-                <div class="p-6 border-b bg-muted/30">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Leadership Information</h3>
-                </div>
-                <div class="p-6 grid gap-6 md:grid-cols-2">
+            {{-- Leadership Settings --}}
+            <x-admin-card>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Leadership Information</h3>
+
+                {{-- Parish Priest --}}
+                <div class="grid gap-6 md:grid-cols-2 mb-8">
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Parish Priest Name</label>
                         <input type="text" name="priest_name" value="{{ $settings['priest_name'] ?? '' }}" placeholder="Rev. Fr. John Doe" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('priest_name') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Role / Title</label>
+                        <input type="text" name="priest_role" value="{{ $settings['priest_role'] ?? '' }}" placeholder="Parish Priest · 2019–Present" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('priest_role') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Quote</label>
+                        <input type="text" name="priest_quote" value="{{ $settings['priest_quote'] ?? '' }}" placeholder="Feeding the sheep and tending the flock..." class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('priest_quote') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Parish Priest Image</label>
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
-                            <div id="priest_preview_container" class="h-32 w-32 relative rounded-full overflow-hidden border bg-white shadow-sm flex items-center justify-center">
-                                @if(isset($settings['priest_image']))
-                                    <img id="priest_preview_image" src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['priest_image']) }}" class="h-full w-full object-cover" />
-                                    <span id="priest_no_image_text" class="hidden text-muted-foreground text-[10px] font-black text-center px-4">No Image</span>
-                                @else
-                                    <img id="priest_preview_image" src="" class="hidden h-full w-full object-cover" />
-                                    <span id="priest_no_image_text" class="text-muted-foreground text-[10px] font-black text-center px-4">No Image</span>
-                                @endif
+                            <div class="h-32 w-32 shrink-0 relative rounded-full overflow-hidden border bg-white shadow-sm flex items-center justify-center">
+                                <template x-if="priestPreview">
+                                    <img :src="priestPreview" class="h-full w-full object-cover" />
+                                </template>
+                                <template x-if="!priestPreview">
+                                    <span class="text-muted-foreground text-[10px] font-black text-center px-4">No Image</span>
+                                </template>
                             </div>
                             <div class="flex-1">
-                                <input type="file" name="priest_image" id="priest_image_input" accept="image/*" class="text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
-                                <p class="mt-2 text-[10px] text-muted-foreground">Upload an image of the current Parish Priest to be shown on the About section. Max 2MB (JPG/PNG).</p>
+                                <input type="file" name="priest_image" accept="image/*" @change="handlePriestUpload($event)"
+                                    class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
+                                <p class="mt-2 text-[10px] text-muted-foreground">Upload an image of the Parish Priest for the About section. Max 1.8MB (JPG/PNG).</p>
                             </div>
                         </div>
-                        </div>
+                        @error('priest_image') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                 </div>
-            </div>
 
-            <!-- Gallery Settings -->
-            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden mb-6">
-                <div class="p-6 border-b bg-muted/30">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Gallery Settings</h3>
-                </div>
-                <div class="p-6 space-y-4">
+                <div style="height:1px; background:linear-gradient(90deg,rgba(var(--primary-rgb),0.15),transparent); margin-bottom:24px;"></div>
+
+                {{-- Assistant Parish Priest --}}
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assistant Parish Priest Name</label>
+                        <input type="text" name="assistant_priest_name" value="{{ $settings['assistant_priest_name'] ?? '' }}" placeholder="Rev. Fr. Jane Smith" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('assistant_priest_name') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
+                    </div>
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Main Gallery Highlights Video (YouTube URL or Cloud Path)</label>
-                        <input type="text" name="gallery_highlights_video" value="{{ $settings['gallery_highlights_video'] ?? '' }}" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
-                        <p class="text-[10px] text-muted-foreground italic">This video will be featured at the top of the main Gallery index page.</p>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Role / Title</label>
+                        <input type="text" name="assistant_priest_role" value="{{ $settings['assistant_priest_role'] ?? '' }}" placeholder="Assistant Parish Priest" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('assistant_priest_role') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Quote</label>
+                        <input type="text" name="assistant_priest_quote" value="{{ $settings['assistant_priest_quote'] ?? '' }}" placeholder="Serving the community with faith and dedication..." class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('assistant_priest_quote') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assistant Parish Priest Image</label>
+                        <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
+                            <div class="h-32 w-32 shrink-0 relative rounded-full overflow-hidden border bg-white shadow-sm flex items-center justify-center">
+                                <template x-if="assistantPriestPreview">
+                                    <img :src="assistantPriestPreview" class="h-full w-full object-cover" />
+                                </template>
+                                <template x-if="!assistantPriestPreview">
+                                    <span class="text-muted-foreground text-[10px] font-black text-center px-4">No Image</span>
+                                </template>
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="assistant_priest_image" accept="image/*" @change="handleAssistantPriestUpload($event)"
+                                    class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
+                                <p class="mt-2 text-[10px] text-muted-foreground">Upload an image of the Assistant Parish Priest for the About section. Max 1.8MB (JPG/PNG).</p>
+                            </div>
+                        </div>
+                        @error('assistant_priest_image') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                 </div>
-            </div>
+            </x-admin-card>
 
-            <!-- Email Template Settings -->
-            <div class="bg-card rounded-2xl border shadow-sm overflow-hidden mb-6">
-                <div class="p-6 border-b bg-muted/30">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-primary italic">Email Templates</h3>
+            {{-- Sacred History Timeline --}}
+            <x-admin-card>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Sacred History Timeline</h3>
+                @php
+                    $timelineRaw = $settings['parish_timeline'] ?? '[]';
+                    $timelineEntries = is_string($timelineRaw) ? (json_decode($timelineRaw, true) ?: []) : (is_array($timelineRaw) ? $timelineRaw : []);
+                    if (empty($timelineEntries)) {
+                        $timelineEntries = \App\Data\DefaultTimeline::entries();
+                    }
+                @endphp
+                <div x-data="{
+                    entries: {{ json_encode($timelineEntries) }},
+                    addEntry() {
+                        this.entries.push({year: '', badge: '', title: '', short: '', full: ''});
+                    },
+                    removeEntry(index) {
+                        if (this.entries.length <= 1) {
+                            this.$store.toast.trigger('At least one timeline entry is required.', 'error');
+                            return;
+                        }
+                        this.entries.splice(index, 1);
+                    },
+                    moveUp(index) {
+                        if (index === 0) return;
+                        const item = this.entries.splice(index, 1)[0];
+                        this.entries.splice(index - 1, 0, item);
+                    },
+                    moveDown(index) {
+                        if (index >= this.entries.length - 1) return;
+                        const item = this.entries.splice(index, 1)[0];
+                        this.entries.splice(index + 1, 0, item);
+                    }
+                }">
+                    <template x-for="(entry, index) in entries" :key="index">
+                        <div class="border border-border rounded-lg p-4 mb-4 bg-background/50">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-muted-foreground" x-text="'Entry ' + (index + 1)"></span>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" @click="moveUp(index)" :disabled="index === 0"
+                                        class="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move Up">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                                    </button>
+                                    <button type="button" @click="moveDown(index)" :disabled="index >= entries.length - 1"
+                                        class="p-1 rounded hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move Down">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                    </button>
+                                    <button type="button" @click="removeEntry(index)"
+                                        class="p-1 rounded bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-colors" title="Remove Entry">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Year</label>
+                                    <input type="text" :name="'parish_timeline['+index+'][year]'" x-model="entries[index].year" placeholder="1986"
+                                        class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm focus:ring-accent focus:border-accent">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Badge (optional)</label>
+                                    <input type="text" :name="'parish_timeline['+index+'][badge]'" x-model="entries[index].badge" placeholder="Cultural Heritage"
+                                        class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm focus:ring-accent focus:border-accent">
+                                </div>
+                            </div>
+                            <div class="space-y-1 mb-3">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Title</label>
+                                <input type="text" :name="'parish_timeline['+index+'][title]'" x-model="entries[index].title" placeholder="Church dedication"
+                                    class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm focus:ring-accent focus:border-accent">
+                            </div>
+                            <div class="space-y-1 mb-3">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Short Description</label>
+                                <textarea :name="'parish_timeline['+index+'][short]'" x-model="entries[index].short" rows="2" placeholder="Always-visible text..."
+                                    class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm focus:ring-accent focus:border-accent"></textarea>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Full Description (Read more)</label>
+                                <textarea :name="'parish_timeline['+index+'][full]'" x-model="entries[index].full" rows="2" placeholder="Hidden until 'Read more' is clicked..."
+                                    class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm focus:ring-accent focus:border-accent"></textarea>
+                            </div>
+                        </div>
+                    </template>
+                    <button type="button" @click="addEntry()" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        Add Timeline Entry
+                    </button>
                 </div>
-                <div class="p-6 space-y-4">
+            </x-admin-card>
+
+            {{-- Gallery Settings --}}
+            <x-admin-card>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Gallery Settings</h3>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Main Gallery Highlights Video (YouTube URL or Cloud Path)</label>
+                    <input type="text" name="gallery_highlights_video" value="{{ $settings['gallery_highlights_video'] ?? '' }}" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                    <p class="text-[10px] text-muted-foreground italic">This video will be featured at the top of the main Gallery index page.</p>
+                    @error('gallery_highlights_video') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
+                </div>
+            </x-admin-card>
+
+            {{-- Email Template Settings --}}
+            <x-admin-card>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Email Templates</h3>
+                <div class="space-y-4">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email Greeting</label>
                         <input type="text" name="email_greeting" value="{{ $settings['email_greeting'] ?? 'Peace be with you!' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
-                        <p class="text-[10px] text-muted-foreground italic">The greeting phrase used in email notifications (e.g., "Peace be with you!").</p>
+                        <p class="text-[10px] text-muted-foreground italic">The greeting phrase used in email notifications.</p>
+                        @error('email_greeting') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email Closing Message</label>
                         <input type="text" name="email_closing" value="{{ $settings['email_closing'] ?? 'Thank you for your faith and patience.' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
                         <p class="text-[10px] text-muted-foreground italic">The closing line before the sign-off.</p>
+                        @error('email_closing') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email Sign-off Name</label>
                         <input type="text" name="email_signoff" value="{{ $settings['email_signoff'] ?? 'Sto. Rosario Parish' }}" class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
-                        <p class="text-[10px] text-muted-foreground italic">The name used at the end of emails (e.g., "Sto. Rosario Parish" or "Parish Office").</p>
+                        <p class="text-[10px] text-muted-foreground italic">The name used at the end of emails.</p>
+                        @error('email_signoff') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
                     </div>
                 </div>
-            </div>
+            </x-admin-card>
 
             <div class="flex justify-end">
                 <button type="submit" class="px-8 py-3 bg-accent text-accent-foreground rounded-xl font-black text-sm shadow-xl hover:scale-[1.02] transition-all flex items-center gap-2">
@@ -155,41 +354,4 @@
             </div>
         </form>
     </div>
-    <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const qrInput = document.querySelector('input[name="qr_code"]');
-            const priestInput = document.querySelector('input[name="priest_image"]');
-            const maxMB = 1.8; // Safer margin for 2M PHP limit
-
-            if (qrInput && qrInput.files.length > 0 && qrInput.files[0].size > maxMB * 1024 * 1024) {
-                e.preventDefault();
-                alert(`The QR Code image is too large. Maximum size is ${maxMB}MB.`);
-                return;
-            }
-
-            if (priestInput && priestInput.files.length > 0 && priestInput.files[0].size > maxMB * 1024 * 1024) {
-                e.preventDefault();
-                alert(`The Parish Priest Image is too large. Maximum size is ${maxMB}MB.`);
-                return;
-            }
-        });
-
-        const priestImageInput = document.getElementById('priest_image_input');
-        if(priestImageInput) {
-            priestImageInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = document.getElementById('priest_preview_image');
-                        const placeholder = document.getElementById('priest_no_image_text');
-                        img.src = event.target.result;
-                        img.classList.remove('hidden');
-                        placeholder.classList.add('hidden');
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-    </script>
 </x-admin-layout>

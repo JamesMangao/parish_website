@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inquiry;
 use App\Mail\InquiryAccepted;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -116,6 +117,11 @@ class InquiryController extends Controller
                 'accepted_at' => now(),
             ]);
 
+            LogService::log('inquiry_accepted', $inquiry, [
+                'inquiry_type' => $inquiry->inquiry_type,
+                'full_name' => $inquiry->full_name,
+            ]);
+
             // Email to the parish office
             Mail::to(config('services.parish.office_email'))->send(new InquiryAccepted($inquiry));
 
@@ -139,6 +145,12 @@ class InquiryController extends Controller
         $inquiry->update([
             'status'           => 'declined',
             'rejection_reason' => $request->reason,
+        ]);
+
+        LogService::log('inquiry_declined', $inquiry, [
+            'inquiry_type' => $inquiry->inquiry_type,
+            'full_name' => $inquiry->full_name,
+            'reason' => $request->reason,
         ]);
 
         // Notify the parishioner

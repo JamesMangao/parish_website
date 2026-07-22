@@ -63,6 +63,12 @@ class AdminIntentionController extends Controller
             'reference_number' => $this->generateReferenceNumber(),
         ]);
 
+        LogService::log('create_intention', null, [
+            'full_name' => $validated['fullName'],
+            'intention_type' => $validated['intentionType'],
+            'preferred_date' => $validated['preferredDate'],
+        ]);
+
         return redirect()->route('admin.intentions')->with('success', 'Mass intention created successfully.');
     }
 
@@ -96,6 +102,14 @@ class AdminIntentionController extends Controller
             'old_status' => $oldStatus,
             'reason' => $intention->rejection_reason
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Status updated.',
+                'intention' => $intention->fresh(['id', 'status', 'reference_number']),
+            ]);
+        }
 
         return back()->with('success', 'Status updated.');
     }
@@ -136,6 +150,14 @@ class AdminIntentionController extends Controller
             'ids' => $ids,
             'reason' => $reason
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) . ' intentions updated.',
+                'updated' => MassIntention::whereIn('id', $ids)->get(['id', 'status', 'reference_number']),
+            ]);
+        }
 
         return back()->with('success', count($ids) . ' intentions updated.');
     }

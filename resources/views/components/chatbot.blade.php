@@ -86,68 +86,6 @@
                             </div>
                         </template>
 
-                        <!-- Special Interaction: Readings Card -->
-                        <template x-if="msg.type === 'readings_card' && (msg.readings_en || msg.readings_tg || msg.readings)">
-                            <div class="mt-3 bg-white border border-primary/10 rounded-2xl overflow-hidden shadow-md max-w-full text-primary" 
-                                 x-data="{ 
-                                    activeTab: 0, 
-                                    lang: msg.initial_lang || 'EN',
-                                    get activeReadings() {
-                                        if (this.lang === 'EN' && msg.readings_en) return msg.readings_en;
-                                        if (this.lang === 'TG' && msg.readings_tg) return msg.readings_tg;
-                                        return msg.readings;
-                                    }
-                                 }">
-                                <!-- Card Header -->
-                                <div class="bg-primary/5 px-4 py-3 border-b border-primary/10 flex flex-col sm:flex-row gap-2 sm:items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-base">📖</span>
-                                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-primary/90" x-text="lang === 'TG' ? 'Mga Pagbasa ng Misa' : 'Daily Mass Readings'"></span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <!-- Language Toggle -->
-                                        <template x-if="msg.readings_en && msg.readings_tg">
-                                            <div class="flex bg-primary/10 rounded-lg p-0.5 border border-primary/10">
-                                                <button @click="lang = 'EN'; activeTab = 0;" 
-                                                        class="px-2 py-0.5 text-[9px] font-bold rounded-md transition-all uppercase"
-                                                        :class="lang === 'EN' ? 'bg-white shadow-sm text-primary' : 'text-primary/60 hover:text-primary'">EN</button>
-                                                <button @click="lang = 'TG'; activeTab = 0;" 
-                                                        class="px-2 py-0.5 text-[9px] font-bold rounded-md transition-all uppercase"
-                                                        :class="lang === 'TG' ? 'bg-white shadow-sm text-primary' : 'text-primary/60 hover:text-primary'">TG</button>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </div>
-
-                                <!-- Tabs / Collapsible Header -->
-                                <div class="flex border-b border-primary/5 bg-primary/[0.01]">
-                                    <template x-for="(r, i) in activeReadings" :key="lang + i">
-                                        <button 
-                                            @click="activeTab = i"
-                                            class="flex-1 py-2.5 text-[9px] sm:text-[10px] font-extrabold text-center border-b-2 transition-all duration-200 outline-none px-1"
-                                            :class="activeTab === i ? 'border-primary text-primary bg-primary/[0.02]' : 'border-transparent text-slate-400 hover:text-primary hover:bg-primary/[0.005]'"
-                                            x-text="r.type"
-                                        ></button>
-                                    </template>
-                                </div>
-
-                                <!-- Tab Contents -->
-                                <div class="p-4 max-h-[250px] overflow-y-auto bg-white text-xs leading-relaxed text-slate-700 font-medium">
-                                    <template x-for="(r, i) in activeReadings" :key="lang + 'content' + i">
-                                        <div x-show="activeTab === i" x-cloak class="space-y-2">
-                                            <!-- Reference / Source -->
-                                            <div x-show="r.reference" class="text-[11px] font-extrabold text-accent flex items-center gap-1">
-                                                <span>📍</span>
-                                                <span x-text="r.reference"></span>
-                                            </div>
-                                            <!-- Text body -->
-                                            <div class="whitespace-pre-line text-slate-700 tracking-wide font-normal leading-relaxed text-[11px]" x-html="r.text"></div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
-
                         <!-- Special Interaction: Error with Retry -->
                         <template x-if="msg.type === 'error'">
                             <div class="mt-2">
@@ -281,7 +219,6 @@
                         this.messages.push(this._makeMsg('assistant', 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.'));
                         this.currentSuggestions = [
                             '⛪ Mass Schedules',
-                            '📖 Today\'s Readings',
                             '🕯️ Offer Mass Intention',
                             '📝 Sacramental Inquiry'
                         ];
@@ -386,14 +323,9 @@
                         } else                         if (data.message) {
                             let newMsg = this._makeMsg('assistant', data.message);
                             if (data.id) {
-                                newMsg.id = data.id; // Store DB ID to prevent polling dupes
+                                newMsg.id = data.id;
                                 this.lastMessageId = Math.max(this.lastMessageId, data.id);
                             }
-                            if (data.type) newMsg.type = data.type; // E.g., 'readings_card'
-                            if (data.readings) newMsg.readings = data.readings;
-                            if (data.readings_en) newMsg.readings_en = data.readings_en;
-                            if (data.readings_tg) newMsg.readings_tg = data.readings_tg;
-                            if (data.initial_lang) newMsg.initial_lang = data.initial_lang;
                             this.messages.push(newMsg);
                         }
                         

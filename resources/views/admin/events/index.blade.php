@@ -1,6 +1,6 @@
 <x-admin-index title="Parish Events" description="Manage upcoming parish activities and celebrations."
     createRoute="{{ route('admin.events.create') }}" :headers="['Event Name', 'Date & Time', 'Status']">
-    @foreach($events as $e)
+    @forelse($events as $e)
         <tr class="hover:bg-muted/20 transition-colors">
             <td class="px-6 py-4">
                 <div class="font-bold text-primary">{{ $e->title }}</div>
@@ -23,18 +23,15 @@
             </td>
 
             <td class="px-6 py-4">
-                <span
-                    class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $e->is_published ? 'bg-green-100 text-green-700 border-green-200' : 'bg-muted text-muted-foreground border-border' }}">
-                    {{ $e->is_published ? 'Published' : 'Draft' }}
-                </span>
+                <x-admin-badge :status="$e->is_published ? 'published' : 'draft'" />
             </td>
             <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-2">
+                <div class="flex items-center justify-end gap-2" x-data>
                     <a href="{{ route('admin.events.edit', $e->id) }}"
                         class="p-1.5 rounded-md border border-border text-muted-foreground hover:border-primary hover:text-primary transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="lucide lucide-pencil">
+                            stroke-linejoin="round">
                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                             <path d="m15 5 4 4" />
                         </svg>
@@ -43,11 +40,11 @@
                         @csrf
                         @method('DELETE')
                         <button type="button" 
-                            @click="triggerConfirm('Confirm Deletion', 'Are you sure you want to permanently remove this event? This action cannot be undone.', () => document.getElementById('delete-event-{{ $e->id }}').submit())"
+                            @click="$store.confirm.open('Confirm Deletion', 'Are you sure you want to permanently remove this event? This action cannot be undone.', () => document.getElementById('delete-event-{{ $e->id }}').submit())"
                             class="p-1.5 rounded-md border border-border text-muted-foreground hover:border-destructive hover:text-destructive transition-all" title="Delete Event">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-trash-2">
+                                stroke-linejoin="round">
                                 <path d="M3 6h18" />
                                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
                                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
@@ -59,5 +56,12 @@
                 </div>
             </td>
         </tr>
-    @endforeach
+    @empty
+        <x-admin-empty
+            title="No events yet"
+            description="Create your first parish event to keep your community informed."
+            icon="empty"
+            :colSpan="4"
+        />
+    @endforelse
 </x-admin-index>

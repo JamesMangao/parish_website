@@ -242,7 +242,7 @@
                                 x-text="'Mass Date: ' + previewData.date"></p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <button @click="showPreview = false"
+                            <button @click="showPreview = false" aria-label="Close preview"
                                 class="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -317,7 +317,7 @@
 
                         <!-- Nav Buttons -->
                         <div class="absolute inset-y-0 left-4 flex items-center">
-                            <button x-show="currentSlide > 0" @click="currentSlide--"
+                            <button x-show="currentSlide > 0" @click="currentSlide--" aria-label="Previous slide"
                                 class="p-3 bg-white hover:bg-muted border rounded-xl shadow-lg transition-all text-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
@@ -327,7 +327,7 @@
                             </button>
                         </div>
                         <div class="absolute inset-y-0 right-4 flex items-center">
-                            <button x-show="currentSlide < previewData.slides.length - 1" @click="currentSlide++"
+                            <button x-show="currentSlide < previewData.slides.length - 1" @click="currentSlide++" aria-label="Next slide"
                                 class="p-3 bg-white hover:bg-muted border rounded-xl shadow-lg transition-all text-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
@@ -442,7 +442,7 @@
             </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Intentions Chart

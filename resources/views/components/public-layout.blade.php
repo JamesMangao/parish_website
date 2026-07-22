@@ -56,6 +56,23 @@
         
         <x-chatbot />
 
+        @php
+            $now = \Carbon\Carbon::now('Asia/Manila');
+            $isSunday = $now->dayOfWeek === \Carbon\Carbon::SUNDAY;
+            $liveStart = $now->copy()->setTime(9, 55);
+            $liveEnd = $now->copy()->setTime(11, 15);
+            $isLiveWindow = $isSunday && $now->gte($liveStart) && $now->lte($liveEnd);
+        @endphp
+        @if($isLiveWindow)
+        <a href="{{ url('/#live-mass') }}" id="live-mass-banner"
+           class="fixed bottom-0 left-0 right-0 z-[90] flex items-center justify-center gap-3 py-3 px-4 text-white font-bold text-sm tracking-wide shadow-lg transition-all hover:brightness-110"
+           style="background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%);">
+            <span class="h-2.5 w-2.5 rounded-full bg-white animate-pulse"></span>
+            <span class="font-cinzel text-xs tracking-[.2em] uppercase">Live Mass is streaming now</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+        @endif
+
 
 
         <!-- Back to Top Button -->

@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <div class="px-6 py-12 max-w-5xl mx-auto" x-data="{ showRejection: false }">
+    <div class="max-w-5xl mx-auto" x-data="{ showRejection: false }">
         <div class="mb-8 flex items-center justify-between">
             <a href="{{ route('admin.intentions') }}" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -23,24 +23,15 @@
             @endif
         </div>
 
-        <div class="bg-card rounded-[2.5rem] border shadow-2xl overflow-hidden relative">
+        <div class="bg-card rounded-xl border shadow-2xl overflow-hidden relative">
             <div class="absolute top-0 right-0 p-8">
-                @php
-                    $statusClasses = [
-                        'pending' => 'bg-amber-50 text-amber-700 border-amber-200',
-                        'approved' => 'bg-green-50 text-green-700 border-green-200',
-                        'rejected' => 'bg-red-50 text-red-700 border-red-200',
-                    ];
-                @endphp
-                <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm {{ $statusClasses[$intention->status] ?? '' }}">
-                    {{ $intention->status }}
-                </span>
+                <x-admin-badge :status="$intention->status" />
             </div>
 
             <div class="p-10 border-b bg-muted/20">
                 <p class="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40 mb-1">Intention Details</p>
                 <h1 class="font-heading text-4xl font-black text-primary italic">{{ $intention->intention_type }}</h1>
-                <p class="text-xs font-medium text-muted-foreground mt-2">Ref: <span class="font-mono font-bold">{{ $intention->reference_number ?? substr($intention->id, 0, 8) }}</span> • Submitted {{ $intention->created_at->diffForHumans() }}</p>
+                <p class="text-xs font-medium text-muted-foreground mt-2">Ref: <span class="font-mono font-bold">{{ $intention->reference_number ?? substr($intention->id, 0, 8) }}</span> &bull; Submitted {{ $intention->created_at->diffForHumans() }}</p>
             </div>
 
             <div class="p-10 space-y-12">
@@ -117,36 +108,32 @@
             </div>
         </div>
 
-        <!-- Rejection Modal -->
-        <div x-show="showRejection" 
+        {{-- Rejection Modal --}}
+        <div x-show="showRejection" x-cloak
              class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm"
-             x-cloak
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-        >
-            <div class="bg-white max-w-lg w-full rounded-[2.5rem] shadow-2xl border p-10 animate-in zoom-in-95 duration-200">
+             x-transition:enter-end="opacity-100">
+            <div class="bg-white max-w-lg w-full rounded-2xl shadow-2xl border p-10 animate-in zoom-in-95 duration-200">
                 <h3 class="text-2xl font-black text-primary italic font-heading mb-2">Confirm Rejection</h3>
-                <p class="text-sm text-muted-foreground mb-8 leading-relaxed italic">Please provide a reason why this intention cannot be processed. This will be recorded in the system logs and the user will be notified if an email was provided.</p>
-                
+                <p class="text-sm text-muted-foreground mb-8 leading-relaxed italic">Provide a reason why this intention cannot be processed. This will be recorded in the system logs.</p>
+
                 <form action="{{ route('admin.intentions.status', $intention->id) }}" method="POST">
                     @csrf
                     <input type="hidden" name="status" value="rejected">
-                    <textarea 
-                        name="rejection_reason" 
-                        required 
-                        rows="4"
+                    <textarea name="rejection_reason" required rows="4"
                         placeholder="e.g. Duplicated submission, incorrect timing, or offensive content."
-                        class="w-full rounded-2xl border-border bg-muted/20 p-4 text-sm focus:ring-accent focus:border-accent italic font-medium mb-8"
-                    ></textarea>
+                        class="w-full rounded-2xl border-border bg-muted/20 p-4 text-sm focus:ring-accent focus:border-accent italic font-medium mb-8"></textarea>
+                    @error('rejection_reason')
+                        <p class="text-xs text-destructive -mt-6 mb-4 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
 
                     <div class="flex items-center justify-end gap-3">
-                        <button type="button" @click="showRejection = false" class="px-6 py-2 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition-colors">
-                            Cancel
-                        </button>
-                        <button type="submit" class="px-8 py-2 bg-destructive text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-destructive/20 hover:brightness-110 transition-all active:scale-95">
-                            Submit & Reject
-                        </button>
+                        <button type="button" @click="showRejection = false" class="px-6 py-2 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition-colors">Cancel</button>
+                        <button type="submit" class="px-8 py-2 bg-destructive text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-destructive/20 hover:brightness-110 transition-all active:scale-95">Submit & Reject</button>
                     </div>
                 </form>
             </div>

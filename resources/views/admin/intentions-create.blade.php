@@ -27,64 +27,100 @@
         @endif
 
         <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Full Name</label>
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Full Name <span class="text-destructive">*</span></label>
             <input type="text" name="fullName" value="{{ old('fullName') }}" required
                 class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary"
                 placeholder="e.g., Juan Dela Cruz">
-            @error('fullName') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Intention Type</label>
-            <select name="intentionType" required 
-                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-                <option value="Thanksgiving" {{ old('intentionType') == 'Thanksgiving' ? 'selected' : '' }}>Thanksgiving</option>
-                <option value="Petition" {{ old('intentionType') == 'Petition' ? 'selected' : '' }}>Petition</option>
-                <option value="Healing" {{ old('intentionType') == 'Healing' ? 'selected' : '' }}>Healing</option>
-                <option value="Souls" {{ old('intentionType') == 'Souls' ? 'selected' : '' }}>For the Souls</option>
-                <option value="Special Intention" {{ old('intentionType') == 'Special Intention' ? 'selected' : '' }}>Special Intention</option>
-            </select>
-            @error('intentionType') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+            @error('fullName')
+                <p class="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Preferred Date</label>
-                <input type="date" name="preferredDate" value="{{ old('preferredDate') }}" 
+                <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Intention Type <span class="text-destructive">*</span></label>
+                <select name="intentionType" required
                     class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-                @error('preferredDate') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Mass Time</label>
-                <select name="massTime" 
-                    class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-                    <option value="" disabled selected>Select time...</option>
-                    @foreach(["6:00 AM", "8:30 AM", "10:00 AM", "3:00 PM", "4:30 PM", "6:00 PM"] as $time)
-                        <option value="{{ $time }}" {{ old('massTime') == $time ? 'selected' : '' }}>{{ $time }}</option>
-                    @endforeach
+                    <option value="Thanksgiving" {{ old('intentionType') == 'Thanksgiving' ? 'selected' : '' }}>Thanksgiving</option>
+                    <option value="Birthday" {{ old('intentionType') == 'Birthday' ? 'selected' : '' }}>Birthday</option>
+                    <option value="Wedding Anniversary" {{ old('intentionType') == 'Wedding Anniversary' ? 'selected' : '' }}>Wedding Anniversary</option>
+                    <option value="Healing" {{ old('intentionType') == 'Healing' ? 'selected' : '' }}>Healing / Recovery</option>
+                    <option value="Special Intention" {{ old('intentionType') == 'Special Intention' ? 'selected' : '' }}>Special Intention</option>
+                    <option value="Repose of Soul" {{ old('intentionType') == 'Repose of Soul' ? 'selected' : '' }}>Repose of Soul</option>
                 </select>
-                @error('massTime') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+                @error('intentionType')
+                    <p class="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                        {{ $message }}
+                    </p>
+                @enderror
+            </div>
+            <div>
+                <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Preferred Date</label>
+                <input type="date" name="preferredDate" value="{{ old('preferredDate') }}"
+                    class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                @error('preferredDate')
+                    <p class="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                        {{ $message }}
+                    </p>
+                @enderror
             </div>
         </div>
 
         <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Description / Specific Intentions</label>
-            <textarea name="description" rows="3" 
-                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary placeholder:text-muted-foreground/50"
-                placeholder="Enter names or specific intentions...">{{ old('description') }}</textarea>
-            @error('description') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Mass Time</label>
+            <select name="massTime"
+                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                <option value="">No preference</option>
+                <option value="6:00 AM" {{ old('massTime') == '6:00 AM' ? 'selected' : '' }}>6:00 AM</option>
+                <option value="7:00 AM" {{ old('massTime') == '7:00 AM' ? 'selected' : '' }}>7:00 AM</option>
+                <option value="8:00 AM" {{ old('massTime') == '8:00 AM' ? 'selected' : '' }}>8:00 AM</option>
+                <option value="9:00 AM" {{ old('massTime') == '9:00 AM' ? 'selected' : '' }}>9:00 AM</option>
+                <option value="10:00 AM" {{ old('massTime') == '10:00 AM' ? 'selected' : '' }}>10:00 AM</option>
+                <option value="11:00 AM" {{ old('massTime') == '11:00 AM' ? 'selected' : '' }}>11:00 AM</option>
+                <option value="12:00 NN" {{ old('massTime') == '12:00 NN' ? 'selected' : '' }}>12:00 NN</option>
+                <option value="5:00 PM" {{ old('massTime') == '5:00 PM' ? 'selected' : '' }}>5:00 PM</option>
+                <option value="6:00 PM" {{ old('massTime') == '6:00 PM' ? 'selected' : '' }}>6:00 PM</option>
+            </select>
+            @error('massTime')
+                <p class="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
 
         <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Donation Method</label>
-            <select name="paymentMethod" 
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Description / Special Request <span class="text-destructive">*</span></label>
+            <textarea name="description" rows="3" required
+                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-primary"
+                placeholder="e.g., For the speedy recovery of...">{{ old('description') }}</textarea>
+            @error('description')
+                <p class="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                    {{ $message }}
+                </p>
+            @enderror
+        </div>
+
+        <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Payment Method</label>
+            <select name="paymentMethod"
                 class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-                <option value="" selected>None / Cash</option>
+                <option value="" {{ old('paymentMethod') == '' ? 'selected' : '' }}>Select payment method</option>
                 <option value="GCash" {{ old('paymentMethod') == 'GCash' ? 'selected' : '' }}>GCash</option>
-                <option value="Bank" {{ old('paymentMethod') == 'Bank' ? 'selected' : '' }}>Bank Transfer</option>
+                <option value="Cash" {{ old('paymentMethod') == 'Cash' ? 'selected' : '' }}>Cash</option>
             </select>
-            @error('paymentMethod') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+            @error('paymentMethod')
+                <p class="text-xs text-destructive mt-1.5 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                    {{ $message }}
+                </p>
+            @enderror
         </div>
     </div>
 </x-admin-form>

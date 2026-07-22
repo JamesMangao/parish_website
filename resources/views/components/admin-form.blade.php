@@ -9,7 +9,7 @@
             </svg>
             Back to List
         </a>
-        <h1 class="font-heading text-3xl font-bold text-primary italic italic text-primary">{{ $title }}</h1>
+        <h1 class="font-heading text-3xl font-bold text-primary italic">{{ $title }}</h1>
         <p class="text-sm text-muted-foreground mt-1">{{ $description }}</p>
     </div>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 
 class EventsController extends Controller
@@ -81,6 +82,7 @@ class EventsController extends Controller
         }));
 
         Event::create($validated);
+        LogService::log('create_event', null, ['title' => $validated['title'], 'event_date' => $validated['event_date']]);
         return redirect()->route('admin.events.index')->with('success', 'Event created.');
     }
 
@@ -107,11 +109,13 @@ class EventsController extends Controller
         }));
 
         $event->update($validated);
+        LogService::log('update_event', $event, ['title' => $event->title]);
         return redirect()->route('admin.events.index')->with('success', 'Event updated.');
     }
 
     public function destroy(Event $event)
     {
+        LogService::log('delete_event', $event, ['title' => $event->title]);
         $event->delete();
         return back()->with('success', 'Event deleted.');
     }

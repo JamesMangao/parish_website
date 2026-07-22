@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <div class="p-6">
+    <div class="p-6" x-data>
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-heading font-bold text-primary italic">Video Highlights</h1>
@@ -12,24 +12,38 @@
         </div>
 
         @if($highlights->isEmpty())
-            <div class="bg-card border rounded-2xl p-20 text-center">
-                <div class="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                </div>
-                <h3 class="text-xl font-heading font-bold text-primary italic mb-2">No highlights yet</h3>
-                <p class="text-muted-foreground max-w-sm mx-auto italic">Start by adding your first standalone cinematic video highlight.</p>
-            </div>
+            <x-admin-empty
+                title="No highlights yet"
+                description="Start by adding your first standalone cinematic video highlight."
+                icon="empty"
+            />
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="highlights-container">
                 @foreach($highlights as $highlight)
                     <div class="bg-card border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative" data-id="{{ $highlight->id }}">
-                        <div class="aspect-video bg-muted relative">
-                            @if(Str::startsWith($highlight->video_url, ['http', 'www']))
-                                <div class="w-full h-full flex items-center justify-center bg-primary/10">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                                </div>
+                        <div class="aspect-video bg-muted relative" x-data="{ playing: false }">
+                            @if($highlight->is_external)
+                                @if($highlight->thumbnail_url)
+                                    <template x-if="!playing">
+                                        <div class="relative w-full h-full cursor-pointer" @click="playing = true">
+                                            <img src="{{ $highlight->thumbnail_url }}" alt="{{ $highlight->title }}" class="w-full h-full object-cover" loading="lazy">
+                                            <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                                                <div class="h-14 w-14 rounded-full bg-white/90 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-primary ml-1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="playing">
+                                        <iframe src="{{ $highlight->embed_url }}?autoplay=1" class="absolute inset-0 w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen x-init="$nextTick(() => $el.focus())"></iframe>
+                                    </template>
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-primary/10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                                    </div>
+                                @endif
                             @else
-                                <video class="w-full h-full object-cover">
+                                <video class="w-full h-full object-cover" poster="{{ $highlight->thumbnail_url }}">
                                     <source src="{{ $highlight->video_url }}" type="video/mp4">
                                 </video>
                                 <div class="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -37,9 +51,7 @@
                                 </div>
                             @endif
                             <div class="absolute top-4 left-4">
-                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $highlight->is_published ? 'bg-green-500 text-white' : 'bg-gray-500 text-white' }}">
-                                    {{ $highlight->is_published ? 'Published' : 'Draft' }}
-                                </span>
+                                <x-admin-badge :status="$highlight->is_published ? 'published' : 'draft'" />
                             </div>
                         </div>
                         <div class="p-6">
@@ -51,9 +63,15 @@
                                     <a href="{{ route('admin.highlights.edit', $highlight) }}" class="p-2 bg-muted/50 hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                                     </a>
-                                    <form action="{{ route('admin.highlights.destroy', $highlight) }}" method="POST" onsubmit="return confirm('Delete this highlight?')">
+                                    <form :id="'delete-highlight-{{ $highlight->id }}" action="{{ route('admin.highlights.destroy', $highlight) }}" method="POST">
                                         @csrf @method('DELETE')
-                                        <button class="p-2 bg-muted/50 hover:bg-destructive hover:text-white rounded-lg transition-colors">
+                                        <button type="button" aria-label="Delete highlight"
+                                            @click="$store.confirm.open({
+                                                title: 'Delete Highlight',
+                                                message: 'Are you sure you want to permanently remove this video highlight? This action cannot be undone.',
+                                                onConfirm: () => document.getElementById('delete-highlight-{{ $highlight->id }}').submit()
+                                            })"
+                                            class="p-2 bg-muted/50 hover:bg-destructive hover:text-white rounded-lg transition-colors">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                         </button>
                                     </form>
