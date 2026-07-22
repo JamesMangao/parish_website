@@ -4,50 +4,11 @@
         $priestUrl = isset($settings['priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['priest_image']) : null;
         $assistantPriestUrl = isset($settings['assistant_priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['assistant_priest_image']) : null;
     @endphp
-    <div class="max-w-4xl" x-data="{
-        MAX_CONTACTS: 10,
-        MAX_TIMELINE: 30,
-        qrPreview: {{ $qrUrl ? "'" . addslashes($qrUrl) . "'" : 'null' }},
-        priestPreview: {{ $priestUrl ? "'" . addslashes($priestUrl) . "'" : 'null' }},
-        assistantPriestPreview: {{ $assistantPriestUrl ? "'" . addslashes($assistantPriestUrl) . "'" : 'null' }},
-        _previewUrls: {},
-        handleQrUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 1.8 * 1024 * 1024) {
-                this.$store.toast.trigger('QR Code image is too large. Maximum size is 1.8MB.', 'error');
-                e.target.value = '';
-                return;
-            }
-            if (this._previewUrls.qrPreview) URL.revokeObjectURL(this._previewUrls.qrPreview);
-            this._previewUrls.qrPreview = URL.createObjectURL(file);
-            this.qrPreview = this._previewUrls.qrPreview;
-        },
-        handlePriestUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 1.8 * 1024 * 1024) {
-                this.$store.toast.trigger('Priest image is too large. Maximum size is 1.8MB.', 'error');
-                e.target.value = '';
-                return;
-            }
-            if (this._previewUrls.priestPreview) URL.revokeObjectURL(this._previewUrls.priestPreview);
-            this._previewUrls.priestPreview = URL.createObjectURL(file);
-            this.priestPreview = this._previewUrls.priestPreview;
-        },
-        handleAssistantPriestUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 1.8 * 1024 * 1024) {
-                this.$store.toast.trigger('Assistant priest image is too large. Maximum size is 1.8MB.', 'error');
-                e.target.value = '';
-                return;
-            }
-            if (this._previewUrls.assistantPriestPreview) URL.revokeObjectURL(this._previewUrls.assistantPriestPreview);
-            this._previewUrls.assistantPriestPreview = URL.createObjectURL(file);
-            this.assistantPriestPreview = this._previewUrls.assistantPriestPreview;
-        }
-    }">
+    <div class="max-w-4xl" x-data="settingsForm({
+        qrUrl: {{ json_encode($qrUrl) }},
+        priestUrl: {{ json_encode($priestUrl) }},
+        assistantPriestUrl: {{ json_encode($assistantPriestUrl) }}
+    })">
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="font-heading text-3xl font-bold text-primary italic">General Settings</h1>
@@ -55,7 +16,7 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" @submit="Object.values(_previewUrls).forEach(url => URL.revokeObjectURL(url))">
+        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" @submit="revokePreviews()">
             @csrf
 
             {{-- Parish Information --}}
@@ -75,18 +36,18 @@
                                 : (is_array($contactRaw) ? $contactRaw : ['']);
                         @endphp
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contact Numbers</label>
-                        <div x-data="{ numbers: {{ json_encode($contactNumbers) }} }">
+                        <div x-data="contactNumbers({{ json_encode($contactNumbers) }})">
                             <template x-for="(number, index) in numbers" :key="index">
                                 <div class="flex gap-2 mb-2">
                                     <input type="text" :name="'parish_contact['+index+']'" x-model="numbers[index]" placeholder="+63 2 8869 2742"
                                         class="flex-1 bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
-                                    <button type="button" @click="numbers.splice(index, 1)" x-show="numbers.length > 1"
+                                    <button type="button" @click="removeNumber(index)" x-show="numbers.length > 1"
                                         class="px-3 py-2 bg-destructive/10 text-destructive rounded-md hover:bg-destructive hover:text-white transition-colors" title="Remove Number">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                                     </button>
                                 </div>
                             </template>
-                            <button type="button" @click="if (numbers.length < 10) numbers.push('')" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1" :class="numbers.length >= 10 && 'opacity-40 pointer-events-none'">
+                            <button type="button" @click="addNumber(10)" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1" :class="numbers.length >= 10 && 'opacity-40 pointer-events-none'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                                 <span x-text="numbers.length >= 10 ? 'Max limit reached' : 'Add Another Number'"></span>
                             </button>
@@ -132,7 +93,7 @@
                                 </template>
                             </div>
                             <div class="flex-1">
-                                <input type="file" name="qr_code" accept="image/*" @change="handleQrUpload($event)"
+                                <input type="file" name="qr_code" accept="image/*" @change="handleFileUpload($event, 'qrPreview', 'QR Code image')"
                                     class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
                                 <p class="mt-2 text-[10px] text-muted-foreground">Upload your GCash QR code. Max 1.8MB (JPG/PNG).</p>
                             </div>
@@ -175,7 +136,7 @@
                                 </template>
                             </div>
                             <div class="flex-1">
-                                <input type="file" name="priest_image" accept="image/*" @change="handlePriestUpload($event)"
+                                <input type="file" name="priest_image" accept="image/*" @change="handleFileUpload($event, 'priestPreview', 'Priest image')"
                                     class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
                                 <p class="mt-2 text-[10px] text-muted-foreground">Upload an image of the Parish Priest for the About section. Max 1.8MB (JPG/PNG).</p>
                             </div>
@@ -215,7 +176,7 @@
                                 </template>
                             </div>
                             <div class="flex-1">
-                                <input type="file" name="assistant_priest_image" accept="image/*" @change="handleAssistantPriestUpload($event)"
+                                <input type="file" name="assistant_priest_image" accept="image/*" @change="handleFileUpload($event, 'assistantPriestPreview', 'Assistant priest image')"
                                     class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:opacity-90">
                                 <p class="mt-2 text-[10px] text-muted-foreground">Upload an image of the Assistant Parish Priest for the About section. Max 1.8MB (JPG/PNG).</p>
                             </div>
@@ -235,33 +196,7 @@
                         $timelineEntries = \App\Data\DefaultTimeline::entries();
                     }
                 @endphp
-                <div x-data="{
-                    entries: {{ json_encode($timelineEntries) }},
-                    addEntry() {
-                        if (this.entries.length >= 30) {
-                            this.$store.toast.trigger('Maximum 30 timeline entries allowed.', 'error');
-                            return;
-                        }
-                        this.entries.push({year: '', badge: '', title: '', short: '', full: ''});
-                    },
-                    removeEntry(index) {
-                        if (this.entries.length <= 1) {
-                            this.$store.toast.trigger('At least one timeline entry is required.', 'error');
-                            return;
-                        }
-                        this.entries.splice(index, 1);
-                    },
-                    moveUp(index) {
-                        if (index === 0) return;
-                        const item = this.entries.splice(index, 1)[0];
-                        this.entries.splice(index - 1, 0, item);
-                    },
-                    moveDown(index) {
-                        if (index >= this.entries.length - 1) return;
-                        const item = this.entries.splice(index, 1)[0];
-                        this.entries.splice(index + 1, 0, item);
-                    }
-                }">
+                <div x-data="timelineManager({{ json_encode($timelineEntries) }})">
                     <template x-for="(entry, index) in entries" :key="index">
                         <div class="border border-border rounded-lg p-4 mb-4 bg-background/50">
                             <div class="flex items-center justify-between mb-3">
