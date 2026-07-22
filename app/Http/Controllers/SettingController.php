@@ -17,14 +17,10 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
-        if ($request->hasFile('priest_image') && !$request->file('priest_image')->isValid()) {
-            return back()->withErrors(['priest_image' => 'Upload Error Code: ' . $request->file('priest_image')->getError() . ' - ' . $request->file('priest_image')->getErrorMessage()]);
-        }
-
         $validated = $request->validate([
             'parish_name' => 'nullable|string|max:255',
             'parish_address' => 'nullable|string|max:500',
-            'parish_contact' => 'nullable|array',
+            'parish_contact' => 'nullable|array|max:10',
             'parish_contact.*' => 'nullable|string|max:50',
             'parish_email' => 'nullable|email|max:255',
             'gcash_number' => 'nullable|string|max:255',
@@ -42,7 +38,7 @@ class SettingController extends Controller
             'email_greeting' => 'nullable|string|max:500',
             'email_closing' => 'nullable|string|max:500',
             'email_signoff' => 'nullable|string|max:500',
-            'parish_timeline' => 'nullable|array',
+            'parish_timeline' => 'nullable|array|max:30',
             'parish_timeline.*.year' => 'nullable|string|max:10',
             'parish_timeline.*.badge' => 'nullable|string|max:50',
             'parish_timeline.*.title' => 'nullable|string|max:255',
@@ -58,15 +54,11 @@ class SettingController extends Controller
         if ($request->hasFile('priest_image')) {
             $path = $request->file('priest_image')->store('settings');
             Setting::updateOrCreate(['key' => 'priest_image'], ['value' => $path]);
-        } elseif ($request->file('priest_image') !== null && !$request->file('priest_image')->isValid()) {
-            return back()->withErrors(['priest_image' => 'File upload failed: ' . $request->file('priest_image')->getErrorMessage()]);
         }
 
         if ($request->hasFile('assistant_priest_image')) {
             $path = $request->file('assistant_priest_image')->store('settings');
             Setting::updateOrCreate(['key' => 'assistant_priest_image'], ['value' => $path]);
-        } elseif ($request->file('assistant_priest_image') !== null && !$request->file('assistant_priest_image')->isValid()) {
-            return back()->withErrors(['assistant_priest_image' => 'File upload failed: ' . $request->file('assistant_priest_image')->getErrorMessage()]);
         }
 
         if (isset($validated['parish_contact'])) {
@@ -74,7 +66,7 @@ class SettingController extends Controller
         }
 
         if (isset($validated['parish_timeline'])) {
-            $validated['parish_timeline'] = json_encode(array_values(array_filter($validated['parish_timeline'], fn($e) => !empty($e['year']) || !empty($e['title']))));
+            $validated['parish_timeline'] = json_encode(array_values(array_filter($validated['parish_timeline'], fn($e) => !empty(trim($e['year'] ?? '')) && !empty(trim($e['title'] ?? '')))));
         }
 
         foreach ($validated as $key => $value) {

@@ -5,9 +5,12 @@
         $assistantPriestUrl = isset($settings['assistant_priest_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($settings['assistant_priest_image']) : null;
     @endphp
     <div class="max-w-4xl" x-data="{
+        MAX_CONTACTS: 10,
+        MAX_TIMELINE: 30,
         qrPreview: {{ $qrUrl ? "'" . addslashes($qrUrl) . "'" : 'null' }},
         priestPreview: {{ $priestUrl ? "'" . addslashes($priestUrl) . "'" : 'null' }},
         assistantPriestPreview: {{ $assistantPriestUrl ? "'" . addslashes($assistantPriestUrl) . "'" : 'null' }},
+        _previewUrls: {},
         handleQrUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -16,9 +19,9 @@
                 e.target.value = '';
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = (ev) => { this.qrPreview = ev.target.result; };
-            reader.readAsDataURL(file);
+            if (this._previewUrls.qrPreview) URL.revokeObjectURL(this._previewUrls.qrPreview);
+            this._previewUrls.qrPreview = URL.createObjectURL(file);
+            this.qrPreview = this._previewUrls.qrPreview;
         },
         handlePriestUpload(e) {
             const file = e.target.files[0];
@@ -28,9 +31,9 @@
                 e.target.value = '';
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = (ev) => { this.priestPreview = ev.target.result; };
-            reader.readAsDataURL(file);
+            if (this._previewUrls.priestPreview) URL.revokeObjectURL(this._previewUrls.priestPreview);
+            this._previewUrls.priestPreview = URL.createObjectURL(file);
+            this.priestPreview = this._previewUrls.priestPreview;
         },
         handleAssistantPriestUpload(e) {
             const file = e.target.files[0];
@@ -40,9 +43,9 @@
                 e.target.value = '';
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = (ev) => { this.assistantPriestPreview = ev.target.result; };
-            reader.readAsDataURL(file);
+            if (this._previewUrls.assistantPriestPreview) URL.revokeObjectURL(this._previewUrls.assistantPriestPreview);
+            this._previewUrls.assistantPriestPreview = URL.createObjectURL(file);
+            this.assistantPriestPreview = this._previewUrls.assistantPriestPreview;
         }
     }">
         <div class="flex items-center justify-between mb-8">
@@ -52,7 +55,7 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" @submit="Object.values(_previewUrls).forEach(url => URL.revokeObjectURL(url))">
             @csrf
 
             {{-- Parish Information --}}
@@ -83,9 +86,9 @@
                                     </button>
                                 </div>
                             </template>
-                            <button type="button" @click="numbers.push('')" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
+                            <button type="button" @click="if (numbers.length < 10) numbers.push('')" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1" :class="numbers.length >= 10 && 'opacity-40 pointer-events-none'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                                Add Another Number
+                                <span x-text="numbers.length >= 10 ? 'Max limit reached' : 'Add Another Number'"></span>
                             </button>
                         </div>
                         @error('parish_contact') <p class="text-xs text-destructive mt-1 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> {{ $message }}</p> @enderror
@@ -235,6 +238,10 @@
                 <div x-data="{
                     entries: {{ json_encode($timelineEntries) }},
                     addEntry() {
+                        if (this.entries.length >= 30) {
+                            this.$store.toast.trigger('Maximum 30 timeline entries allowed.', 'error');
+                            return;
+                        }
                         this.entries.push({year: '', badge: '', title: '', short: '', full: ''});
                     },
                     removeEntry(index) {
@@ -303,9 +310,9 @@
                             </div>
                         </div>
                     </template>
-                    <button type="button" @click="addEntry()" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-2">
+                    <button type="button" @click="addEntry()" class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-2" :class="entries.length >= 30 && 'opacity-40 pointer-events-none'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                        Add Timeline Entry
+                        <span x-text="entries.length >= 30 ? 'Max limit reached' : 'Add Timeline Entry'"></span>
                     </button>
                 </div>
             </x-admin-card>
