@@ -5,11 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="description" content="Admin portal for Sto. Rosario Parish - managing mass intentions, schedules, announcements, and community outreach.">
     <title>Admin - Sto. Rosario Parish</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         [x-cloak] { display: none !important; }
@@ -41,7 +37,7 @@
         <aside
             x-data
             :class="$store.ui.isMobile && $store.ui.sidebarOpen ? 'w-64' : (!$store.ui.isMobile ? ($store.ui.sidebarOpen ? 'w-64' : 'w-20') : 'w-0 overflow-hidden')"
-            class="bg-primary text-primary-foreground transition-all duration-300 flex flex-col fixed inset-y-0 z-50 shadow-xl w-64"
+            class="bg-primary text-primary-foreground transition-all duration-300 flex flex-col fixed inset-y-0 z-50 shadow-xl"
             :style="$store.ui.isMobile && !$store.ui.sidebarOpen ? 'width:0;overflow:hidden' : ''"
         >
             <div class="h-16 flex items-center px-6 border-b border-primary-foreground/10 shrink-0">
@@ -129,12 +125,11 @@
         <main
             x-data
             :class="($store.ui.isMobile ? 'ml-0' : ($store.ui.sidebarOpen ? 'ml-64' : 'ml-20'))"
-            class="flex-1 flex flex-col transition-all duration-300 min-h-screen ml-64"
+            class="flex-1 flex flex-col transition-all duration-300 min-h-screen"
         >
             <header class="h-16 bg-white border-b flex items-center justify-between px-8 sticky top-0 z-40">
                 <button @click="$store.ui.sidebarOpen = !$store.ui.sidebarOpen"
-                    class="p-2 -ml-2 rounded-md hover:bg-muted text-muted-foreground transition-colors"
-                    aria-label="Toggle sidebar">
+                    class="p-2 -ml-2 rounded-md hover:bg-muted text-muted-foreground transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="4" x2="20" y1="12" y2="12" />
@@ -150,7 +145,7 @@
                         get counts() { return $store.ui.notifCounts },
                         get total() { return this.counts.intentions + this.counts.inquiries + this.counts.chats }
                     }" class="relative">
-                        <button @click="open = !open" class="p-2 rounded-lg hover:bg-muted text-muted-foreground transition-all relative group" aria-label="Notifications">
+                        <button @click="open = !open" class="p-2 rounded-lg hover:bg-muted text-muted-foreground transition-all relative group">
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                             <template x-if="total > 0">
                                 <span class="absolute -top-1 -right-1 h-5 w-5 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse" x-text="total"></span>

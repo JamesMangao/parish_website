@@ -65,7 +65,7 @@
                                     </a>
                                     <form :id="'delete-highlight-{{ $highlight->id }}" action="{{ route('admin.highlights.destroy', $highlight) }}" method="POST">
                                         @csrf @method('DELETE')
-                                        <button type="button" aria-label="Delete highlight"
+                                        <button type="button"
                                             @click="$store.confirm.open({
                                                 title: 'Delete Highlight',
                                                 message: 'Are you sure you want to permanently remove this video highlight? This action cannot be undone.',

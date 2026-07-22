@@ -58,7 +58,7 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <span x-show="hasUnsavedChanges" class="text-[10px] font-black uppercase tracking-widest text-amber-600 animate-pulse">Unsaved edits</span>
-                        <button @click="showPreview = false" aria-label="Close preview" class="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground">
+                        <button @click="showPreview = false" class="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M18 6 6 18" /><path d="m6 6 12 12" />
                             </svg>
@@ -121,7 +121,7 @@
 
                     {{-- Nav Buttons --}}
                     <div class="absolute inset-y-0 left-4 flex items-center">
-                        <button x-show="currentSlide > 0" @click="currentSlide--" aria-label="Previous slide"
+                        <button x-show="currentSlide > 0" @click="currentSlide--"
                             class="p-3 bg-white hover:bg-muted border rounded-xl shadow-lg transition-all text-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m15 18-6-6 6-6" />
@@ -129,7 +129,7 @@
                         </button>
                     </div>
                     <div class="absolute inset-y-0 right-4 flex items-center">
-                        <button x-show="currentSlide < previewData.slides.length - 1" @click="currentSlide++" aria-label="Next slide"
+                        <button x-show="currentSlide < previewData.slides.length - 1" @click="currentSlide++"
                             class="p-3 bg-white hover:bg-muted border rounded-xl shadow-lg transition-all text-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m9 18 6-6-6-6" />

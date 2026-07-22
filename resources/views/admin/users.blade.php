@@ -97,7 +97,7 @@
             <div class="bg-card w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div class="p-6 border-b bg-muted/30 flex items-center justify-between">
                     <h3 class="text-xl font-black text-primary uppercase tracking-tighter italic font-heading">Add New User</h3>
-                    <button @click="showAddModal = false" aria-label="Close" class="text-muted-foreground hover:text-primary transition-colors">
+                    <button @click="showAddModal = false" class="text-muted-foreground hover:text-primary transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
@@ -141,7 +141,7 @@
             <div class="bg-card w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div class="p-6 border-b bg-muted/30 flex items-center justify-between">
                     <h3 class="text-xl font-black text-primary uppercase tracking-tighter italic font-heading">Edit User</h3>
-                    <button @click="showEditModal = false" aria-label="Close" class="text-muted-foreground hover:text-primary transition-colors">
+                    <button @click="showEditModal = false" class="text-muted-foreground hover:text-primary transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
