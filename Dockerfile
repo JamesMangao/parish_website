@@ -124,6 +124,18 @@ RUN sed -i \
 /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # ----------------------------------------------------------
+# PHP-FPM tuning
+# ----------------------------------------------------------
+RUN cat <<EOF > /usr/local/etc/php-fpm.d/zz-tuning.conf
+[www]
+pm = dynamic
+pm.max_children = 25
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 15
+EOF
+
+# ----------------------------------------------------------
 # Nginx
 # ----------------------------------------------------------
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf

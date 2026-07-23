@@ -890,9 +890,14 @@
                     <p class="info-card-label">Contact</p>
                     @php
                         $contactRaw = $global_settings['parish_contact'] ?? '';
-                        $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
-                            ? (json_decode($contactRaw, true) ?: [$contactRaw])
-                            : (is_array($contactRaw) ? $contactRaw : ['(02) 8869 2742', '0906 099 2324']);
+                        if (is_string($contactRaw) && $contactRaw !== '') {
+                            $decoded = json_decode($contactRaw, true);
+                            $contactNumbers = is_array($decoded) ? $decoded : [$contactRaw];
+                        } elseif (is_array($contactRaw)) {
+                            $contactNumbers = $contactRaw;
+                        } else {
+                            $contactNumbers = ['(02) 8869 2742', '0906 099 2324'];
+                        }
                     @endphp
                     @foreach($contactNumbers as $number)
                     <p>{{ $number }}</p>
