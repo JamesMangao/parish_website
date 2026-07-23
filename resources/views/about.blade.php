@@ -431,41 +431,75 @@
         }
         .leader-card {
             background: #fff;
-            border-radius: 18px;
-            padding: 36px 32px;
-            max-width: 380px;
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 400px;
             width: 100%;
-            transition: transform .4s ease, box-shadow .4s ease;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .leader-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--gold), #ffdf70);
+            transform: scaleX(0);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: center;
         }
         .leader-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 24px 56px rgba(0,0,0,.22);
+            transform: translateY(-8px);
+            box-shadow: 0 32px 64px rgba(0,0,0,0.25);
+        }
+        .leader-card:hover::before {
+            transform: scaleX(1);
         }
         .leader-avatar {
-            width: 180px; height: 180px;
+            width: 160px; height: 160px;
             border-radius: 50%;
             background: var(--maroon);
             color: var(--gold);
             font-size: 3.5rem;
             font-weight: 800;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 24px;
-            animation: float 4s ease-in-out infinite;
+            margin: 0 auto 32px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 4px solid #fff;
+            outline: 2px solid var(--gold);
+            outline-offset: 4px;
+        }
+        .leader-card:hover .leader-avatar {
+            transform: scale(1.05) translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
         }
         .leader-name {
             font-family: 'Playfair Display', Georgia, serif;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             color: var(--maroon);
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
         }
         .leader-role {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 800;
-            letter-spacing: .2em;
+            letter-spacing: 0.25em;
             text-transform: uppercase;
             color: var(--gold);
-            margin: 6px 0 18px;
+            margin: 0 0 24px;
         }
-        .leader-rule { width: 28px; height: 1px; background: var(--border); margin: 0 auto 18px; }
+        .leader-rule { 
+            width: 40px; 
+            height: 2px; 
+            background: var(--gold); 
+            margin: 0 auto 20px; 
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .leader-card:hover .leader-rule {
+            width: 80px;
+        }
         .leader-quote { font-size: .87rem; font-style: italic; color: var(--muted); line-height: 1.7; }
 
         /* ════════════════════════════════════════
