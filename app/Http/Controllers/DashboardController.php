@@ -10,6 +10,7 @@ use App\Models\Inquiry;
 use App\Models\ChatMessage;
 use App\Models\ChatSession;
 use App\Models\ActivityLog;
+use App\Models\Donation;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -29,6 +30,9 @@ class DashboardController extends Controller
                 'upcoming_events' => Event::where('event_date', '>=', now())->count(),
                 'total_announcements' => Announcement::count(),
                 'active_schedules' => MassSchedule::where('is_active', true)->count(),
+                'total_donations_amount' => Donation::where('status', 'paid')->sum('amount'),
+                'today_donations_amount' => Donation::where('status', 'paid')->whereDate('paid_at', today())->sum('amount'),
+                'total_donation_count' => Donation::where('status', 'paid')->count(),
             ];
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Dashboard stats query failed: ' . $e->getMessage());

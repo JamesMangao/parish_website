@@ -192,6 +192,19 @@
                     <p class="text-4xl font-black text-purple-700 tracking-tighter">{{ $stats['active_schedules'] ?? 0 }}</p>
                 </div>
             @endif
+
+            @if($role === 'super_admin' || $role === 'staff')
+                <div class="bg-card rounded-xl border p-6 flex flex-col justify-between shadow-sm border-l-4 border-l-green-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Donations</span>
+                        <div class="p-2 bg-green-100 rounded text-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-black text-green-600 tracking-tighter">₱{{ number_format(($stats['total_donations_amount'] ?? 0) / 100, 2) }}</p>
+                    <p class="text-[10px] font-bold text-muted-foreground mt-1">{{ $stats['total_donation_count'] ?? 0 }} completed</p>
+                </div>
+            @endif
         </div>
 
         <div class="bg-card rounded-3xl border shadow-xl p-8 mb-10 overflow-hidden relative">
@@ -521,6 +534,16 @@
                             </svg>
                         </div>
                         <div class="text-sm font-bold text-primary">Review Intentions</div>
+                    </a>
+                    <a href="{{ route('admin.donations') }}"
+                        class="p-4 bg-card border rounded-lg hover:border-accent hover:shadow-md transition-all flex items-center gap-4">
+                        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-green-100 text-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm font-bold text-primary">View Donations</div>
                     </a>
                 @endif
 

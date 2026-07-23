@@ -88,13 +88,13 @@
         .video-btn:active { transform: translateY(0); }
 
         .progress-container {
-            height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
-            position: relative; cursor: pointer; transition: height 0.2s;
+            height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px;
+            position: relative; cursor: pointer; transition: all 0.2s ease;
         }
-        .progress-container:hover { height: 6px; }
+        .progress-container:hover { height: 8px; }
         .progress-fill {
             height: 100%; width: 0%; background: linear-gradient(90deg, #FFD740, #F5C518);
-            border-radius: 2px; position: relative;
+            border-radius: 3px; position: relative;
         }
         .progress-handle {
             position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
@@ -102,6 +102,48 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.2s;
         }
         .progress-container:hover .progress-handle { opacity: 1; }
+
+        .video-btn-custom {
+            background: transparent; border: none; color: rgba(255, 255, 255, 0.8);
+            padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .video-btn-custom:hover {
+            color: #F5C518; background: rgba(255, 255, 255, 0.12); transform: scale(1.1);
+        }
+        .video-btn-custom:active {
+            transform: scale(0.95);
+        }
+
+        .play-btn-circle {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .play-btn-circle:hover {
+            background: #F5C518 !important; border-color: #F5C518 !important;
+            transform: scale(1.12); box-shadow: 0 0 30px rgba(245, 197, 24, 0.5) !important;
+        }
+        .play-btn-circle:hover svg {
+            fill: #0D2A52 !important;
+        }
+
+        .highlight-cinema:hover .video-controls-wrapper {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        /* Hide native HTML5 video controls */
+        #hv-0::-webkit-media-controls {
+            display: none !important;
+        }
+        #hv-0::-webkit-media-controls-panel {
+            display: none !important;
+        }
+        #hv-0::-webkit-media-controls-play-button {
+            display: none !important;
+        }
+        #hv-0::-webkit-media-controls-start-playback-button {
+            display: none !important;
+        }
 
         /* Lightbox */
         .lightbox-backdrop {
@@ -203,7 +245,7 @@
         </div>
 
         {{-- Cinematic video container --}}
-        <div class="highlight-cinema" id="highlight-cinema"
+        <div class="highlight-cinema group" id="highlight-cinema"
              style="position:relative; width:100%; max-width:1200px; margin:0 auto; border-radius:28px; overflow:hidden;
                     box-shadow:0 24px 80px rgba(13,42,82,0.22); background:#000; aspect-ratio:16/9;">
 
@@ -217,37 +259,42 @@
                         referrerpolicy="strict-origin-when-cross-origin"
                         title="{{ $v->title }}"></iframe>
             @else
-                <video id="highlight-vid" class="highlight-video"
+                <video id="hv-0" class="highlight-video"
                        src="{{ $v->video_url }}"
                        playsinline preload="metadata"
-                       style="width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1;">
+                       style="width:100%; height:100%; object-fit:cover; display:block; position:relative; z-index:1;"
+                       onclick="toggleVideoPlay(0)"
+                       onplay="syncVideoUI(0, true)"
+                       onpause="syncVideoUI(0, false)"
+                       ontimeupdate="updateVideoProgress(0)"
+                       onended="onVideoEnded(0)"
+                       onloadedmetadata="document.getElementById('time-dur-0').innerText = Math.floor(this.duration / 60) + ':' + Math.floor(this.duration % 60).toString().padStart(2, '0')">
                 </video>
+
+                {{-- Center Play/Pause Circle Overlay --}}
+                <div id="play-overlay-0" onclick="toggleVideoPlay(0)"
+                     style="position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center;
+                            background:rgba(13,42,82,0.15); cursor:pointer; transition:all 0.3s ease;">
+                    <div class="play-btn-circle"
+                         style="width:76px; height:76px; border-radius:50%; background:rgba(255,255,255,0.12);
+                                border:1px solid rgba(255,255,255,0.25); backdrop-filter:blur(8px);
+                                display:flex; align-items:center; justify-content:center;
+                                box-shadow:0 12px 36px rgba(0,0,0,0.3); color:#FFFFFF;">
+                        <svg id="overlay-play-icon-0" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="margin-left:3px;">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
             @endif
 
-            {{-- BOTTOM GRADIENT OVERLAY --}}
-            <div style="position:absolute; inset:0; z-index:2; pointer-events:none;
-                        background:linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(13,42,82,0.40) 55%, rgba(13,42,82,0.85) 78%, rgba(13,42,82,0.96) 100%);">
-            </div>
-
-            {{-- TOP-LEFT BADGE --}}
-            <div style="position:absolute; top:24px; left:28px; z-index:4; display:flex; align-items:center; gap:8px;">
-                <span style="display:flex; align-items:center; gap:6px;
-                             background:rgba(13,42,82,0.60); backdrop-filter:blur(12px);
-                             border:1px solid rgba(255,255,255,0.15); border-radius:999px; padding:6px 14px;">
-                    <span style="width:7px; height:7px; border-radius:50%; background:#F5C518;
-                                 box-shadow:0 0 8px rgba(245,197,24,0.80); display:inline-block;"></span>
-                    <span style="font-family:'Jost',sans-serif; font-size:9px; font-weight:700;
-                                 letter-spacing:0.28em; text-transform:uppercase; color:#FFFFFF;">
-                        Highlight Video
-                    </span>
-                </span>
-            </div>
-
-
-            {{-- BOTTOM OVERLAY TEXT CONTENT --}}
-            <div id="hl-info-bar" class="cinema-overlay-text"
-                 style="position:absolute; bottom:0; left:0; right:0; z-index:3; padding:40px 44px 36px;">
-                <div style="max-width:720px;">
+            {{-- BOTTOM GRADIENT OVERLAY, TEXT CONTENT, & CONTROLS --}}
+            <div id="hl-overlay-container"
+                 style="position:absolute; bottom:0; left:0; right:0; z-index:3;
+                        background:linear-gradient(to top, rgba(13,42,82,0.96) 0%, rgba(13,42,82,0.75) 60%, transparent 100%);
+                        padding:60px 44px 20px; display:flex; flex-direction:column; gap:18px; pointer-events:none;">
+                
+                {{-- Text Content --}}
+                <div style="max-width:720px; pointer-events:auto;">
                     <p style="font-family:'Jost',sans-serif; font-size:10px; font-weight:700;
                               letter-spacing:0.32em; text-transform:uppercase;
                               color:rgba(245,197,24,0.85); margin-bottom:10px;">
@@ -277,16 +324,98 @@
                         $videoDesc = trim(preg_replace('/\s+/', ' ', $videoDesc));
                     @endphp
                     <p style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
-                              font-size:clamp(0.95rem, 1.5vw, 1.1rem); color:rgba(255,255,255,0.68);
-                              line-height:1.7; max-width:580px; margin-top:6px;
-                              display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                               font-size:clamp(0.95rem, 1.5vw, 1.1rem); color:rgba(255,255,255,0.68);
+                               line-height:1.7; max-width:580px; margin-top:6px;
+                               display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                         {{ $videoDesc }}
                     </p>
                     @endif
                 </div>
-            </div>
 
-            {{-- ═══ VIDEO CONTROL BAR (local videos only) ═══ --}}
+                {{-- Controls --}}
+                @if(!$isExternal)
+                    <div class="video-controls-wrapper"
+                         style="display:flex; flex-direction:column; gap:12px; pointer-events:auto;
+                                opacity:0; transform:translateY(10px); transition:all 0.3s ease;">
+                        
+                        {{-- Progress Bar --}}
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span id="time-curr-0" style="font-family:'Jost',sans-serif; font-size:11px; color:rgba(255,255,255,0.8); min-width:32px;">0:00</span>
+                            <div class="progress-container" onclick="seekVideo(0, event)" style="flex:1;">
+                                <div id="prog-fill-0" class="progress-fill">
+                                    <div class="progress-handle"></div>
+                                </div>
+                            </div>
+                            <span id="time-dur-0" style="font-family:'Jost',sans-serif; font-size:11px; color:rgba(255,255,255,0.6); min-width:32px;">0:00</span>
+                        </div>
+
+                        {{-- Buttons Row --}}
+                        <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                            {{-- Left Side Controls --}}
+                            <div style="display:flex; align-items:center; gap:16px;">
+                                {{-- Play/Pause --}}
+                                <button onclick="toggleVideoPlay(0)" class="video-btn-custom" title="Play/Pause">
+                                    <svg id="play-icon-0" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <svg id="pause-icon-0" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+                                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                    </svg>
+                                </button>
+
+                                {{-- Skip Backward 10s --}}
+                                <button onclick="skipVideo(0, -10)" class="video-btn-custom" title="Rewind 10s">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                        <path d="M3 3v5h5"/>
+                                        <text x="12" y="15.5" font-size="8" font-family="sans-serif" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">10</text>
+                                    </svg>
+                                </button>
+
+                                {{-- Skip Forward 10s --}}
+                                <button onclick="skipVideo(0, 10)" class="video-btn-custom" title="Forward 10s">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                        <path d="M21 3v5h-5"/>
+                                        <text x="12" y="15.5" font-size="8" font-family="sans-serif" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">10</text>
+                                    </svg>
+                                </button>
+
+                                {{-- Volume/Mute --}}
+                                <button onclick="toggleVideoMute(0)" class="video-btn-custom" title="Mute/Unmute">
+                                    <svg id="vol-icon-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                    </svg>
+                                    <svg id="mute-icon-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                        <line x1="23" y1="9" x2="17" y2="15"/>
+                                        <line x1="17" y1="9" x2="23" y2="15"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {{-- Right Side Controls --}}
+                            <div style="display:flex; align-items:center; gap:16px;">
+                                {{-- Picture-in-Picture --}}
+                                <button onclick="triggerPiP(0)" class="video-btn-custom" title="Picture in Picture">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                        <rect x="13" y="11" width="7" height="5" rx="1" ry="1"/>
+                                    </svg>
+                                </button>
+
+                                {{-- Fullscreen --}}
+                                <button onclick="toggleFullscreen('hv-0')" class="video-btn-custom" title="Fullscreen">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
 
         </div>
 
@@ -759,6 +888,16 @@ function toggleFullscreen(id) {
     if (vid.requestFullscreen) vid.requestFullscreen();
     else if (vid.webkitRequestFullscreen) vid.webkitRequestFullscreen();
     else if (vid.msRequestFullscreen) vid.msRequestFullscreen();
+}
+
+function triggerPiP(index) {
+    const vid = document.getElementById(`hv-${index}`);
+    if (!vid) return;
+    if (document.pictureInPictureElement) {
+        document.exitPictureInPicture();
+    } else if (vid.requestPictureInPicture) {
+        vid.requestPictureInPicture();
+    }
 }
 
 function openCinematicLightbox(url, title, desc) {

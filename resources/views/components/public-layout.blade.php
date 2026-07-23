@@ -158,5 +158,6 @@
             revealElements.forEach(el => revealObserver.observe(el));
         });
     </script>
+    @stack('scripts')
 </body>
 </html>

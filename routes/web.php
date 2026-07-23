@@ -20,13 +20,18 @@ use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\CalendarFeedController;
+use App\Http\Controllers\DonationController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/about', 'about')->name('about');
 Route::get('/mass-schedule', [MassScheduleController::class, 'index'])->name('mass-schedule');
 Route::get('/mass-schedule/{id}/ical', [MassScheduleController::class, 'generateICal'])->name('mass-schedule.ical');
-Route::view('/donate', 'donate')->name('donate');
+Route::get('/donate', [DonationController::class, 'create'])->name('donate');
+Route::post('/donate/checkout', [DonationController::class, 'checkout'])->middleware('throttle:submissions')->name('donate.checkout');
+Route::get('/donate/success', [DonationController::class, 'success'])->name('donate.success');
+Route::get('/donate/cancel', [DonationController::class, 'cancel'])->name('donate.cancel');
+Route::post('/paymongo/webhook', [DonationController::class, 'webhook'])->name('paymongo.webhook');
 
 // Tracking Status
 Route::get('/track', [TrackController::class, 'index'])->name('track');
@@ -84,6 +89,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
 
     // Role: super_admin or staff
     Route::middleware('role:super_admin,staff')->group(function () {
+        Route::get('/admin-portal/donations', [DonationController::class, 'adminIndex'])->name('admin.donations');
         Route::get('/admin-portal/intentions', [AdminIntentionController::class, 'index'])->name('admin.intentions');
         Route::get('/admin-portal/intentions/create', [AdminIntentionController::class, 'create'])->name('admin.intentions.create');
         Route::get('/admin-portal/intentions/{id}', [AdminIntentionController::class, 'show'])->name('admin.intentions.show');

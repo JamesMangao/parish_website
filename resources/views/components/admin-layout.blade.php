@@ -53,6 +53,8 @@
                 @if($role === 'super_admin' || $role === 'staff')
                     <x-admin-nav-link href="{{ route('admin.intentions') }}" icon="heart" label="Mass Intentions"
                         :active="request()->is('admin-portal/intentions*')" />
+                    <x-admin-nav-link href="{{ route('admin.donations') }}" icon="banknote" label="Donations"
+                        :active="request()->is('admin-portal/donations*')" />
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom' || $role === 'staff')
