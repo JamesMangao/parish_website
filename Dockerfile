@@ -128,11 +128,10 @@ RUN sed -i \
 # ----------------------------------------------------------
 RUN cat <<EOF > /usr/local/etc/php-fpm.d/zz-tuning.conf
 [www]
-pm = dynamic
-pm.max_children = 25
-pm.start_servers = 5
-pm.min_spare_servers = 5
-pm.max_spare_servers = 15
+pm = ondemand
+pm.max_children = 10
+pm.process_idle_timeout = 10s
+pm.max_requests = 200
 EOF
 
 # ----------------------------------------------------------
