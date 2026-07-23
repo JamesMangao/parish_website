@@ -870,7 +870,7 @@
     <section class="leadership-section">
         <p class="section-eyebrow" data-reveal>Our Leadership</p>
         <h2 class="leadership-title" data-reveal>Shepherds of<br>the flock</h2>
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; max-width:820px; margin:0 auto;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; max-width:960px; margin:0 auto;">
             <div class="leader-card" data-reveal="scale">
                 @if(isset($global_settings['priest_image']))
                     <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
