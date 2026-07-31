@@ -471,7 +471,7 @@
             <div class="md:col-span-3 p-8 md:p-10" style="background:#FFF;"
                  x-data="{ 
             loading: false, 
-            inquiryType: '{{ old('inquiryType', '') }}',
+            inquiryType: '{{ old('inquiryType', '') }}' || new URLSearchParams(window.location.search).get('type') || '',
             serviceRequirements: {
                 'Baptism': [
                     'Birth Certificate with Registry Number (Original & Photocopy)',
@@ -645,56 +645,6 @@
                                     </svg>
                                 </div>
                             </div>
-
-                            {{-- Dynamic Requirements for Wedding --}}
-                            <template x-if="inquiryType === 'Wedding'">
-                                <div class="mt-4 space-y-4 animate-fade-down">
-                                    <div class="p-4 bg-[#FDFBF7] border border-[#E6D5B8]/50 rounded-2xl space-y-4">
-                                        <div>
-                                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#B08D00] mb-2 flex items-center gap-2">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
-                                                </svg>
-                                                Wedding Requirements
-                                            </p>
-                                            <ul class="space-y-1.5 text-left text-[11px] text-blue-800/70">
-                                                <li>1. Original Copy of Certificate of Baptism with "For Marriage Purpose" annotation</li>
-                                                <li>2. Original Copy of Certificate of Confirmation with "For Marriage Purpose" annotation</li>
-                                                <li>3. PSA-issued Birth Certificate</li>
-                                                <li>4. PSA-issued Certificate of No Records of Marriage (Cenomar)</li>
-                                                <li>5. Permit from the parish of the bride (if non-parishioner)</li>
-                                                <li>6. Certificate of Legal Capacity to Marry (from Embassy, for non-Filipinos)</li>
-                                                <li>7. Death Certificate & Marriage Contract of deceased spouse (for widows/widowers)</li>
-                                                <li>8. Original Copy of Marriage License from respective municipalities</li>
-                                                <li>9. NSO Certified True Copy of Civil Marriage Contract (if applicable)</li>
-                                                <li>10. Affidavit of 5+ years cohabitation (if applicable)</li>
-                                                <li>11. Wedding Fees to be settled one (1) week before the date</li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="pt-3 border-t border-[#E6D5B8]/20">
-                                            <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1.5">Optional Donations & Fees</p>
-                                            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-blue-900/60">
-                                                <div class="bg-white/50 px-2 py-1 rounded">Wedding: ₱5k</div>
-                                                <div class="bg-white/50 px-2 py-1 rounded">Floral: ₱12k</div>
-                                                <div class="bg-white/50 px-2 py-1 rounded">Aircon: ₱8k</div>
-                                                <div class="bg-white/50 px-2 py-1 rounded">Lights: ₱3k-5k</div>
-                                            </div>
-                                        </div>
-                                        <div class="pt-2 border-t border-[#E6D5B8]/20 text-sm text-blue-800/60 space-y-2">
-                                            <div>
-                                                <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest mb-1">Schedule & Deadlines</p>
-                                                <p>• Completion: 2 months before preferred date</p>
-                                                <p>• Interview: 1 month before preferred date</p>
-                                            </div>
-                                            <div class="pt-2 border-t border-[#E6D5B8]/10">
-                                                <p><strong>Seminar Schedule:</strong></p>
-                                                <p>1st Sat: 1:00-6:00 PM | 2nd Sat: 1:00-4:00 PM</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
                         </div>
                         
                         {{-- Document Confirmation Banner --}}
@@ -849,6 +799,62 @@
                                         </div>
                                     </div>
                                 </template>
+                            </div>
+                        </template>
+
+                        {{-- Wedding-specific guidelines --}}
+                        <template x-if="inquiryType === 'Wedding'">
+                            <div class="mt-4 space-y-4 animate-fade-down">
+                                <div class="p-4 bg-[#FDFBF7] border border-[#E6D5B8]/50 rounded-2xl space-y-4">
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#B08D00] mb-2 flex items-center gap-2">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 8h.01M12 12V16M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 4.03 9 9 9z"/>
+                                            </svg>
+                                            Wedding Requirements
+                                        </p>
+                                        <ul class="space-y-1.5 text-left text-sm text-blue-800/70">
+                                            <li>1. Original Copy of Certificate of Baptism with "For Marriage Purpose" annotation</li>
+                                            <li>2. Original Copy of Certificate of Confirmation with "For Marriage Purpose" annotation</li>
+                                            <li>3. PSA-issued Birth Certificate</li>
+                                            <li>4. PSA-issued Certificate of No Records of Marriage (Cenomar)</li>
+                                            <li>5. Permit from the parish of the bride (if non-parishioner)</li>
+                                            <li>6. Certificate of Legal Capacity to Marry (from Embassy, for non-Filipinos)</li>
+                                            <li>7. Death Certificate & Marriage Contract of deceased spouse (for widows/widowers)</li>
+                                            <li>8. Original Copy of Marriage License from respective municipalities</li>
+                                            <li>9. NSO Certified True Copy of Civil Marriage Contract (if applicable)</li>
+                                            <li>10. Affidavit of 5+ years cohabitation (if applicable)</li>
+                                            <li>11. Wedding Fees to be settled one (1) week before the date</li>
+                                        </ul>
+                                    </div>
+                                    <div class="pt-3 border-t border-[#E6D5B8]/20 space-y-4">
+                                        <div class="space-y-1.5">
+                                            <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest">Optional Donations & Fees</p>
+                                            <div class="grid grid-cols-2 gap-2 text-sm text-blue-800/70">
+                                                <div>• Wedding: ₱5k</div>
+                                                <div>• Floral: ₱12k</div>
+                                                <div>• Aircon: ₱8k</div>
+                                                <div>• Lights: ₱3k-5k</div>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest">Schedule & Deadlines</p>
+                                            <ul class="text-sm text-blue-800/70 space-y-1">
+                                                <li>• Completion: 2 months before preferred date</li>
+                                                <li>• Interview: 1 month before preferred date</li>
+                                            </ul>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <p class="text-[11px] font-bold text-[#B08D00] uppercase tracking-widest">Seminar Schedule</p>
+                                            <ul class="text-sm text-blue-800/70 space-y-1">
+                                                <li>• 1st Saturday: 1:00 - 6:00 PM</li>
+                                                <li>• 2nd Saturday: 1:00 - 4:00 PM</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -917,10 +923,11 @@
                     </div>
 
                     {{-- Submit --}}
+                    <div style="text-align:right;">
                     <button type="submit" :disabled="loading"
-                            class="gold-btn w-full h-14 rounded-2xl relative overflow-hidden
+                            class="gold-btn h-14 rounded-2xl relative overflow-hidden
                                    inline-flex items-center justify-center gap-2.5
-                                   text-[11px] font-bold uppercase tracking-widest">
+                                   text-[11px] font-bold uppercase tracking-widest px-10">
                         <span :class="loading ? 'opacity-0' : 'opacity-100'"
                               class="transition-opacity flex items-center gap-2.5">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -938,6 +945,7 @@
                             </svg>
                         </div>
                     </button>
+                    </div>
                 </form>
             </div>
 

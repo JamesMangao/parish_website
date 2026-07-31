@@ -123,16 +123,7 @@
                 </div>
             </div>
 
-            <a href="{{ route('mass-schedule') }}" class="group relative flex flex-col items-center justify-center overflow-hidden mt-6 events-cta-banner" style="background:var(--blue-deep);text-decoration:none;padding:22px 24px;border-radius:0 0 24px 24px;display:flex;min-height:82px;" aria-label="View Full Mass Schedule">
-                <div class="absolute left-0 top-[70%] -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110" style="opacity:.5;height:150%;width:auto;" aria-hidden="true">
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/parish-illustration.svg') }}" alt="Parish Illustration" width="285" height="135" style="height:90%;width:auto;object-fit:contain;filter:brightness(0) invert(1);">
-                </div>
-                <div class="flex items-center gap-2.5 mb-1.5">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M11 2v3M9 3h4"/></svg>
-                    <span class="font-cinzel" style="font-size:12.5px;letter-spacing:.32em;color:#fff;font-weight:600;">FULL SCHEDULE</span>
-                </div>
-                <span class="transition-transform duration-300 group-hover:translate-x-1 block" style="color:#C9A200;font-size:16px;line-height:1;" aria-hidden="true">→</span>
-            </a>
+
         </div>
     @endif
 </section>

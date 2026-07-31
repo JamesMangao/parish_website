@@ -282,9 +282,9 @@
             };
             $subTitle = match($type) {
                 'sunday' => 'The Lord\'s Day',
-                'anticipated' => 'Vigil Mass',
+                'anticipated' => 'Anticipated Mass',
                 'weekday' => 'Monday – Friday',
-                'saturday' => 'Vigil Mass',
+                'saturday' => 'Anticipated Mass',
                 default => 'Special Liturgy'
             };
             $descText = match($type) {
