@@ -7,18 +7,18 @@ A full-featured Catholic parish management web application built for **Sto. Rosa
 ### Public-Facing
 - **Home Page** - Hero section, next mass countdown, quick actions, events & announcements feed
 - **Mass Schedule** - Weekly schedule display with iCal export
-- **Mass Intention Submission** - Online form with email notifications and reference tracking
-- **Intention Tracking** - Look up intention status by reference number
+- **Mass Intention Submission** - Online form with `INT-YYYY-XXXX` auto-generated reference IDs, email notifications, and tracking
+- **Intention & Inquiry Tracking** - Search and look up intention or inquiry status by Reference Number (`INT-...`/`INQ-...`) or Email Address
 - **Events** - Event listing with calendar view and detail pages
-- **Gallery** - Photo/video album browsing with video highlights
+- **Gallery** - Photo/video album browsing with video highlights and queued background uploads (`UploadGalleryMediaJob`)
 - **Daily Readings** - Auto-preloaded daily Catholic readings (English & Tagalog) via USCCB (primary) or Evangelizo (fallback), with `GET /api/readings/today?language=EN|TG&refresh=true`
 - **Bulletin Board** - Downloadable parish bulletins
-- **Inquiry Form** - Contact/inquiry submission with accept/decline workflow
-- **Donation Page** - GCash, Maya, and bank transfer information
+- **Inquiry Form** - Contact/inquiry submission with `INQ-YYYY-XXXX` reference IDs and accept/decline workflow
+- **Donation Page** - GCash, Maya, QR Ph, and card payment integration via PayMongo checkout with automated email receipts (`DonationReceiptMail`)
 - **AI Chatbot** - AI-powered concierge with live agent handoff capability
 
 ### Admin Panel
-- **Dashboard** - Overview stats and activity logs
+- **Dashboard** - Overview stats, activity logs, and real-time Server-Sent Events (SSE) notification streaming (`/admin-portal/notifications/stream`)
 - **Mass Intentions** - CRUD with batch status updates, email notifications
 - **Announcements** - CRUD with recruitment field support
 - **Events** - CRUD with multiple time slots
