@@ -109,4 +109,31 @@ class DashboardController extends Controller
         $logs = $query->latest()->paginate(50)->appends($request->query());
         return view('admin.logs', compact('logs'));
     }
+
+    public function streamNotifications()
+    {
+        return response()->stream(function () {
+            while (true) {
+                if (connection_aborted()) {
+                    break;
+                }
+
+                $data = [
+                    'intentions' => MassIntention::where('status', 'pending')->count(),
+                    'inquiries' => Inquiry::where('status', 'pending')->count(),
+                    'timestamp' => now()->toIso8601String(),
+                ];
+
+                echo "data: " . json_encode($data) . "\n\n";
+                ob_flush();
+                flush();
+                sleep(3);
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
 }

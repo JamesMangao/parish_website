@@ -45,4 +45,31 @@ class MassIntention extends Model
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
+
+    protected static function booted()
+    {
+        static::creating(function ($intention) {
+            if (!$intention->reference_number) {
+                $intention->reference_number = static::generateReferenceNumber();
+            }
+        });
+    }
+
+    public static function generateReferenceNumber(): string
+    {
+        $year = date('Y');
+        $latest = static::where('reference_number', 'like', "INT-{$year}-%")
+            ->orderBy('reference_number', 'desc')
+            ->first();
+
+        $nextNumber = 1;
+        if ($latest && preg_match('/INT-\d{4}-(\d+)/', $latest->reference_number, $matches)) {
+            $nextNumber = ((int) $matches[1]) + 1;
+        } else {
+            // Fallback check counting current year if sequence pattern not matched
+            $nextNumber = static::whereYear('created_at', $year)->count() + 1;
+        }
+
+        return 'INT-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
 }

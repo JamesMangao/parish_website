@@ -164,8 +164,6 @@ class AdminIntentionController extends Controller
 
     private function generateReferenceNumber(): string
     {
-        $year = date('Y');
-        $count = MassIntention::whereYear('created_at', $year)->count() + 1;
-        return 'SRP-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        return MassIntention::generateReferenceNumber();
     }
 }

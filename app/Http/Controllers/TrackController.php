@@ -22,10 +22,29 @@ class TrackController extends Controller
         return $this->showStatus($validated['reference_id']);
     }
 
-    public function showStatus($refId)
+    public function showStatus($query)
     {
-        // Try searching in Mass Intentions
-        $intention = MassIntention::where('reference_number', $refId)->first();
+        $queryStr = trim($query);
+
+        // Check if query is an email address
+        if (filter_var($queryStr, FILTER_VALIDATE_EMAIL)) {
+            $intentions = MassIntention::where('email', $queryStr)->latest()->get();
+            $inquiries = Inquiry::where('email', $queryStr)->latest()->get();
+
+            if ($intentions->isEmpty() && $inquiries->isEmpty()) {
+                return redirect()->route('track')->withErrors(['reference_id' => 'No records found for email: ' . $queryStr]);
+            }
+
+            return view('track-status', [
+                'type' => 'Multiple Records',
+                'intentions' => $intentions,
+                'inquiries' => $inquiries,
+                'searchQuery' => $queryStr,
+            ]);
+        }
+
+        // Search by reference ID in Mass Intentions
+        $intention = MassIntention::where('reference_number', $queryStr)->first();
         
         if ($intention) {
             return view('track-status', [
@@ -33,12 +52,12 @@ class TrackController extends Controller
                 'item' => $intention,
                 'status' => $intention->status,
                 'date' => $intention->preferred_date,
-                'refId' => $refId
+                'refId' => $queryStr
             ]);
         }
 
-        // Try searching in Inquiries
-        $inquiry = Inquiry::where('reference_id', $refId)->first();
+        // Search by reference ID in Inquiries
+        $inquiry = Inquiry::where('reference_id', $queryStr)->first();
 
         if ($inquiry) {
             return view('track-status', [
@@ -46,10 +65,10 @@ class TrackController extends Controller
                 'item' => $inquiry,
                 'status' => $inquiry->status,
                 'date' => $inquiry->preferred_date,
-                'refId' => $refId
+                'refId' => $queryStr
             ]);
         }
 
-        return redirect()->route('track')->withErrors(['reference_id' => 'Invalid Reference ID. Please check and try again.']);
+        return redirect()->route('track')->withErrors(['reference_id' => 'No record matching Reference ID or Email found. Please check and try again.']);
     }
 }

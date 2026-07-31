@@ -20,12 +20,16 @@ class CalendarFeedController extends Controller
         $lines[] = 'METHOD:PUBLISH';
         $lines[] = 'X-WR-CALNAME:Sto. Rosario Parish';
 
+        $appUrl = config('app.url', 'http://localhost');
+        $domain = parse_url($appUrl, PHP_URL_HOST) ?? 'storosario.ph';
+        $appName = config('app.name', 'Sto. Rosario Parish');
+
         foreach ($events as $event) {
             $dtStart = \Carbon\Carbon::parse($event->event_date)->format('Ymd');
             $dtEnd = \Carbon\Carbon::parse($event->event_date)->format('Ymd');
 
             $lines[] = 'BEGIN:VEVENT';
-            $lines[] = 'UID:event-' . $event->id . '@storosario.ph';
+            $lines[] = 'UID:event-' . $event->id . '@' . $domain;
             $lines[] = 'DTSTART;VALUE=DATE:' . $dtStart;
             $lines[] = 'DTEND;VALUE=DATE:' . $dtEnd;
             $lines[] = 'SUMMARY:' . $this->escapeIcal($event->title);
@@ -45,14 +49,14 @@ class CalendarFeedController extends Controller
                 $rrule = 'FREQ=WEEKLY;BYDAY=' . $daysOfWeek[$mass->day_of_week];
 
                 $lines[] = 'BEGIN:VEVENT';
-                $lines[] = 'UID:mass-' . $mass->id . '@storosario.ph';
+                $lines[] = 'UID:mass-' . $mass->id . '@' . $domain;
                 $lines[] = 'DTSTART;TZID=Asia/Manila:' . now()->format('Ymd') . 'T' . $time;
                 $lines[] = 'RRULE:' . $rrule;
                 $lines[] = 'SUMMARY:' . $this->escapeIcal($mass->mass_type . ' Mass');
                 if ($mass->description) {
                     $lines[] = 'DESCRIPTION:' . $this->escapeIcal($mass->description);
                 }
-                $lines[] = 'LOCATION:' . ($mass->location ?? 'Sto. Rosario Parish Church');
+                $lines[] = 'LOCATION:' . ($mass->location ?? ($appName . ' Church'));
                 $lines[] = 'END:VEVENT';
             }
         }

@@ -116,6 +116,15 @@ class DonationController extends Controller
                                 'paymongo_payment_id' => $paymentId,
                                 'payment_method' => $paymentMethod,
                             ]);
+
+                            if ($donation->donor_email) {
+                                try {
+                                    \Illuminate\Support\Facades\Mail::to($donation->donor_email)
+                                        ->queue(new \App\Mail\DonationReceiptMail($donation));
+                                } catch (\Exception $e) {
+                                    Log::error('Failed to send donation receipt email: ' . $e->getMessage());
+                                }
+                            }
                         }
                     }
                 } catch (\Exception $e) {
@@ -193,6 +202,15 @@ class DonationController extends Controller
                         'payment_method' => $paymentMethod,
                         'paymongo_payment_id' => $paymentId,
                     ]);
+
+                    if ($donation->donor_email) {
+                        try {
+                            \Illuminate\Support\Facades\Mail::to($donation->donor_email)
+                                ->queue(new \App\Mail\DonationReceiptMail($donation));
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send webhook donation receipt email: ' . $e->getMessage());
+                        }
+                    }
 
                     Log::info('Donation marked as paid via webhook', ['donation_id' => $donation->id]);
                 }
