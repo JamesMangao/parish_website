@@ -28,8 +28,10 @@
             {{-- Embed --}}
             <div class="aspect-video bg-black">
                 <template x-if="activeTab === 'youtube'">
-                    <iframe src="https://www.youtube.com/embed?listType=live_{{ config('services.parish.youtube_channel_id') }}&autoplay=1&mute=1"
-                        class="w-full h-full" frameborder="0"
+<iframe src="https://www.youtube.com/embed/live_stream?channel={{ config('services.parish.youtube_channel_id') }}&autoplay=1&mute=1"
+    class="w-full h-full" frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen loading="lazy"></iframe>                        class="w-full h-full" frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen loading="lazy"></iframe>
                 </template>
