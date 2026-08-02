@@ -21,6 +21,7 @@ use App\Http\Controllers\TrackController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\CalendarFeedController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\FacebookLiveWebhookController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -32,6 +33,9 @@ Route::post('/donate/checkout', [DonationController::class, 'checkout'])->middle
 Route::get('/donate/success', [DonationController::class, 'success'])->name('donate.success');
 Route::get('/donate/cancel', [DonationController::class, 'cancel'])->name('donate.cancel');
 Route::post('/paymongo/webhook', [DonationController::class, 'webhook'])->name('paymongo.webhook');
+
+Route::get('/webhooks/facebook-live', [FacebookLiveWebhookController::class, 'verify']);
+Route::post('/webhooks/facebook-live', [FacebookLiveWebhookController::class, 'handle']);
 
 // Tracking Status
 Route::get('/track', [TrackController::class, 'index'])->name('track');

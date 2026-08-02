@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleApi('api');
 
         $middleware->trustProxies(at: '*');
+
+        $middleware->validateCsrfTokens(except: [
+            'paymongo/webhook',
+            'webhooks/facebook-live',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
