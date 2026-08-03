@@ -1,3 +1,8 @@
+@php
+    $home = route('home');
+    $email = config('services.parish.office_email', 'officestorosarioparish@gmail.com');
+@endphp
+
 <x-public-layout>
     <section class="min-h-[70vh] flex items-center justify-center py-24 px-6"
              style="background: var(--cream, #F7F9FF);">
@@ -10,9 +15,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24"
                          fill="none" stroke="#0D2A52" stroke-width="1.8"
                          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                        <path d="M12 9v4"/>
-                        <path d="M12 17h.01"/>
+                        <circle cx="12" cy="12" r="2.5"/>
+                        <path d="M12 5v4m0 6v4"/>
+                        <path d="M5 12h4m6 0h4"/>
                     </svg>
                 </div>
             </div>
@@ -20,33 +25,33 @@
             {{-- Error code --}}
             <p class="font-cinzel font-bold mb-2"
                style="font-size: clamp(5rem, 15vw, 8rem); color: rgba(13,42,82,0.08);
-                      line-height: 1; letter-spacing: 0.1em; margin-top: -1rem;">
-                500
+                       line-height: 1; letter-spacing: 0.1em; margin-top: -1rem;">
+                503
             </p>
 
             {{-- Eyebrow --}}
             <div style="display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:12px; margin-top:-1rem;">
                 <span style="height:1px; width:40px; background:linear-gradient(90deg,transparent,rgba(245,197,24,0.5)); display:block;"></span>
                 <span style="font-size:10px; font-weight:700; letter-spacing:0.32em;
-                             text-transform:uppercase; color:var(--gold, #F5C518);">System Error</span>
+                             text-transform:uppercase; color:var(--gold, #F5C518);">Maintenance</span>
                 <span style="height:1px; width:40px; background:linear-gradient(90deg,rgba(245,197,24,0.5),transparent); display:block;"></span>
             </div>
 
             <h1 class="font-heading font-bold italic mb-4"
                 style="font-size: clamp(2rem, 5vw, 3rem); color: var(--blue-deep, #0D2A52); line-height: 1.1;">
-                Something Went Wrong
+                Service Unavailable
             </h1>
 
             <p style="color: rgba(13,42,82,0.48); font-size: 14px; line-height: 1.8; margin-bottom: 2.5rem;">
-                Something went wrong on our end. Please try again later or
-                contact the parish office if the problem persists.
+                Our site is temporarily unavailable for scheduled maintenance.
+                Please check back soon, or contact the parish office for assistance.
             </p>
 
             {{-- Actions --}}
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="{{ route('home') }}"
+                <a href="{{ $home }}"
                    style="display:inline-flex; align-items:center; gap:8px;
-                          background: linear-gradient(135deg, #FFD740 0%, #F5C518 55%, #E0A800 100%);
+                          background: linear-gradient(135deg, #FFD740 0%, #F5C918 55%, #E0A800 100%);
                           color: #0D2A52; font-weight: 700; font-size: 11px;
                           letter-spacing: 0.2em; text-transform: uppercase;
                           padding: 0 32px; height: 52px; border-radius: 999px;
@@ -62,7 +67,7 @@
                     Back to Home
                 </a>
 
-                <a href="mailto:{{ config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}"
+                <a href="mailto:{{ $email }}"
                    style="display:inline-flex; align-items:center; gap:8px;
                           height: 52px; padding: 0 28px; border-radius: 999px;
                           border: 1.5px solid rgba(13,42,82,0.18);
