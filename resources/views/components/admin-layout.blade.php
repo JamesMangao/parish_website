@@ -48,37 +48,37 @@
                 @php $role = Auth::user()->role ?? 'super_admin'; @endphp
 
                 <x-admin-nav-link href="{{ route('admin.dashboard') }}" icon="layout-dashboard" label="Dashboard"
-                    :active="request()->is('admin-portal/dashboard')" />
+                    :active="request()->is('internal/dashboard')" />
 
                 @if($role === 'super_admin' || $role === 'staff')
                     <x-admin-nav-link href="{{ route('admin.intentions') }}" icon="heart" label="Mass Intentions"
-                        :active="request()->is('admin-portal/intentions*')" />
+                        :active="request()->is('internal/intentions*')" />
                     <x-admin-nav-link href="{{ route('admin.donations') }}" icon="banknote" label="Donations"
-                        :active="request()->is('admin-portal/donations*')" />
+                        :active="request()->is('internal/donations*')" />
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom' || $role === 'staff')
                     <x-admin-nav-link href="{{ route('admin.inquiries.index') }}" icon="message-square-quote" label="Inquiries"
-                        :active="request()->is('admin-portal/inquiries*')" />
+                        :active="request()->is('internal/inquiries*')" />
                 @endif
 
                 @if($role === 'super_admin' || $role === 'soccom')
                     <x-admin-nav-link href="{{ route('admin.schedules.index') }}" icon="calendar" label="Schedules"
-                        :active="request()->is('admin-portal/schedules*')" />
+                        :active="request()->is('internal/schedules*')" />
 
                     <x-admin-nav-link href="{{ route('admin.announcements.index') }}" icon="megaphone" label="Announcements"
-                        :active="request()->is('admin-portal/announcements*')" />
+                        :active="request()->is('internal/announcements*')" />
                     <x-admin-nav-link href="{{ route('admin.events.index') }}" icon="sparkles" label="Events"
-                        :active="request()->is('admin-portal/events*')" />
+                        :active="request()->is('internal/events*')" />
                     <x-admin-nav-link href="{{ route('admin.gallery.index') }}" icon="image" label="Gallery"
-                        :active="request()->is('admin-portal/gallery*')" />
+                        :active="request()->is('internal/gallery*')" />
                     <x-admin-nav-link href="{{ route('admin.highlights.index') }}" icon="clapperboard" label="Video Highlights"
-                        :active="request()->is('admin-portal/highlights*')" />
+                        :active="request()->is('internal/highlights*')" />
 
                     {{-- Live Chat with badge --}}
                     <div class="relative">
                         <x-admin-nav-link href="{{ route('admin.chats.index') }}" icon="messages-square" label="Live Chat"
-                            :active="request()->is('admin-portal/chats*')" />
+                            :active="request()->is('internal/chats*')" />
                         <template x-if="$store.ui.notifCounts.chats > 0">
                             <span class="absolute top-1 right-2 h-5 w-5 bg-red-600 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-primary animate-pulse" x-text="$store.ui.notifCounts.chats"></span>
                         </template>
@@ -91,11 +91,11 @@
                     </div>
 
                     <x-admin-nav-link href="{{ route('admin.users') }}" icon="users" label="Users"
-                        :active="request()->is('admin-portal/users*')" />
+                        :active="request()->is('internal/users*')" />
                     <x-admin-nav-link href="{{ route('admin.logs') }}" icon="scroll-text" label="Logs"
-                        :active="request()->is('admin-portal/logs*')" />
+                        :active="request()->is('internal/logs*')" />
                     <x-admin-nav-link href="{{ route('admin.settings') }}" icon="settings" label="Settings"
-                        :active="request()->is('admin-portal/settings*')" />
+                        :active="request()->is('internal/settings*')" />
                 @endif
             </nav>
 

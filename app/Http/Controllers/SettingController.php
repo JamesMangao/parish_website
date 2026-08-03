@@ -12,6 +12,7 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::all()->pluck('value', 'key');
+
         return view('admin.settings', compact('settings'));
     }
 
@@ -62,15 +63,15 @@ class SettingController extends Controller
         }
 
         if (isset($validated['parish_contact'])) {
-            $validated['parish_contact'] = json_encode(array_filter($validated['parish_contact'], fn($v) => $v !== null && $v !== ''));
+            $validated['parish_contact'] = json_encode(array_filter($validated['parish_contact'], fn ($v) => $v !== null && $v !== ''));
         }
 
         if (isset($validated['parish_timeline'])) {
-            $validated['parish_timeline'] = json_encode(array_values(array_filter($validated['parish_timeline'], fn($e) => !empty(trim($e['year'] ?? '')) && !empty(trim($e['title'] ?? '')))));
+            $validated['parish_timeline'] = json_encode(array_values(array_filter($validated['parish_timeline'], fn ($e) => ! empty(trim($e['year'] ?? '')) && ! empty(trim($e['title'] ?? '')))));
         }
 
         foreach ($validated as $key => $value) {
-            if (!in_array($key, ['qr_code', 'priest_image', 'assistant_priest_image'])) {
+            if (! in_array($key, ['qr_code', 'priest_image', 'assistant_priest_image'])) {
                 if ($value !== null) {
                     Setting::updateOrCreate(['key' => $key], ['value' => $value]);
                 }
@@ -78,8 +79,10 @@ class SettingController extends Controller
         }
 
         Cache::forget('global_settings');
+        Cache::forget('chatbot_parish_context');
 
         LogService::log('update_settings', null, ['keys' => array_keys($validated)]);
+
         return back()->with('success', 'Settings updated successfully!');
     }
 }

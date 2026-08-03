@@ -145,7 +145,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
-                <form x-ref="editForm" :action="`/admin-portal/users/${currentUser.id}`" @submit.prevent="submitEdit()" method="POST" class="p-6 space-y-4">
+                <form x-ref="editForm" :action="`{{ route('admin.users.update', ':id') }}`.replace(':id', currentUser.id)" @submit.prevent="submitEdit()" method="POST" class="p-6 space-y-4">
                     @csrf
                     @method('PUT')
                     <div>

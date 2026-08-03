@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use App\Models\MassSchedule;
 use App\Models\Announcement;
 use App\Models\Event;
+use App\Models\MassSchedule;
 use App\Models\Setting;
+use Illuminate\Http\Client\Pool;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AIService
 {
     protected $groqKey;
+
     protected $openRouterKey;
 
     public function __construct()
@@ -22,17 +24,18 @@ class AIService
     }
 
     /**
-     * Get a response from AI, trying OpenRouter first then Groq, then local fallback.
+     * Get a response from AI, racing OpenRouter + Groq concurrently,
+     * then falling back to OpenRouter model 2, then local keyword engine.
      */
     public function getResponse(array $messages)
     {
         $messages = $this->sanitizeMessages($messages);
 
-        if (!collect($messages)->contains('role', 'system')) {
+        if (! collect($messages)->contains('role', 'system')) {
             $context = $this->getParishContext();
             array_unshift($messages, [
                 'role' => 'system',
-                'content' => $this->getSystemPrompt($context)
+                'content' => $this->getSystemPrompt($context),
             ]);
         }
 
@@ -44,51 +47,121 @@ class AIService
             }
         }
 
-        if ($this->openRouterKey) {
-            $models = [
-                'google/gemini-2.5-flash',
-                'meta-llama/llama-4-scout',
-            ];
-            foreach ($models as $model) {
-                try {
-                    $response = Http::withoutVerifying()->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->openRouterKey,
-                        'HTTP-Referer' => config('app.url'),
-                        'X-Title' => config('app.name'),
-                        'Content-Type' => 'application/json',
-                    ])->timeout(15)->post('https://openrouter.ai/api/v1/chat/completions', [
-                        'model' => $model,
-                        'messages' => $messages,
-                        'max_tokens' => 800,
-                    ]);
-                    if ($response->successful()) {
-                        return $response->json()['choices'][0]['message']['content'];
-                    }
-                    Log::warning("OpenRouter failed for {$model}: " . $response->body());
-                } catch (\Exception $e) {
-                    Log::error("OpenRouter error for {$model}: " . $e->getMessage());
-                }
-            }
+        // --- Response caching: only for self-contained first messages (2b) ---
+        // Skip caching for short follow-ups like "yes", "how much", "tomorrow"
+        // which are context-dependent and could cause wrong cached replies.
+        $userCount = collect($messages)->filter(fn ($m) => ($m['role'] ?? '') === 'user')->count();
+        $cacheKey = ($userCount <= 1 && strlen($userMessage) >= 15)
+            ? 'chatbot_response_'.md5($userMessage)
+            : null;
+
+        if ($cacheKey && $cached = Cache::get($cacheKey)) {
+            return $cached;
         }
 
-        if ($this->groqKey) {
-                try {
-                    $response = Http::withoutVerifying()->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->groqKey,
-                        'Content-Type' => 'application/json',
-                    ])->timeout(15)->post('https://api.groq.com/openai/v1/chat/completions', [
+        $aiResponse = null;
+
+        // --- Concurrent pool: race OpenRouter model 1 vs Groq (2a) ---
+        if ($this->openRouterKey && $this->groqKey) {
+            $pool = Http::pool(function (Pool $pool) use ($messages) {
+                $pool->withoutVerifying()->withHeaders([
+                    'Authorization' => 'Bearer '.$this->openRouterKey,
+                    'HTTP-Referer' => config('app.url'),
+                    'X-Title' => config('app.name'),
+                    'Content-Type' => 'application/json',
+                ])->timeout(8)->post('https://openrouter.ai/api/v1/chat/completions', [
+                    'model' => 'google/gemini-2.5-flash',
+                    'messages' => $messages,
+                    'max_tokens' => 800,
+                ]);
+
+                $pool->withoutVerifying()->withHeaders([
+                    'Authorization' => 'Bearer '.$this->groqKey,
+                    'Content-Type' => 'application/json',
+                ])->timeout(8)->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model' => 'llama-3.1-8b-instant',
                     'messages' => $messages,
                     'temperature' => 0.7,
                     'max_tokens' => 2000,
                 ]);
-                if ($response->successful()) {
-                    return $response->json()['choices'][0]['message']['content'];
-                }
-                Log::warning('Groq failed: ' . $response->body());
-            } catch (\Exception $e) {
-                Log::error('Groq error: ' . $e->getMessage());
+            });
+
+            if ($pool[0]->successful()) {
+                $aiResponse = $pool[0]->json()['choices'][0]['message']['content'];
+            } elseif ($pool[1]->successful()) {
+                $aiResponse = $pool[1]->json()['choices'][0]['message']['content'];
+            } else {
+                Log::warning('Concurrent pool failed — OR: '.$pool[0]->status().', Groq: '.$pool[1]->status());
             }
+        }
+
+        // --- Sequential fallback for remaining/unpooled providers ---
+        if ($aiResponse === null) {
+            $providers = [];
+
+            if ($this->openRouterKey) {
+                $orModels = ($this->openRouterKey && $this->groqKey)
+                    ? ['meta-llama/llama-4-scout']
+                    : ['google/gemini-2.5-flash', 'meta-llama/llama-4-scout'];
+
+                foreach ($orModels as $model) {
+                    $providers[] = [
+                        'label' => 'OpenRouter ('.$model.')',
+                        'url' => 'https://openrouter.ai/api/v1/chat/completions',
+                        'headers' => [
+                            'Authorization' => 'Bearer '.$this->openRouterKey,
+                            'HTTP-Referer' => config('app.url'),
+                            'X-Title' => config('app.name'),
+                            'Content-Type' => 'application/json',
+                        ],
+                        'payload' => [
+                            'model' => $model,
+                            'messages' => $messages,
+                            'max_tokens' => 800,
+                        ],
+                    ];
+                }
+            }
+
+            // Only try Groq sequentially if it wasn't already in the pool
+            if ($this->groqKey && ! $this->openRouterKey) {
+                $providers[] = [
+                    'label' => 'Groq',
+                    'url' => 'https://api.groq.com/openai/v1/chat/completions',
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->groqKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'payload' => [
+                        'model' => 'llama-3.1-8b-instant',
+                        'messages' => $messages,
+                        'temperature' => 0.7,
+                        'max_tokens' => 2000,
+                    ],
+                ];
+            }
+
+            foreach ($providers as $provider) {
+                try {
+                    $response = Http::withoutVerifying()->withHeaders($provider['headers'])
+                        ->timeout(8)->post($provider['url'], $provider['payload']);
+                    if ($response->successful()) {
+                        $aiResponse = $response->json()['choices'][0]['message']['content'];
+                        break;
+                    }
+                    Log::warning($provider['label'].' failed: '.$response->body());
+                } catch (\Exception $e) {
+                    Log::error($provider['label'].' error: '.$e->getMessage());
+                }
+            }
+        }
+
+        if ($aiResponse !== null) {
+            if ($cacheKey) {
+                Cache::put($cacheKey, $aiResponse, 600);
+            }
+
+            return $aiResponse;
         }
 
         return $this->localFallback($userMessage);
@@ -113,7 +186,9 @@ class AIService
         ];
 
         return array_map(function ($message) use ($patterns) {
-            if (($message['role'] ?? '') !== 'user') return $message;
+            if (($message['role'] ?? '') !== 'user') {
+                return $message;
+            }
             $content = $message['content'] ?? '';
             foreach ($patterns as $pattern) {
                 if (preg_match($pattern, $content)) {
@@ -121,6 +196,7 @@ class AIService
                     break;
                 }
             }
+
             return ['role' => 'user', 'content' => trim($content)];
         }, $messages);
     }
@@ -132,7 +208,7 @@ class AIService
             $announcements = Announcement::where('is_published', true)->orderBy('published_at', 'desc')->take(5)->get();
             $events = Event::where('is_published', true)->where('event_date', '>=', now()->toDateString())->orderBy('event_date', 'asc')->get();
 
-            $ctx = "CURRENT DATE & TIME: " . now('Asia/Manila')->format('l, F j, Y h:i A') . " (Philippine Time)\n\n";
+            $ctx = 'CURRENT DATE & TIME: '.now('Asia/Manila')->format('l, F j, Y h:i A')." (Philippine Time)\n\n";
 
             $ctx .= "### OFFICE HOURS:\n";
             $ctx .= "- Tuesday to Saturday: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM\n";
@@ -148,7 +224,9 @@ class AIService
             $ctx .= "- Donations are voluntary; used for parish operations and outreach.\n\n";
 
             $ctx .= "### ACTIVE MASS SCHEDULES:\n";
-            if ($schedules->isEmpty()) $ctx .= "No active schedules found.\n";
+            if ($schedules->isEmpty()) {
+                $ctx .= "No active schedules found.\n";
+            }
             foreach ($schedules as $s) {
                 $days = is_array($s->day_of_week) ? implode(', ', $s->day_of_week) : $s->day_of_week;
                 $times = is_array($s->time) ? implode(', ', $s->time) : $s->time;
@@ -156,25 +234,31 @@ class AIService
             }
 
             $ctx .= "\n### RECENT ANNOUNCEMENTS:\n";
-            if ($announcements->isEmpty()) $ctx .= "No recent announcements.\n";
+            if ($announcements->isEmpty()) {
+                $ctx .= "No recent announcements.\n";
+            }
             foreach ($announcements as $a) {
-                $ctx .= "- {$a->title}: " . strip_tags($a->content) . " (Published: " . ($a->published_at ? $a->published_at->format('M d, Y') : 'N/A') . ")\n";
+                $ctx .= "- {$a->title}: ".strip_tags($a->content).' (Published: '.($a->published_at ? $a->published_at->format('M d, Y') : 'N/A').")\n";
             }
 
             $ctx .= "\n### UPCOMING EVENTS & PARISH ACTIVITIES:\n";
-            if ($events->isEmpty()) $ctx .= "No upcoming events.\n";
+            if ($events->isEmpty()) {
+                $ctx .= "No upcoming events.\n";
+            }
             foreach ($events as $e) {
                 $eTimes = [];
                 if (is_array($e->event_time)) {
                     foreach ($e->event_time as $t) {
                         $timePart = $t['time'] ?? '';
                         $titlePart = $t['title'] ?? '';
-                        $combined = trim($timePart . ($titlePart ? " ($titlePart)" : ""));
-                        if ($combined) $eTimes[] = $combined;
+                        $combined = trim($timePart.($titlePart ? " ($titlePart)" : ''));
+                        if ($combined) {
+                            $eTimes[] = $combined;
+                        }
                     }
                 }
-                $eTimeStr = !empty($eTimes) ? implode(', ', $eTimes) : (is_string($e->event_time) ? $e->event_time : 'N/A');
-                $ctx .= "- {$e->title} on " . ($e->event_date ? $e->event_date->format('M d, Y') : 'N/A') . " at {$eTimeStr} [{$e->location}]: {$e->description}\n";
+                $eTimeStr = ! empty($eTimes) ? implode(', ', $eTimes) : (is_string($e->event_time) ? $e->event_time : 'N/A');
+                $ctx .= "- {$e->title} on ".($e->event_date ? $e->event_date->format('M d, Y') : 'N/A')." at {$eTimeStr} [{$e->location}]: {$e->description}\n";
             }
 
             $ctx .= "\n### PARISH HISTORY:\n";
@@ -184,19 +268,28 @@ class AIService
             }
             $ctx .= " 2024: Image declared Important Cultural Property of San Pedro. 2025: Our Lady titled 'Queen of the City of San Pedro'.\n";
 
+            $ctx .= "\n### SACRAMENTAL REQUIREMENTS & FEES:\n";
+            $ctx .= "- **Baptism**: Birth Certificate (with Registry Number), Baptismal Permit (non-Pacita residents), Registration Fee: ₱500.00\n";
+            $ctx .= "- **Wedding**: Baptismal & Confirmation Certificates (for Marriage Purpose), PSA Birth Certificate & CENOMAR, Marriage License/Civil Marriage Contract, complete 2 months before preferred date\n";
+            $ctx .= "- **Confirmation**: Photocopy of Baptismal Certificate\n";
+            $ctx .= "- **First Communion**: Photocopy of Baptismal Certificate\n";
+            $ctx .= "- **Funeral Mass**: Photocopy of Death Certificate\n";
+            $ctx .= "- **Mass Intention**: ₱500.00 per intention. Submit via [/submit-intention](/submit-intention)\n";
+            $ctx .= "- **Sacramental Certificates** (Baptismal/Confirmation/Marriage): Full name, date, processing fee (₱100)\n";
+
             return $ctx;
         });
     }
 
     protected function getSystemPrompt($context = ''): string
     {
-        $contactRaw = Cache::remember('chatbot_settings_parish_contact', 300, fn() => Setting::where('key', 'parish_contact')->value('value'));
+        $contactRaw = Cache::remember('chatbot_settings_parish_contact', 300, fn () => Setting::where('key', 'parish_contact')->value('value'));
         $contactRaw = $contactRaw ?? '+63 2 8869 2742';
         $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
             ? (json_decode($contactRaw, true) ?: [$contactRaw])
             : (is_array($contactRaw) ? $contactRaw : ['+63 2 8869 2742']);
         $contactLine = implode(' | ', $contactNumbers);
-        $email = Cache::remember('chatbot_settings_parish_email', 300, fn() => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
+        $email = Cache::remember('chatbot_settings_parish_email', 300, fn () => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
 
         return "You are Sto. Rosario Parish's digital assistant (Pacita, San Pedro, Laguna). Warm, helpful Catholic parish concierge.
 
@@ -221,7 +314,7 @@ class AIService
 
     protected function getGcashNumber(): string
     {
-        return Cache::remember('chatbot_settings_gcash_number', 300, fn() => Setting::where('key', 'gcash_number')->value('value')) ?? '09123456789';
+        return Cache::remember('chatbot_settings_gcash_number', 300, fn () => Setting::where('key', 'gcash_number')->value('value')) ?? '09123456789';
     }
 
     /**
@@ -310,16 +403,16 @@ class AIService
         arsort($scores);
         $topIntent = key($scores) ?: 'unknown';
 
-        $name = Cache::remember('chatbot_settings_parish_name', 300, fn() => Setting::where('key', 'parish_name')->value('value')) ?? 'Sto. Rosario Parish';
-        $contactRaw = Cache::remember('chatbot_settings_parish_contact', 300, fn() => Setting::where('key', 'parish_contact')->value('value')) ?? '+63 2 8869 2742';
+        $name = Cache::remember('chatbot_settings_parish_name', 300, fn () => Setting::where('key', 'parish_name')->value('value')) ?? 'Sto. Rosario Parish';
+        $contactRaw = Cache::remember('chatbot_settings_parish_contact', 300, fn () => Setting::where('key', 'parish_contact')->value('value')) ?? '+63 2 8869 2742';
         $contactNumbers = is_string($contactRaw) && $contactRaw !== ''
             ? (json_decode($contactRaw, true) ?: [$contactRaw])
             : (is_array($contactRaw) ? $contactRaw : ['+63 2 8869 2742']);
         $contact = implode(' | ', $contactNumbers);
-        $email = Cache::remember('chatbot_settings_parish_email', 300, fn() => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
-        $gcashNum = Cache::remember('chatbot_settings_gcash_number', 300, fn() => Setting::where('key', 'gcash_number')->value('value')) ?? '09123456789';
-        $priest = Cache::remember('chatbot_settings_priest_name', 300, fn() => Setting::where('key', 'priest_name')->value('value')) ?? 'our Parish Priest';
-        $assistantPriest = Cache::remember('chatbot_settings_assistant_priest_name', 300, fn() => Setting::where('key', 'assistant_priest_name')->value('value'));
+        $email = Cache::remember('chatbot_settings_parish_email', 300, fn () => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
+        $gcashNum = Cache::remember('chatbot_settings_gcash_number', 300, fn () => Setting::where('key', 'gcash_number')->value('value')) ?? '09123456789';
+        $priest = Cache::remember('chatbot_settings_priest_name', 300, fn () => Setting::where('key', 'priest_name')->value('value')) ?? 'our Parish Priest';
+        $assistantPriest = Cache::remember('chatbot_settings_assistant_priest_name', 300, fn () => Setting::where('key', 'assistant_priest_name')->value('value'));
 
         $responses = [
             'greeting' => "Peace be with you! 🙏 I am the digital concierge of {$name}. How may I assist you today? You can ask me about:\n\n- ⛪ Mass Schedules\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n\nHow can I help?",
@@ -332,7 +425,7 @@ class AIService
 
             'track' => "You can track the status of your Mass Intention or Inquiry here:\n👉 [Track Your Request](/track)\n\nYou'll need your Reference ID (e.g., SRP-2026-001 or INQ-2026-001).",
 
-            'donation' => "Thank you for your generosity! 🙏\n\n**GCash:** {$gcashNum}\n**Account Name:** " . (Cache::remember('chatbot_settings_gcash_name', 300, fn() => Setting::where('key', 'gcash_name')->value('value')) ?? $name) . "\n\nYou can also donate via Bank Transfer — check our [Donation Page](/donate) for details.\n\n*Donations are voluntary and support our parish operations and outreach programs.*",
+            'donation' => "Thank you for your generosity! 🙏\n\n**GCash:** {$gcashNum}\n**Account Name:** ".(Cache::remember('chatbot_settings_gcash_name', 300, fn () => Setting::where('key', 'gcash_name')->value('value')) ?? $name)."\n\nYou can also donate via Bank Transfer — check our [Donation Page](/donate) for details.\n\n*Donations are voluntary and support our parish operations and outreach programs.*",
 
             'gallery' => "View our parish photo gallery and videos:\n👉 [Gallery](/gallery)\n\nWe have collections from parish events, feasts, and daily life at {$name}.",
 
@@ -346,7 +439,7 @@ class AIService
 
             'contact' => "📞 **Contact Information:**\n- Phone: {$contact}\n- Email: {$email}\n- Facebook: [Sto. Rosario Parish Pacita](https://facebook.com/storosarioparish)\n- Messenger: [m.me/storosarioparishpacita1](https://m.me/storosarioparishpacita1)\n\n**Office Hours:**\n- Tue–Sat: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM\n- Sun: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM\n- Mon: Closed",
 
-            'about' => "{$name} is a Catholic parish located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our patroness is the **Queen of the Most Holy Rosary of Pacita**, whose image was carved in Paete, Laguna in 1982.\n\n⛪ **Key Milestones:**\n- 1983 (Oct 16): Canonical erection of the parish\n- 1986 (Dec 6): Church dedication\n- 2024: Image declared Important Cultural Property of San Pedro\n- 2025: Our Lady accorded the title 'Queen of the City of San Pedro'\n\nOur Parish Priest is {$priest}" . ($assistantPriest ? " and our Assistant Parish Priest is {$assistantPriest}" : "") . ".\n\nLearn more: [About Us](/about)",
+            'about' => "{$name} is a Catholic parish located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our patroness is the **Queen of the Most Holy Rosary of Pacita**, whose image was carved in Paete, Laguna in 1982.\n\n⛪ **Key Milestones:**\n- 1983 (Oct 16): Canonical erection of the parish\n- 1986 (Dec 6): Church dedication\n- 2024: Image declared Important Cultural Property of San Pedro\n- 2025: Our Lady accorded the title 'Queen of the City of San Pedro'\n\nOur Parish Priest is {$priest}".($assistantPriest ? " and our Assistant Parish Priest is {$assistantPriest}" : '').".\n\nLearn more: [About Us](/about)",
 
             'faith' => "That's a beautiful question about our Catholic faith! 🙏\n\nI'd be happy to help with basic questions about prayers, sacraments, and Catholic traditions. For more complex spiritual guidance, I recommend speaking with {$priest} after Mass or scheduling a pastoral appointment.\n\nIs there something specific about our faith you'd like to know?",
 
@@ -362,7 +455,7 @@ class AIService
     {
         $schedules = MassSchedule::where('is_active', true)->get();
         if ($schedules->isEmpty()) {
-            return "There are no active mass schedules available at the moment. Please check back later or contact the parish office for more information.";
+            return 'There are no active mass schedules available at the moment. Please check back later or contact the parish office for more information.';
         }
 
         $response = "⛪ **Mass Schedules:**\n\n";
@@ -389,7 +482,7 @@ class AIService
             ->get();
 
         if ($events->isEmpty()) {
-            return "There are no upcoming events scheduled at the moment. Check back soon or visit our [Events page](/events) for updates!";
+            return 'There are no upcoming events scheduled at the moment. Check back soon or visit our [Events page](/events) for updates!';
         }
 
         $response = "📅 **Upcoming Events:**\n\n";
@@ -397,7 +490,7 @@ class AIService
             $date = $e->event_date ? $e->event_date->format('M d, Y') : 'TBA';
             $response .= "- **{$e->title}** — {$date}\n";
             if ($e->description) {
-                $response .= "  " . strip_tags(mb_strimwidth($e->description, 0, 120, '...')) . "\n";
+                $response .= '  '.strip_tags(mb_strimwidth($e->description, 0, 120, '...'))."\n";
             }
         }
         $response .= "\n👉 [View All Events](/events)";

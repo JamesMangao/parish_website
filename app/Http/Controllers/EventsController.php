@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Services\LogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class EventsController extends Controller
 {
     public function publicIndex(Request $request)
     {
         $view = $request->get('view', 'list');
-        
+
         $events = Event::where('is_published', true)
             ->whereDate('event_date', '>=', now())
             ->orderBy('event_date', 'asc')
@@ -27,13 +28,13 @@ class EventsController extends Controller
 
         $allEvents = Event::where('is_published', true)->orderBy('event_date', 'asc')->get();
 
-        $eventsJson = $allEvents->map(fn($e) => [
-            'id'          => $e->id,
-            'title'       => $e->title,
-            'event_date'  => $e->event_date->format('Y-m-d'),
+        $eventsJson = $allEvents->map(fn ($e) => [
+            'id' => $e->id,
+            'title' => $e->title,
+            'event_date' => $e->event_date->format('Y-m-d'),
             'description' => $e->description,
-            'event_time'  => $e->event_time,
-            'url'         => $e->url ?? $e->link ?? null,
+            'event_time' => $e->event_time,
+            'url' => $e->url ?? $e->link ?? null,
         ]);
 
         return view('events', compact('events', 'calendarEvents', 'month', 'year', 'view', 'allEvents', 'eventsJson'));
@@ -41,7 +42,7 @@ class EventsController extends Controller
 
     public function publicShow(Event $event)
     {
-        if (!$event->is_published) {
+        if (! $event->is_published) {
             abort(404);
         }
 
@@ -51,6 +52,7 @@ class EventsController extends Controller
     public function index()
     {
         $events = Event::orderBy('event_date', 'desc')->get();
+
         return view('admin.events.index', compact('events'));
     }
 
@@ -77,12 +79,14 @@ class EventsController extends Controller
             'is_published' => 'boolean',
         ]);
 
-        $validated['event_time'] = array_values(array_filter($validated['event_time'], function($item) {
-            return !empty($item['time']) || !empty($item['title']);
+        $validated['event_time'] = array_values(array_filter($validated['event_time'], function ($item) {
+            return ! empty($item['time']) || ! empty($item['title']);
         }));
 
         Event::create($validated);
+        Cache::forget('chatbot_parish_context');
         LogService::log('create_event', null, ['title' => $validated['title'], 'event_date' => $validated['event_date']]);
+
         return redirect()->route('admin.events.index')->with('success', 'Event created.');
     }
 
@@ -104,19 +108,23 @@ class EventsController extends Controller
             'is_published' => 'boolean',
         ]);
 
-        $validated['event_time'] = array_values(array_filter($validated['event_time'], function($item) {
-            return !empty($item['time']) || !empty($item['title']);
+        $validated['event_time'] = array_values(array_filter($validated['event_time'], function ($item) {
+            return ! empty($item['time']) || ! empty($item['title']);
         }));
 
         $event->update($validated);
+        Cache::forget('chatbot_parish_context');
         LogService::log('update_event', $event, ['title' => $event->title]);
+
         return redirect()->route('admin.events.index')->with('success', 'Event updated.');
     }
 
     public function destroy(Event $event)
     {
         LogService::log('delete_event', $event, ['title' => $event->title]);
+        Cache::forget('chatbot_parish_context');
         $event->delete();
+
         return back()->with('success', 'Event deleted.');
     }
 }

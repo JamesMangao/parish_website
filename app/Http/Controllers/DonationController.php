@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DonationReceiptMail;
 use App\Models\Donation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class DonationController extends Controller
 {
@@ -14,7 +17,8 @@ class DonationController extends Controller
      */
     public function create()
     {
-        $paymongoEnabled = !empty(config('services.paymongo.secret_key'));
+        $paymongoEnabled = ! empty(config('services.paymongo.secret_key'));
+
         return view('donate', compact('paymongoEnabled'));
     }
 
@@ -56,10 +60,10 @@ class DonationController extends Controller
                                 ],
                             ],
                             'payment_method_types' => ['gcash', 'paymaya', 'card', 'qrph'],
-                            'success_url' => route('donate.success') . '?donation_id=' . $donation->id,
-                            'cancel_url' => route('donate.cancel') . '?donation_id=' . $donation->id,
-                            'reference_number' => 'DON-' . strtoupper(substr($donation->id, 0, 8)),
-                            'description' => 'Sto. Rosario Parish — ' . $validated['purpose'],
+                            'success_url' => route('donate.success').'?donation_id='.$donation->id,
+                            'cancel_url' => route('donate.cancel').'?donation_id='.$donation->id,
+                            'reference_number' => 'DON-'.strtoupper(substr($donation->id, 0, 8)),
+                            'description' => 'Sto. Rosario Parish — '.$validated['purpose'],
                         ],
                     ],
                 ]);
@@ -70,6 +74,7 @@ class DonationController extends Controller
                     'body' => $response->body(),
                 ]);
                 $donation->update(['status' => 'failed']);
+
                 return back()->with('error', 'Unable to create checkout session. Please try again.');
             }
 
@@ -83,6 +88,7 @@ class DonationController extends Controller
         } catch (\Exception $e) {
             Log::error('PayMongo checkout exception', ['error' => $e->getMessage()]);
             $donation->update(['status' => 'failed']);
+
             return back()->with('error', 'Payment service unavailable. Please try again later.');
         }
     }
@@ -101,7 +107,7 @@ class DonationController extends Controller
             if ($donation && $donation->status === 'pending' && $donation->checkout_session_id) {
                 try {
                     $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
-                        ->get('https://api.paymongo.com/v2/checkout_sessions/' . $donation->checkout_session_id);
+                        ->get('https://api.paymongo.com/v2/checkout_sessions/'.$donation->checkout_session_id);
 
                     if ($response->successful()) {
                         $sessionData = $response->json();
@@ -119,10 +125,10 @@ class DonationController extends Controller
 
                             if ($donation->donor_email) {
                                 try {
-                                    \Illuminate\Support\Facades\Mail::to($donation->donor_email)
-                                        ->queue(new \App\Mail\DonationReceiptMail($donation));
+                                    Mail::to($donation->donor_email)
+                                        ->queue(new DonationReceiptMail($donation));
                                 } catch (\Exception $e) {
-                                    Log::error('Failed to send donation receipt email: ' . $e->getMessage());
+                                    Log::error('Failed to send donation receipt email: '.$e->getMessage());
                                 }
                             }
                         }
@@ -165,6 +171,7 @@ class DonationController extends Controller
             $parts = collect(explode(',', $sigHeader))
                 ->mapWithKeys(function ($part) {
                     [$key, $value] = explode('=', $part, 2);
+
                     return [$key => $value];
                 });
 
@@ -172,12 +179,13 @@ class DonationController extends Controller
             $testSignature = $parts->get('te');
             $liveSignature = $parts->get('li');
 
-            $expectedPayload = $timestamp . '.' . $payload;
+            $expectedPayload = $timestamp.'.'.$payload;
             $computedSignature = hash_hmac('sha256', $expectedPayload, $webhookSecret);
 
             $signature = $liveSignature ?: $testSignature;
-            if (!hash_equals($computedSignature, $signature ?? '')) {
+            if (! hash_equals($computedSignature, $signature ?? '')) {
                 Log::warning('PayMongo webhook signature mismatch');
+
                 return response()->json(['error' => 'Invalid signature'], 403);
             }
         }
@@ -194,7 +202,7 @@ class DonationController extends Controller
                 if ($donation && $donation->status !== 'paid') {
                     $paymentMethod = $event['data']['attributes']['data']['attributes']['payment_method_used'] ?? null;
                     $payments = $event['data']['attributes']['data']['attributes']['payments'] ?? [];
-                    $paymentId = !empty($payments) ? ($payments[0]['id'] ?? null) : null;
+                    $paymentId = ! empty($payments) ? ($payments[0]['id'] ?? null) : null;
 
                     $donation->update([
                         'status' => 'paid',
@@ -205,10 +213,10 @@ class DonationController extends Controller
 
                     if ($donation->donor_email) {
                         try {
-                            \Illuminate\Support\Facades\Mail::to($donation->donor_email)
-                                ->queue(new \App\Mail\DonationReceiptMail($donation));
+                            Mail::to($donation->donor_email)
+                                ->queue(new DonationReceiptMail($donation));
                         } catch (\Exception $e) {
-                            Log::error('Failed to send webhook donation receipt email: ' . $e->getMessage());
+                            Log::error('Failed to send webhook donation receipt email: '.$e->getMessage());
                         }
                     }
 
@@ -229,6 +237,17 @@ class DonationController extends Controller
         $totalPaid = Donation::where('status', 'paid')->sum('amount');
         $todayPaid = Donation::where('status', 'paid')->whereDate('paid_at', today())->sum('amount');
         $totalCount = Donation::where('status', 'paid')->count();
+
         return view('admin.donations', compact('donations', 'totalPaid', 'todayPaid', 'totalCount'));
+    }
+
+    /**
+     * Stream a PDF receipt for direct browser viewing or download.
+     * Accessible only via a signed URL tied to the specific donation.
+     */
+    public function receipt(Request $request, Donation $donation)
+    {
+        return Pdf::loadView('pdfs.donation-receipt', ['donation' => $donation])
+            ->stream('donation-receipt-DON-'.strtoupper(substr($donation->id, 0, 8)).'.pdf');
     }
 }

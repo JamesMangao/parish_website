@@ -99,6 +99,15 @@
 
             {{-- Actions --}}
             <div style="display:flex;flex-direction:column;gap:12px;">
+                @if($donation && $donation->status === 'paid')
+                    <a href="{{ URL::signedRoute('donation.receipt', ['donation' => $donation]) }}"
+                       style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:14px;background:rgba(26,64,128,0.06);border:1.5px solid rgba(26,64,128,0.12);color:var(--color-blue-deep,#0D2A52);font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;"
+                       onmouseenter="this.style.background='rgba(26,64,128,0.1)'"
+                       onmouseleave="this.style.background='rgba(26,64,128,0.06)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M4 22h16a2 2 0 0 0 2-2V10H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/><path d="M14 2l6 6v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6z"/></svg>
+                        Download Receipt (PDF)
+                    </a>
+                @endif
                 <a href="{{ route('donate') }}" style="display:block;padding:14px 24px;border-radius:14px;background:linear-gradient(135deg,#F5C518 0%,#FFD740 100%);color:#0D2A52;font-size:14px;font-weight:800;text-decoration:none;text-align:center;transition:all .3s;box-shadow:0 4px 20px rgba(245,197,24,0.25);"
                    onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px rgba(245,197,24,0.4)'"
                    onmouseleave="this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(245,197,24,0.25)'">

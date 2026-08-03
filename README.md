@@ -18,7 +18,7 @@ A full-featured Catholic parish management web application built for **Sto. Rosa
 - **AI Chatbot** - AI-powered concierge with live agent handoff capability
 
 ### Admin Panel
-- **Dashboard** - Overview stats, activity logs, and real-time Server-Sent Events (SSE) notification streaming (`/admin-portal/notifications/stream`)
+- **Dashboard** - Overview stats, activity logs, and real-time Server-Sent Events (SSE) notification streaming (`/internal/notifications/stream`)
 - **Mass Intentions** - CRUD with batch status updates, email notifications
 - **Announcements** - CRUD with recruitment field support
 - **Events** - CRUD with multiple time slots

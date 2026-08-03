@@ -23,10 +23,11 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        $key = 'login:' . Str::lower($request->email) . '|' . $request->ip();
+        $key = 'login:'.Str::lower($request->email).'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
+
             return back()->withErrors([
                 'email' => "Too many failed login attempts. Please try again in {$seconds} seconds.",
             ])->onlyInput('email');
@@ -34,8 +35,9 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $user = Auth::user();
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 Auth::logout();
+
                 return back()->withErrors([
                     'email' => 'Your account has been disabled. Please contact the administrator.',
                 ])->onlyInput('email');
@@ -48,7 +50,7 @@ class LoginController extends Controller
                 'ip' => $request->ip(),
             ]);
 
-            return redirect()->intended('/admin-portal/dashboard');
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         RateLimiter::hit($key, 300);
@@ -69,6 +71,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

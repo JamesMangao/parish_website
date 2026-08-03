@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Donation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -28,5 +29,13 @@ class DonationReceiptMail extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.donation-receipt',
         );
+    }
+
+    public function attachments(): array
+    {
+        return [
+            Pdf::loadView('pdfs.donation-receipt', ['donation' => $this->donation])
+                ->filename('donation-receipt-DON-'.strtoupper(substr($this->donation->id, 0, 8)).'.pdf'),
+        ];
     }
 }

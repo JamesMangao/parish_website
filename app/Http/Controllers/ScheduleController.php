@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\MassSchedule;
 use App\Services\LogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ScheduleController extends Controller
 {
     public function index()
     {
         $schedules = MassSchedule::orderByRaw('CAST(day_of_week AS TEXT)')->orderByRaw('CAST(time AS TEXT)')->get();
+
         return view('admin.schedules.index', compact('schedules'));
     }
 
@@ -37,7 +39,9 @@ class ScheduleController extends Controller
         ]);
 
         MassSchedule::create($validated);
+        Cache::forget('chatbot_parish_context');
         LogService::log('create_schedule', null, ['mass_type' => $validated['mass_type'], 'day_of_week' => $validated['day_of_week'] ?? null, 'time' => $validated['time'] ?? null]);
+
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule created.');
     }
 
@@ -59,14 +63,18 @@ class ScheduleController extends Controller
             'is_active' => 'boolean',
         ]);
         $schedule->update($validated);
+        Cache::forget('chatbot_parish_context');
         LogService::log('update_schedule', $schedule, ['mass_type' => $validated['mass_type'] ?? null]);
+
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule updated.');
     }
 
     public function destroy(MassSchedule $schedule)
     {
         LogService::log('delete_schedule', $schedule, ['mass_type' => $schedule->mass_type]);
+        Cache::forget('chatbot_parish_context');
         $schedule->delete();
+
         return back()->with('success', 'Schedule deleted.');
     }
 }
