@@ -2,7 +2,7 @@
     title="Announcements" 
     description="Manage latest news and updates for the parish."
     createRoute="{{ route('admin.announcements.create') }}"
-    :headers="['Title', 'Content Preview', 'Status', 'Posted']"
+    :headers="['Title', 'Content Preview', 'Category', 'Status', 'Posted']"
 >
     @forelse($announcements as $a)
         <tr class="hover:bg-muted/20 transition-colors">
@@ -18,6 +18,9 @@
                 </div>
             </td>
             <td class="px-6 py-4 max-w-[300px] truncate text-muted-foreground">{{ $a->content }}</td>
+            <td class="px-6 py-4">
+                <span class="text-xs font-medium text-muted-foreground">{{ $a->category ?? 'Parish Life' }}</span>
+            </td>
             <td class="px-6 py-4">
                 <x-admin-badge :status="$a->is_published ? 'published' : 'draft'" />
             </td>
@@ -44,7 +47,7 @@
             title="No announcements yet"
             description="Create your first announcement to share news and updates with your parish community."
             icon="empty"
-            :colSpan="5"
+            :colSpan="6"
         />
     @endforelse
 </x-admin-index>

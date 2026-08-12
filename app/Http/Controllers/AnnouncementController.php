@@ -9,6 +9,32 @@ use Illuminate\Support\Facades\Cache;
 
 class AnnouncementController extends Controller
 {
+    public function publicIndex()
+    {
+        $announcements = Announcement::active()
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('published_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('announcements.index', compact('announcements'));
+    }
+
+    public function publicShow(Announcement $announcement)
+    {
+        if (!$announcement->is_published) {
+            abort(404);
+        }
+
+        $recentAnnouncements = Announcement::active()
+            ->where('id', '!=', $announcement->id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('announcements.show', compact('announcement', 'recentAnnouncements'));
+    }
+
     public function index()
     {
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
@@ -31,6 +57,8 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category' => 'required|string|in:Parish Life,Liturgical,Sacraments,Formation',
+            'is_featured' => 'boolean',
             'is_recruitment' => 'boolean',
             'registration_link' => 'nullable|url|max:255',
             'is_published' => 'boolean',
@@ -38,6 +66,7 @@ class AnnouncementController extends Controller
         ]);
 
         $announcement = Announcement::create($validated);
+        Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
         LogService::log('create_announcement', $announcement);
 
@@ -54,6 +83,8 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category' => 'required|string|in:Parish Life,Liturgical,Sacraments,Formation',
+            'is_featured' => 'boolean',
             'is_recruitment' => 'boolean',
             'registration_link' => 'nullable|url|max:255',
             'is_published' => 'boolean',
@@ -61,6 +92,7 @@ class AnnouncementController extends Controller
         ]);
 
         $announcement->update($validated);
+        Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
         LogService::log('update_announcement', $announcement);
 
@@ -70,6 +102,7 @@ class AnnouncementController extends Controller
     public function destroy(Announcement $announcement)
     {
         LogService::log('delete_announcement', $announcement, ['title' => $announcement->title]);
+        Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
         $announcement->delete();
 

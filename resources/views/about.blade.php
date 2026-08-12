@@ -952,7 +952,7 @@
             </div>
 
             {{-- MAP --}}
-            <div class="map-wrap" data-reveal>
+            <div class="map-wrap" id="visit-map" data-reveal>
                 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
                 <div id="parish-map" style="width:100%;height:400px;"></div>
             </div>

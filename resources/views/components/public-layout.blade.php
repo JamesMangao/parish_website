@@ -60,7 +60,7 @@
             $now = \Carbon\Carbon::now('Asia/Manila');
             $isSunday = $now->dayOfWeek === \Carbon\Carbon::SUNDAY;
             $liveStart = $now->copy()->setTime(9, 55);
-            $liveEnd = $now->copy()->setTime(11, 15);
+            $liveEnd = $now->copy()->setTime(11, 30);
             $isLiveWindow = $isSunday && $now->gte($liveStart) && $now->lte($liveEnd);
         @endphp
         @if($isLiveWindow)

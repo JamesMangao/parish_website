@@ -194,89 +194,189 @@
     </div><br><br>
 </section>
 
-<section class="relative py-24 overflow-hidden reveal section-pad-mobile section-pad-tablet">
-    <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-        <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp') }}" alt="" loading="lazy" width="1200" height="800" class="w-full h-full object-cover" style="filter:saturate(.18) brightness(1.15) blur(4px);transform:scale(1.06);">
-        <div style="position:absolute;inset:0;background:rgba(246,243,238,.91);"></div>
-    </div>
-
+@if($announcements->isNotEmpty())
     @php
-    $annImgs = [
-        \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp'),
-        \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/mass.webp'),
-        \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/img/church1.webp'),
-    ];
-    $annCats = ['Liturgical', 'Parish Life', 'Parish Event'];
+        $heroAnnouncement = $announcements->firstWhere('is_featured', true) ?? $announcements->first();
+        $carouselAnnouncements = $announcements->filter(fn($a) => $a->id !== $heroAnnouncement->id)->values();
     @endphp
 
-    <div class="relative z-10 max-w-6xl mx-auto px-6 section-px-mobile">
-        <div class="ann-header-row relative flex items-start justify-between mb-14">
-            <div class="w-24 shrink-0 hidden sm:block ann-header-spacer"></div>
-            <div class="flex-1 text-center">
-                <div class="flex items-center justify-center gap-4 mb-5">
-                    <span style="display:block;flex:1;max-width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,0,.4));"></span>
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/><line x1="12" y1="2" x2="12" y2="0"/><line x1="10" y1="1" x2="14" y2="1"/></svg>
-                    <span style="display:block;flex:1;max-width:60px;height:1px;background:linear-gradient(90deg,rgba(201,162,0,.4),transparent);"></span>
+    @php
+        $categoryConfigs = [
+            'Parish Life'  => ['tint' => '#FBEEE7', 'color' => '#B5562F'],
+            'Liturgical'   => ['tint' => '#F3ECFA', 'color' => '#6B3FA0'],
+            'Sacraments'   => ['tint' => '#FBF3DC', 'color' => '#A87F22'],
+            'Formation'    => ['tint' => '#EEF1F6', 'color' => '#1B2A4A'],
+        ];
+        $categoryIcons = [
+            'Parish Life' => '<path d="M16 21v-2a4 4 0 0 0-3.7-3.97"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M22 21v-2a4 4 0 0 0-4-4h-2"/><circle cx="6" cy="9" r="4"/>',
+            'Liturgical'  => '<path d="M12 2L2 21h10l2-4 2 4z"/><path d="M12 2L22 21H12z"/><path d="M6 17V9"/>',
+            'Sacraments'  => '<path d="M20 14.69 12 23l-8-8.31A6 6 0 0 1 12 7a6 6 0 0 1 10 7.69Z"/>',
+            'Formation'   => '<path d="M4 19V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13"/><path d="M4 19l8-8 8 8"/><path d="M8 7v4"/><path d="M16 7v2"/>',
+        ];
+        $heroCategory = $heroAnnouncement->category ?? 'Parish Life';
+        $heroCfg = $categoryConfigs[$heroCategory] ?? $categoryConfigs['Parish Life'];
+        $heroIconPath = $categoryIcons[$heroCategory] ?? $categoryIcons['Parish Life'];
+    @endphp
+
+    <section class="py-12 reveal">
+        <div class="max-w-6xl mx-auto px-6 section-px-mobile">
+            <article class="bg-card border border-muted rounded-2xl shadow-xl overflow-hidden group relative" style="border-top-width:4px;border-top-color:{{ $heroCfg['tint'] }};">
+                <div class="p-6 md:p-8">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            @if($heroAnnouncement->is_recruitment)
+                                <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-accent">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    <span>Recruitment</span>
+                                </span>
+                            @endif
+                        </div>
+                        <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center" style="background:{{ $heroCfg['tint'] }};">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ $heroCfg['color'] }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                {!! $heroIconPath !!}
+                            </svg>
+                        </div>
+                    </div>
+
+                    <h2 class="font-heading font-bold italic text-xl md:text-2xl text-primary leading-tight line-clamp-2 min-h-[2.7em] mb-3 group-hover:text-accent transition-colors">
+                        <a href="{{ route('announcements.show', $heroAnnouncement) }}" class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
+                            {{ $heroAnnouncement->title }}
+                        </a>
+                    </h2>
+
+                    @if($heroAnnouncement->content)
+                        <p class="text-sm text-muted-foreground leading-relaxed line-clamp-2 min-h-[2.6em] mb-4">
+                            {{ strip_tags($heroAnnouncement->content) }}
+                        </p>
+                    @endif
+
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('announcements.show', $heroAnnouncement) }}" class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-primary hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
+                            Read more <span aria-hidden="true">&rarr;</span>
+                        </a>
+                        @if($heroAnnouncement->is_recruitment)
+                            @if($heroAnnouncement->registration_link)
+                                <a href="{{ $heroAnnouncement->registration_link }}" target="_blank" rel="noopener" class="gold-btn text-[9.5px] px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Register Now</a>
+                            @else
+                                <a href="{{ route('about') }}#visit-map" class="gold-btn text-[9.5px] px-3 py-1 rounded-lg font-bold uppercase tracking-wider">Visit Parish Office</a>
+                            @endif
+                        @endif
+                    </div>
                 </div>
-                <h2 class="font-cinzel font-semibold" style="font-size:clamp(1.25rem,3vw,2.15rem);color:var(--blue-deep);letter-spacing:.16em;margin-bottom:8px;">LATEST ANNOUNCEMENTS</h2>
-                <p style="color:rgba(13,42,82,.4);font-size:15.5px;max-width:480px;margin:0 auto 14px;">Stay informed. Be involved. Grow in faith together.</p>
-                <div class="flex justify-center"><div style="width:6px;height:6px;background:rgba(201,162,0,.42);transform:rotate(45deg);"></div></div>
+            </article>
+        </div>
+    </section>
+@endif
+
+<section class="py-24 reveal section-pad-mobile section-pad-tablet">
+    <div class="max-w-6xl mx-auto px-6 section-px-mobile">
+        
+        <div class="text-center mb-12">
+            <div class="flex items-center justify-center gap-4 mb-5">
+                <span style="display:block;flex:1;max-width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,0,.4));"></span>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/><line x1="12" y1="2" x2="12" y2="0"/><line x1="10" y1="1" x2="14" y2="1"/></svg>
+                <span style="display:block;flex:1;max-width:60px;height:1px;background:linear-gradient(90deg,rgba(201,162,0,.4),transparent);"></span>
             </div>
-            <div class="ann-nav-btns hidden sm:flex items-center gap-2 shrink-0 pt-1">
-                <button onclick="document.getElementById('ann-grid').scrollBy({left:-340,behavior:'smooth'})" class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200" style="border:1.5px solid rgba(13,42,82,.16);color:rgba(13,42,82,.4);background:#fff;" aria-label="Previous announcements">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                <button onclick="document.getElementById('ann-grid').scrollBy({left:340,behavior:'smooth'})" class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200" style="border:1.5px solid rgba(13,42,82,.16);color:rgba(13,42,82,.4);background:#fff;" aria-label="Next announcements">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-            </div>
+            <h2 class="font-cinzel font-semibold" style="font-size:clamp(1.25rem,3vw,2.15rem);color:var(--blue-deep);letter-spacing:.16em;margin-bottom:8px;">LATEST ANNOUNCEMENTS</h2>
+            <p style="color:rgba(13,42,82,.4);font-size:15.5px;max-width:480px;margin:0 auto 14px;">Stay informed. Be involved. Grow in faith together.</p>
+            <div class="flex justify-center"><div style="width:6px;height:6px;background:rgba(201,162,0,.42);transform:rotate(45deg);"></div></div>
         </div>
 
-        @if($announcements->isEmpty())
-        <div class="text-center py-16">
-            <p style="color:rgba(13,42,82,.3);font-size:14px;">No announcements at this time.</p>
-        </div>
+        @if($carouselAnnouncements->isEmpty())
+            <div class="text-center py-16">
+                <p style="color:rgba(13,42,82,.3);font-size:14px;">No announcements at this time.</p>
+            </div>
         @else
-        <div id="ann-grid" class="ann-grid grid md:grid-cols-3 gap-5 mb-10 reveal reveal-stagger">
-            @foreach($announcements as $ann)
-            @php $aIdx = $loop->index; $aIsFirst = $loop->first; @endphp
-            <article class="card-sacred overflow-hidden flex flex-col group/ann">
-                <div class="relative overflow-hidden shrink-0" style="height:196px;">
-                    <img src="{{ $annImgs[$aIdx % 3] }}" alt="{{ $ann->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover/ann:scale-105">
-                    @if($aIsFirst)
-                    <div class="absolute top-0 left-0 flex items-center gap-1.5 px-3 py-2" style="background:rgba(162,118,0,.92);border-bottom-right-radius:14px;">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="#FFFFFF" stroke="none" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span style="font-size:8.5px;font-weight:700;letter-spacing:.18em;color:#fff;text-transform:uppercase;">FEATURED</span>
-                    </div>
-                    @endif
-                </div>
-                <div class="p-5 flex-1 flex flex-col">
-                    <div class="flex items-start gap-3 mb-3">
-                        <div class="shrink-0 text-center rounded-lg overflow-hidden" style="border:1px solid rgba(201,162,0,.3);min-width:44px;">
-                            <div style="background:rgba(201,162,0,.09);padding:2px 6px;font-size:8px;font-weight:700;letter-spacing:.1em;color:#C9A200;text-transform:uppercase;">{{ ($ann->published_at ?? $ann->created_at)->format('M') }}</div>
-                            <div class="font-heading font-bold" style="font-size:1.1rem;color:var(--blue-deep);padding:2px 6px;line-height:1.15;">{{ ($ann->published_at ?? $ann->created_at)->format('d') }}</div>
+            <div x-data="announcementCarousel(@js($carouselAnnouncements->count()))" x-init="init()" class="relative">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($carouselAnnouncements as $index => $ann)
+                        <div x-show="isVisible({{ $index }})" x-cloak>
+                            <x-announcement-card :ann="$ann" />
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="eyebrow mb-1" style="font-size:8.5px;">{{ strtoupper($annCats[$aIdx % 3]) }}</p>
-                            <h3 class="font-heading font-bold italic leading-snug" style="font-size:1.08rem;color:var(--blue-deep);">{{ $ann->title }}</h3>
-                        </div>
+                    @endforeach
+                </div>
+
+                <div x-show="totalPages > 1" x-cloak class="flex items-center justify-center gap-4 mt-8">
+                    <button @click="prev()" :disabled="!hasPrev"
+                        class="w-10 h-10 rounded-full bg-card border border-muted shadow-sm flex items-center justify-center text-primary hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 19 12 12 15 5"/></svg>
+                    </button>
+
+                    <div class="flex items-center justify-center gap-1.5">
+                        <template x-for="i in totalPages" :key="i">
+                            <button @click="goToPage(i - 1)"
+                                :class="currentPage === i - 1 ? 'w-6 bg-accent' : 'w-2 bg-muted'"
+                                class="h-2 rounded-full transition-all duration-200">
+                            </button>
+                        </template>
                     </div>
-                    @if($ann->content)
-                    <p class="text-sm leading-relaxed flex-1" style="color:rgba(13,42,82,.48);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">{{ mb_substr(strip_tags($ann->content), 0, 130) }}</p>
-                    @endif
+
+                    <button @click="next()" :disabled="!hasNext"
+                        class="w-10 h-10 rounded-full bg-card border border-muted shadow-sm flex items-center justify-center text-primary hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 15 12 9 19"/></svg>
+                    </button>
                 </div>
-                @if($ann->is_recruitment && $ann->registration_link)
-                <div class="px-5 pb-5 mt-auto">
-                    <a href="{{ $ann->registration_link }}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 0;border-radius:12px;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;" class="gold-btn group/reg transition-all hover:scale-[1.02] active:scale-95 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
-                        Register Now
-                    </a>
-                </div>
-                @endif
-            </article>
-            @endforeach
-        </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <a href="{{ route('announcements.index') }}" class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded p-1">
+                    <span>View all announcements</span>
+                    <span class="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">&rarr;</span>
+                </a>
+            </div>
         @endif
+
+        <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('announcementCarousel', (count) => ({
+                cardsCount: count,
+                currentPage: 0,
+                perPageDesktop: 3,
+                perPageTablet: 2,
+                perPageMobile: 1,
+                perPage: 3,
+
+                init() {
+                    this.updatePerPage();
+                    window.addEventListener('resize', () => this.updatePerPage());
+                },
+
+                updatePerPage() {
+                    const w = window.innerWidth;
+                    this.perPage = w >= 1024 ? this.perPageDesktop : w >= 640 ? this.perPageTablet : this.perPageMobile;
+                    if (this.currentPage >= this.totalPages) this.currentPage = Math.max(0, this.totalPages - 1);
+                },
+
+                get totalPages() {
+                    return Math.ceil(this.cardsCount / this.perPage);
+                },
+
+                isVisible(index) {
+                    return index >= this.currentPage * this.perPage && index < (this.currentPage + 1) * this.perPage;
+                },
+
+                get hasPrev() {
+                    return this.currentPage > 0;
+                },
+
+                get hasNext() {
+                    return this.currentPage < this.totalPages - 1;
+                },
+
+                next() {
+                    if (this.hasNext) this.currentPage++;
+                },
+
+                prev() {
+                    if (this.hasPrev) this.currentPage--;
+                },
+
+                goToPage(page) {
+                    if (page >= 0 && page < this.totalPages) this.currentPage = page;
+                }
+            }));
+        });
+        </script>
     </div>
 </section>
 

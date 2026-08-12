@@ -56,6 +56,10 @@ Route::get('/track-intention/{refId}', [TrackController::class, 'showStatus'])->
 Route::get('/bulletins', [BulletinController::class, 'index'])->name('bulletins.index');
 Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'download'])->name('bulletins.download');
 
+// Announcements
+Route::get('/announcements', [AnnouncementController::class, 'publicIndex'])->name('announcements.index');
+Route::get('/announcements/{announcement}', [AnnouncementController::class, 'publicShow'])->name('announcements.show');
+
 Route::get('/submit-intention', [IntentionController::class, 'create'])->name('submit-intention');
 Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:submissions');
 

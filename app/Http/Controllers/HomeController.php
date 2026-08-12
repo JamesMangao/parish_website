@@ -13,8 +13,8 @@ class HomeController extends Controller
     {
         $announcements = \Illuminate\Support\Facades\Cache::remember('home_announcements', now()->addMinutes(30), function() {
             return Announcement::active()
+                ->orderBy('is_featured', 'desc')
                 ->orderBy('created_at', 'desc')
-                ->take(3)
                 ->get();
         });
 
