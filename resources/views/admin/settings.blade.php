@@ -58,7 +58,7 @@
                     <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 px-2">Quick Nav</p>
                     <ul class="space-y-0.5">
                         <li><a href="#section-parish" @click.prevent="scrollToSection('section-parish')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-parish' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Parish Information</a></li>
-                        <li><a href="#section-donations" @click.prevent="scrollToSection('section-donations')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-donations' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Donation & Payments</a></li>
+                        <li><a href="#section-donations" @click.prevent="scrollToSection('section-donations')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-donations' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Donations & Bank</a></li>
                         <li><a href="#section-leadership" @click.prevent="scrollToSection('section-leadership')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-leadership' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Leadership</a></li>
                         <li><a href="#section-former-priests" @click.prevent="scrollToSection('section-former-priests')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-former-priests' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Former Priests</a></li>
                         <li><a href="#section-about-video" @click.prevent="scrollToSection('section-about-video')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-about-video' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">About Video</a></li>
@@ -121,7 +121,7 @@
         <form id="section-donations" action="{{ route('admin.settings.section.update', 'donations') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
             @csrf
             <x-admin-card>
-                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Donation & Payments (GCash)</h3>
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Donation & Payments</h3>
                 <div class="grid gap-6 md:grid-cols-2">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">GCash Number</label>
@@ -147,6 +147,27 @@
                             </div>
                         </div>
                         @error('qr_code') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+                <div style="height:1px; background:linear-gradient(90deg,rgba(var(--primary-rgb),0.15),transparent); margin:24px 0;"></div>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bank Name</label>
+                        <input type="text" name="bank_name" value="{{ $settings['bank_name'] ?? '' }}" placeholder="BPI (Bank of the Philippine Islands)"
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('bank_name') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bank Account Name</label>
+                        <input type="text" name="bank_account_name" value="{{ $settings['bank_account_name'] ?? '' }}" placeholder="Sto. Rosario Parish - Pacita 1"
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('bank_account_name') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bank Account Number</label>
+                        <input type="text" name="bank_account_number" value="{{ $settings['bank_account_number'] ?? '' }}" placeholder="1234 5678 9012"
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        @error('bank_account_number') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
                 <x-settings-section-footer label="Save Donation Settings" />

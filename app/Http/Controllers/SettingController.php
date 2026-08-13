@@ -20,6 +20,9 @@ class SettingController extends Controller
             'gcash_number',
             'gcash_name',
             'qr_code',
+            'bank_name',
+            'bank_account_name',
+            'bank_account_number',
         ],
         'leadership' => [
             'priest_name',
@@ -108,6 +111,9 @@ class SettingController extends Controller
                 'gcash_number' => 'nullable|string|max:255',
                 'gcash_name' => 'nullable|string|max:255',
                 'qr_code' => 'nullable|image|max:10240',
+                'bank_name' => 'nullable|string|max:255',
+                'bank_account_name' => 'nullable|string|max:255',
+                'bank_account_number' => 'nullable|string|max:255',
             ],
             'leadership' => [
                 'priest_name' => 'nullable|string|max:255',

@@ -330,20 +330,26 @@
                         <div style="background:#F7F9FF;border-radius:16px;padding:24px;border:1px solid rgba(26,64,128,0.06);margin-bottom:20px;">
                             <p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:rgba(13,42,82,0.35);margin-bottom:16px;">Account Details</p>
                             <div style="display:flex;flex-direction:column;gap:14px;">
+                                @if(!empty($global_settings['bank_name']))
                                 <div>
                                     <p style="font-size:11px;color:rgba(13,42,82,0.4);font-weight:600;">Bank Name</p>
-                                    <p style="font-weight:700;color:var(--color-blue-deep,#0D2A52);font-size:15px;">BPI (Bank of the Philippine Islands)</p>
+                                    <p style="font-weight:700;color:var(--color-blue-deep,#0D2A52);font-size:15px;">{{ $global_settings['bank_name'] }}</p>
                                 </div>
                                 <div style="height:1px;background:rgba(26,64,128,0.08);"></div>
+                                @endif
+                                @if(!empty($global_settings['bank_account_name']))
                                 <div>
                                     <p style="font-size:11px;color:rgba(13,42,82,0.4);font-weight:600;">Account Name</p>
-                                    <p style="font-weight:700;color:var(--color-blue-deep,#0D2A52);font-size:15px;">Sto. Rosario Parish - Pacita 1</p>
+                                    <p style="font-weight:700;color:var(--color-blue-deep,#0D2A52);font-size:15px;">{{ $global_settings['bank_account_name'] }}</p>
                                 </div>
                                 <div style="height:1px;background:rgba(26,64,128,0.08);"></div>
+                                @endif
+                                @if(!empty($global_settings['bank_account_number']))
                                 <div>
                                     <p style="font-size:11px;color:rgba(13,42,82,0.4);font-weight:600;">Account Number</p>
-                                    <p style="font-weight:700;color:var(--color-blue-deep,#0D2A52);font-size:15px;letter-spacing:.05em;">Contact the parish office</p>
+                                    <p style="font-weight:700;color:var(--color-blue-deep,#0D2A52);font-size:15px;letter-spacing:.05em;">{{ $global_settings['bank_account_number'] }}</p>
                                 </div>
+                                @endif
                             </div>
                         </div>
 
