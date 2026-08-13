@@ -32,6 +32,7 @@ class Announcement extends Model
         'is_recruitment',
         'registration_link',
         'is_published',
+        'is_featured',
         'published_at',
         'expires_at',
         'created_by',
@@ -40,6 +41,7 @@ class Announcement extends Model
     protected $casts = [
         'is_recruitment' => 'boolean',
         'is_published' => 'boolean',
+        'is_featured' => 'boolean',
         'published_at' => 'datetime',
         'expires_at' => 'datetime',
     ];

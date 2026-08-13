@@ -55,6 +55,13 @@
             </div>
         </div>
 
+        <div class="flex items-center gap-3 pt-4 border-t">
+            <input type="hidden" name="is_featured" value="0">
+            <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured', $announcement->is_featured) ? 'checked' : '' }}
+                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+            <label for="is_featured" class="text-sm font-bold text-primary cursor-pointer">Feature on announcements page</label>
+        </div>
+
         <div class="flex items-center gap-3 pt-4">
             <input type="hidden" name="is_published" value="0">
             <input type="checkbox" name="is_published" id="is_published" value="1" {{ old('is_published', $announcement->is_published) ? 'checked' : '' }}

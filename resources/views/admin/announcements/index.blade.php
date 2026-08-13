@@ -15,6 +15,12 @@
                             Recruitment
                         </span>
                     @endif
+                    @if($a->is_featured)
+                        <span class="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Featured
+                        </span>
+                    @endif
                 </div>
             </td>
             <td class="px-6 py-4 max-w-[300px] truncate text-muted-foreground">{{ $a->content }}</td>

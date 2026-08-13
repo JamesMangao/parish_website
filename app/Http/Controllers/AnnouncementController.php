@@ -11,13 +11,19 @@ class AnnouncementController extends Controller
 {
     public function publicIndex()
     {
-        $announcements = Announcement::active()
-            ->orderBy('is_featured', 'desc')
+        $featuredAnnouncement = Announcement::active()
+            ->where('is_featured', true)
+            ->orderBy('published_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        $latestAnnouncements = Announcement::active()
+            ->when($featuredAnnouncement, fn ($query) => $query->where('id', '!=', $featuredAnnouncement->id))
             ->orderBy('published_at', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('announcements.index', compact('announcements'));
+        return view('announcements.index', compact('featuredAnnouncement', 'latestAnnouncements'));
     }
 
     public function publicShow(Announcement $announcement)
@@ -57,6 +63,7 @@ class AnnouncementController extends Controller
         $validated = $this->validateAnnouncement($request);
 
         $announcement = Announcement::create($validated);
+        $this->syncFeaturedAnnouncement($announcement);
         Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
         LogService::log('create_announcement', $announcement);
@@ -74,6 +81,7 @@ class AnnouncementController extends Controller
         $validated = $this->validateAnnouncement($request);
 
         $announcement->update($validated);
+        $this->syncFeaturedAnnouncement($announcement);
         Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
         LogService::log('update_announcement', $announcement);
@@ -116,6 +124,21 @@ class AnnouncementController extends Controller
 
         unset($validated['custom_category']);
 
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_recruitment'] = $request->boolean('is_recruitment');
+        $validated['is_published'] = $request->boolean('is_published');
+
         return $validated;
+    }
+
+    private function syncFeaturedAnnouncement(Announcement $announcement): void
+    {
+        if (!$announcement->is_featured) {
+            return;
+        }
+
+        Announcement::where('id', '!=', $announcement->id)
+            ->where('is_featured', true)
+            ->update(['is_featured' => false]);
     }
 }
