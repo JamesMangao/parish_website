@@ -287,53 +287,12 @@
                 </div>
             @endif
 
-            {{-- BOTTOM GRADIENT OVERLAY, TEXT CONTENT, & CONTROLS --}}
-            <div id="hl-overlay-container"
+            {{-- BOTTOM CONTROLS OVERLAY (text moved below player) --}}
+            @if(!$isExternal)
+            <div id="hl-controls-overlay"
                  style="position:absolute; bottom:0; left:0; right:0; z-index:3;
-                        background:linear-gradient(to top, rgba(13,42,82,0.96) 0%, rgba(13,42,82,0.75) 60%, transparent 100%);
-                        padding:60px 44px 20px; display:flex; flex-direction:column; gap:18px; pointer-events:none;">
-                
-                {{-- Text Content --}}
-                <div style="max-width:720px; pointer-events:auto;">
-                    <p style="font-family:'Jost',sans-serif; font-size:10px; font-weight:700;
-                              letter-spacing:0.32em; text-transform:uppercase;
-                              color:rgba(245,197,24,0.85); margin-bottom:10px;">
-                        Featured Highlight
-                    </p>
-                    <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:700;
-                               font-size:clamp(1.8rem, 3.5vw, 3rem); color:#FFFFFF; line-height:1.05;
-                               letter-spacing:-0.01em; text-shadow:0 2px 20px rgba(0,0,0,0.40); margin-bottom:10px;">
-                        @php
-                            $cleanVideoTitle = preg_replace('/[\x{1D400}-\x{1D7FF}]/u', '', $v->title ?? 'Parish Highlight');
-                        @endphp
-                        {{ trim($cleanVideoTitle) }}
-                    </h2>
-                    <span style="display:block; width:56px; height:3px; background:linear-gradient(90deg,#FFD740,#F5C518);
-                                 border-radius:999px; margin-bottom:14px;"></span>
-                    @if($v->event_date ?? null)
-                    <p style="font-family:'Jost',sans-serif; font-size:11px; font-weight:600;
-                              letter-spacing:0.18em; text-transform:uppercase;
-                              color:rgba(255,255,255,0.55); margin-bottom:10px;">
-                        {{ $v->event_date }}
-                    </p>
-                    @endif
-                    @if($v->description ?? null)
-                    @php
-                        $videoDesc = preg_replace('/^(NASA LARAWAN:|IN PHOTOS:|TINGNAN:|IN VIDEO:|WATCH:)\s*/iu', '', $v->description);
-                        $videoDesc = preg_replace('/#\w+/u', '', $videoDesc);
-                        $videoDesc = trim(preg_replace('/\s+/', ' ', $videoDesc));
-                    @endphp
-                    <p style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
-                               font-size:clamp(0.95rem, 1.5vw, 1.1rem); color:rgba(255,255,255,0.68);
-                               line-height:1.7; max-width:580px; margin-top:6px;
-                               display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                        {{ $videoDesc }}
-                    </p>
-                    @endif
-                </div>
-
-                {{-- Controls --}}
-                @if(!$isExternal)
+                        background:linear-gradient(to top, rgba(13,42,82,0.88) 0%, transparent 100%);
+                        padding:16px 44px 18px; pointer-events:none;">
                     <div class="video-controls-wrapper"
                          style="display:flex; flex-direction:column; gap:12px; pointer-events:auto;
                                 opacity:0; transform:translateY(10px); transition:all 0.3s ease;">
@@ -414,9 +373,49 @@
                             </div>
                         </div>
                     </div>
-                @endif
             </div>
+            @endif
 
+        </div>
+
+        {{-- Title & description below the player --}}
+        <div id="hl-info-bar" class="card-sacred"
+             style="max-width:1200px; margin:1.25rem auto 0; padding:1.75rem 2.75rem;">
+            <p style="font-family:'Jost',sans-serif; font-size:10px; font-weight:700;
+                      letter-spacing:0.32em; text-transform:uppercase;
+                      color:rgba(245,197,24,0.85); margin-bottom:10px;">
+                Featured Highlight
+            </p>
+            <h2 class="font-heading"
+                style="font-style:italic; font-weight:700;
+                       font-size:clamp(1.6rem, 3vw, 2.5rem); color:var(--blue-deep); line-height:1.1;
+                       letter-spacing:-0.01em; margin-bottom:10px;">
+                @php
+                    $cleanVideoTitle = preg_replace('/[\x{1D400}-\x{1D7FF}]/u', '', $v->title ?? 'Parish Highlight');
+                @endphp
+                {{ trim($cleanVideoTitle) }}
+            </h2>
+            <span style="display:block; width:56px; height:3px; background:linear-gradient(90deg,#FFD740,#F5C518);
+                         border-radius:999px; margin-bottom:14px;"></span>
+            @if($v->event_date ?? null)
+            <p style="font-family:'Jost',sans-serif; font-size:11px; font-weight:600;
+                      letter-spacing:0.18em; text-transform:uppercase;
+                      color:rgba(13,42,82,0.45); margin-bottom:10px;">
+                {{ $v->event_date }}
+            </p>
+            @endif
+            @if($v->description ?? null)
+            @php
+                $videoDesc = preg_replace('/^(NASA LARAWAN:|IN PHOTOS:|TINGNAN:|IN VIDEO:|WATCH:)\s*/iu', '', $v->description);
+                $videoDesc = preg_replace('/#\w+/u', '', $videoDesc);
+                $videoDesc = trim(preg_replace('/\s+/', ' ', $videoDesc));
+            @endphp
+            <p style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
+                       font-size:clamp(0.95rem, 1.5vw, 1.1rem); color:rgba(13,42,82,0.65);
+                       line-height:1.7; max-width:720px;">
+                {{ $videoDesc }}
+            </p>
+            @endif
         </div>
 
         {{-- Responsive styles --}}
@@ -427,8 +426,14 @@
                     border-radius: 20px !important;
                     margin-left: 16px !important;
                     margin-right: 16px !important;
+                    width: calc(100% - 32px) !important;
                 }
-                #hl-info-bar { padding: 24px 20px 20px !important; }
+                #hl-controls-overlay { padding: 12px 16px 14px !important; }
+                #hl-info-bar {
+                    margin-left: 16px !important;
+                    margin-right: 16px !important;
+                    padding: 1.25rem 1.25rem 1.5rem !important;
+                }
             }
         </style>
 
