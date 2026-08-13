@@ -3,14 +3,16 @@ import Alpine from 'alpinejs';
 import chatList from './components/chat-list';
 import userManage from './components/user-manage';
 import intentionList from './components/intention-list';
-import { settingsForm, contactNumbers, timelineManager } from './components/settings-form';
+import { settingsForm, contactNumbers, timelineManager, settingsSection, formerPriestsManager } from './components/settings-form';
 
 Alpine.data('chatList', chatList);
 Alpine.data('userManage', userManage);
 Alpine.data('intentionList', intentionList);
 Alpine.data('settingsForm', settingsForm);
+Alpine.data('settingsSection', settingsSection);
 Alpine.data('contactNumbers', contactNumbers);
 Alpine.data('timelineManager', timelineManager);
+Alpine.data('formerPriestsManager', formerPriestsManager);
 
 Alpine.store('toast', {
     show: false,

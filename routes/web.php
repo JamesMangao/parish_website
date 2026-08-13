@@ -160,6 +160,6 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::delete('/internal/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
         Route::get('/internal/logs', [DashboardController::class, 'logs'])->name('admin.logs');
         Route::get('/internal/settings', [SettingController::class, 'index'])->name('admin.settings');
-        Route::post('/internal/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+        Route::post('/internal/settings/{section}', [SettingController::class, 'updateSection'])->name('admin.settings.section.update');
     });
 });

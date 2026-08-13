@@ -1,6 +1,4 @@
 export const settingsForm = () => ({
-    MAX_CONTACTS: 10,
-    MAX_TIMELINE: 30,
     qrPreview: null,
     priestPreview: null,
     assistantPriestPreview: null,
@@ -29,10 +27,54 @@ export const settingsForm = () => ({
         if (this._previewUrls[key]) URL.revokeObjectURL(this._previewUrls[key]);
         this._previewUrls[key] = URL.createObjectURL(file);
         this[key] = this._previewUrls[key];
+        e.target.dispatchEvent(new Event('change', { bubbles: true }));
     },
 
     revokePreviews() {
         Object.values(this._previewUrls).forEach(url => URL.revokeObjectURL(url));
+    }
+});
+
+export const settingsSection = () => ({
+    isDirty: false,
+    _snapshot: '',
+
+    init() {
+        this.$nextTick(() => {
+            this._snapshot = this._serialize();
+        });
+        this.$el.addEventListener('input', () => this._checkDirty(), true);
+        this.$el.addEventListener('change', () => this._checkDirty(), true);
+        this.$el.addEventListener('settings-changed', () => this._checkDirty());
+    },
+
+    _serialize() {
+        const fd = new FormData(this.$el);
+        const pairs = [];
+        for (const [k, v] of fd.entries()) {
+            if (v instanceof File) {
+                pairs.push([k, v.name + ':' + v.size + ':' + v.lastModified]);
+            } else {
+                pairs.push([k, String(v)]);
+            }
+        }
+        pairs.sort((a, b) => a[0].localeCompare(b[0]));
+        return JSON.stringify(pairs);
+    },
+
+    _checkDirty() {
+        this.isDirty = this._serialize() !== this._snapshot;
+    },
+
+    notifyChanged() {
+        this._checkDirty();
+    },
+
+    onSubmit() {
+        const parent = this.$el.closest('[x-data*="settingsForm"]');
+        if (parent && parent.__x) {
+            parent.__x.$data.revokePreviews?.();
+        }
     }
 });
 
@@ -50,11 +92,17 @@ export const contactNumbers = () => ({
     },
 
     addNumber() {
-        if (this.numbers.length < 10) this.numbers.push('');
+        if (this.numbers.length < 10) {
+            this.numbers.push('');
+            this.$dispatch('settings-changed');
+        }
     },
 
     removeNumber(index) {
-        if (this.numbers.length > 1) this.numbers.splice(index, 1);
+        if (this.numbers.length > 1) {
+            this.numbers.splice(index, 1);
+            this.$dispatch('settings-changed');
+        }
     }
 });
 
@@ -71,12 +119,17 @@ export const timelineManager = () => ({
         }
     },
 
+    _notify() {
+        this.$dispatch('settings-changed');
+    },
+
     addEntry() {
         if (this.entries.length >= 30) {
             this.$store.toast.trigger('Maximum 30 timeline entries allowed.', 'error');
             return;
         }
         this.entries.push({ year: '', badge: '', title: '', short: '', full: '' });
+        this._notify();
     },
 
     removeEntry(index) {
@@ -85,17 +138,97 @@ export const timelineManager = () => ({
             return;
         }
         this.entries.splice(index, 1);
+        this._notify();
     },
 
     moveUp(index) {
         if (index === 0) return;
         const item = this.entries.splice(index, 1)[0];
         this.entries.splice(index - 1, 0, item);
+        this._notify();
     },
 
     moveDown(index) {
         if (index >= this.entries.length - 1) return;
         const item = this.entries.splice(index, 1)[0];
         this.entries.splice(index + 1, 0, item);
+        this._notify();
+    }
+});
+
+export const formerPriestsManager = () => ({
+    entries: [],
+    _previewUrls: {},
+
+    init() {
+        const el = document.getElementById('former-priests-data');
+        if (el) {
+            try {
+                const parsed = JSON.parse(el.textContent);
+                this.entries = Array.isArray(parsed) ? parsed.map(e => ({
+                    name: e.name || '',
+                    role: e.role || 'Parish Priest',
+                    years: e.years || '',
+                    quote: e.quote || '',
+                    existing_image: e.image || '',
+                    imagePreview: e.imageUrl || null,
+                })) : [];
+            } catch {}
+        }
+    },
+
+    _notify() {
+        this.$dispatch('settings-changed');
+    },
+
+    addEntry() {
+        if (this.entries.length >= 20) {
+            this.$store.toast.trigger('Maximum 20 former priests allowed.', 'error');
+            return;
+        }
+        this.entries.push({ name: '', role: 'Parish Priest', years: '', quote: '', existing_image: '', imagePreview: null });
+        this._notify();
+    },
+
+    removeEntry(index) {
+        this.entries.splice(index, 1);
+        this._notify();
+    },
+
+    moveUp(index) {
+        if (index === 0) return;
+        const item = this.entries.splice(index, 1)[0];
+        this.entries.splice(index - 1, 0, item);
+        this._notify();
+    },
+
+    moveDown(index) {
+        if (index >= this.entries.length - 1) return;
+        const item = this.entries.splice(index, 1)[0];
+        this.entries.splice(index + 1, 0, item);
+        this._notify();
+    },
+
+    handleImageUpload(e, index) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 1.8 * 1024 * 1024) {
+            this.$store.toast.trigger('Image is too large. Maximum size is 1.8MB.', 'error');
+            e.target.value = '';
+            return;
+        }
+        const key = `former-${index}`;
+        if (this._previewUrls[key]) URL.revokeObjectURL(this._previewUrls[key]);
+        this._previewUrls[key] = URL.createObjectURL(file);
+        this.entries[index].imagePreview = this._previewUrls[key];
+        this._notify();
+        e.target.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+
+    initials(name) {
+        if (!name) return '?';
+        const parts = name.trim().split(/\s+/).filter(p => !/^(rev|fr|father|msgr|monsignor)\.?$/i.test(p));
+        if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        return (parts[0]?.[0] || '?').toUpperCase();
     }
 });

@@ -503,6 +503,74 @@
         .leader-quote { font-size: .87rem; font-style: italic; color: var(--muted); line-height: 1.7; }
 
         /* ════════════════════════════════════════
+           ABOUT VIDEO
+        ════════════════════════════════════════ */
+        .about-video-section {
+            background: var(--cream);
+            padding: 88px 24px;
+            text-align: center;
+        }
+        .about-video-inner { max-width: 960px; margin: 0 auto; }
+        .about-video-desc {
+            font-size: 1rem;
+            color: var(--muted);
+            max-width: 640px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+            font-style: italic;
+        }
+        .about-video-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(13, 42, 82, 0.15);
+            background: #000;
+        }
+        .about-video-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        /* Former priests — smaller cards */
+        .former-priests-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            max-width: 1100px;
+            margin: 48px auto 0;
+        }
+        @media (min-width: 640px) { .former-priests-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 960px) { .former-priests-grid { grid-template-columns: repeat(3, 1fr); } }
+        .leader-card.former-priest-card {
+            max-width: none;
+            padding: 32px 28px;
+        }
+        .leader-card.former-priest-card .leader-avatar {
+            width: 120px;
+            height: 120px;
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+        }
+        .former-priests-heading {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: rgba(255,255,255,0.9);
+            margin-top: 64px;
+            margin-bottom: 8px;
+        }
+        .former-priests-sub {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 0;
+            font-style: italic;
+        }
+
+        /* ════════════════════════════════════════
            FIND US
         ════════════════════════════════════════ */
         .findus-section { background: var(--cream); padding: 88px 24px; }
@@ -821,6 +889,32 @@
         </div>
     </section>
 
+    @php
+        $aboutVideoUrl = $global_settings['about_video_url'] ?? '';
+        $aboutVideoEmbed = $aboutVideoUrl ? \App\Support\VideoEmbed::embedUrl($aboutVideoUrl) : null;
+    @endphp
+    @if($aboutVideoEmbed)
+    {{-- ═══════════════ FEATURED VIDEO ═══════════════ --}}
+    <section class="about-video-section">
+        <div class="about-video-inner">
+            <p class="section-eyebrow" data-reveal>Featured Video</p>
+            <h2 class="section-title" data-reveal>{{ $global_settings['about_video_title'] ?? 'Our Parish Story' }}</h2>
+            @if(!empty($global_settings['about_video_description']))
+                <p class="about-video-desc" data-reveal>{{ $global_settings['about_video_description'] }}</p>
+            @endif
+            <div class="about-video-frame" data-reveal="scale">
+                <iframe
+                    src="{{ $aboutVideoEmbed }}"
+                    title="{{ $global_settings['about_video_title'] ?? 'Parish video' }}"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+    @endif
+
     {{-- ═══════════════ CELESTIAL INTERCESSORS ═══════════════ --}}
     <section class="patrons-section">
         <div class="text-center">
@@ -900,6 +994,43 @@
             </div>
             @endif
         </div>
+
+        @php
+            $formerPriestsRaw = $global_settings['former_priests'] ?? '[]';
+            $formerPriests = is_string($formerPriestsRaw)
+                ? (json_decode($formerPriestsRaw, true) ?: [])
+                : (is_array($formerPriestsRaw) ? $formerPriestsRaw : []);
+        @endphp
+        @if(!empty($formerPriests))
+        <div style="max-width:1100px; margin:0 auto;">
+            <h3 class="former-priests-heading" data-reveal>Former Parish Priests</h3>
+            <p class="former-priests-sub" data-reveal>Shepherds who faithfully served our community</p>
+            <div class="former-priests-grid">
+                @foreach($formerPriests as $fp)
+                @php
+                    $initials = collect(preg_split('/\s+/', $fp['name'] ?? ''))
+                        ->filter(fn ($p) => !preg_match('/^(rev|fr|father|msgr|monsignor)\.?$/i', $p))
+                        ->map(fn ($p) => mb_substr($p, 0, 1))
+                        ->take(2)
+                        ->implode('');
+                @endphp
+                <div class="leader-card former-priest-card" data-reveal="scale">
+                    @if(!empty($fp['image']))
+                        <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($fp['image']) }}'); background-size: cover; background-position: center;"></div>
+                    @else
+                        <div class="leader-avatar">{{ $initials ?: '?' }}</div>
+                    @endif
+                    <h3 class="leader-name">{{ $fp['name'] }}</h3>
+                    <p class="leader-role">{{ $fp['role'] ?? 'Parish Priest' }}@if(!empty($fp['years'])) · {{ $fp['years'] }}@endif</p>
+                    <div class="leader-rule"></div>
+                    @if(!empty($fp['quote']))
+                        <p class="leader-quote">"{{ $fp['quote'] }}"</p>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </section>
 
     {{-- ═══════════════ FIND US ═══════════════ --}}
