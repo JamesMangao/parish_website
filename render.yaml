@@ -10,7 +10,13 @@ services:
       - key: APP_DEBUG
         value: "false"
       - key: APP_URL
-        sync: false
+        value: https://sto-rosario-parish.onrender.com
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SAME_SITE
+        value: lax
+      - key: SESSION_EXPIRE_ON_CLOSE
+        value: "false"
       - key: APP_KEY
         generateValue: true
       - key: DB_CONNECTION
@@ -35,8 +41,6 @@ services:
         fromDatabase:
           name: parish-db
           property: password
-      - key: SESSION_DRIVER
-        value: file
       - key: CACHE_STORE
         value: file
       - key: QUEUE_CONNECTION
@@ -85,7 +89,7 @@ services:
           name: parish-db
           property: password
       - key: SESSION_DRIVER
-        value: file
+        value: database
       - key: CACHE_STORE
         value: file
 

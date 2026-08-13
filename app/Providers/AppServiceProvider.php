@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
     {
         if (app()->isProduction()) {
             URL::forceScheme('https');
+
+            if ($appUrl = config('app.url')) {
+                URL::forceRootUrl($appUrl);
+            }
         }
 
         $this->configureRateLimiting();

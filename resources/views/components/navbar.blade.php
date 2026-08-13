@@ -394,8 +394,12 @@ document.addEventListener('alpine:init', () => {
         open: false,
         scrolled: false,
         init() {
+            const hasDarkHero = document.querySelector('.hero-section, .page-hero, .about-hero')
+            if (!hasDarkHero) {
+                this.scrolled = true
+            }
             window.addEventListener('scroll', () => {
-                this.scrolled = window.scrollY > 80
+                this.scrolled = window.scrollY > 80 || !hasDarkHero
             }, { passive: true })
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 768) this.open = false
