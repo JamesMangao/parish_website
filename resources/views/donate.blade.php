@@ -120,7 +120,7 @@
 
     {{-- ═══════════ MAIN ═══════════ --}}
     <div style="max-width:960px;margin:0 auto;padding:48px 24px 80px;" x-data="{
-        tab: '{{ ($paymongoEnabled ?? false) ? 'online' : 'qr' }}',
+        tab: '{{ ($paymongoEnabled ?? false) ? 'online' : (!empty($global_settings['qr_code']) ? 'qr' : 'bank') }}',
         amount: 0,
         custom: false,
         customAmount: '',
@@ -155,10 +155,12 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
                         Online Payment
                     </button>
+                    @if(!empty($global_settings['qr_code']))
                     <button class="donate-tab" :class="tab === 'qr' && 'active'" @click="tab = 'qr'">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/></svg>
                         Scan QR
                     </button>
+                    @endif
                     <button class="donate-tab" :class="tab === 'bank' && 'active'" @click="tab = 'bank'">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 10-4 10 4"/><path d="M4 10v8"/><path d="M20 10v8"/><path d="M12 10v8"/><path d="M2 19h20"/></svg>
                         Bank Transfer
@@ -255,6 +257,7 @@
                     </div>
                 </div>
 
+                @if(!empty($global_settings['qr_code']))
                 {{-- ═══════ TAB 2: Scan QR ═══════ --}}
                 <div class="tab-panel" :class="tab === 'qr' && 'active'">
                     <div style="background:#fff;border-radius:24px;border:1px solid rgba(26,64,128,0.1);box-shadow:0 8px 32px rgba(13,42,82,0.06);padding:32px;overflow:hidden;">
@@ -313,6 +316,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 {{-- ═══════ TAB 3: Bank Transfer ═══════ --}}
                 <div class="tab-panel" :class="tab === 'bank' && 'active'">
