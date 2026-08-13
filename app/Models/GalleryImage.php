@@ -37,4 +37,29 @@ class GalleryImage extends Model
     {
         return \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url('gallery/' . $this->storage_path);
     }
+
+    /**
+     * Alt text for public pages — never exposes the stored upload filename.
+     */
+    public function publicAlt(?GalleryAlbum $album = null): string
+    {
+        if ($this->caption) {
+            return $this->caption;
+        }
+
+        $album ??= $this->album;
+        if ($album?->title) {
+            return 'Photo from ' . $album->title;
+        }
+
+        return 'Gallery photo';
+    }
+
+    /**
+     * Optional caption for public overlay/lightbox (null when none set).
+     */
+    public function publicCaption(): ?string
+    {
+        return $this->caption ?: null;
+    }
 }

@@ -264,21 +264,25 @@
                 @endif
 
                 <img src="{{ $img->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $img->url }}"
-                     alt="{{ $img->title }}"
+                     alt="{{ $img->publicAlt($album) }}"
                      width="400" height="300"
                      @load="loaded = true"
                      :class="loaded ? '' : 'opacity-0'"
                      loading="lazy">
-                
+
+                @if($img->publicCaption() || $img->type === 'video')
                 <div class="photo-overlay">
+                    @if($img->publicCaption())
                     <p style="font-size:1rem; font-weight:600; color:#EBF2FF;
                               white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                        {{ $img->caption ?: $img->title }}
+                        {{ $img->publicCaption() }}
                     </p>
+                    @endif
                     @if($img->type === 'video')
                         <span style="font-size:11px; color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Video Highlight</span>
                     @endif
                 </div>
+                @endif
             </div>
             @endforeach
         </div>
@@ -329,11 +333,12 @@
 </div>
 
 <script>
-const images = {!! json_encode($album->images->map(function($i) {
+const images = {!! json_encode($album->images->map(function($i) use ($album) {
     return [
         'url' => $i->url,
-        'title' => $i->title,
-        'caption' => $i->caption,
+        'alt' => $i->publicAlt($album),
+        'caption' => $i->publicCaption(),
+        'albumTitle' => $album->title,
         'type' => $i->type
     ];
 })) !!};
@@ -375,13 +380,13 @@ function renderLb() {
     } else {
         const img = document.createElement('img');
         img.src = item.url;
-        img.alt = item.title;
+        img.alt = item.alt;
         img.className = 'lightbox-img';
         lbContent.appendChild(img);
     }
 
-    lbTitle.textContent = item.title || '';
-    lbSub.textContent   = item.caption || '';
+    lbTitle.textContent = item.caption || item.albumTitle || '';
+    lbSub.textContent   = item.caption ? '' : '';
     lbCount.textContent = `${lbIdx + 1} / ${images.length}`;
 }
 
