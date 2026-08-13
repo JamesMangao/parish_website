@@ -6,16 +6,18 @@
         'Liturgical'   => ['tint' => '#F3ECFA', 'color' => '#6B3FA0'],
         'Sacraments'   => ['tint' => '#FBF3DC', 'color' => '#A87F22'],
         'Formation'    => ['tint' => '#EEF1F6', 'color' => '#1B2A4A'],
+        '_default'     => ['tint' => '#E8F4F0', 'color' => '#2D6A4F'],
     ];
     $categoryIcons = [
         'Parish Life' => '<path d="M16 21v-2a4 4 0 0 0-3.7-3.97"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M22 21v-2a4 4 0 0 0-4-4h-2"/><circle cx="6" cy="9" r="4"/>',
         'Liturgical'  => '<path d="M12 2L2 21h10l2-4 2 4z"/><path d="M12 2L22 21H12z"/><path d="M6 17V9"/>',
         'Sacraments'  => '<path d="M20 14.69 12 23l-8-8.31A6 6 0 0 1 12 7a6 6 0 0 1 10 7.69Z"/>',
         'Formation'   => '<path d="M4 19V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13"/><path d="M4 19l8-8 8 8"/><path d="M8 7v4"/><path d="M16 7v2"/>',
+        '_default'    => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
     ];
     $category = $ann->category ?? 'Parish Life';
-    $cfg = $categoryConfigs[$category] ?? $categoryConfigs['Parish Life'];
-    $iconPath = $categoryIcons[$category] ?? $categoryIcons['Parish Life'];
+    $cfg = $categoryConfigs[$category] ?? $categoryConfigs['_default'];
+    $iconPath = $categoryIcons[$category] ?? $categoryIcons['_default'];
 @endphp
 
 <article class="bg-card border border-muted rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group relative h-[268px]" style="border-top-width:4px;border-top-color:{{ $cfg['tint'] }};">

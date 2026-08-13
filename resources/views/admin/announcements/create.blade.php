@@ -14,16 +14,7 @@
             @error('title') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
-        <div>
-            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Category</label>
-            <select name="category"
-                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-primary">
-                <option value="Parish Life" {{ old('category', 'Parish Life') == 'Parish Life' ? 'selected' : '' }}>Parish Life</option>
-                <option value="Liturgical" {{ old('category') == 'Liturgical' ? 'selected' : '' }}>Liturgical</option>
-                <option value="Sacraments" {{ old('category') == 'Sacraments' ? 'selected' : '' }}>Sacraments</option>
-                <option value="Formation" {{ old('category') == 'Formation' ? 'selected' : '' }}>Formation</option>
-            </select>
-        </div>
+        @include('admin.announcements._category-fields', ['storedCategory' => 'Parish Life'])
 
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Notice Content</label>

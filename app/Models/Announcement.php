@@ -12,6 +12,15 @@ class Announcement extends Model
 {
     use HasFactory, HasUuids;
 
+    public const PREDEFINED_CATEGORIES = [
+        'Parish Life',
+        'Liturgical',
+        'Sacraments',
+        'Formation',
+    ];
+
+    public const CATEGORY_OTHER = 'Other';
+
     protected $table = 'announcements';
     protected $keyType = 'string';
     public $incrementing = false;

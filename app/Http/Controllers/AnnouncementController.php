@@ -54,16 +54,7 @@ class AnnouncementController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'category' => 'required|string|in:Parish Life,Liturgical,Sacraments,Formation',
-            'is_featured' => 'boolean',
-            'is_recruitment' => 'boolean',
-            'registration_link' => 'nullable|url|max:255',
-            'is_published' => 'boolean',
-            'expires_at' => 'nullable|date',
-        ]);
+        $validated = $this->validateAnnouncement($request);
 
         $announcement = Announcement::create($validated);
         Cache::forget('home_announcements');
@@ -80,16 +71,7 @@ class AnnouncementController extends Controller
 
     public function update(Request $request, Announcement $announcement)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'category' => 'required|string|in:Parish Life,Liturgical,Sacraments,Formation',
-            'is_featured' => 'boolean',
-            'is_recruitment' => 'boolean',
-            'registration_link' => 'nullable|url|max:255',
-            'is_published' => 'boolean',
-            'expires_at' => 'nullable|date',
-        ]);
+        $validated = $this->validateAnnouncement($request);
 
         $announcement->update($validated);
         Cache::forget('home_announcements');
@@ -107,5 +89,33 @@ class AnnouncementController extends Controller
         $announcement->delete();
 
         return back()->with('success', 'Announcement deleted.');
+    }
+
+    private function validateAnnouncement(Request $request): array
+    {
+        $categoryOptions = array_merge(
+            Announcement::PREDEFINED_CATEGORIES,
+            [Announcement::CATEGORY_OTHER]
+        );
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'category' => 'required|string|in:' . implode(',', $categoryOptions),
+            'custom_category' => 'required_if:category,' . Announcement::CATEGORY_OTHER . '|nullable|string|max:100',
+            'is_featured' => 'boolean',
+            'is_recruitment' => 'boolean',
+            'registration_link' => 'nullable|url|max:255',
+            'is_published' => 'boolean',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        if ($validated['category'] === Announcement::CATEGORY_OTHER) {
+            $validated['category'] = trim($validated['custom_category']);
+        }
+
+        unset($validated['custom_category']);
+
+        return $validated;
     }
 }

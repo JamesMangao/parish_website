@@ -44,7 +44,7 @@ Route names are prefixed `admin.announcements.*`. Legacy `/admin-portal/*` URLs 
 ```
 app/Http/Controllers/AnnouncementController.php   # Public + admin CRUD
 app/Models/Announcement.php                       # UUID primary key, scopes
-resources/views/admin/announcements/              # index, create, edit, show
+resources/views/admin/announcements/              # index, create, edit, show, _category-fields
 resources/views/announcements/                    # Public index + show
 resources/views/components/announcement-card.blade.php
 routes/web.php                                    # Route definitions
@@ -61,7 +61,7 @@ database/migrations/2026_08_10_000000_add_category_to_announcements_table.php
 |-------|-------|
 | `title` | Required, max 255 |
 | `content` | Required text body |
-| `category` | One of: Parish Life, Liturgical, Sacraments, Formation |
+| `category` | Predefined: Parish Life, Liturgical, Sacraments, Formation — or any custom string via **Other** (stored in same column) |
 | `is_published` | Boolean; controls public visibility |
 | `published_at` | Timestamp; defaults on create |
 | `expires_at` | Optional; hidden from public after this date |
@@ -71,6 +71,47 @@ database/migrations/2026_08_10_000000_add_category_to_announcements_table.php
 
 ### Scopes
 - `active()` — `is_published = true` AND (`expires_at` is null OR `expires_at > now()`)
+
+### Category constants (model)
+- `Announcement::PREDEFINED_CATEGORIES` — Parish Life, Liturgical, Sacraments, Formation
+- `Announcement::CATEGORY_OTHER` — sentinel value `'Other'` used only in the admin form dropdown
+
+Custom categories are stored as plain strings in the existing `category` column (no extra migration). The admin form never persists the literal string `"Other"`.
+
+## Category form pattern (create / edit)
+
+Shared partial: `resources/views/admin/announcements/_category-fields.blade.php`
+
+Both `create.blade.php` and `edit.blade.php` include it:
+
+```blade
+@include('admin.announcements._category-fields', ['storedCategory' => $announcement->category ?? 'Parish Life'])
+```
+
+### Alpine.js show/hide
+- `x-data="{ category: ... }"` on the wrapper; `x-model="category"` on the `<select>`
+- Dropdown lists predefined options plus **Other**
+- When `category === 'Other'`, a **Custom Category** text input appears (`x-show` + `x-transition`)
+- Input has `:required="category === 'Other'"` for client-side validation
+
+### Edit pre-fill logic
+If the stored `category` is not in `PREDEFINED_CATEGORIES`:
+1. Select **Other** in the dropdown
+2. Populate the custom input with the stored value
+
+On validation failure, `old('category')` and `old('custom_category')` take precedence.
+
+### Controller validation (`validateAnnouncement`)
+```php
+'category' => 'required|in:Parish Life,Liturgical,Sacraments,Formation,Other',
+'custom_category' => 'required_if:category,Other|nullable|string|max:100',
+```
+When `category === 'Other'`, the controller replaces it with `trim(custom_category)` before save and drops `custom_category` from the payload.
+
+### Public display
+- **Admin index** — shows raw `$a->category` (custom text appears as entered)
+- **announcement-card / home hero** — predefined categories get themed tint/icon; custom categories fall back to `_default` (green tint, book icon)
+- **announcements/show** — badge shows `strtoupper($category)` with amber default styling for unknown categories
 
 ## When invoked
 
@@ -90,7 +131,8 @@ database/migrations/2026_08_10_000000_add_category_to_announcements_table.php
 
 ### Create / Edit
 - Uses `<x-admin-form>` component
-- Validates title, content, category, booleans, optional registration_link and expires_at
+- Category field via `_category-fields.blade.php` partial (predefined + **Other** with Alpine show/hide)
+- Validates title, content, category (or custom_category when Other), booleans, optional registration_link and expires_at
 - Checkboxes: `is_published`, `is_recruitment`, `is_featured` (if present in form)
 - On success: redirect to index with flash `success`
 
