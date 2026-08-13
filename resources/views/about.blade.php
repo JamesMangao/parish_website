@@ -890,22 +890,30 @@
     </section>
 
     @php
-        $aboutVideoUrl = $global_settings['about_video_url'] ?? '';
-        $aboutVideoEmbed = $aboutVideoUrl ? \App\Support\VideoEmbed::embedUrl($aboutVideoUrl) : null;
+        $aboutVideoUrl = $aboutVideoUrl ?? ($global_settings['about_video_url'] ?? '');
+        $aboutVideoEmbed = $aboutVideoEmbed ?? ($aboutVideoUrl ? \App\Support\VideoEmbed::embedUrl($aboutVideoUrl) : null);
+        $aboutVideoTitle = $aboutVideoTitle ?? ($global_settings['about_video_title'] ?? null);
+        $aboutVideoDescription = $aboutVideoDescription ?? ($global_settings['about_video_description'] ?? null);
+        if (! isset($formerPriests)) {
+            $formerPriestsRaw = $global_settings['former_priests'] ?? '[]';
+            $formerPriests = is_string($formerPriestsRaw)
+                ? (json_decode($formerPriestsRaw, true) ?: [])
+                : (is_array($formerPriestsRaw) ? $formerPriestsRaw : []);
+        }
     @endphp
     @if($aboutVideoEmbed)
     {{-- ═══════════════ FEATURED VIDEO ═══════════════ --}}
     <section class="about-video-section">
         <div class="about-video-inner">
             <p class="section-eyebrow" data-reveal>Featured Video</p>
-            <h2 class="section-title" data-reveal>{{ $global_settings['about_video_title'] ?? 'Our Parish Story' }}</h2>
-            @if(!empty($global_settings['about_video_description']))
-                <p class="about-video-desc" data-reveal>{{ $global_settings['about_video_description'] }}</p>
+            <h2 class="section-title" data-reveal>{{ $aboutVideoTitle ?: 'Our Parish Story' }}</h2>
+            @if(!empty($aboutVideoDescription))
+                <p class="about-video-desc" data-reveal>{{ $aboutVideoDescription }}</p>
             @endif
             <div class="about-video-frame" data-reveal="scale">
                 <iframe
                     src="{{ $aboutVideoEmbed }}"
-                    title="{{ $global_settings['about_video_title'] ?? 'Parish video' }}"
+                    title="{{ $aboutVideoTitle ?: 'Parish video' }}"
                     loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerpolicy="strict-origin-when-cross-origin"
@@ -995,12 +1003,6 @@
             @endif
         </div>
 
-        @php
-            $formerPriestsRaw = $global_settings['former_priests'] ?? '[]';
-            $formerPriests = is_string($formerPriestsRaw)
-                ? (json_decode($formerPriestsRaw, true) ?: [])
-                : (is_array($formerPriestsRaw) ? $formerPriestsRaw : []);
-        @endphp
         @if(!empty($formerPriests))
         <div style="max-width:1100px; margin:0 auto;">
             <h3 class="former-priests-heading" data-reveal>Former Parish Priests</h3>

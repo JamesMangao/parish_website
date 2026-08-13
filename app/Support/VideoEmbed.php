@@ -6,7 +6,9 @@ class VideoEmbed
 {
     public static function parseYouTubeId(string $url): ?string
     {
-        if (preg_match('#(?:youtube\.com/(?:watch\?.*v=|embed/)|youtu\.be/)([a-zA-Z0-9_-]{11})#', $url, $m)) {
+        $url = trim($url);
+
+        if (preg_match('#(?:youtube\.com/(?:watch\?.*v=|embed/|shorts/)|youtu\.be/)([a-zA-Z0-9_-]{11})#', $url, $m)) {
             return $m[1];
         }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminIntentionController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BulletinController;
@@ -27,7 +28,7 @@ use App\Http\Controllers\VideoHighlightController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::view('/about', 'about')->name('about');
+Route::get('/about', AboutController::class)->name('about');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/mass-schedule', [MassScheduleController::class, 'index'])->name('mass-schedule');
 Route::get('/mass-schedule/{id}/ical', [MassScheduleController::class, 'generateICal'])->name('mass-schedule.ical');
