@@ -95,7 +95,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-cloud"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
                         </div>
                         <p class="text-sm font-bold text-primary">Click to select photos or videos</p>
-                        <p class="text-xs text-muted-foreground mt-1">Images up to 5MB, Videos up to 100MB</p>
+                        <p class="text-xs text-muted-foreground mt-1">Photos and videos up to 100 MB each</p>
                     </div>
 
                     <div class="grid grid-cols-4 gap-4 mt-4" x-show="images.length > 0">

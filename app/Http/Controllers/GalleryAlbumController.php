@@ -35,7 +35,10 @@ class GalleryAlbumController extends Controller
             'description' => 'nullable|string',
             'featured_video_url' => 'nullable|string',
             'is_published' => 'boolean',
-            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,mov,ogv|max:102400', // Up to 100MB
+            'images.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,mov,ogv|max:102400',
+        ], [
+            'images.*.max' => 'Each file must be no larger than 100 MB.',
+            'images.*.mimes' => 'Only JPEG, PNG, GIF, MP4, MOV, and OGV files are allowed.',
         ]);
 
         try {
@@ -95,6 +98,9 @@ class GalleryAlbumController extends Controller
     {
         $request->validate([
             'images.*' => 'required|file|mimes:jpeg,png,jpg,gif,mp4,mov,ogv|max:102400',
+        ], [
+            'images.*.max' => 'Each file must be no larger than 100 MB.',
+            'images.*.mimes' => 'Only JPEG, PNG, GIF, MP4, MOV, and OGV files are allowed.',
         ]);
 
         if ($request->hasFile('images')) {

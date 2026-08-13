@@ -11,6 +11,28 @@
             </a>
         </div>
 
+        @if($errors->any())
+            <div class="mb-6 bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-xl">
+                <ul class="list-disc list-inside text-sm font-bold">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-6 bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-xl font-bold text-sm">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if(session('success'))
+            <div class="mb-6 bg-green-100 border border-green-200 text-green-700 p-4 rounded-xl font-bold text-sm">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Details Form -->
             <div class="lg:col-span-1">
@@ -78,7 +100,7 @@
                             @click="if(!loading) $refs.addInput.click()"
                         >
                             <span class="text-xs font-bold text-accent" x-text="count === 0 ? 'Click to select photos or videos' : `${count} files ready` "></span>
-                            <span class="text-[9px] text-muted-foreground mt-1">Images up to 5MB, Videos up to 100MB</span>
+                            <span class="text-[9px] text-muted-foreground mt-1">Photos and videos up to 100 MB each</span>
                         </div>
 
                         <div class="grid grid-cols-4 gap-2 mt-4 mb-4" x-show="count > 0">

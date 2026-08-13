@@ -103,6 +103,17 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # ----------------------------------------------------------
+# PHP upload limits (gallery media up to 100MB per file)
+# ----------------------------------------------------------
+RUN cat <<EOF > /usr/local/etc/php/conf.d/uploads.ini
+upload_max_filesize = 128M
+post_max_size = 256M
+max_file_uploads = 50
+memory_limit = 256M
+max_execution_time = 300
+EOF
+
+# ----------------------------------------------------------
 # PHP Opcache
 # ----------------------------------------------------------
 RUN cat <<EOF > /usr/local/etc/php/conf.d/opcache.ini
