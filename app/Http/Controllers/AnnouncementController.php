@@ -11,19 +11,12 @@ class AnnouncementController extends Controller
 {
     public function publicIndex()
     {
-        $featuredAnnouncement = Announcement::active()
-            ->where('is_featured', true)
-            ->orderBy('published_at', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $latestAnnouncements = Announcement::active()
-            ->when($featuredAnnouncement, fn ($query) => $query->where('id', '!=', $featuredAnnouncement->id))
+        $announcements = Announcement::active()
             ->orderBy('published_at', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        return view('announcements.index', compact('featuredAnnouncement', 'latestAnnouncements'));
+        return view('announcements.index', compact('announcements'));
     }
 
     public function publicShow(Announcement $announcement)

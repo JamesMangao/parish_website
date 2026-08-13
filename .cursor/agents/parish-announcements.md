@@ -64,7 +64,7 @@ database/migrations/2026_08_13_000000_add_is_featured_to_announcements_table.php
 | `content` | Required text body |
 | `category` | Predefined: Parish Life, Liturgical, Sacraments, Formation — or any custom string via **Other** (stored in same column) |
 | `is_published` | Boolean; controls public visibility |
-| `is_featured` | Boolean; one featured announcement at a time — shown in the featured spot on `/announcements` and as homepage hero |
+| `is_featured` | Boolean; one featured announcement at a time — shown in the featured spot on the **homepage** only |
 | `published_at` | Timestamp; defaults on create |
 | `expires_at` | Optional; hidden from public after this date |
 | `is_recruitment` | Boolean; shows recruitment badge in admin |
@@ -135,7 +135,7 @@ When `category === 'Other'`, the controller replaces it with `trim(custom_catego
 - Uses `<x-admin-form>` component
 - Category field via `_category-fields.blade.php` partial (predefined + **Other** with Alpine show/hide)
 - Validates title, content, category (or custom_category when Other), booleans, optional registration_link and expires_at
-- Checkboxes: `is_published`, `is_recruitment`, `is_featured` ("Feature on announcements page")
+- Checkboxes: `is_published`, `is_recruitment`, `is_featured` ("Feature on homepage")
 - When `is_featured` is checked on save, all other announcements are unset as featured (only one at a time)
 - On success: redirect to index with flash `success`
 
@@ -162,12 +162,13 @@ Forms must use static `id="delete-announcement-{{ $a->id }}"` (not Alpine `:id` 
 
 ## Public display
 
-- Index shows **LATEST ANNOUNCEMENTS** grid on top (paginated, 12 per page), then the **featured** announcement card below (if one is set)
-- Featured announcement is excluded from the latest grid (no duplicate)
+- `/announcements` index is a simple paginated grid (12 per page) — no separate featured block
+- Homepage shows **LATEST ANNOUNCEMENTS** carousel grid on top, then the **featured** announcement card below (only when `is_featured` is set)
+- Featured announcement is excluded from the homepage carousel grid (no duplicate)
 - Only one announcement can be featured at a time (`is_featured` boolean)
 - Show page 404s if announcement is unpublished
 - Sidebar shows 5 recent active announcements
-- Home page may pull cached announcements (`home_announcements` cache key)
+- Home page pulls cached announcements (`home_announcements` cache key)
 
 ## Session, login & CSRF
 
