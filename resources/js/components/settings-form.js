@@ -69,6 +69,7 @@ export const settingsForm = () => ({
 export const settingsSection = () => ({
     isDirty: false,
     _snapshot: '',
+    _submitting: false,
 
     init() {
         this.$nextTick(() => {
@@ -77,6 +78,7 @@ export const settingsSection = () => ({
         this.$el.addEventListener('input', () => this._checkDirty(), true);
         this.$el.addEventListener('change', () => this._checkDirty(), true);
         this.$el.addEventListener('settings-changed', () => this._checkDirty());
+        this.$el.addEventListener('submit', (e) => this._handleSubmit(e));
     },
 
     _serialize() {
@@ -101,10 +103,43 @@ export const settingsSection = () => ({
         this._checkDirty();
     },
 
-    onSubmit() {
+    async _handleSubmit(e) {
+        e.preventDefault();
+        if (this._submitting) return;
+        this._submitting = true;
+
         const parent = this.$el.closest('[x-data*="settingsForm"]');
         if (parent && parent.__x) {
             parent.__x.$data.revokePreviews?.();
+        }
+
+        const fd = new FormData(this.$el);
+        try {
+            const res = await fetch(this.$el.action, {
+                method: 'POST',
+                body: fd,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                },
+            });
+
+            if (res.ok) {
+                this.$store.toast.trigger('Settings saved successfully!', 'success');
+                this._snapshot = this._serialize();
+                this.isDirty = false;
+            } else if (res.status === 422) {
+                const data = await res.json();
+                const msg = data.message || Object.values(data.errors || {}).flat().join('\n');
+                this.$store.toast.trigger(msg || 'Validation failed.', 'error');
+            } else {
+                this.$store.toast.trigger('Failed to save settings.', 'error');
+            }
+        } catch {
+            this.$store.toast.trigger('Network error. Please try again.', 'error');
+        } finally {
+            this._submitting = false;
         }
     }
 });

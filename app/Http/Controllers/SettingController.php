@@ -81,6 +81,10 @@ class SettingController extends Controller
 
         LogService::log('update_settings', null, ['section' => $section, 'keys' => array_keys($validated)]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Settings saved successfully!']);
+        }
+
         return back()->with('success', 'Settings saved successfully!');
     }
 
