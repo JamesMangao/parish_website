@@ -30,6 +30,11 @@ class SettingController extends Controller
             'assistant_priest_role',
             'assistant_priest_quote',
             'assistant_priest_image',
+            'priest_years',
+            'priest_contrib_short',
+            'priest_contrib_full',
+            'priest_contrib_confirmed',
+            'priest_contrib_sources',
         ],
         'former_priests' => [
             'former_priests',
@@ -109,6 +114,11 @@ class SettingController extends Controller
                 'assistant_priest_role' => 'nullable|string|max:255',
                 'assistant_priest_quote' => 'nullable|string|max:500',
                 'assistant_priest_image' => 'nullable|image|max:10240',
+                'priest_years' => 'nullable|string|max:100',
+                'priest_contrib_short' => 'nullable|string|max:500',
+                'priest_contrib_full' => 'nullable|string|max:3000',
+                'priest_contrib_confirmed' => 'nullable|boolean',
+                'priest_contrib_sources' => 'nullable|string|max:3000',
             ],
             'former_priests' => [
                 'former_priests' => 'nullable|array|max:20',
@@ -118,6 +128,10 @@ class SettingController extends Controller
                 'former_priests.*.quote' => 'nullable|string|max:500',
                 'former_priests.*.existing_image' => 'nullable|string|max:500',
                 'former_priests.*.image' => 'nullable|image|max:10240',
+                'former_priests.*.contrib_short' => 'nullable|string|max:500',
+                'former_priests.*.contrib_full' => 'nullable|string|max:3000',
+                'former_priests.*.contrib_confirmed' => 'nullable|boolean',
+                'former_priests.*.contrib_sources' => 'nullable|string|max:3000',
             ],
             'about_video' => [
                 'about_video_url' => 'nullable|string|max:500',
@@ -148,20 +162,22 @@ class SettingController extends Controller
 
     private function processFileUploads(Request $request, string $section, array &$validated): void
     {
+        $disk = $this->publicSettingsDisk();
+
         if ($section === 'donations' && $request->hasFile('qr_code')) {
-            $path = $request->file('qr_code')->store('settings');
+            $path = $request->file('qr_code')->storePublicly('settings', $disk);
             Setting::updateOrCreate(['key' => 'qr_code'], ['value' => $path]);
             unset($validated['qr_code']);
         }
 
         if ($section === 'leadership') {
             if ($request->hasFile('priest_image')) {
-                $path = $request->file('priest_image')->store('settings');
+                $path = $request->file('priest_image')->storePublicly('settings', $disk);
                 Setting::updateOrCreate(['key' => 'priest_image'], ['value' => $path]);
                 unset($validated['priest_image']);
             }
             if ($request->hasFile('assistant_priest_image')) {
-                $path = $request->file('assistant_priest_image')->store('settings');
+                $path = $request->file('assistant_priest_image')->storePublicly('settings', $disk);
                 Setting::updateOrCreate(['key' => 'assistant_priest_image'], ['value' => $path]);
                 unset($validated['assistant_priest_image']);
             }
@@ -196,7 +212,7 @@ class SettingController extends Controller
 
                 $imagePath = $entry['existing_image'] ?? null;
                 if ($request->hasFile("former_priests.{$index}.image")) {
-                    $imagePath = $request->file("former_priests.{$index}.image")->store('settings/former-priests');
+                    $imagePath = $request->file("former_priests.{$index}.image")->storePublicly('settings/former-priests', $this->publicSettingsDisk());
                 }
 
                 $entries[] = [
@@ -205,6 +221,10 @@ class SettingController extends Controller
                     'years' => trim($entry['years'] ?? ''),
                     'quote' => trim($entry['quote'] ?? ''),
                     'image' => $imagePath,
+                    'contrib_short' => trim($entry['contrib_short'] ?? ''),
+                    'contrib_full' => trim($entry['contrib_full'] ?? ''),
+                    'contrib_confirmed' => !empty($entry['contrib_confirmed']),
+                    'contrib_sources' => trim($entry['contrib_sources'] ?? ''),
                 ];
             }
 
@@ -224,5 +244,16 @@ class SettingController extends Controller
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             }
         }
+    }
+
+    /**
+     * Settings images must be publicly accessible (admin previews + public pages).
+     * If the app is using the private `local` disk by default, fall back to `public`.
+     */
+    private function publicSettingsDisk(): string
+    {
+        $default = config('filesystems.default');
+
+        return $default === 'local' ? 'public' : $default;
     }
 }

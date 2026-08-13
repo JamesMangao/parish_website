@@ -1,6 +1,6 @@
 <x-admin-layout>
     @php
-        $disk = config('filesystems.default');
+        $disk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
         $qrUrl = isset($settings['qr_code']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($settings['qr_code']) : null;
         $priestUrl = isset($settings['priest_image']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($settings['priest_image']) : null;
         $assistantPriestUrl = isset($settings['assistant_priest_image']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($settings['assistant_priest_image']) : null;
@@ -25,6 +25,10 @@
             'quote' => $e['quote'] ?? '',
             'image' => $e['image'] ?? '',
             'imageUrl' => ! empty($e['image']) ? \Illuminate\Support\Facades\Storage::disk($disk)->url($e['image']) : null,
+            'contrib_short' => $e['contrib_short'] ?? '',
+            'contrib_full' => $e['contrib_full'] ?? '',
+            'contrib_confirmed' => $e['contrib_confirmed'] ?? false,
+            'contrib_sources' => $e['contrib_sources'] ?? '',
         ])->values()->all();
     @endphp
 
@@ -160,6 +164,46 @@
                     </div>
                 </div>
                 <div style="height:1px; background:linear-gradient(90deg,rgba(var(--primary-rgb),0.15),transparent); margin-bottom:24px;"></div>
+
+                {{-- Significant Contributions --}}
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Years Served (for contributions)</label>
+                        <input type="text" name="priest_years" value="{{ $settings['priest_years'] ?? '' }}" placeholder="2019–Present"
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">
+                        <p class="text-[10px] text-muted-foreground italic">Used to determine if contributions fall within the 1991–2008 gap.</p>
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contributions — Short Summary</label>
+                        <textarea name="priest_contrib_short" rows="2" placeholder="Brief summary of significant contributions..."
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">{{ $settings['priest_contrib_short'] ?? '' }}</textarea>
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contributions — Full Details (expandable)</label>
+                        <textarea name="priest_contrib_full" rows="4" placeholder="Detailed description of contributions..."
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">{{ $settings['priest_contrib_full'] ?? '' }}</textarea>
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contributions Confirmed</label>
+                        <div class="flex items-center gap-3">
+                            <input type="hidden" name="priest_contrib_confirmed" value="0">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="priest_contrib_confirmed" value="1" {{ !empty($settings['priest_contrib_confirmed']) ? 'checked' : '' }}
+                                    class="sr-only peer">
+                                <div class="w-9 h-5 bg-muted peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                            <span class="text-[10px] text-muted-foreground">Required to show if years overlap 1991–2008</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sources (internal only)</label>
+                        <textarea name="priest_contrib_sources" rows="2" placeholder="Internal references — not shown publicly..."
+                            class="w-full bg-muted/20 border-border rounded-lg px-4 py-2 text-sm focus:ring-accent focus:border-accent">{{ $settings['priest_contrib_sources'] ?? '' }}</textarea>
+                        <p class="text-[10px] text-muted-foreground italic">Not shown publicly. For internal reference only.</p>
+                    </div>
+                </div>
+                <div style="height:1px; background:linear-gradient(90deg,rgba(var(--primary-rgb),0.15),transparent); margin:24px 0;"></div>
+
                 <div class="grid gap-6 md:grid-cols-2">
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assistant Parish Priest Name</label>
@@ -242,6 +286,39 @@
                                         <input type="file" :name="'former_priests['+index+'][image]'" accept="image/*" @change="handleImageUpload($event, index)"
                                             class="flex-1 text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white">
                                     </div>
+                                </div>
+                            </div>
+                            {{-- Contribution fields --}}
+                            <div style="height:1px; background:linear-gradient(90deg,rgba(var(--primary-rgb),0.1),transparent); margin:4px 0 12px;"></div>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <div class="space-y-1 md:col-span-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contributions — Short Summary</label>
+                                    <textarea :name="'former_priests['+index+'][contrib_short]'" x-model="entries[index].contrib_short" rows="2" placeholder="Brief summary of significant contributions..."
+                                        class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm"></textarea>
+                                </div>
+                                <div class="space-y-1 md:col-span-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contributions — Full Details (expandable)</label>
+                                    <textarea :name="'former_priests['+index+'][contrib_full]'" x-model="entries[index].contrib_full" rows="3" placeholder="Detailed description of contributions..."
+                                        class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm"></textarea>
+                                </div>
+                                <div class="space-y-1 md:col-span-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Contributions Confirmed</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="hidden" :name="'former_priests['+index+'][contrib_confirmed]'" value="0">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" :name="'former_priests['+index+'][contrib_confirmed]'" value="1" :checked="entries[index].contrib_confirmed"
+                                                @change="entries[index].contrib_confirmed = $event.target.checked"
+                                                class="sr-only peer">
+                                            <div class="w-9 h-5 bg-muted peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                        <span class="text-[10px] text-muted-foreground">Required if years overlap 1991–2008</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 md:col-span-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sources (internal only)</label>
+                                    <textarea :name="'former_priests['+index+'][contrib_sources]'" x-model="entries[index].contrib_sources" rows="1" placeholder="Internal references — not shown publicly..."
+                                        class="w-full bg-muted/20 border-border rounded-lg px-3 py-1.5 text-sm"></textarea>
+                                    <p class="text-[10px] text-muted-foreground italic">Not shown publicly.</p>
                                 </div>
                             </div>
                         </div>

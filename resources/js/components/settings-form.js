@@ -172,6 +172,10 @@ export const formerPriestsManager = () => ({
                     quote: e.quote || '',
                     existing_image: e.image || '',
                     imagePreview: e.imageUrl || null,
+                    contrib_short: e.contrib_short || '',
+                    contrib_full: e.contrib_full || '',
+                    contrib_confirmed: !!e.contrib_confirmed,
+                    contrib_sources: e.contrib_sources || '',
                 })) : [];
             } catch {}
         }
@@ -186,7 +190,7 @@ export const formerPriestsManager = () => ({
             this.$store.toast.trigger('Maximum 20 former priests allowed.', 'error');
             return;
         }
-        this.entries.push({ name: '', role: 'Parish Priest', years: '', quote: '', existing_image: '', imagePreview: null });
+        this.entries.push({ name: '', role: 'Parish Priest', years: '', quote: '', existing_image: '', imagePreview: null, contrib_short: '', contrib_full: '', contrib_confirmed: false, contrib_sources: '' });
         this._notify();
     },
 

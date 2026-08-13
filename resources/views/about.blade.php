@@ -3,6 +3,11 @@
         <meta name="description" content="Learn about Sto. Rosario Parish in Pacita, San Pedro, Laguna. Discover our history, the Queen of the Most Holy Rosary, office hours, and contact details.">
     </x-slot>
 
+    @php
+        // Settings images must be publicly accessible (works for both local `public` disk and Supabase).
+        $settingsDisk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
+    @endphp
+
     {{-- ───────────── STYLES + ANIMATIONS ───────────── --}}
     <style>
         /* ── Tokens ── */
@@ -503,6 +508,51 @@
         .leader-quote { font-size: .87rem; font-style: italic; color: var(--muted); line-height: 1.7; }
 
         /* ════════════════════════════════════════
+           PRIEST CONTRIBUTIONS
+        ════════════════════════════════════════ */
+        .priest-contrib {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(139,69,19,0.1);
+        }
+        .priest-contrib-short {
+            font-size: 0.85rem;
+            color: var(--maroon);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .priest-contrib-details {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .priest-contrib-details summary {
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+            list-style: none;
+        }
+        .priest-contrib-details summary::-webkit-details-marker { display: none; }
+        .priest-contrib-details summary::before {
+            content: '+ ';
+            font-weight: 800;
+        }
+        .priest-contrib-details[open] summary::before {
+            content: '− ';
+        }
+        .priest-contrib-details p {
+            margin-top: 6px;
+        }
+        .leader-card.former-priest-card .priest-contrib {
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+
+        /* ════════════════════════════════════════
            ABOUT VIDEO
         ════════════════════════════════════════ */
         .about-video-section {
@@ -768,12 +818,16 @@
 
     {{-- ═══════════════ STATS ═══════════════ --}}
     <section class="stats-bar">
+        @php
+            $foundedYear = 1983;
+            $yearsOfService = max(1, now('Asia/Manila')->year - $foundedYear);
+        @endphp
         <div class="stat-cell">
-            <p class="stat-number" data-target="42" data-suffix="+">42+</p>
+            <p class="stat-number" data-target="{{ $yearsOfService }}" data-suffix="+">{{ $yearsOfService }}+</p>
             <p class="stat-label">Years of Service</p>
         </div>
         <div class="stat-cell">
-            <p class="stat-number" data-target="1983" data-suffix="">1983</p>
+            <p class="stat-number" data-target="{{ $foundedYear }}" data-suffix="">{{ $foundedYear }}</p>
             <p class="stat-label">Year Founded</p>
         </div>
     </section>
@@ -797,6 +851,9 @@
                 </p>
                 <p class="calling-body">
                     In 2024, the image was declared an <strong style="color:var(--maroon)">Important Cultural Property</strong> of the City of San Pedro. In 2025, Our Lady was accorded the honorific title <strong style="color:var(--maroon)">"Queen of the City of San Pedro."</strong>
+                </p>
+                <p class="calling-body">
+                    We welcome you whether you are a longtime parishioner, a visitor, or someone returning to the faith. Join us for Mass, take part in parish ministries, and let Sto. Rosario Parish be a place where prayer becomes community and community becomes mission.
                 </p>
             </div>
         </div>
@@ -975,7 +1032,7 @@
         <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; max-width:960px; margin:0 auto;">
             <div class="leader-card" data-reveal="scale">
                 @if(isset($global_settings['priest_image']))
-                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($global_settings['priest_image']) }}'); background-size: cover; background-position: center;"></div>
                 @else
                     <div class="leader-avatar">FV</div>
                 @endif
@@ -985,11 +1042,24 @@
                 @if(!empty($global_settings['priest_quote']))
                     <p class="leader-quote">"{{ $global_settings['priest_quote'] }}"</p>
                 @endif
+                @if(!empty($currentPriestContrib['show']))
+                <div class="priest-contrib">
+                    @if(!empty($currentPriestContrib['short']))
+                        <p class="priest-contrib-short">{{ $currentPriestContrib['short'] }}</p>
+                    @endif
+                    @if(!empty($currentPriestContrib['full']))
+                        <details class="priest-contrib-details">
+                            <summary>Read more</summary>
+                            <p>{{ $currentPriestContrib['full'] }}</p>
+                        </details>
+                    @endif
+                </div>
+                @endif
             </div>
             @if(!empty($global_settings['assistant_priest_name']))
             <div class="leader-card" data-reveal="scale">
                 @if(isset($global_settings['assistant_priest_image']))
-                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['assistant_priest_image']) }}'); background-size: cover; background-position: center;"></div>
+                    <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($global_settings['assistant_priest_image']) }}'); background-size: cover; background-position: center;"></div>
                 @else
                     <div class="leader-avatar">AP</div>
                 @endif
@@ -1018,7 +1088,7 @@
                 @endphp
                 <div class="leader-card former-priest-card" data-reveal="scale">
                     @if(!empty($fp['image']))
-                        <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($fp['image']) }}'); background-size: cover; background-position: center;"></div>
+                        <div class="leader-avatar" style="background-image: url('{{ \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($fp['image']) }}'); background-size: cover; background-position: center;"></div>
                     @else
                         <div class="leader-avatar">{{ $initials ?: '?' }}</div>
                     @endif
@@ -1027,6 +1097,19 @@
                     <div class="leader-rule"></div>
                     @if(!empty($fp['quote']))
                         <p class="leader-quote">"{{ $fp['quote'] }}"</p>
+                    @endif
+                    @if(!empty($fp['show_contrib']))
+                    <div class="priest-contrib">
+                        @if(!empty($fp['contrib_short']))
+                            <p class="priest-contrib-short">{{ $fp['contrib_short'] }}</p>
+                        @endif
+                        @if(!empty($fp['contrib_full']))
+                            <details class="priest-contrib-details">
+                                <summary>Read more</summary>
+                                <p>{{ $fp['contrib_full'] }}</p>
+                            </details>
+                        @endif
+                    </div>
                     @endif
                 </div>
                 @endforeach
@@ -1047,7 +1130,11 @@
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="#F5C518"/></svg>
                     </div>
                     <p class="info-card-label">Address</p>
-                    <p>1 Sto. Rosario Drive, Pacita,<br>San Pedro, Laguna</p>
+                    @php
+                        $address = $global_settings['parish_address'] ?? '1 Sto. Rosario Drive, Pacita, San Pedro, Laguna';
+                        $addressHtml = nl2br(e($address));
+                    @endphp
+                    <p>{!! $addressHtml !!}</p>
                 </div>
 
                 <div class="info-card" data-reveal style="transition-delay:.1s">
@@ -1069,7 +1156,7 @@
                     @foreach($contactNumbers as $number)
                     <p>{{ $number }}</p>
                     @endforeach
-                    <small>{{ config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}</small>
+                    <small>{{ $global_settings['parish_email'] ?? config('services.parish.office_email', 'officestorosarioparish@gmail.com') }}</small>
                 </div>
 
                 <div class="info-card" data-reveal style="transition-delay:.2s">
