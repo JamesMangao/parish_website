@@ -269,18 +269,13 @@
                         </div>
 
                         {{-- QR Code --}}
+                        @if(!empty($global_settings['qr_code']))
                         <div style="padding:20px;background:#F7F9FF;border-radius:20px;border:1px solid rgba(26,64,128,0.08);margin-bottom:24px;">
-                            @if(isset($global_settings['qr_code']))
-                                <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['qr_code']) }}"
-                                     alt="Parish Donation QR"
-                                     style="max-width:240px;width:100%;height:auto;border-radius:12px;display:block;margin:0 auto;">
-                            @else
-                                <div style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed rgba(26,64,128,0.15);border-radius:12px;color:rgba(13,42,82,0.3);padding:2rem;text-align:center;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:1rem;opacity:.2;"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/></svg>
-                                    <p style="font-size:.875rem;font-style:italic;">QR code not yet available. Use the account details below.</p>
-                                </div>
-                            @endif
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['qr_code']) }}"
+                                 alt="Parish Donation QR"
+                                 style="max-width:240px;width:100%;height:auto;border-radius:12px;display:block;margin:0 auto;">
                         </div>
+                        @endif
 
                         {{-- Copy Details --}}
                         <div style="display:flex;flex-direction:column;gap:10px;">
