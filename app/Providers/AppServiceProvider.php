@@ -29,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
             if ($appUrl = config('app.url')) {
                 URL::forceRootUrl($appUrl);
             }
+
+            // Render terminates TLS at the edge; ensure session cookies are HTTPS-only.
+            config(['session.secure' => true]);
         }
 
         $this->configureRateLimiting();
@@ -51,9 +54,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('auth', function (Request $request) {
             return Limit::perMinute(5)
                 ->by($request->input('email') . '|' . $request->ip())
-                ->response(fn() => response()->json([
-                    'message' => 'Too many attempts. Try again in 60 seconds.'
-                ], 429));
+                ->response(function (Request $request) {
+                    $message = 'Too many login attempts. Please try again in a minute.';
+
+                    if ($request->expectsJson()) {
+                        return response()->json(['message' => $message], 429);
+                    }
+
+                    return back()
+                        ->withErrors(['email' => $message])
+                        ->withInput($request->only('email'));
+                });
         });
 
         // ─── PASSWORD RESET ────────────────────────────────

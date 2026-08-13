@@ -50,14 +50,26 @@
                     <div class="flex items-center justify-between">
                         <label class="text-sm font-bold text-primary" for="password">Password</label>
                     </div>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        required 
-                        class="flex h-11 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="••••••••"
-                    />
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            class="flex h-11 w-full rounded-lg border border-input bg-background px-3 py-2 pr-11 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            placeholder="••••••••"
+                        />
+                        <button
+                            type="button"
+                            id="toggle-password"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-off hidden"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+                        </button>
+                    </div>
                     @error('password')
                         <p class="text-xs text-destructive font-bold">{{ $message }}</p>
                     @enderror
@@ -79,5 +91,19 @@
             </a>
         </div>
     </div>
+    <script>
+        document.getElementById('toggle-password')?.addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const eyeOpen = document.getElementById('eye-open');
+            const eyeClosed = document.getElementById('eye-closed');
+            const showing = input.type === 'text';
+
+            input.type = showing ? 'password' : 'text';
+            eyeOpen.classList.toggle('hidden', !showing);
+            eyeClosed.classList.toggle('hidden', showing);
+            this.setAttribute('aria-pressed', showing ? 'false' : 'true');
+            this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+        });
+    </script>
 </body>
 </html>
