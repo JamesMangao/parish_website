@@ -37,7 +37,7 @@
     <script type="application/json" id="timeline-entries-data">{!! json_encode($timelineEntries) !!}</script>
     <script type="application/json" id="former-priests-data">{!! json_encode($formerPriestsForJs) !!}</script>
 
-    <div class="max-w-4xl space-y-6" x-data="settingsForm()">
+    <div x-data="settingsForm()" x-init="initSettingsNav()">
         <div class="flex items-center justify-between mb-2">
             <div>
                 <h1 class="font-heading text-3xl font-bold text-primary italic">General Settings</h1>
@@ -51,8 +51,29 @@
             </div>
         @endif
 
+        <div class="flex gap-6 items-start">
+            {{-- Quick Nav --}}
+            <nav class="hidden lg:block w-48 shrink-0 sticky top-20">
+                <div class="bg-white border border-border rounded-xl p-3 shadow-sm">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 px-2">Quick Nav</p>
+                    <ul class="space-y-0.5">
+                        <li><a href="#section-parish" @click.prevent="scrollToSection('section-parish')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-parish' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Parish Information</a></li>
+                        <li><a href="#section-donations" @click.prevent="scrollToSection('section-donations')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-donations' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Donation & Payments</a></li>
+                        <li><a href="#section-leadership" @click.prevent="scrollToSection('section-leadership')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-leadership' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Leadership</a></li>
+                        <li><a href="#section-former-priests" @click.prevent="scrollToSection('section-former-priests')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-former-priests' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Former Priests</a></li>
+                        <li><a href="#section-about-video" @click.prevent="scrollToSection('section-about-video')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-about-video' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">About Video</a></li>
+                        <li><a href="#section-timeline" @click.prevent="scrollToSection('section-timeline')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-timeline' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Timeline</a></li>
+                        <li><a href="#section-gallery" @click.prevent="scrollToSection('section-gallery')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-gallery' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Gallery</a></li>
+                        <li><a href="#section-email" @click.prevent="scrollToSection('section-email')" class="nav-link block px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" :class="activeSection === 'section-email' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted hover:text-foreground'">Email Templates</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            {{-- Settings Forms --}}
+            <div class="flex-1 min-w-0 max-w-4xl space-y-6">
+
         {{-- Parish Information --}}
-        <form action="{{ route('admin.settings.section.update', 'parish') }}" method="POST" x-data="settingsSection()">
+        <form id="section-parish" action="{{ route('admin.settings.section.update', 'parish') }}" method="POST" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Parish Information</h3>
@@ -97,7 +118,7 @@
         </form>
 
         {{-- Donations --}}
-        <form action="{{ route('admin.settings.section.update', 'donations') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
+        <form id="section-donations" action="{{ route('admin.settings.section.update', 'donations') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Donation & Payments (GCash)</h3>
@@ -133,7 +154,7 @@
         </form>
 
         {{-- Leadership --}}
-        <form action="{{ route('admin.settings.section.update', 'leadership') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
+        <form id="section-leadership" action="{{ route('admin.settings.section.update', 'leadership') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()" @submit="$root.revokePreviews()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Leadership Information</h3>
@@ -234,7 +255,7 @@
         </form>
 
         {{-- Former Parish Priests --}}
-        <form action="{{ route('admin.settings.section.update', 'former_priests') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()">
+        <form id="section-former-priests" action="{{ route('admin.settings.section.update', 'former_priests') }}" method="POST" enctype="multipart/form-data" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-2">Former Parish Priests</h3>
@@ -333,7 +354,7 @@
         </form>
 
         {{-- About Page Video --}}
-        <form action="{{ route('admin.settings.section.update', 'about_video') }}" method="POST" x-data="settingsSection()">
+        <form id="section-about-video" action="{{ route('admin.settings.section.update', 'about_video') }}" method="POST" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-2">About Page Video</h3>
@@ -361,7 +382,7 @@
         </form>
 
         {{-- Timeline --}}
-        <form action="{{ route('admin.settings.section.update', 'timeline') }}" method="POST" x-data="settingsSection()">
+        <form id="section-timeline" action="{{ route('admin.settings.section.update', 'timeline') }}" method="POST" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Sacred History Timeline</h3>
@@ -407,7 +428,7 @@
         </form>
 
         {{-- Gallery --}}
-        <form action="{{ route('admin.settings.section.update', 'gallery') }}" method="POST" x-data="settingsSection()">
+        <form id="section-gallery" action="{{ route('admin.settings.section.update', 'gallery') }}" method="POST" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Gallery Settings</h3>
@@ -422,7 +443,7 @@
         </form>
 
         {{-- Email --}}
-        <form action="{{ route('admin.settings.section.update', 'email') }}" method="POST" x-data="settingsSection()">
+        <form id="section-email" action="{{ route('admin.settings.section.update', 'email') }}" method="POST" x-data="settingsSection()">
             @csrf
             <x-admin-card>
                 <h3 class="text-xs font-black uppercase tracking-widest text-primary italic mb-6">Email Templates</h3>
@@ -443,5 +464,7 @@
                 <x-settings-section-footer label="Save Email Templates" />
             </x-admin-card>
         </form>
+        </div>{{-- /flex-1 settings forms --}}
+        </div>{{-- /flex gap-6 --}}
     </div>
 </x-admin-layout>

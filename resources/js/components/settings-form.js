@@ -2,7 +2,9 @@ export const settingsForm = () => ({
     qrPreview: null,
     priestPreview: null,
     assistantPriestPreview: null,
+    activeSection: '',
     _previewUrls: {},
+    _observer: null,
 
     init() {
         const el = document.getElementById('settings-previews-data');
@@ -13,6 +15,35 @@ export const settingsForm = () => ({
                 this.priestPreview = d.priestUrl || null;
                 this.assistantPriestPreview = d.assistantPriestUrl || null;
             } catch {}
+        }
+    },
+
+    initSettingsNav() {
+        const sectionIds = ['section-parish', 'section-donations', 'section-leadership', 'section-former-priests', 'section-about-video', 'section-timeline', 'section-gallery', 'section-email'];
+        const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+        if (!sections.length) return;
+
+        this._observer = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    this.activeSection = entry.target.id;
+                }
+            }
+        }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+
+        sections.forEach(s => this._observer.observe(s));
+        if (sections.length) this.activeSection = sections[0].id;
+
+        this.$el.addEventListener('submit', () => {
+            if (this._observer) this._observer.disconnect();
+        }, { once: true });
+    },
+
+    scrollToSection(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.activeSection = id;
         }
     },
 
