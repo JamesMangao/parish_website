@@ -77,6 +77,12 @@ class SettingController extends Controller
 
         $this->processFileUploads($request, $section, $validated);
         $this->processStructuredFields($request, $section, $validated);
+
+        if ($section === 'donations' && $request->input('remove_qr')) {
+            Setting::where('key', 'qr_code')->delete();
+            unset($validated['qr_code']);
+        }
+
         $this->persistValidated($validated, $section);
 
         Cache::forget('global_settings');

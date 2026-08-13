@@ -134,7 +134,8 @@
                         @error('gcash_name') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payment QR Code</label>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Payment QR Code (optional)</label>
+                        <input type="hidden" name="remove_qr" value="0">
                         <div class="flex items-center gap-6 p-4 bg-muted/10 rounded-xl border border-dashed">
                             <div class="h-32 w-32 shrink-0 rounded bg-white border shadow-sm flex items-center justify-center overflow-hidden">
                                 <template x-if="$root.qrPreview"><img :src="$root.qrPreview" class="h-full w-full object-contain" /></template>
@@ -143,7 +144,11 @@
                             <div class="flex-1">
                                 <input type="file" name="qr_code" accept="image/*" @change="$root.handleFileUpload($event, 'qrPreview', 'QR Code image')"
                                     class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white">
-                                <p class="mt-2 text-[10px] text-muted-foreground">Max 1.8MB (JPG/PNG).</p>
+                                <p class="mt-2 text-[10px] text-muted-foreground">Max 1.8MB (JPG/PNG). Leave empty to keep current.</p>
+                                @if(!empty($settings['qr_code']))
+                                <button type="button" @click="if(confirm('Remove the current QR code?')){$root.qrPreview=null;$el.closest('form').querySelector('[name=remove_qr]').value='1'}"
+                                    class="mt-2 text-[10px] font-bold text-destructive hover:underline">Remove QR Code</button>
+                                @endif
                             </div>
                         </div>
                         @error('qr_code') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
