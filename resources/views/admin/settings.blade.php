@@ -146,7 +146,13 @@
                                     class="w-full text-xs text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white">
                                 <p class="mt-2 text-[10px] text-muted-foreground">Max 1.8MB (JPG/PNG). Leave empty to keep current.</p>
                                 @if(!empty($settings['qr_code']))
-                                <button type="button" @click="if(confirm('Remove the current QR code?')){$root.qrPreview=null;$el.closest('form').querySelector('[name=remove_qr]').value='1'}"
+                                <button type="button" @click="$store.confirm.open({
+                                    title: 'Remove QR Code',
+                                    message: 'This will remove the current QR code from the donation page. You can upload a new one later.',
+                                    confirmText: 'Remove',
+                                    type: 'danger',
+                                    onConfirm: () => { $root.qrPreview = null; $el.closest('form').querySelector('[name=remove_qr]').value = '1'; $store.toast.trigger('QR code marked for removal. Save to apply.', 'success'); }
+                                })"
                                     class="mt-2 text-[10px] font-bold text-destructive hover:underline">Remove QR Code</button>
                                 @endif
                             </div>
