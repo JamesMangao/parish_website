@@ -139,6 +139,7 @@
                                 backdrop-blur-xl p-1.5 shadow-[0_16px_48px_rgba(0,0,0,0.2)]"
                          :class="scrolled ? 'bg-white border-black/5 shadow-xl' : 'border-white/10 bg-[rgba(13,42,82,0.97)]'">
                         @foreach([
+                            ['Announcements',   route('announcements.index'), 'News & parish updates'],
                             ['Parish Events',   '/events',  'Liturgical & community events'],
                             ['Gallery',         '/gallery', 'Memories & celebrations'],
                             ['About Our Parish','/about',   'History & our mission'],
@@ -288,6 +289,12 @@
                       padding:0 4px; margin-bottom:4px;">Community</p>
 
             @foreach([
+                [
+                    'label' => 'Announcements',
+                    'url'   => route('announcements.index'),
+                    'sub'   => 'News & parish updates',
+                    'icon'  => '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+                ],
                 [
                     'label' => 'Parish Events',
                     'url'   => '/events',
