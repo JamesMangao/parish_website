@@ -6,8 +6,10 @@
     $liveStart = $now->copy()->setTime(9, 55);
     $liveEnd = $now->copy()->setTime(11, 30);
     $isManualLive = \Illuminate\Support\Facades\Cache::get('manual_live_override', false);
-    $isLiveWindow = true; // TEMP: force live for tonight's mass — revert after
-    $facebookLivePermalink = 'https://www.facebook.com/storosarioparishpacita1/videos/2915672612105350'; // TEMP: hardcode for tonight
+    $isLiveWindow = $isManualLive || ($isSunday && $now->gte($liveStart) && $now->lte($liveEnd));
+    $facebookLivePermalink = \Illuminate\Support\Facades\Cache::get(
+        \App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY
+    );
 @endphp
 
 <section id="live-mass" class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile">
