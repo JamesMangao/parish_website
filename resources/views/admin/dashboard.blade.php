@@ -142,6 +142,31 @@
             <p class="text-sm text-muted-foreground mt-1">Overview of parish activities and statistics.</p>
         </div>
 
+        @if(in_array(Auth::user()->role, ['super_admin','staff','soccom']))
+<div class="bg-card rounded-xl border p-6 mb-8 flex items-center justify-between shadow-sm border-l-4 {{ \Illuminate\Support\Facades\Cache::get('manual_live_override') ? 'border-l-red-500' : 'border-l-muted' }}">
+    <div>
+        <span class="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Live Mass Override</span>
+        <p class="text-sm mt-1">
+            @if(\Illuminate\Support\Facades\Cache::get('manual_live_override'))
+                <span class="text-red-600 font-bold">● LIVE</span> — showing on the site now.
+            @else
+                Not live. Click "Go Live" right when Mass starts.
+            @endif
+        </p>
+    </div>
+    <div class="flex gap-2">
+        <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
+            @csrf<input type="hidden" name="state" value="on">
+            <button class="px-4 py-2 rounded-lg bg-red-500 text-white text-xs font-bold uppercase">Go Live</button>
+        </form>
+        <form method="POST" action="{{ route('admin.live-mass.toggle') }}">
+            @csrf<input type="hidden" name="state" value="off">
+            <button class="px-4 py-2 rounded-lg bg-muted text-xs font-bold uppercase">End</button>
+        </form>
+    </div>
+</div>
+@endif
+        
         @php $role = Auth::user()->role; @endphp
 
         <!-- Stats Grid -->
