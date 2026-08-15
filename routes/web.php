@@ -18,6 +18,8 @@ use App\Http\Controllers\GoogleSlidesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\IntentionController;
+use App\Http\Controllers\LiveMassController;
+use App\Http\Controllers\MassScheduleController;
 use App\Http\Controllers\MassScheduleController;
 use App\Http\Controllers\PptController;
 use App\Http\Controllers\ScheduleController;
