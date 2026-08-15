@@ -7,7 +7,7 @@
     $liveEnd = $now->copy()->setTime(11, 30);
     $isManualLive = \Illuminate\Support\Facades\Cache::get('manual_live_override', false);
     $isLiveWindow = true; // TEMP: force live for tonight's mass — revert after
-    $facebookLivePermalink = 'https://www.facebook.com/share/v/19YpWZSyzY/'; // TEMP: hardcode for tonight
+    $facebookLivePermalink = 'https://www.facebook.com/share/v/1LG89pkJGB/'; // TEMP: hardcode for tonight
 @endphp
 
 <section id="live-mass" class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile">
