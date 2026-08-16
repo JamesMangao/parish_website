@@ -188,10 +188,9 @@
                                 </div>
 
                                 <div style="margin-bottom:20px;">
-                                    <label class="donate-label">Or Enter Custom Amount (min ₱100)</label>
-                                    <div style="position:relative;">
-                                        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-weight:700;color:rgba(13,42,82,0.3);font-size:15px;">₱</span>
-                                        <input type="number" class="donate-input" style="padding-left:36px;" placeholder="0.00" min="100" step="1"
+                                    <label class="donate-label">Or Enter Custom Amount (min ₱20)</label>
+...
+<input type="number" class="donate-input" style="padding-left:36px;" placeholder="0.00" min="20" step="1"
                                                x-model="customAmount"
                                                @input="amount = Math.round(parseFloat($event.target.value || 0) * 100); custom = true">
                                     </div>
@@ -227,8 +226,8 @@
                                 </div>
 
                                 {{-- Submit --}}
-                                <button type="submit" class="donate-submit" :disabled="amount < 10000">
-                                    <span x-text="amount >= 10000 ? 'Donate ₱' + (amount / 100).toLocaleString('en-PH', {minimumFractionDigits: 2}) : 'Select an amount'"></span>
+                                <button type="submit" class="donate-submit" :disabled="amount < 2000">
+    <span x-text="amount >= 2000 ? 'Donate ₱' + (amount / 100).toLocaleString('en-PH', {minimumFractionDigits: 2}) : 'Select an amount'"></span>
                                 </button>
 
                                 <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:12px;">
