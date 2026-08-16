@@ -28,7 +28,7 @@ class DonationController extends Controller
     public function checkout(Request $request)
     {
         $validated = $request->validate([
-            'amount' => 'required|integer|min:10000', // min ₱100 in centavos
+            'amount' => 'required|integer|min:2000', // min ₱100 in centavos
             'donor_name' => 'nullable|string|max:255',
             'donor_email' => 'nullable|email|max:255',
             'purpose' => 'required|string|in:General Donation,Church Maintenance,Outreach,Youth Ministry',
