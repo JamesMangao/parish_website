@@ -6,7 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Staff Login — Sto. Rosario Parish</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="preload" href="{{ asset('fonts/Canterbury.ttf') }}" as="font" type="font/ttf" crossorigin>
     <style>
+        @font-face{font-family:'Canterbury';src:url('{{ asset('fonts/Canterbury.ttf') }}') format('truetype');font-weight:normal;font-style:normal;font-display:swap;}
         /* ── Login-specific design tokens ── */
         :root {
             --login-bg: #fbfbfd;
@@ -112,12 +114,17 @@
             background: rgba(217, 178, 107, 0.08);
             backdrop-filter: blur(12px);
             margin-bottom: 1.75rem;
-            color: var(--login-gold);
-            font-size: 1.75rem;
-            line-height: 1;
+            overflow: hidden;
+        }
+        .brand-cross img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
         }
         .brand-title {
-            font-family: var(--font-login);
+            font-family: 'Canterbury', serif;
             font-size: clamp(1.5rem, 3vw, 2.25rem);
             font-weight: 700;
             letter-spacing: -0.025em;
@@ -427,11 +434,15 @@
             border: 1.5px solid rgba(125, 46, 59, 0.15);
             background: rgba(122, 46, 59, 0.04);
             margin-bottom: 1rem;
-            color: var(--login-primary);
-            font-size: 1.25rem;
+            overflow: hidden;
+        }
+        .mobile-brand-cross img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
         }
         .mobile-brand-title {
-            font-family: var(--font-login);
+            font-family: 'Canterbury', serif;
             font-size: 1.125rem;
             font-weight: 700;
             letter-spacing: -0.01em;
@@ -539,7 +550,7 @@
             </div>
 
             <div class="brand-content">
-                <div class="brand-cross">✝</div>
+                <div class="brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Sto. Rosario Parish Logo"></div>
                 <h1 class="brand-title">Sto. Rosario<br>Parish</h1>
                 <p class="brand-subtitle">Staff Administration</p>
                 <div class="brand-divider"></div>
@@ -558,7 +569,7 @@
 
                 {{-- Mobile brand header --}}
                 <div class="mobile-brand">
-                    <div class="mobile-brand-cross">✝</div>
+                    <div class="mobile-brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Sto. Rosario Parish Logo"></div>
                     <p class="mobile-brand-title">Sto. Rosario Parish</p>
                     <p class="mobile-brand-sub">Staff Login</p>
                 </div>
