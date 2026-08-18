@@ -82,8 +82,8 @@
             {{-- Logo --}}
             <div class="h-[72px] flex items-center px-5 border-b border-white/[.06] shrink-0 relative">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-gold-dark flex items-center justify-center shrink-0 shadow-lg shadow-accent/20">
-                        <span class="font-heading font-bold text-sm text-primary">SR</span>
+                    <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-lg shadow-accent/20 flex items-center justify-center bg-white">
+                        <img src="{{ url('images/parish-logo.png') }}" alt="Sto. Rosario Parish" class="w-full h-full object-contain p-0.5">
                     </div>
                     <div x-show="$store.ui.sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-x-2" x-transition:enter-end="opacity-100 translate-x-0">
                         <p class="font-heading font-bold text-[15px] tracking-tight leading-tight text-white/95">Sto. Rosario</p>
