@@ -150,7 +150,7 @@
             background: var(--cream);
             border-bottom: 1px solid var(--border);
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
         }
         .stat-cell {
             padding: 40px 0;
@@ -158,6 +158,7 @@
             border-right: 1px solid var(--border);
         }
         .stat-cell:last-child { border-right: none; }
+        .stat-cell:nth-child(3) { border-right: none; }
         .stat-number {
             font-family: 'Playfair Display', Georgia, serif;
             font-size: 3.4rem;
@@ -759,6 +760,22 @@
         .sacrament-card:hover .sacrament-icon {
             background: var(--gold); color: #fff; transform: scale(1.1) rotate(5deg);
         }
+        .sacrament-img-wrap {
+            width: 100%; height: 200px; border-radius: 16px; overflow: hidden;
+            margin-bottom: 24px; position: relative; background: var(--cream);
+        }
+        .sacrament-img-wrap img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .sacrament-card:hover .sacrament-img-wrap img {
+            transform: scale(1.05);
+        }
+        .sacrament-img-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 60px; background: linear-gradient(transparent, rgba(255,255,255,0.9));
+            pointer-events: none;
+        }
         .sacrament-title {
             font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
             font-weight: 700; color: var(--blue-deep); margin-bottom: 12px; font-style: italic;
@@ -830,6 +847,10 @@
             <p class="stat-number" data-target="{{ $foundedYear }}" data-suffix="">{{ $foundedYear }}</p>
             <p class="stat-label">Year Founded</p>
         </div>
+        <div class="stat-cell">
+            <p class="stat-number" data-target="13" data-suffix="">13</p>
+            <p class="stat-label">Weekly Masses</p>
+        </div>
     </section>
 
     {{-- ═══════════════ OUR CALLING ═══════════════ --}}
@@ -869,14 +890,16 @@
 
         <div class="sacraments-grid">
             @php
+            $settingsDisk = config('filesystems.default') === 'local' ? 'public' : config('filesystems.default');
+
             $sacraments = [
-                ['name' => 'Baptism',      'desc' => 'The gate of the sacraments and necessary for salvation, by which we are freed from sin and reborn as children of God.', 'icon' => 'droplets'],
-                ['name' => 'Confirmation', 'desc' => 'The perfection of Baptismal grace, strengthening us with the gifts of the Holy Spirit to be witnesses of Christ.', 'icon' => 'flame'],
-                ['name' => 'Eucharist',    'desc' => 'The source and summit of the Christian life, where we receive the real body and blood of our Lord Jesus Christ.', 'icon' => 'sun'],
-                ['name' => 'Penance',      'desc' => 'The sacrament of reconciliation through which we obtain God\'s mercy for sins committed against Him.', 'icon' => 'shield-check'],
-                ['name' => 'Anointing',    'desc' => 'A source of spiritual and physical healing for those whose health is seriously impaired by sickness or old age.', 'icon' => 'hand-heart'],
-                ['name' => 'Holy Orders',  'desc' => 'The sacrament through which the mission entrusted by Christ to his apostles continues to be exercised in the Church.', 'icon' => 'cross'],
-                ['name' => 'Matrimony',    'desc' => 'A sacred covenant between a man and a woman, established as a partnership of the whole of life for their mutual good.', 'icon' => 'heart'],
+                ['name' => 'Baptism',      'desc' => 'The gate of the sacraments and necessary for salvation, by which we are freed from sin and reborn as children of God.', 'icon' => 'droplets', 'image_key' => 'sacrament_baptism_image', 'fallback' => 'assets/sacraments/baptism.svg', 'alt' => 'Baptism at Sto. Rosario Parish'],
+                ['name' => 'Confirmation', 'desc' => 'The perfection of Baptismal grace, strengthening us with the gifts of the Holy Spirit to be witnesses of Christ.', 'icon' => 'flame', 'image_key' => 'sacrament_confirmation_image', 'fallback' => 'assets/sacraments/confirmation.svg', 'alt' => 'Confirmation at Sto. Rosario Parish'],
+                ['name' => 'Eucharist',    'desc' => 'The source and summit of the Christian life, where we receive the real body and blood of our Lord Jesus Christ.', 'icon' => 'sun', 'image_key' => 'sacrament_eucharist_image', 'fallback' => 'assets/sacraments/eucharist.svg', 'alt' => 'Eucharistic celebration at Sto. Rosario Parish'],
+                ['name' => 'Penance',      'desc' => 'The sacrament of reconciliation through which we obtain God\'s mercy for sins committed against Him.', 'icon' => 'shield-check', 'image_key' => 'sacrament_penance_image', 'fallback' => 'assets/sacraments/penance.svg', 'alt' => 'Confession at Sto. Rosario Parish'],
+                ['name' => 'Anointing',    'desc' => 'A source of spiritual and physical healing for those whose health is seriously impaired by sickness or old age.', 'icon' => 'hand-heart', 'image_key' => 'sacrament_anointing_image', 'fallback' => 'assets/sacraments/anointing.svg', 'alt' => 'Anointing of the Sick at Sto. Rosario Parish'],
+                ['name' => 'Holy Orders',  'desc' => 'The sacrament through which the mission entrusted by Christ to his apostles continues to be exercised in the Church.', 'icon' => 'cross', 'image_key' => 'sacrament_holy_orders_image', 'fallback' => 'assets/sacraments/holy-orders.svg', 'alt' => 'Ordination at Sto. Rosario Parish'],
+                ['name' => 'Matrimony',    'desc' => 'A sacred covenant between a man and a woman, established as a partnership of the whole of life for their mutual good.', 'icon' => 'heart', 'image_key' => 'sacrament_matrimony_image', 'fallback' => 'assets/sacraments/matrimony.svg', 'alt' => 'Wedding at Sto. Rosario Parish'],
             ];
 
             $icons = [
@@ -891,8 +914,21 @@
             @endphp
 
             @foreach($sacraments as $s)
+            @php
+                $sacramentImage = $global_settings[$s['image_key']] ?? null;
+                $sacramentSrc = $sacramentImage
+                    ? \Illuminate\Support\Facades\Storage::disk($settingsDisk)->url($sacramentImage)
+                    : asset($s['fallback']);
+            @endphp
             <div class="sacrament-card" data-reveal="up" style="transition-delay: {{ $loop->index * 0.1 }}s">
-                <div class="sacrament-icon">{!! $icons[$s['icon']] !!}</div>
+                <div class="sacrament-img-wrap">
+                    <img
+                        src="{{ $sacramentSrc }}"
+                        alt="{{ $s['alt'] }}"
+                        loading="lazy"
+                    >
+                    <div class="sacrament-img-overlay"></div>
+                </div>
                 <h3 class="sacrament-title">{{ $s['name'] }}</h3>
                 <p class="sacrament-body">{{ $s['desc'] }}</p>
             </div>
