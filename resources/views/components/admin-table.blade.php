@@ -8,15 +8,15 @@
 <x-admin-card padding="p-0">
     <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-            <thead class="bg-muted/50 border-b">
-                <tr>
+            <thead>
+                <tr class="border-b border-black/[.04]">
                     @foreach($headers as $h)
-                        <th class="px-6 py-4 font-bold text-primary text-[11px] uppercase tracking-wider">{{ $h }}</th>
+                        <th class="px-6 py-4 font-bold text-primary/50 text-[10px] uppercase tracking-[.15em]">{{ $h }}</th>
                     @endforeach
-                    <th class="px-6 py-4 font-bold text-primary text-[11px] uppercase tracking-wider text-right">Actions</th>
+                    <th class="px-6 py-4 font-bold text-primary/50 text-[10px] uppercase tracking-[.15em] text-right">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-border">
+            <tbody class="divide-y divide-black/[.03]">
                 {{ $slot }}
             </tbody>
         </table>

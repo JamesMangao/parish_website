@@ -2,22 +2,23 @@
 
 @php
     $map = [
-        'pending'    => 'bg-accent/10 text-accent border-accent/20',
-        'approved'   => 'bg-green-100 text-green-700 border-green-200',
-        'rejected'   => 'bg-destructive/10 text-destructive border-destructive/20',
-        'active'     => 'bg-blue-100 text-blue-600 border-blue-200',
-        'inactive'   => 'bg-muted text-muted-foreground border-border',
-        'draft'      => 'bg-muted text-muted-foreground border-border',
-        'published'  => 'bg-green-100 text-green-700 border-green-200',
-        'accepted'   => 'bg-green-100 text-green-700 border-green-200',
-        'declined'   => 'bg-destructive/10 text-destructive border-destructive/20',
-        'handover'   => 'bg-red-50 text-red-600 border-red-100',
-        'resolved'   => 'bg-green-50 text-green-600 border-green-100',
-        'paused'     => 'bg-amber-50 text-amber-600 border-amber-100',
+        'pending'    => 'bg-amber-50 text-amber-700 border-amber-200/80',
+        'approved'   => 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+        'rejected'   => 'bg-red-50 text-red-600 border-red-200/80',
+        'active'     => 'bg-blue-50 text-blue-600 border-blue-200/80',
+        'inactive'   => 'bg-gray-50 text-gray-500 border-gray-200/80',
+        'draft'      => 'bg-gray-50 text-gray-500 border-gray-200/80',
+        'published'  => 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+        'accepted'   => 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+        'declined'   => 'bg-red-50 text-red-600 border-red-200/80',
+        'handover'   => 'bg-orange-50 text-orange-600 border-orange-200/80',
+        'resolved'   => 'bg-emerald-50 text-emerald-600 border-emerald-200/80',
+        'paused'     => 'bg-amber-50 text-amber-600 border-amber-200/80',
     ];
-    $classes = $map[$status] ?? 'bg-muted text-muted-foreground border-border';
+    $classes = $map[$status] ?? 'bg-gray-50 text-gray-500 border-gray-200/80';
 @endphp
 
-<span class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $classes }}">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-[.1em] border {{ $classes }}">
+    <span class="w-1.5 h-1.5 rounded-full bg-current opacity-60 mr-1.5"></span>
     {{ $slot ?? str_replace('_', ' ', $status) }}
 </span>
