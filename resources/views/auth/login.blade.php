@@ -125,7 +125,7 @@
         }
         .brand-title {
             font-family: 'Canterbury', serif;
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
             font-weight: 700;
             letter-spacing: -0.025em;
             line-height: 1.15;
@@ -443,7 +443,7 @@
         }
         .mobile-brand-title {
             font-family: 'Canterbury', serif;
-            font-size: 1.125rem;
+            font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.01em;
             color: var(--login-text);
@@ -551,7 +551,7 @@
 
             <div class="brand-content">
                 <div class="brand-cross"><img src="{{ asset('images/parish-logo.png') }}" alt="Sto. Rosario Parish Logo"></div>
-                <h1 class="brand-title">Sto. Rosario<br>Parish</h1>
+                <h1 class="brand-title">Sto. Rosario Parish</h1>
                 <p class="brand-subtitle">Staff Administration</p>
                 <div class="brand-divider"></div>
                 <p class="brand-quote">
