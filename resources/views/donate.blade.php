@@ -283,6 +283,24 @@
                             </div>
                         </div>
 
+                        @if($paymongoEnabled ?? false)
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+                                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse-glow 2s infinite;"></div>
+                                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:rgba(13,42,82,0.4);">Pay via Online Banking (BPI / UnionBank)</span>
+                            </div>
+
+                            @include('partials.donation-form-fields', [
+                                'channel' => 'bank',
+                                'helperText' => 'Secured by PayMongo · Redirects to your bank login to authorize the transfer',
+                            ])
+
+                            <div style="display:flex;align-items:center;gap:12px;margin:32px 0;">
+                                <div style="flex:1;height:1px;background:rgba(26,64,128,0.08);"></div>
+                                <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.15em;color:rgba(13,42,82,0.3);">or transfer manually</span>
+                                <div style="flex:1;height:1px;background:rgba(26,64,128,0.08);"></div>
+                            </div>
+                        @endif
+
                         <div style="background:#F7F9FF;border-radius:16px;padding:24px;border:1px solid rgba(26,64,128,0.06);margin-bottom:20px;">
                             <p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:rgba(13,42,82,0.35);margin-bottom:16px;">Account Details</p>
                             <div style="display:flex;flex-direction:column;gap:14px;">

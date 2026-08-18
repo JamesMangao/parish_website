@@ -63,7 +63,10 @@ class DonationController extends Controller
             'purpose' => $validated['purpose'],
             'message' => $validated['message'] ?? null,
             'status' => 'pending',
-            'checkout_session_id' => '',
+            // Unique placeholder until PayMongo returns the real session id —
+            // prevents a unique-constraint crash if two donations are created
+            // concurrently (column is unique + not nullable).
+            'checkout_session_id' => 'pending_'.\Illuminate\Support\Str::uuid(),
         ]);
 
         try {
@@ -80,6 +83,10 @@ class DonationController extends Controller
                                 ],
                             ],
                             'payment_method_types' => $paymentMethodTypes,
+                            'billing' => array_filter([
+                                'name' => $validated['donor_name'] ?? null,
+                                'email' => $validated['donor_email'] ?? null,
+                            ]),
                             'success_url' => route('donate.success').'?donation_id='.$donation->id,
                             'cancel_url' => route('donate.cancel').'?donation_id='.$donation->id,
                             'reference_number' => 'DON-'.strtoupper(substr($donation->id, 0, 8)),
@@ -135,7 +142,7 @@ class DonationController extends Controller
 
                         if ($paymentStatus === 'succeeded') {
                             $paymentId = $sessionData['data']['attributes']['payment_intent']['id'] ?? null;
-                            $paymentMethod = $sessionData['data']['attributes']['payment_method_used'] ?? null;
+                            $paymentMethod = $sessionData['data']['attributes']['payments'][0]['attributes']['source']['type'] ?? null;
                             $donation->update([
                                 'status' => 'paid',
                                 'paid_at' => now(),
@@ -220,8 +227,8 @@ class DonationController extends Controller
                 $donation = Donation::where('checkout_session_id', $checkoutSessionId)->first();
 
                 if ($donation && $donation->status !== 'paid') {
-                    $paymentMethod = $event['data']['attributes']['data']['attributes']['payment_method_used'] ?? null;
                     $payments = $event['data']['attributes']['data']['attributes']['payments'] ?? [];
+                    $paymentMethod = $payments[0]['attributes']['source']['type'] ?? null;
                     $paymentId = ! empty($payments) ? ($payments[0]['id'] ?? null) : null;
 
                     $donation->update([
