@@ -61,7 +61,7 @@ class AnnouncementController extends Controller
         Cache::forget('chatbot_parish_context');
         LogService::log('create_announcement', $announcement);
 
-        return redirect()->route('admin.announcements.index')->with('success', 'Announcement created.');
+        return $this->redirectOrJson($request, 'admin.announcements.index', 'Announcement created.');
     }
 
     public function edit(Announcement $announcement)
@@ -79,7 +79,7 @@ class AnnouncementController extends Controller
         Cache::forget('chatbot_parish_context');
         LogService::log('update_announcement', $announcement);
 
-        return redirect()->route('admin.announcements.index')->with('success', 'Announcement updated.');
+        return $this->redirectOrJson($request, 'admin.announcements.index', 'Announcement updated.');
     }
 
     public function destroy(Announcement $announcement)

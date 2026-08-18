@@ -27,7 +27,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.gallery.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
+        <form action="{{ route('admin.gallery.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{ loading: false }" @submit.prevent="submitGalleryForm($event, this)">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-1">
@@ -137,4 +137,35 @@
             </div>
         </form>
     </div>
+
+    @push('scripts')
+    <script>
+    function submitGalleryForm(event, alpine) {
+        alpine.loading = true;
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+        })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+            if (ok) {
+                $store.toast.trigger(data.message || 'Album created successfully!', 'success');
+                setTimeout(() => { window.location.href = '{{ route('admin.gallery.index') }}'; }, 800);
+            } else {
+                const msgs = data.errors ? Object.values(data.errors).flat().join('\n') : (data.message || 'Something went wrong.');
+                $store.toast.trigger(msgs, 'error');
+                alpine.loading = false;
+            }
+        })
+        .catch(() => {
+            $store.toast.trigger('Network error. Please try again.', 'error');
+            alpine.loading = false;
+        });
+    }
+    </script>
+    @endpush
 </x-admin-layout>

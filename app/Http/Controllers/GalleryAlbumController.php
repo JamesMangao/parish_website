@@ -54,10 +54,10 @@ class GalleryAlbumController extends Controller
             }
 
             LogService::log('create_album', $album, ['title' => $album->title]);
-            return redirect()->route('admin.gallery.index')->with('success', 'Album created successfully!');
+            return $this->redirectOrJson($request, 'admin.gallery.index', 'Album created successfully!');
         } catch (\Exception $e) {
             if (isset($album)) $album->delete(); // Cleanup if failed partway
-            return redirect()->back()->withInput()->with('error', 'Upload failed: ' . $e->getMessage());
+            return $this->errorOrJson($request, 'Upload failed: ' . $e->getMessage());
         }
     }
 
@@ -84,7 +84,7 @@ class GalleryAlbumController extends Controller
         ]);
 
         LogService::log('update_album', $gallery, ['title' => $gallery->title]);
-        return redirect()->route('admin.gallery.index')->with('success', 'Album updated!');
+        return $this->redirectOrJson($request, 'admin.gallery.index', 'Album updated!');
     }
 
     public function destroy(GalleryAlbum $gallery)

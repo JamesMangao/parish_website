@@ -87,7 +87,7 @@ class EventsController extends Controller
         Cache::forget('chatbot_parish_context');
         LogService::log('create_event', null, ['title' => $validated['title'], 'event_date' => $validated['event_date']]);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event created.');
+        return $this->redirectOrJson($request, 'admin.events.index', 'Event created.');
     }
 
     public function edit(Event $event)
@@ -116,7 +116,7 @@ class EventsController extends Controller
         Cache::forget('chatbot_parish_context');
         LogService::log('update_event', $event, ['title' => $event->title]);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event updated.');
+        return $this->redirectOrJson($request, 'admin.events.index', 'Event updated.');
     }
 
     public function destroy(Event $event)

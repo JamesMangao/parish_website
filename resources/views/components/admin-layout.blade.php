@@ -298,5 +298,7 @@
     {{-- Global Toast + Confirm --}}
     <x-admin-toast />
     <x-admin-confirm />
+
+    @stack('scripts')
 </body>
 </html>
