@@ -39,12 +39,14 @@
     <meta property="twitter:description" content="{{ $description ?? 'Official portal of Sto. Rosario Parish - Pacita 1. Experience our community of faith through daily masses, sacraments, and spiritual activities.' }}">
     <meta property="twitter:image" content="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <!-- Favicon (works on all devices) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/parish-logo.png">
     <link rel="manifest" href="/site.webmanifest">
-    <meta name="theme-color" content="#6B1D2A">
+    <meta name="theme-color" content="#0D2A52">
+    <meta name="msapplication-TileColor" content="#0D2A52">
+    <meta name="msapplication-TileImage" content="/images/parish-logo.png">
 
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
