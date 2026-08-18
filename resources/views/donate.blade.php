@@ -232,7 +232,7 @@
                         {{-- QR Code (manual — send directly, not tracked automatically) --}}
                         @if(!empty($global_settings['qr_code']))
                         <div style="padding:20px;background:#F7F9FF;border-radius:20px;border:1px solid rgba(26,64,128,0.08);margin-bottom:24px;">
-                            <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['qr_code']) }}"
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['qr_code']) }}"
                                  alt="Parish Donation QR"
                                  style="max-width:240px;width:100%;height:auto;border-radius:12px;display:block;margin:0 auto;">
                         </div>
@@ -499,7 +499,7 @@
                         {{-- QR Code --}}
                         @if(!empty($global_settings['qr_code']))
                         <div style="padding:20px;background:#F7F9FF;border-radius:20px;border:1px solid rgba(26,64,128,0.08);margin-bottom:24px;">
-                            <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($global_settings['qr_code']) }}"
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['qr_code']) }}"
                                  alt="Parish Donation QR"
                                  style="max-width:240px;width:100%;height:auto;border-radius:12px;display:block;margin:0 auto;">
                         </div>
