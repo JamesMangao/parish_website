@@ -12,7 +12,7 @@
         <p class="text-sm text-muted-foreground mt-1.5">{{ $description }}</p>
     </div>
 
-    <div class="max-w-2xl bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] p-8">
+    <div class="max-w-4xl bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] p-8">
         <form action="{{ $action }}" method="POST" class="space-y-6">
             @csrf
             @if($method ?? false)
