@@ -54,9 +54,32 @@
             align-items: center;
             width: 48%;
             padding: 3rem;
-            background: linear-gradient(160deg, var(--login-primary) 0%, var(--login-primary-dark) 45%, var(--login-gradient-end) 100%);
             overflow: hidden;
             text-align: center;
+            color: #fff;
+        }
+        .login-brand-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .login-brand-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(.75) brightness(.85);
+            transform: scale(1.04);
+        }
+        .login-brand-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(8,20,45,.68) 0%, rgba(10,25,55,.58) 40%, rgba(8,20,45,.8) 72%, rgba(247,249,255,1) 100%);
+        }
+        .login-brand-radial {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(26,64,128,.22) 0%, transparent 70%);
         }
 
         @media (min-width: 1024px) {
@@ -474,6 +497,13 @@
              LEFT PANEL — Branded (desktop only)
              ═══════════════════════════════════════════════════════ --}}
         <aside class="login-brand" aria-hidden="true">
+            {{-- Background image matching hero section --}}
+            <div class="login-brand-bg">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+                <div class="login-brand-overlay"></div>
+                <div class="login-brand-radial"></div>
+            </div>
+
             {{-- Rosary-bead arc motif --}}
             <div class="rosary-arc">
                 <svg viewBox="0 0 520 520" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
