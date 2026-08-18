@@ -133,8 +133,6 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- PAGE HERO                                          --}}
 {{-- ═══════════════════════════════════════════════════ --}}
-<x-breadcrumb :items="[['label' => 'Mass Schedule']]" />
-
 <section class="page-hero py-24 md:py-32">
 
     {{-- Watermark cross --}}

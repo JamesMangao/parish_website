@@ -99,8 +99,6 @@
         </style>
     </x-slot>
 
-    <x-breadcrumb :items="[['label' => 'Donate']]" />
-
     {{-- ═══════════ HERO ═══════════ --}}
     <section style="background:var(--color-blue-deep);position:relative;overflow:hidden;padding:100px 24px 80px;text-align:center;">
         <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 110%,rgba(245,197,24,0.10) 0%,transparent 70%);pointer-events:none;"></div>
