@@ -133,6 +133,8 @@
 {{-- ═══════════════════════════════════════════════════ --}}
 {{-- PAGE HERO                                          --}}
 {{-- ═══════════════════════════════════════════════════ --}}
+<x-breadcrumb :items="[['label' => 'Mass Schedule']]" />
+
 <section class="page-hero py-24 md:py-32">
 
     {{-- Watermark cross --}}
@@ -303,7 +305,15 @@
 
         <article class="card-schedule">
             {{-- Left: Sidebar --}}
-            <div class="schedule-sidebar">
+            @php
+                $todayName = \Carbon\Carbon::now('Asia/Manila')->format('l');
+                $scheduleDays = is_array($s->day_of_week) ? $s->day_of_week : ($s->day_of_week ? [$s->day_of_week] : []);
+                $isToday = in_array($todayName, $scheduleDays) || $type === 'weekday' && in_array($todayName, ['Monday','Tuesday','Wednesday','Thursday','Friday']);
+            @endphp
+            <div class="schedule-sidebar" @if($isToday) style="border-left:4px solid var(--gold);" @endif>
+                @if($isToday)
+                    <div style="position:absolute;top:16px;right:16px;background:var(--gold);color:#0D2A52;font-size:9px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;border-radius:4px;z-index:1;">Today</div>
+                @endif
                 <div class="mb-6 opacity-80" style="color:var(--gold);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">{!! $icon !!}</svg>
                 </div>

@@ -1,0 +1,22 @@
+{
+    "name": "Sto. Rosario Parish",
+    "short_name": "SR Parish",
+    "description": "Official website of Sto. Rosario Parish - Pacita, San Pedro, Laguna. Mass schedules, sacraments, events, and community.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0D2A52",
+    "theme_color": "#6B1D2A",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/images/parish-logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/parish-logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

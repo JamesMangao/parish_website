@@ -45,7 +45,11 @@
         </div>
 
         <div class="hero-stats-strip animate-fade-in-up" style="display:flex;align-items:center;justify-content:center;gap:60px;padding:20px 32px;width:100%;max-width:440px;border-top:1px solid rgba(245,197,24,.15);border-radius:16px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);animation-delay:.6s;">
-            @foreach([['42+','Years of Service'],['7','Weekly Masses']] as $stat)
+            @php
+            $foundedYear = 1983;
+            $yearsOfService = max(1, now('Asia/Manila')->year - $foundedYear);
+        @endphp
+        @foreach([[$yearsOfService.'+','Years of Service'],['13','Weekly Masses']] as $stat)
             <div style="text-align:center;">
                 <div class="font-heading stat-val" style="font-size:1.75rem;font-weight:700;font-style:italic;color:var(--gold-light);line-height:1;">{{ $stat[0] }}</div>
                 <div style="font-size:11px;text-transform:uppercase;letter-spacing:.3em;color:rgb(255, 255, 255);margin-top:5px;">{{ $stat[1] }}</div>
@@ -73,7 +77,7 @@
             ];
             @endphp
             @foreach($actions as $a)
-            <a href="{{ $a['href'] }}" class="card-sacred group flex flex-col items-center gap-5 p-9 text-center" style="text-decoration:none;"><br><br>
+            <a href="{{ $a['href'] }}" class="card-sacred group flex flex-col items-center gap-5 p-8 text-center" style="text-decoration:none;">
                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110" style="background:linear-gradient(135deg,rgba(245,197,24,.14),rgba(245,197,24,.04));border:1px solid rgba(245,197,24,.32);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9A200" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">{!! $a['icon'] !!}</svg>
                 </div>

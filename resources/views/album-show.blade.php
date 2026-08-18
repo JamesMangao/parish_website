@@ -300,6 +300,17 @@
         </svg>
     </button>
 
+    <a id="lb-download" href="#" download
+       class="lb-close" style="right:56px;text-decoration:none;"
+       aria-label="Download image" title="Download">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" x2="12" y1="15" y2="3"/>
+        </svg>
+    </a>
+
     <button class="lb-nav lb-prev" onclick="lbNav(-1)" aria-label="Previous">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -344,11 +355,12 @@ const images = {!! json_encode($album->images->map(function($i) use ($album) {
 })) !!};
 let lbIdx = 0;
 
-const lb        = document.getElementById('lightbox');
-const lbContent = document.getElementById('lb-content');
-const lbTitle   = document.getElementById('lb-title');
-const lbSub     = document.getElementById('lb-sub');
-const lbCount   = document.getElementById('lb-counter');
+const lb         = document.getElementById('lightbox');
+const lbContent  = document.getElementById('lb-content');
+const lbTitle    = document.getElementById('lb-title');
+const lbSub      = document.getElementById('lb-sub');
+const lbCount    = document.getElementById('lb-counter');
+const lbDownload = document.getElementById('lb-download');
 
 function openLightbox(idx) {
     lbIdx = idx;
@@ -388,6 +400,14 @@ function renderLb() {
     lbTitle.textContent = item.caption || item.albumTitle || '';
     lbSub.textContent   = item.caption ? '' : '';
     lbCount.textContent = `${lbIdx + 1} / ${images.length}`;
+
+    // Update download link
+    if (item.type !== 'video' && lbDownload) {
+        lbDownload.href = item.url;
+        lbDownload.style.display = 'flex';
+    } else if (lbDownload) {
+        lbDownload.style.display = 'none';
+    }
 }
 
 document.addEventListener('keydown', e => {

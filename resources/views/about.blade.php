@@ -318,6 +318,12 @@
         }
         .tl-btn-left { left: 10px; }
         .tl-btn-right { right: 10px; }
+        @media (max-width: 640px) {
+            .tl-btn { width: 36px; height: 36px; }
+            .tl-btn-left { left: 4px; }
+            .tl-btn-right { right: 4px; }
+            .tl-wrapper { padding: 20px 36px; gap: 40px; }
+        }
         .tl-btn svg { width: 20px; height: 20px; }
 
         .tl-spine {
@@ -416,6 +422,10 @@
             letter-spacing: .05em;
             user-select: none;
             transition: opacity .2s;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
         }
         .tl-toggle:hover { opacity: .7; }
 
@@ -973,7 +983,7 @@
                                 {{ $e['short'] }}
                                 <span class="tl-body-full"> {{ $e['full'] }}</span>
                             </p>
-                            <span class="tl-toggle" onclick="toggleItem(this)">Read more ↓</span>
+                            <button class="tl-toggle" onclick="toggleItem(this)" aria-expanded="false" aria-controls="tl-body-{{ $i }}">Read more ↓</button>
                         </div>
                     </div>
                     @endforeach
@@ -1332,6 +1342,7 @@
         const item = toggle.closest('.tl-item');
         const expanded = item.classList.toggle('expanded');
         toggle.textContent = expanded ? 'Read less ↑' : 'Read more ↓';
+        toggle.setAttribute('aria-expanded', expanded.toString());
     }
 
     /* ── Stat counter animation ── */

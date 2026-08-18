@@ -249,6 +249,8 @@
 </x-slot>
 
 {{-- ═══════════════════════════════════════════════════ --}}
+<x-breadcrumb :items="[['label' => 'Sacramental Inquiry']]" />
+
 {{-- PAGE HERO                                          --}}
 {{-- ═══════════════════════════════════════════════════ --}}
 <section class="page-hero py-24 md:py-32">

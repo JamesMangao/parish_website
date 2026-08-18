@@ -99,6 +99,8 @@
         </style>
     </x-slot>
 
+    <x-breadcrumb :items="[['label' => 'Donate']]" />
+
     {{-- ═══════════ HERO ═══════════ --}}
     <section style="background:var(--color-blue-deep);position:relative;overflow:hidden;padding:100px 24px 80px;text-align:center;">
         <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 110%,rgba(245,197,24,0.10) 0%,transparent 70%);pointer-events:none;"></div>
@@ -191,8 +193,12 @@
                                 </div>
                                 <h3 class="font-heading" style="font-size:1.25rem;font-weight:700;color:var(--color-blue-deep,#0D2A52);margin-bottom:8px;">Online Payments</h3>
                                 <p style="font-size:.875rem;color:rgba(13,42,82,0.5);line-height:1.7;max-width:320px;margin:0 auto;">
-                                    We're setting up secure online payments via GCash, Maya, and credit/debit cards. For now, please use the <strong>Scan QR</strong> or <strong>Bank Transfer</strong> tabs.
+                                    We're setting up secure online payments via GCash, Maya, and credit/debit cards.
                                 </p>
+                                <button @click="tab = 'qr'" class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5" style="background:linear-gradient(135deg,#F5C518 0%,#FFD740 100%);color:#0D2A52;box-shadow:0 4px 16px rgba(245,197,24,0.3);cursor:pointer;border:none;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/></svg>
+                                    In the meantime, try QR
+                                </button>
                             </div>
                         @endif
                     </div>
@@ -385,6 +391,27 @@
                         <p style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.25em;color:var(--color-gold,#F5C518);">– 2 Corinthians 9:7</p>
                     </div>
                 </div>
+
+                {{-- Impact Counter / Social Proof --}}
+                @php
+                    $totalDonations = \App\Models\Donation::where('status', 'completed')->count();
+                @endphp
+                @if($totalDonations > 0)
+                <div style="padding:24px;background:#fff;border-radius:24px;border:1px solid rgba(26,64,128,0.1);box-shadow:0 4px 20px rgba(13,42,82,0.05);text-align:center;">
+                    <p style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.25em;color:rgba(13,42,82,0.35);margin-bottom:12px;">Community Impact</p>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:24px;">
+                        <div>
+                            <p class="font-heading" style="font-size:1.8rem;font-weight:700;font-style:italic;color:var(--color-blue-deep,#0D2A52);line-height:1;">{{ number_format($totalDonations) }}</p>
+                            <p style="font-size:10px;color:rgba(13,42,82,0.4);margin-top:4px;">Donations Made</p>
+                        </div>
+                        <div style="width:1px;height:36px;background:rgba(26,64,128,0.08);"></div>
+                        <div>
+                            <p class="font-heading" style="font-size:1.8rem;font-weight:700;font-style:italic;color:var(--color-gold,#F5C518);line-height:1;">142+</p>
+                            <p style="font-size:10px;color:rgba(13,42,82,0.4);margin-top:4px;">Families Supported</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 {{-- Mass Intention CTA --}}
                 <a href="{{ route('submit-intention') }}" style="display:block;padding:20px 24px;background:#fff;border-radius:18px;border:1px solid rgba(26,64,128,0.1);text-decoration:none;transition:all .3s ease;box-shadow:0 2px 12px rgba(13,42,82,0.04);"
