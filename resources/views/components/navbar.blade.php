@@ -2,7 +2,7 @@
     x-data="nav()"
     x-init="init()"
     @keydown.escape.window="closeAll()"
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+    class="fixed top-0 left-0 right-0 z-[9999] transition-all duration-500"
     style="padding-top: 8px; padding-bottom: 8px;">
 
 {{-- Scrolled background --}}
