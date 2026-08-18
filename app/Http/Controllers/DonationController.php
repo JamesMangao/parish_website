@@ -71,7 +71,7 @@ class DonationController extends Controller
 
         try {
             $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
-                ->post('https://api.paymongo.com/v2/checkout_sessions', [
+                ->post('https://api.paymongo.com/v1/checkout_sessions', [
                     'data' => [
                         'attributes' => [
                             'line_items' => [
@@ -134,7 +134,7 @@ class DonationController extends Controller
             if ($donation && $donation->status === 'pending' && $donation->checkout_session_id) {
                 try {
                     $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
-                        ->get('https://api.paymongo.com/v2/checkout_sessions/'.$donation->checkout_session_id);
+                        ->get('https://api.paymongo.com/v1/checkout_sessions/'.$donation->checkout_session_id);
 
                     if ($response->successful()) {
                         $sessionData = $response->json();
