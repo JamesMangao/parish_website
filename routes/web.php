@@ -61,6 +61,7 @@ Route::get('/bulletins/{bulletin}/download', [BulletinController::class, 'downlo
 // Announcements
 Route::get('/announcements', [AnnouncementController::class, 'publicIndex'])->name('announcements.index');
 Route::get('/announcements/{announcement}', [AnnouncementController::class, 'publicShow'])->name('announcements.show');
+Route::get('/api/announcements/filter', [AnnouncementController::class, 'publicFilter'])->name('announcements.filter');
 
 Route::get('/submit-intention', [IntentionController::class, 'create'])->name('submit-intention');
 Route::post('/submit-intention', [IntentionController::class, 'store'])->middleware('throttle:submissions');

@@ -32,7 +32,18 @@ class AnnouncementController extends Controller
         }
         $counts['Recruitment'] = Announcement::active()->where('is_recruitment', true)->count();
 
-        return view('announcements.index', compact('announcements', 'categories', 'category', 'counts'));
+        $initialAnnouncements = $announcements->map(fn ($ann) => [
+            'id' => $ann->id,
+            'title' => $ann->title,
+            'content' => strip_tags($ann->content),
+            'category' => $ann->category ?? 'Parish Life',
+            'is_recruitment' => $ann->is_recruitment,
+            'registration_link' => $ann->registration_link,
+            'published_at' => $ann->published_at?->format('M d, Y'),
+            'url' => route('announcements.show', $ann),
+        ]);
+
+        return view('announcements.index', compact('announcements', 'categories', 'category', 'counts', 'initialAnnouncements'));
     }
 
     public function publicShow(Announcement $announcement)
@@ -48,6 +59,42 @@ class AnnouncementController extends Controller
             ->get();
 
         return view('announcements.show', compact('announcement', 'recentAnnouncements'));
+    }
+
+    /**
+     * JSON endpoint for AJAX-filtered announcements (used by Alpine.js tabs).
+     */
+    public function publicFilter(Request $request)
+    {
+        $query = Announcement::active();
+
+        $category = $request->input('category', 'all');
+        if ($category === 'Recruitment') {
+            $query->where('is_recruitment', true);
+        } elseif ($category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        $announcements = $query->orderBy('published_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12)->withQueryString();
+
+        $cards = $announcements->map(fn ($ann) => [
+            'id' => $ann->id,
+            'title' => $ann->title,
+            'content' => strip_tags($ann->content),
+            'category' => $ann->category ?? 'Parish Life',
+            'is_recruitment' => $ann->is_recruitment,
+            'registration_link' => $ann->registration_link,
+            'published_at' => $ann->published_at?->format('M d, Y'),
+            'url' => route('announcements.show', $ann),
+        ]);
+
+        return response()->json([
+            'announcements' => $cards,
+            'hasMore' => $announcements->hasMorePages(),
+            'nextPage' => $announcements->nextPageUrl(),
+        ]);
     }
 
     public function index()
