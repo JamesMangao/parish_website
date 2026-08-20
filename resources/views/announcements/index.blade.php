@@ -5,7 +5,7 @@
         <meta property="og:description" content="Latest news, novenas, community updates, and event announcements from Sto. Rosario Parish.">
     </x-slot>
 
-    <section class="max-w-6xl mx-auto px-6 pt-20 pb-16" x-data="announcementTabs()" x-init="init()">
+    <section class="max-w-6xl mx-auto px-6 pt-28 pb-16" x-data="announcementTabs()" x-init="init()">
         {{-- Header --}}
         <div class="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <p class="text-[12px] font-black uppercase tracking-[0.3em] text-accent mb-4">Stay Informed</p>
