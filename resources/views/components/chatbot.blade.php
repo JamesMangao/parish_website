@@ -494,11 +494,21 @@
                         this.liveAgentStatus = 'suggesting';
                         text = text.replace('[[HANDOVER]]', '');
                     }
-                    // Format [Link Name](/url) -> <a>
+                    // Markdown links [text](url) -> clickable <a>
                     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
-                    // Handle [Link name to /url]
-                    text = text.replace(/\[([^\]]*?)(?:to\s+)?(\/[a-z\-/]+)\]/gi, '<a href="$2" class="text-accent underline font-bold hover:text-primary transition-colors">$1 $2</a>');
-                    return text.replace(/\n/g, '<br>');
+                    // Bold **text** -> <strong>
+                    text = text.replace(/\*\*([^*]+?)\*\*/g, '<strong class="font-bold">$1</strong>');
+                    // Bare internal paths like /mass-schedule -> clickable link
+                    text = text.replace(/(?<!["])(\/[a-z][a-z0-9\-/]+)(?![\w<])/g, '<a href="$1" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
+                    // Bullet lines: "- text" or "* text" -> styled bullet points
+                    text = text.replace(/^(\s*)([-*])\s+(.+)$/gm, '$1<span class="flex items-start gap-2 my-0.5"><span class="text-accent mt-0.5 shrink-0">\u2022</span><span>$3</span></span>');
+                    // Double newlines -> paragraph break
+                    text = text.replace(/\n\n/g, '</p><p class="mt-2">');
+                    // Single newlines -> <br>
+                    text = text.replace(/\n/g, '<br>');
+                    // Wrap in paragraph
+                    text = '<p>' + text + '</p>';
+                    return text;
                 },
 
                 saveState() {
