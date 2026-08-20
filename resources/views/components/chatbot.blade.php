@@ -142,7 +142,7 @@
 
             <!-- Start new chat after resolved -->
             <div x-show="_resolved" x-cloak class="flex flex-col gap-2">
-                <p class="text-[10px] text-muted-foreground text-center font-medium">This conversation has ended.</p>
+                <p class="text-[10px] text-muted-foreground text-center font-medium">This conversation has ended. Feel free to start a new one anytime.</p>
                 <button @click="startNewChat()" :disabled="loading"
                     class="w-full py-2.5 bg-accent text-accent-foreground rounded-xl text-xs font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
@@ -216,7 +216,7 @@
                                 return;
                             }
                         } catch (e) {}
-                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.'));
+                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Sto. Rosario Parish. I can help you with schedules, intentions, sacraments, and more. What would you like to know?'));
                         this.currentSuggestions = [
                             '⛪ Mass Schedules',
                             '🕯️ Offer Mass Intention',
@@ -313,7 +313,7 @@
                             this._resolved = true;
                             if (this.pollInterval) clearInterval(this.pollInterval);
                             this.isPolling = false;
-                            const systemMsg = this._makeMsg('assistant', data.message || 'This conversation has ended.', 'system');
+                            const systemMsg = this._makeMsg('assistant', data.message || 'This conversation has ended. You can start a new chat anytime.', 'system');
                             this.messages.push(systemMsg);
                         } else if (data.status === 'suggest_handover') {
                             this.liveAgentStatus = 'suggesting';
@@ -333,7 +333,7 @@
                         this.currentSuggestions = data.suggestions || [];
                         this._lastFailedMessage = null;
                     } catch (e) {
-                        this.messages.push(this._makeMsg('assistant', 'I am sorry, I am having trouble connecting to the parish servers right now.', 'error'));
+                        this.messages.push(this._makeMsg('assistant', 'I am having a brief connection issue. Please try again in a moment.', 'error'));
                     } finally {
                         this.loading = false;
                         this.scrollToBottom();
@@ -361,7 +361,7 @@
                         this.isPolling = false;
                         this.scrollToBottom();
                     } catch (e) {
-                        this.messages.push(this._makeMsg('assistant', 'Could not start a new chat. Please try again.', 'error'));
+                        this.messages.push(this._makeMsg('assistant', 'Unable to start a new chat. Please try again.', 'error'));
                     } finally {
                         this.loading = false;
                         this.scrollToBottom();
@@ -387,11 +387,11 @@
                             headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }
                         });
                         this.liveAgentStatus = 'waiting';
-                        this.messages.push(this._makeMsg('assistant', 'Connecting you to a parish representative… Please stay on the line.', 'system'));
+                        this.messages.push(this._makeMsg('assistant', 'Connecting you to a parish representative. Please stay on the line.', 'system'));
                         this.startPolling();
                         this.startTimeout();
                     } catch (e) {
-                        this.messages.push(this._makeMsg('assistant', 'Could not request a live agent. Please try again.', 'error'));
+                        this.messages.push(this._makeMsg('assistant', 'Unable to request a live agent. Please try again.', 'error'));
                     } finally {
                         this.loading = false;
                         this.scrollToBottom();
@@ -428,20 +428,20 @@
 
                             if (data.agent_connected && data.status !== 'paused' && this.liveAgentStatus !== 'connected') {
                                 this.liveAgentStatus = 'connected';
-                                this.messages.push(this._makeMsg('assistant', 'A parish representative has connected.', 'system'));
+                                this.messages.push(this._makeMsg('assistant', 'A parish representative has joined the conversation.', 'system'));
                                 clearInterval(this.waitTimer);
                                 this.scrollToBottom();
                             }
                             // Notify user when admin pauses or resolves the chat
                             if (data.status === 'paused' && prevStatus !== 'paused') {
                                 this.liveAgentStatus = 'none';
-                                this.messages.push(this._makeMsg('assistant', 'The live agent has paused this conversation. Our AI assistant will now handle your questions. An agent will return shortly.', 'system'));
+                                this.messages.push(this._makeMsg('assistant', 'The live agent has paused this conversation. Our AI assistant is here to help. An agent will return shortly.', 'system'));
                                 this.scrollToBottom();
                             }
                             if (data.status === 'resolved' && prevStatus !== 'resolved') {
                                 this.liveAgentStatus = 'none';
                                 this._resolved = true;
-                                this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved by our team. Thank you for contacting Sto. Rosario Parish! Feel free to start a new conversation anytime.', 'system'));
+                                this.messages.push(this._makeMsg('assistant', 'This conversation has been resolved. Thank you for reaching out to Sto. Rosario Parish! Feel free to start a new conversation anytime.', 'system'));
                                 this.scrollToBottom();
                                 if (this.pollInterval) clearInterval(this.pollInterval);
                             }
@@ -459,7 +459,7 @@
                     this.waitTimer = setInterval(() => {
                         this.waitCounter += 5;
                         if (this.waitCounter >= 120 && this.liveAgentStatus === 'waiting') {
-                            this.messages.push(this._makeMsg('assistant', 'No agents are available at the moment. Please use the inquiry page to leave a message.', 'timeout'));
+                            this.messages.push(this._makeMsg('assistant', 'No agents are available right now. You can [submit an inquiry](/inquiry) and we will get back to you.', 'timeout'));
                             this.liveAgentStatus = 'none';
                             clearInterval(this.waitTimer);
                             clearInterval(this.pollInterval);

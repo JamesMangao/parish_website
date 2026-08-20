@@ -33,7 +33,7 @@ class ChatbotController extends Controller
         if ($session->status === 'resolved') {
             return response()->json([
                 'status' => 'conversation_ended',
-                'message' => 'This conversation has ended. Please start a new chat.',
+                'message' => 'This conversation has ended. You can start a new chat anytime.',
             ]);
         }
 
@@ -94,7 +94,7 @@ class ChatbotController extends Controller
             Log::error("Chatbot AI Service failed: " . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'I am sorry, I am having trouble connecting to the parish servers right now.',
+                'message' => 'I am having a brief connection issue with the parish servers. Please try again in a moment.',
             ], 500);
         }
     }
@@ -128,7 +128,7 @@ class ChatbotController extends Controller
         $welcomeMsg = ChatMessage::create([
             'chat_session_id' => $session->id,
             'sender' => 'ai',
-            'message' => 'Peace be with you! I can help you with mass schedules, intentions, inquiries, events, our gallery, parish info, and donations.',
+            'message' => 'Peace be with you! Welcome back. How can I assist you today?',
         ]);
 
         return response()->json([
@@ -138,7 +138,7 @@ class ChatbotController extends Controller
             'suggestions' => [
                 '⛪ Mass Schedules',
                 '🕯️ Offer Mass Intention',
-                '📝 Sacramental Inquiry',
+                '💬 Talk to a Human',
             ],
         ]);
     }
@@ -322,6 +322,9 @@ class ChatbotController extends Controller
     /**
      * Get dynamic, context-aware suggestions based on user query and topic.
      */
+        /**
+     * Get dynamic, context-aware suggestions based on user query and topic.
+     */
     protected function getDynamicSuggestions(string $message, string $detectedTopic = ''): array
     {
         $lower = strtolower($message);
@@ -329,32 +332,48 @@ class ChatbotController extends Controller
         if (Str::contains($lower, ['intention', 'alay', 'panalangin', 'offering'])) {
             return [
                 '🔍 Track Intention Status',
-                '📝 Sacramental Inquiry',
-                '⛪ Mass Schedules'
+                '⛪ Mass Schedules',
+                '💬 Talk to a Human',
             ];
         }
 
         if (Str::contains($lower, ['mass', 'misa', 'schedule', 'oras', 'time'])) {
             return [
                 '🕯️ Offer Mass Intention',
-                '📝 Sacramental Inquiry',
-                '📅 Upcoming Parish Events'
+                '💬 Talk to a Human',
+                '📅 Upcoming Events',
             ];
         }
 
         if (Str::contains($lower, ['inquiry', 'sacrament', 'baptis', 'baptize', 'baptized', 'wedding', 'kasal', 'binyag', 'confirmation', 'kumpil', 'funeral'])) {
             return [
                 '🔍 Check Inquiry Status',
-                'ℹ️ Office Hours & Address',
-                '🙏 Parish Donation Info'
+                '📍 Location & Office Hours',
+                '💬 Talk to a Human',
             ];
         }
 
-        if (Str::contains($lower, ['donate', 'donation', 'ambag', 'tulong'])) {
+        if (Str::contains($lower, ['donate', 'donation', 'ambag', 'tulong', 'gcash'])) {
             return [
                 '⛪ Mass Schedules',
                 '🕯️ Offer Mass Intention',
-                '📅 Upcoming Parish Events'
+                '💬 Talk to a Human',
+            ];
+        }
+
+        if (Str::contains($lower, ['event', 'events', 'activity', 'activities'])) {
+            return [
+                '⛪ Mass Schedules',
+                '📝 Sacramental Inquiry',
+                '📜 Parish History',
+            ];
+        }
+
+        if (Str::contains($lower, ['contact', 'phone', 'email', 'address', 'location', 'office'])) {
+            return [
+                '⛪ Mass Schedules',
+                '📝 Sacramental Inquiry',
+                '📅 Upcoming Events',
             ];
         }
 
@@ -362,7 +381,7 @@ class ChatbotController extends Controller
         return [
             '⛪ Mass Schedules',
             '🕯️ Offer Mass Intention',
-            '📝 Sacramental Inquiry'
+            '💬 Talk to a Human',
         ];
     }
 }

@@ -291,25 +291,48 @@ class AIService
         $contactLine = implode(' | ', $contactNumbers);
         $email = Cache::remember('chatbot_settings_parish_email', 300, fn () => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
 
-        return "You are Sto. Rosario Parish's digital assistant (Pacita, San Pedro, Laguna). Warm, helpful Catholic parish concierge.
+        return "You are the official digital concierge of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines). You embody the warmth and hospitality of this Catholic community.
 
-### PARISH KNOWLEDGE BASE:
+## PERSONALITY
+- Warm, approachable, and genuinely helpful — like a well-informed parish volunteer.
+- Confident and knowledgeable about parish life, Catholic traditions, and local community.
+- Concise by default; expand with detail only when the question demands it.
+- You are NOT a generic chatbot. You ARE part of the parish.
+
+## RESPONSE STYLE
+- Open with a brief acknowledgment of what the user asked, then answer directly.
+- Use bold (**text**) for key terms, dates, fees, and names.
+- Use clean bullet points for lists (2+ items). Single-item answers should be inline.
+- Limit emojis to 1-2 per message maximum, only where they add genuine warmth. Never use emojis as decoration.
+- For links, write naturally in the sentence — never raw URLs or arrow symbols.
+- End longer responses with a single helpful follow-up suggestion, not a generic \"How can I help?\"
+- Never say \"according to our records\", \"based on the knowledge base\", or any meta-references to your data source.
+
+## LANGUAGE
+- Reply in the SAME language the user writes in — English, Tagalog, or Taglish.
+- When in Tagalog or Taglish, match the casual register naturally.
+- Never mix languages mid-sentence unless it is natural Taglish.
+
+## PARISH KNOWLEDGE BASE:
 {$context}
 
-### INFO:
+## CONTACT INFO:
 - Address: 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna 4023
-- Contact: {$contactLine} | {$email}
+- Phone: {$contactLine}
+- Email: {$email}
 - Website: https://storosario.ph
 
-### RULES:
-- Speak naturally — never say 'according to the knowledge base'. You ARE the concierge.
-- Reply in the SAME language the user uses (English/Tagalog/Taglish).
-- For sacramental inquiries (Baptism, Wedding, etc.), give ALL options: [Submit an Inquiry](/inquiry), phone number ({$contactLine}), and office address with hours.
-- Use ONLY these links: [/], [/mass-schedule], [/submit-intention], [/inquiry], [/events], [/gallery], [/bulletins], [/track], [/about], [/donate].
-- Never use 'chapel' — say 'church' or 'Sto. Rosario Parish'.
-- No mass reservations. For handover, only if user explicitly asks.
-- You may answer basic Catholic faith questions.
-- Keep replies concise (2-4 sentences unless detail is needed).";
+## ALLOWED LINKS (use ONLY these)
+[/] [/mass-schedule] [/submit-intention] [/inquiry] [/events] [/gallery] [/bulletins] [/track] [/about] [/donate]
+
+## BOUNDARIES
+- For sacramental inquiries (Baptism, Wedding, Confirmation, Funeral, etc.), always provide all three options: online inquiry form, phone, and office visit with hours.
+- Never say \"chapel\" — always say \"church\" or \"Sto. Rosario Parish\".
+- No mass seat reservations exist. If asked, direct them to the inquiry form.
+- For live agent requests: only suggest handover if the user explicitly asks for a person or human.
+- You may answer basic Catholic faith questions (prayers, sacrament meaning, feast days, etc.).
+- For complex pastoral or theological questions beyond your scope, gently recommend speaking with the parish priest.
+- Never fabricate schedules, fees, or event details. If unsure, say so and direct them to contact the office.";
     }
 
     protected function getGcashNumber(): string
@@ -415,37 +438,89 @@ class AIService
         $assistantPriest = Cache::remember('chatbot_settings_assistant_priest_name', 300, fn () => Setting::where('key', 'assistant_priest_name')->value('value'));
 
         $responses = [
-            'greeting' => "Peace be with you! 🙏 I am the digital concierge of {$name}. How may I assist you today? You can ask me about:\n\n- ⛪ Mass Schedules\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n\nHow can I help?",
+            'greeting' => "Peace be with you! Welcome to {$name}. I can help you with mass schedules, intentions, sacraments, events, and parish information. What would you like to know?",
 
             'mass_schedule' => $this->buildMassScheduleResponse(),
 
-            'intention' => "You can offer a Mass Intention through our online form:\n👉 [Submit Mass Intention](/submit-intention)\n\nAfter submission, you'll receive a reference number to [track your intention status](/track).\n\nMass offerings are ₱500.00 per intention. Thank you for your support! 🕯️",
+            'intention' => "You can offer a **Mass Intention** for ₱500.00 per intention. Here is how:
 
-            'inquiry' => "For sacramental inquiries like Baptism, Wedding, Confirmation, Funeral Mass, House Blessing, or Car Blessing, you have a few options:\n\n📝 **Submit an Inquiry Online:** [Click here to fill out our inquiry form](/inquiry) — you'll receive a reference ID to [track your status](/track).\n\n📞 **Call us directly:** {$contact}\n\n📍 **Visit the parish office:** 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna\n🕐 Office Hours: Tue–Sat 6AM–12NN & 1:30–6PM | Sun 6AM–12NN & 3–6PM\n\nOur team will review your inquiry and get back to you soon. God bless! 🙏",
+- Submit online: [Mass Intention Form](/submit-intention)
+- You will receive a reference number to [track your status](/track)
 
-            'track' => "You can track the status of your Mass Intention or Inquiry here:\n👉 [Track Your Request](/track)\n\nYou'll need your Reference ID (e.g., SRP-2026-001 or INQ-2026-001).",
+Mass intentions may be offered for the living or deceased, for thanksgiving, healing, or special intentions.",
 
-            'donation' => "Thank you for your generosity! 🙏\n\n**GCash:** {$gcashNum}\n**Account Name:** ".(Cache::remember('chatbot_settings_gcash_name', 300, fn () => Setting::where('key', 'gcash_name')->value('value')) ?? $name)."\n\nYou can also donate via Bank Transfer — check our [Donation Page](/donate) for details.\n\n*Donations are voluntary and support our parish operations and outreach programs.*",
+            'inquiry' => "For sacramental inquiries (Baptism, Wedding, Confirmation, Funeral Mass, House Blessing, etc.), you have three options:
 
-            'gallery' => "View our parish photo gallery and videos:\n👉 [Gallery](/gallery)\n\nWe have collections from parish events, feasts, and daily life at {$name}.",
+- **Online:** [Submit an Inquiry](/inquiry) — you will receive a reference ID to [track your status](/track)
+- **Phone:** {$contact}
+- **Visit:** 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna (Tue–Sat 6AM–12NN & 1:30–6PM, Sun 6AM–12NN & 3–6PM)
+
+Our team will review your inquiry and respond promptly.",
+
+            'track' => "You can check the status of your Mass Intention or Inquiry anytime: [Track Your Request](/track)
+
+You will need your Reference ID (e.g., SRP-2026-001 or INQ-2026-001).",
+
+            'donation' => "Thank you for your generosity!
+
+- **GCash:** {$gcashNum}
+- **Account Name:** ".(Cache::remember('chatbot_settings_gcash_name', 300, fn () => Setting::where('key', 'gcash_name')->value('value')) ?? $name)."
+
+You can also donate via Bank Transfer. See details on our [Donation Page](/donate). Donations support our parish operations and outreach programs.",
+
+            'gallery' => "Browse our parish photos and videos from events, feasts, and community life: [Gallery](/gallery)",
 
             'events' => $this->buildEventsResponse(),
 
-            'bulletins' => "Stay updated with our latest parish announcements:\n👉 [Bulletins](/bulletins)",
+            'bulletins' => "Read our latest parish announcements and updates: [Bulletins](/bulletins)",
 
-            'office_hours' => "🕐 **Office Hours:**\n- Tuesday to Saturday: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM\n- Sunday: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM\n- Monday: **Closed**\n\n📍 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna",
+            'office_hours' => "**Office Hours:**
+- Tuesday to Saturday: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM
+- Sunday: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM
+- Monday: **Closed**
 
-            'location' => "📍 **Address:**\n1 Sto. Rosario Drive, Pacita, San Pedro, Laguna, Philippines 4023\n\nWe are located in Pacita Complex 1. You can view our location on [Google Maps](https://maps.google.com/?q=Sto.+Rosario+Parish+Pacita+San+Pedro+Laguna).",
+**Address:** 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna",
 
-            'contact' => "📞 **Contact Information:**\n- Phone: {$contact}\n- Email: {$email}\n- Facebook: [Sto. Rosario Parish Pacita](https://facebook.com/storosarioparish)\n- Messenger: [m.me/storosarioparishpacita1](https://m.me/storosarioparishpacita1)\n\n**Office Hours:**\n- Tue–Sat: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM\n- Sun: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM\n- Mon: Closed",
+            'location' => "**Parish Address:**
+1 Sto. Rosario Drive, Pacita, San Pedro, Laguna, Philippines 4023
 
-            'about' => "{$name} is a Catholic parish located at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our patroness is the **Queen of the Most Holy Rosary of Pacita**, whose image was carved in Paete, Laguna in 1982.\n\n⛪ **Key Milestones:**\n- 1983 (Oct 16): Canonical erection of the parish\n- 1986 (Dec 6): Church dedication\n- 2024: Image declared Important Cultural Property of San Pedro\n- 2025: Our Lady accorded the title 'Queen of the City of San Pedro'\n\nOur Parish Priest is {$priest}".($assistantPriest ? " and our Assistant Parish Priest is {$assistantPriest}" : '').".\n\nLearn more: [About Us](/about)",
+Located in Pacita Complex 1. View on [Google Maps](https://maps.google.com/?q=Sto.+Rosario+Parish+Pacita+San+Pedro+Laguna).",
 
-            'faith' => "That's a beautiful question about our Catholic faith! 🙏\n\nI'd be happy to help with basic questions about prayers, sacraments, and Catholic traditions. For more complex spiritual guidance, I recommend speaking with {$priest} after Mass or scheduling a pastoral appointment.\n\nIs there something specific about our faith you'd like to know?",
+            'contact' => "**Contact Us:**
+- Phone: {$contact}
+- Email: {$email}
+- Facebook: [Sto. Rosario Parish Pacita](https://facebook.com/storosarioparish)
+- Messenger: [m.me/storosarioparishpacita1](https://m.me/storosarioparishpacita1)
 
-            'thank_you' => "You're most welcome! 🙏 It is my joy to assist you. If you ever need anything else, feel free to ask. God bless you and your family! ✝️",
+Office Hours: Tue–Sat 6AM–12NN & 1:30–6PM | Sun 6AM–12NN & 3–6PM | Mon Closed",
 
-            'unknown' => "I'm not sure I understand. Could you please rephrase your question? You can ask me about:\n\n- ⛪ Mass Schedules\n- 🕯️ Mass Intentions\n- 📝 Sacramental Inquiries\n- 📅 Events & Activities\n- 💰 Donations & GCash\n- 📍 Location & Contact Info\n- 📜 Parish History",
+            'about' => "**{$name}** is a Catholic parish at 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna. Our patroness is the **Queen of the Most Holy Rosary of Pacita**, whose image was carved in Paete, Laguna in 1982.
+
+**Key Milestones:**
+- 1983: Canonical erection of the parish
+- 1986: Church dedication
+- 2024: Image declared Important Cultural Property of San Pedro
+- 2025: Our Lady accorded the title 'Queen of the City of San Pedro'
+
+Parish Priest: {$priest}".($assistantPriest ? " | Asst. Parish Priest: {$assistantPriest}" : '')."
+
+More details: [About Us](/about)",
+
+            'faith' => "I am happy to help with questions about Catholic prayers, sacraments, feast days, and traditions.
+
+For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or scheduling a pastoral appointment. What would you like to know?",
+
+            'thank_you' => "You are most welcome! God bless you and your family. Feel free to reach out anytime you need help.",
+
+            'unknown' => "I want to make sure I help you correctly. Could you rephrase that? Here is what I can assist with:
+
+- Mass Schedules
+- Mass Intentions
+- Sacramental Inquiries (Baptism, Wedding, etc.)
+- Events & Activities
+- Donations & GCash
+- Location & Contact Info
+- Parish History",
         ];
 
         return $responses[$topIntent] ?? $responses['unknown'];
@@ -455,10 +530,12 @@ class AIService
     {
         $schedules = MassSchedule::where('is_active', true)->get();
         if ($schedules->isEmpty()) {
-            return 'There are no active mass schedules available at the moment. Please check back later or contact the parish office for more information.';
+            return 'No active mass schedules at the moment. Please check back later or [contact us](/inquiry) for information.';
         }
 
-        $response = "⛪ **Mass Schedules:**\n\n";
+        $response = "**Mass Schedules:**
+
+";
         foreach ($schedules as $s) {
             $days = is_array($s->day_of_week) ? implode(', ', $s->day_of_week) : $s->day_of_week;
             $times = is_array($s->time) ? implode(', ', $s->time) : $s->time;
@@ -466,9 +543,11 @@ class AIService
             if ($s->location && $s->location !== 'Main Church') {
                 $response .= " [{$s->location}]";
             }
-            $response .= "\n";
+            $response .= "
+";
         }
-        $response .= "\n*Schedule may change on special occasions. Visit our [Mass Schedule page](/mass-schedule) for updates.*";
+        $response .= "
+*Schedules may change on special occasions. See our [Mass Schedule page](/mass-schedule) for the latest.*";
 
         return $response;
     }
@@ -482,18 +561,23 @@ class AIService
             ->get();
 
         if ($events->isEmpty()) {
-            return 'There are no upcoming events scheduled at the moment. Check back soon or visit our [Events page](/events) for updates!';
+            return 'No upcoming events scheduled right now. Check our [Events page](/events) for the latest updates.';
         }
 
-        $response = "📅 **Upcoming Events:**\n\n";
+        $response = "**Upcoming Events:**
+
+";
         foreach ($events as $e) {
             $date = $e->event_date ? $e->event_date->format('M d, Y') : 'TBA';
-            $response .= "- **{$e->title}** — {$date}\n";
+            $response .= "- **{$e->title}** — {$date}
+";
             if ($e->description) {
-                $response .= '  '.strip_tags(mb_strimwidth($e->description, 0, 120, '...'))."\n";
+                $response .= '  '.strip_tags(mb_strimwidth($e->description, 0, 120, '...'))."
+";
             }
         }
-        $response .= "\n👉 [View All Events](/events)";
+        $response .= "
+[View All Events](/events)";
 
         return $response;
     }
