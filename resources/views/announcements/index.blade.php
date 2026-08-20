@@ -48,22 +48,8 @@
                 :style="underlineStyle"></div>
         </div>
 
-        {{-- Loading spinner --}}
-        <div x-show="loading" x-transition.opacity class="flex justify-center py-16">
-            <div class="flex items-center gap-3 text-muted-foreground">
-                <svg class="animate-spin h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
-                <span class="text-sm font-medium">Loading announcements...</span>
-            </div>
-        </div>
-
-        {{-- Announcements Grid --}}
-        <div x-show="!loading"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-3"
-            x-transition:enter-end="opacity-100 translate-y-0">
+        {{-- Announcements Grid (fades during tab switch) --}}
+        <div class="transition-all duration-300 ease-out" :class="loading ? 'opacity-30 pointer-events-none scale-[0.99]' : 'opacity-100 scale-100'">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <template x-for="ann in announcements" :key="ann.id">
