@@ -20,7 +20,7 @@
 
         {{-- Tab Bar --}}
         <div class="relative mb-10">
-            <div class="flex items-center justify-center gap-0 border-b-2 border-muted/50 overflow-x-auto" x-ref="tabBar">
+            <div class="flex items-center justify-center gap-0 border-b-2 border-muted/50 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" x-ref="tabBar">
                 <button @click="switchTab('all')"
                     :class="activeTab === 'all' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-primary/60'"
                     class="relative px-5 py-3 text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors duration-200 border-b-2 -mb-[2px]">
