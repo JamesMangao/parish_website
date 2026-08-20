@@ -26,7 +26,13 @@ class AnnouncementController extends Controller
 
         $categories = array_merge(Announcement::PREDEFINED_CATEGORIES, ['Recruitment']);
 
-        return view('announcements.index', compact('announcements', 'categories', 'category'));
+        $counts = ['all' => Announcement::active()->count()];
+        foreach (Announcement::PREDEFINED_CATEGORIES as $cat) {
+            $counts[$cat] = Announcement::active()->where('category', $cat)->count();
+        }
+        $counts['Recruitment'] = Announcement::active()->where('is_recruitment', true)->count();
+
+        return view('announcements.index', compact('announcements', 'categories', 'category', 'counts'));
     }
 
     public function publicShow(Announcement $announcement)

@@ -20,14 +20,18 @@
 
         {{-- Category Filters --}}
         <div class="flex flex-wrap items-center justify-center gap-2 mb-10">
+            @php $activeAll = !$category; @endphp
             <a href="{{ route('announcements.index') }}"
-               class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 {{ !$category ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary' }}">
+               class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 {{ $activeAll ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary' }}">
                 All
+                <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-black {{ $activeAll ? 'bg-white/25 text-white' : 'bg-primary/10 text-primary' }}">{{ $counts['all'] }}</span>
             </a>
             @foreach($categories as $cat)
+                @php $isActive = $category === $cat; @endphp
                 <a href="{{ route('announcements.index', ['category' => $cat]) }}"
-                   class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 {{ $category === $cat ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary' }}">
+                   class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 {{ $isActive ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary' }}">
                     {{ $cat }}
+                    <span class="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-black {{ $isActive ? 'bg-white/25 text-white' : 'bg-primary/10 text-primary' }}">{{ $counts[$cat] }}</span>
                 </a>
             @endforeach
         </div>
