@@ -228,7 +228,13 @@
                 <div x-data="announcementCarousel(@js($carouselAnnouncements->count()))" x-init="init()" class="relative">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($carouselAnnouncements as $index => $ann)
-                            <div x-show="isVisible({{ $index }})" x-cloak>
+                            <div x-show="isVisible({{ $index }})" x-cloak
+                                x-transition:enter="transition ease-out duration-400"
+                                x-transition:enter-start="opacity-0 scale-95 translate-x-4"
+                                x-transition:enter-end="opacity-100 scale-100 translate-x-0"
+                                x-transition:leave="transition ease-in duration-250"
+                                x-transition:leave-start="opacity-100 scale-100 translate-x-0"
+                                x-transition:leave-end="opacity-0 scale-95 -translate-x-4">
                                 <x-announcement-card :ann="$ann" />
                             </div>
                         @endforeach
@@ -236,7 +242,7 @@
 
                     <div x-show="totalPages > 1" x-cloak class="flex items-center justify-center gap-4 mt-8">
                         <button @click="prev()" :disabled="!hasPrev"
-                            class="w-10 h-10 rounded-full bg-card border border-muted shadow-sm flex items-center justify-center text-primary hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                            class="w-10 h-10 rounded-full bg-card border border-muted shadow-sm flex items-center justify-center text-primary hover:bg-muted/50 hover:scale-110 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 19 12 12 15 5"/></svg>
                         </button>
 
@@ -250,7 +256,7 @@
                         </div>
 
                         <button @click="next()" :disabled="!hasNext"
-                            class="w-10 h-10 rounded-full bg-card border border-muted shadow-sm flex items-center justify-center text-primary hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                            class="w-10 h-10 rounded-full bg-card border border-muted shadow-sm flex items-center justify-center text-primary hover:bg-muted/50 hover:scale-110 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 15 12 9 19"/></svg>
                         </button>
                     </div>
