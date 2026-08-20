@@ -9,14 +9,24 @@ use Illuminate\Support\Facades\Cache;
 
 class AnnouncementController extends Controller
 {
-    public function publicIndex()
+    public function publicIndex(Request $request)
     {
-        $announcements = Announcement::active()
-            ->orderBy('published_at', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        $query = Announcement::active();
 
-        return view('announcements.index', compact('announcements'));
+        $category = $request->input('category');
+        if ($category === 'Recruitment') {
+            $query->where('is_recruitment', true);
+        } elseif ($category && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        $announcements = $query->orderBy('published_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12)->withQueryString();
+
+        $categories = array_merge(Announcement::PREDEFINED_CATEGORIES, ['Recruitment']);
+
+        return view('announcements.index', compact('announcements', 'categories', 'category'));
     }
 
     public function publicShow(Announcement $announcement)

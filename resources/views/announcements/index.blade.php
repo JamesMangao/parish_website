@@ -17,6 +17,21 @@
             </p>
         </div>
 
+
+        {{-- Category Filters --}}
+        <div class="flex flex-wrap items-center justify-center gap-2 mb-10">
+            <a href="{{ route('announcements.index') }}"
+               class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 {{ !$category ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary' }}">
+                All
+            </a>
+            @foreach($categories as $cat)
+                <a href="{{ route('announcements.index', ['category' => $cat]) }}"
+                   class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 {{ $category === $cat ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary' }}">
+                    {{ $cat }}
+                </a>
+            @endforeach
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($announcements as $ann)
                 <x-announcement-card :ann="$ann" />
