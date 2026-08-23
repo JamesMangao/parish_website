@@ -74,10 +74,10 @@ class DonationController extends Controller
                 ->post('https://api.paymongo.com/v1/checkout_sessions', [
                     'data' => [
                         'attributes' => [
-                            'line_items' => [
+                            line_items' => [
                                 [
                                     'name' => 'Parish Donation',
-                                    'amount' => $validated['amount'],
+                                    'amount' => (int) $validated['amount'],
                                     'currency' => 'PHP',
                                     'quantity' => 1,
                                 ],
@@ -102,8 +102,7 @@ class DonationController extends Controller
                 ]);
                 $donation->update(['status' => 'failed']);
 
-                $pmError = $response->json('errors.0.detail') ?? $response->body();
-                return back()->with('error', 'PayMongo: '.$pmError);
+                return back()->with('error', 'Unable to create checkout session. Please try again.');
             }
 
             $data = $response->json();
