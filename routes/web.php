@@ -102,6 +102,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::get('/internal/preview-ppt', [PptController::class, 'preview'])->name('admin.preview-ppt');
         Route::post('/internal/create-google-slides', [GoogleSlidesController::class, 'create'])->name('admin.create-google-slides');
         Route::post('/internal/live-mass/toggle', [LiveMassController::class, 'toggle'])->name('admin.live-mass.toggle');
+        Route::post('/internal/live-mass/facebook-link', [LiveMassController::class, 'updateFacebookLink'])->name('admin.live-mass.facebook-link');
 
         Route::get('/google/auth', [GoogleAuthController::class, 'auth']);
         Route::get('/google/callback', [GoogleAuthController::class, 'callback']);
