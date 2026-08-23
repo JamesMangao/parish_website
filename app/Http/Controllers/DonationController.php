@@ -102,7 +102,8 @@ class DonationController extends Controller
                 ]);
                 $donation->update(['status' => 'failed']);
 
-                return back()->with('error', 'Unable to create checkout session. Please try again.');
+                $pmError = $response->json('errors.0.detail') ?? $response->body();
+                return back()->with('error', 'PayMongo: '.$pmError);
             }
 
             $data = $response->json();
