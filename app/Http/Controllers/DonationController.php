@@ -74,7 +74,7 @@ class DonationController extends Controller
                 ->post('https://api.paymongo.com/v1/checkout_sessions', [
                     'data' => [
                         'attributes' => [
-                            line_items' => [
+                            'line_items' => [
                                 [
                                     'name' => 'Parish Donation',
                                     'amount' => (int) $validated['amount'],
