@@ -69,29 +69,36 @@ class DonationController extends Controller
             'checkout_session_id' => 'pending_'.\Illuminate\Support\Str::uuid(),
         ]);
 
+        $attributes = [
+            'line_items' => [
+                [
+                    'name' => 'Parish Donation',
+                    'amount' => (int) $validated['amount'],
+                    'currency' => 'PHP',
+                    'quantity' => 1,
+                ],
+            ],
+            'payment_method_types' => $paymentMethodTypes,
+            'success_url' => route('donate.success').'?donation_id='.$donation->id,
+            'cancel_url' => route('donate.cancel').'?donation_id='.$donation->id,
+            'reference_number' => 'DON-'.strtoupper(substr($donation->id, 0, 8)),
+            'description' => 'Sto. Rosario Parish — '.$validated['purpose'],
+        ];
+
+        $billing = array_filter([
+            'name' => $validated['donor_name'] ?? null,
+            'email' => $validated['donor_email'] ?? null,
+        ]);
+
+        if (! empty($billing)) {
+            $attributes['billing'] = $billing;
+        }
+
         try {
             $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
                 ->post('https://api.paymongo.com/v1/checkout_sessions', [
                     'data' => [
-                        'attributes' => [
-                            'line_items' => [
-                                [
-                                    'name' => 'Parish Donation',
-                                    'amount' => (int) $validated['amount'],
-                                    'currency' => 'PHP',
-                                    'quantity' => 1,
-                                ],
-                            ],
-                            'payment_method_types' => $paymentMethodTypes,
-                            'billing' => array_filter([
-                                'name' => $validated['donor_name'] ?? null,
-                                'email' => $validated['donor_email'] ?? null,
-                            ]),
-                            'success_url' => route('donate.success').'?donation_id='.$donation->id,
-                            'cancel_url' => route('donate.cancel').'?donation_id='.$donation->id,
-                            'reference_number' => 'DON-'.strtoupper(substr($donation->id, 0, 8)),
-                            'description' => 'Sto. Rosario Parish — '.$validated['purpose'],
-                        ],
+                        'attributes' => $attributes,
                     ],
                 ]);
 
