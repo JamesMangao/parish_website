@@ -174,6 +174,22 @@
                         <button class="px-5 py-2 rounded-xl bg-[#F5F7FA] text-muted-foreground/60 text-[10px] font-black uppercase tracking-[.15em] hover:bg-black/[.04] transition-all">End</button>
                     </form>
                 </div>
+                <div class="w-full mt-4 pt-4 border-t border-black/[.04]">
+    <form method="POST" action="{{ route('admin.live-mass.facebook-link') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+        @csrf
+        <span class="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[.15em] shrink-0">Facebook Live Link</span>
+        <input type="url" name="facebook_live_url" placeholder="https://www.facebook.com/.../videos/..."
+            value="{{ \Illuminate\Support\Facades\Cache::get(\App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY) }}"
+            class="flex-1 w-full text-sm px-3 py-2 rounded-lg border border-black/10 focus:outline-none focus:ring-2 focus:ring-primary/30">
+        <button type="submit" class="px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-[.15em] hover:opacity-90 transition-all shrink-0">Save Link</button>
+    </form>
+    @if(\Illuminate\Support\Facades\Cache::get(\App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY))
+        <form method="POST" action="{{ route('admin.live-mass.facebook-link') }}" class="mt-2">
+            @csrf<input type="hidden" name="facebook_live_url" value="">
+            <button type="submit" class="text-[10px] font-bold text-red-500/70 hover:text-red-500 uppercase tracking-wider">Clear link</button>
+        </form>
+    @endif
+                </div>
             </div>
         @endif
         
