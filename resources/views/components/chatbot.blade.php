@@ -500,6 +500,25 @@
                         this.liveAgentStatus = 'suggesting';
                         text = text.replace('[[HANDOVER]]', '');
                     }
+                    // Detect if AI returned raw HTML tags — if so, strip tags and re-render via markdown
+                    const hasHtmlTags = /<\/?\w+[^>]*>/.test(text);
+                    if (hasHtmlTags) {
+                        // Convert HTML tags to markdown equivalents
+                        text = text.replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**');
+                        text = text.replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**');
+                        text = text.replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*');
+                        text = text.replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*');
+                        // Convert HTML links to markdown links
+                        text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
+                        // Convert HTML lists to plain text
+                        text = text.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1');
+                        // Convert HTML line breaks
+                        text = text.replace(/<br\s*\/?>/gi, '\n');
+                        // Convert HTML paragraphs
+                        text = text.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '$1\n\n');
+                        // Strip any remaining HTML tags
+                        text = text.replace(/<[^>]+>/g, '');
+                    }
                     // Markdown links [text](url) -> clickable <a>
                     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
                     // Bold **text** -> <strong>
