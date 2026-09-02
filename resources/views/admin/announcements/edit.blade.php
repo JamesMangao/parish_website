@@ -1,3 +1,23 @@
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trix@2.0.8/dist/trix.min.css">
+    <style>
+        .trix-button--icon-heading-1::before { content: none; }
+        .trix-button--icon-bold::before { content: none; }
+        .trix-button--icon-italic::before { content: none; }
+        .trix-button--icon-link::before { content: none; }
+        .trix-button--icon-bullet-list::before { content: none; }
+        .trix-button--icon-number-list::before { content: none; }
+        .trix-button--icon-quote::before { content: none; }
+        .trix-button--icon-code::before { content: none; }
+        .trix-button--icon-strike::before { content: none; }
+        .trix-button--icon-undo::before { content: none; }
+        .trix-button--icon-redo::before { content: none; }
+        .trix-toolbar .trix-button { border-radius: 8px; }
+        .trix-toolbar .trix-button-group { border: 1px solid rgba(0,0,0,.08); border-radius: 10px; }
+        .trix-content { min-height: 200px; }
+    </style>
+@endpush
+
 <x-admin-form 
     title="Edit Announcement" 
     description="Update the details of your parish announcement."
@@ -19,9 +39,9 @@
 
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Notice Content</label>
-            <textarea name="content" required rows="6"
-                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-primary"
-                placeholder="Enter the full details of the announcement...">{{ old('content', $announcement->content) }}</textarea>
+            <input type="hidden" name="content" id="announcement-content" value="{{ old('content', $announcement->content) }}">
+            <trix-editor input="announcement-content" class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-primary min-h-[200px]"
+                placeholder="Enter the full details of the announcement..."></trix-editor>
             @error('content') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -70,3 +90,7 @@
         </div>
     </div>
 </x-admin-form>
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/trix@2.0.8/dist/trix.min.js"></script>
+@endpush

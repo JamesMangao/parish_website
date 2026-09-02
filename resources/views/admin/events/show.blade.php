@@ -20,15 +20,9 @@
                     <p class="text-primary leading-relaxed text-sm">{{ $event->description ?? 'No description provided.' }}</p>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/40 mb-2">Date</h3>
-                        <p class="font-bold text-primary text-sm">{{ $event->event_date->format('l, F d, Y') }}</p>
-                    </div>
-                    <div>
-                        <h3 class="text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/40 mb-2">Location</h3>
-                        <p class="font-bold text-primary text-sm">{{ $event->location ?? 'Not specified' }}</p>
-                    </div>
+                <div>
+                    <h3 class="text-[10px] font-black uppercase tracking-[.15em] text-muted-foreground/40 mb-2">Date</h3>
+                    <p class="font-bold text-primary text-sm">{{ $event->event_date->format('l, F d, Y') }}</p>
                 </div>
 
                 @if(!empty($event->event_time))
@@ -39,6 +33,9 @@
                                 <div class="flex items-center gap-2 text-sm">
                                     @if(!empty($slot['title']))
                                         <span class="font-bold text-primary/60">{{ $slot['title'] }}:</span>
+                                    @endif
+                                    @if(!empty($slot['date']))
+                                        <span class="text-xs text-muted-foreground font-medium">{{ \Carbon\Carbon::parse($slot['date'])->format('M d, Y') }}</span>
                                     @endif
                                     @if(!empty($slot['time']))
                                         <span class="text-primary font-medium">{{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}</span>

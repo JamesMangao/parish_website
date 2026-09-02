@@ -51,7 +51,7 @@
                     {{ $announcement->title }}
                 </h1>
 
-                <div class="prose prose-lg max-w-none text-muted-foreground leading-relaxed mb-8">
+                <div class="prose prose-lg max-w-none text-muted-foreground leading-relaxed mb-8" style="white-space: pre-line;">
                     {!! $announcement->content !!}
                 </div>
 

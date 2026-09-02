@@ -177,7 +177,7 @@
         </div>
     </div>
 
-    <script>
+    <script>/* v2.1 */
         function chatbot() {
             let _msgId = 0;
 
@@ -489,8 +489,14 @@
 
                 formatMessage(content, role) {
                     if (!content) return '';
-                    let text = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    if (role === 'assistant' && text.includes('[[HANDOVER]]')) {
+                    if (role === 'user') {
+                        let text = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        text = text.replace(/\n/g, '<br>');
+                        return '<p>' + text + '</p>';
+                    }
+                    // Assistant: decode HTML entities, then process markdown/links
+                    let text = content.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&amp;/gi, '&');
+                    if (text.includes('[[HANDOVER]]')) {
                         this.liveAgentStatus = 'suggesting';
                         text = text.replace('[[HANDOVER]]', '');
                     }
@@ -498,6 +504,8 @@
                     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
                     // Bold **text** -> <strong>
                     text = text.replace(/\*\*([^*]+?)\*\*/g, '<strong class="font-bold">$1</strong>');
+                    // Italic *text* -> <em>
+                    text = text.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
                     // Bare internal paths like /mass-schedule -> clickable link
                     text = text.replace(/(?<!["])(\/[a-z][a-z0-9\-/]+)(?![\w<])/g, '<a href="$1" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
                     // Bullet lines: "- text" or "* text" -> styled bullet points

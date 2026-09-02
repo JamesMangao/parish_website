@@ -75,7 +75,7 @@ class EventsController extends Controller
             'event_time' => 'required|array',
             'event_time.*.time' => 'nullable',
             'event_time.*.title' => 'nullable',
-            'location' => 'nullable|string',
+            'event_time.*.date' => 'nullable|date',
             'is_published' => 'boolean',
         ]);
 
@@ -104,7 +104,7 @@ class EventsController extends Controller
             'event_time' => 'required|array',
             'event_time.*.time' => 'nullable',
             'event_time.*.title' => 'nullable',
-            'location' => 'nullable|string',
+            'event_time.*.date' => 'nullable|date',
             'is_published' => 'boolean',
         ]);
 

@@ -69,16 +69,6 @@
 
                                 <div class="flex items-center gap-3">
                                     <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <span class="text-[10px] uppercase font-black text-muted-foreground tracking-wider">Location</span>
-                                        <span class="text-sm font-bold text-primary">Sto. Rosario Parish</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center gap-3">
-                                    <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                                     </div>
                                     <div class="flex flex-col">
@@ -101,6 +91,9 @@
                                         <div class="flex items-center justify-between group">
                                             <div class="flex flex-col">
                                                 <span class="text-[10px] uppercase font-black text-muted-foreground group-hover:text-accent transition-colors">{{ $slot['title'] ?? 'Main Session' }}</span>
+                                                @if(!empty($slot['date']))
+                                                    <span class="text-xs text-muted-foreground">{{ \Carbon\Carbon::parse($slot['date'])->format('M d, Y') }}</span>
+                                                @endif
                                                 <span class="font-bold text-primary">{{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}</span>
                                             </div>
                                             <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">

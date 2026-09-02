@@ -19,24 +19,15 @@
             @error('description') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Event
-                    Date</label>
-                <input type="date" name="event_date" required
-                    value="{{ old('event_date', \Carbon\Carbon::parse($event->event_date)->format('Y-m-d')) }}"
-                    class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-            </div>
-            <div>
-                <label
-                    class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Location</label>
-                <input type="text" name="location" value="{{ old('location', $event->location) }}"
-                    class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary"
-                    placeholder="e.g., Parish Hall / Online">
-            </div>
+        <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Event
+                Date</label>
+            <input type="date" name="event_date" required
+                value="{{ old('event_date', \Carbon\Carbon::parse($event->event_date)->format('Y-m-d')) }}"
+                class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
         </div>
 
-        <div x-data="{ times: {{ json_encode(old('event_time', $event->event_time ?: [['time' => '', 'title' => '']])) }} }">
+        <div x-data="{ times: {{ json_encode(old('event_time', $event->event_time ?: [['time' => '', 'title' => '', 'date' => '']])) }} }">
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Service
                 Times</label>
             <template x-for="(time, index) in times" :key="index">
@@ -44,6 +35,9 @@
                     <input type="text" :name="'event_time['+index+'][title]'" x-model="times[index].title"
                         placeholder="Title (e.g. Mass)"
                         class="flex-1 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                    <input type="date" :name="'event_time['+index+'][date]'" x-model="times[index].date"
+                        class="w-36 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary text-[12px]"
+                        title="Optional: different date for this session">
                     <input type="time" :name="'event_time['+index+'][time]'" x-model="times[index].time"
                         class="w-32 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
                     <button type="button" @click="times.splice(index, 1)" x-show="times.length > 1"
@@ -58,7 +52,7 @@
                     </button>
                 </div>
             </template>
-            <button type="button" @click="times.push({time: '', title: ''})"
+            <button type="button" @click="times.push({time: '', title: '', date: ''})"
                 class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

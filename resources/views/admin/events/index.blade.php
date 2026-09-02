@@ -14,6 +14,9 @@
                             @if(!empty($slot['title']))
                                 <span class="font-bold text-primary/50">{{ $slot['title'] }}:</span>
                             @endif
+                            @if(!empty($slot['date']))
+                                <span class="text-muted-foreground/70">{{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}</span>
+                            @endif
                             @if(!empty($slot['time']))
                                 <span>{{ \Carbon\Carbon::parse($slot['time'])->format('h:i A') }}</span>
                             @endif

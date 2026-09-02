@@ -20,7 +20,6 @@ class Event extends Model
         'description',
         'event_date',
         'event_time',
-        'location',
         'is_published',
     ];
 

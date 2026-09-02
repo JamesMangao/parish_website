@@ -251,14 +251,15 @@ class AIService
                     foreach ($e->event_time as $t) {
                         $timePart = $t['time'] ?? '';
                         $titlePart = $t['title'] ?? '';
-                        $combined = trim($timePart.($titlePart ? " ($titlePart)" : ''));
+                        $datePart = $t['date'] ?? '';
+                        $combined = trim(($datePart ? "{$datePart} " : '').$timePart.($titlePart ? " ($titlePart)" : ''));
                         if ($combined) {
                             $eTimes[] = $combined;
                         }
                     }
                 }
                 $eTimeStr = ! empty($eTimes) ? implode(', ', $eTimes) : (is_string($e->event_time) ? $e->event_time : 'N/A');
-                $ctx .= "- {$e->title} on ".($e->event_date ? $e->event_date->format('M d, Y') : 'N/A')." at {$eTimeStr} [{$e->location}]: {$e->description}\n";
+                $ctx .= "- {$e->title} on ".($e->event_date ? $e->event_date->format('M d, Y') : 'N/A')." at {$eTimeStr}: {$e->description}\n";
             }
 
             $ctx .= "\n### PARISH HISTORY:\n";
@@ -541,12 +542,7 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
         foreach ($schedules as $s) {
             $days = is_array($s->day_of_week) ? implode(', ', $s->day_of_week) : $s->day_of_week;
             $times = is_array($s->time) ? implode(', ', $s->time) : $s->time;
-            $response .= "- **{$s->title}** ({$s->mass_type}): {$days} at {$times}";
-            if ($s->location && $s->location !== 'Main Church') {
-                $response .= " [{$s->location}]";
-            }
-            $response .= "
-";
+            $response .= "- **{$s->title}** ({$s->mass_type}): {$days} at {$times}\n";
         }
         $response .= "
 *Schedules may change on special occasions. See our [Mass Schedule page](/mass-schedule) for the latest.*";
@@ -571,11 +567,20 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
 ";
         foreach ($events as $e) {
             $date = $e->event_date ? $e->event_date->format('M d, Y') : 'TBA';
-            $response .= "- **{$e->title}** — {$date}
-";
+            $response .= "- **{$e->title}** — {$date}\n";
+            if (is_array($e->event_time)) {
+                foreach ($e->event_time as $t) {
+                    $timePart = $t['time'] ?? '';
+                    $titlePart = $t['title'] ?? '';
+                    $datePart = $t['date'] ?? '';
+                    $combined = trim($titlePart . ($datePart ? " ({$datePart})" : '') . ($timePart ? " at {$timePart}" : ''));
+                    if ($combined) {
+                        $response .= "  - {$combined}\n";
+                    }
+                }
+            }
             if ($e->description) {
-                $response .= '  '.strip_tags(mb_strimwidth($e->description, 0, 120, '...'))."
-";
+                $response .= '  '.strip_tags(mb_strimwidth($e->description, 0, 120, '...'))."\n";
             }
         }
         $response .= "

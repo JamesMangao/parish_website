@@ -351,6 +351,10 @@
                                              font-family:'Jost',sans-serif; font-style:normal;">
                                     {{ $slot['title'] }}
                                 </span>
+                                @if(!empty($slot['date']) || !empty($slot['time']))<span style="opacity:0.30;">·</span>@endif
+                            @endif
+                            @if(!empty($slot['date']))
+                                <span style="font-size:10px; font-weight:600; color:rgba(13,42,82,0.40); font-family:'Jost',sans-serif; font-style:normal;">{{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}</span>
                                 @if(!empty($slot['time']))<span style="opacity:0.30;">·</span>@endif
                             @endif
                             @if(!empty($slot['time']))
@@ -481,6 +485,7 @@
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/5 border text-[11px] font-bold text-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 <span x-text="slot.title ? slot.title + ' · ' : ''"></span>
+                                <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' : ''"></span>
                                 <span x-text="new Date('2000-01-01T' + slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })"></span>
                             </span>
                         </template>
