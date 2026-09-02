@@ -494,31 +494,46 @@
                         text = text.replace(/\n/g, '<br>');
                         return '<p>' + text + '</p>';
                     }
-                    // Assistant: decode HTML entities, then process markdown/links
+                    // Assistant: decode HTML entities first
                     let text = content.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&amp;/gi, '&');
                     if (text.includes('[[HANDOVER]]')) {
                         this.liveAgentStatus = 'suggesting';
                         text = text.replace('[[HANDOVER]]', '');
                     }
-                    // Detect if AI returned raw HTML tags — if so, strip tags and re-render via markdown
-                    const hasHtmlTags = /<\/?\w+[^>]*>/.test(text);
-                    if (hasHtmlTags) {
-                        // Convert HTML tags to markdown equivalents
-                        text = text.replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**');
-                        text = text.replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**');
-                        text = text.replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*');
-                        text = text.replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, '*$1*');
-                        // Convert HTML links to markdown links
-                        text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
-                        // Convert HTML lists to plain text
-                        text = text.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1');
-                        // Convert HTML line breaks
-                        text = text.replace(/<br\s*\/?>/gi, '\n');
-                        // Convert HTML paragraphs
-                        text = text.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '$1\n\n');
-                        // Strip any remaining HTML tags
-                        text = text.replace(/<[^>]+>/g, '');
-                    }
+                    // NUCLEAR FIX: Strip ALL HTML tags (paired or broken) first,
+                    // preserving inner text so formatting can be re-applied via markdown
+                    text = text.replace(/<\/?strong[^>]*>/gi, '');
+                    text = text.replace(/<\/?b[^>]*>/gi, '');
+                    text = text.replace(/<\/?em[^>]*>/gi, '');
+                    text = text.replace(/<\/?i[^>]*>/gi, '');
+                    text = text.replace(/<\/?u[^>]*>/gi, '');
+                    text = text.replace(/<\/?s[^>]*>/gi, '');
+                    text = text.replace(/<\/?mark[^>]*>/gi, '');
+                    text = text.replace(/<\/?small[^>]*>/gi, '');
+                    text = text.replace(/<\/?sub[^>]*>/gi, '');
+                    text = text.replace(/<\/?sup[^>]*>/gi, '');
+                    // Convert HTML links before stripping them
+                    text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
+                    // Convert <br> and <p> to newlines before stripping
+                    text = text.replace(/<br\s*\/?>/gi, '\n');
+                    text = text.replace(/<\/?p[^>]*>/gi, '\n');
+                    text = text.replace(/<\/?li[^>]*>/gi, '\n- ');
+                    // Convert <ul>/<ol>/<div>/<span> to nothing
+                    text = text.replace(/<\/?ul[^>]*>/gi, '');
+                    text = text.replace(/<\/?ol[^>]*>/gi, '');
+                    text = text.replace(/<\/?div[^>]*>/gi, '');
+                    text = text.replace(/<\/?span[^>]*>/gi, '');
+                    text = text.replace(/<\/?h[1-6][^>]*>/gi, '\n');
+                    text = text.replace(/<\/?blockquote[^>]*>/gi, '');
+                    // Strip any remaining HTML tags
+                    text = text.replace(/<[^>]+>/g, '');
+                    // Decode any leftover HTML entities
+                    text = text.replace(/&nbsp;/gi, ' ');
+                    text = text.replace(/&amp;/gi, '&');
+                    text = text.replace(/&lt;/gi, '<');
+                    text = text.replace(/&gt;/gi, '>');
+                    text = text.replace(/&quot;/gi, '"');
+                    text = text.replace(/&#39;/gi, "'");
                     // Markdown links [text](url) -> clickable <a>
                     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
                     // Bold **text** -> <strong>

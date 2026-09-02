@@ -303,6 +303,7 @@ class AIService
 ## RESPONSE STYLE
 - Open with a brief acknowledgment of what the user asked, then answer directly.
 - Use bold (**text**) for key terms, dates, fees, and names.
+- CRITICAL: NEVER use HTML tags like <strong>, </strong>, <em>, </em>, <b>, <i>, <a>, etc. Only use markdown formatting.
 - Use clean bullet points for lists (2+ items). Single-item answers should be inline.
 - Limit emojis to 1-2 per message maximum, only where they add genuine warmth. Never use emojis as decoration.
 - For links, write naturally in the sentence — never raw URLs or arrow symbols.
