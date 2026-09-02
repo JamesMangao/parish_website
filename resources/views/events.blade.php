@@ -198,8 +198,23 @@
     events: window.__events,
     get calendarEvents() {
         return this.events.filter(e => {
+            // Check main event date
             const d = new Date(e.event_date + 'T00:00:00');
-            return d.getMonth() + 1 === this.calMonth && d.getFullYear() === this.calYear;
+            if (d.getMonth() + 1 === this.calMonth && d.getFullYear() === this.calYear) return true;
+            // Check service time dates and date ranges
+            if (e.event_time && Array.isArray(e.event_time)) {
+                for (const slot of e.event_time) {
+                    if (slot.date) {
+                        const sd = new Date(slot.date + 'T00:00:00');
+                        if (sd.getMonth() + 1 === this.calMonth && sd.getFullYear() === this.calYear) return true;
+                    }
+                    if (slot.date_to) {
+                        const ed = new Date(slot.date_to + 'T00:00:00');
+                        if (ed.getMonth() + 1 === this.calMonth && ed.getFullYear() === this.calYear) return true;
+                    }
+                }
+            }
+            return false;
         });
     },
     get monthName() {
@@ -221,7 +236,18 @@
         else { this.calMonth++; }
     },
     eventsForDate(dateStr) {
-        return this.calendarEvents.filter(e => e.event_date === dateStr);
+        return this.calendarEvents.filter(e => {
+            // Check main event date
+            if (e.event_date === dateStr) return true;
+            // Check service time dates and date ranges
+            if (e.event_time && Array.isArray(e.event_time)) {
+                for (const slot of e.event_time) {
+                    if (slot.date && slot.date === dateStr) return true;
+                    if (slot.date && slot.date_to && dateStr >= slot.date && dateStr <= slot.date_to) return true;
+                }
+            }
+            return false;
+        });
     },
     downloadICS(title, desc, start, end, loc) {
         const ics = [
