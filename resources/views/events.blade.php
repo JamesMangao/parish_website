@@ -360,7 +360,10 @@
                             @endif
                             @foreach($slots as $slot)
                                 @if(!empty($slot['date']))
-                                    <span style="font-size:10px; font-weight:600; color:rgba(13,42,82,0.40); font-family:'Jost',sans-serif; font-style:normal;">{{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}</span>
+                                    <span style="font-size:10px; font-weight:600; color:rgba(13,42,82,0.40); font-family:'Jost',sans-serif; font-style:normal;">
+                                        {{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}
+                                        @if(!empty($slot['date_to'])) – {{ \Carbon\Carbon::parse($slot['date_to'])->format('M d') }}@endif
+                                    </span>
                                 @endif
                                 @if(!empty($slot['time']))
                                     @if(!empty($slot['date']))<span style="opacity:0.30;">·</span>@endif
@@ -506,7 +509,7 @@
                                 <span x-show="group[0]" x-text="group[0] + ' \u00b7 '" class="text-[10px] uppercase font-black tracking-wider text-primary/60"></span>
                                 <template x-for="(slot, si) in group[1]" :key="si">
                                     <span>
-                                        <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''"></span>
+                                        <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + (slot.date_to ? ' \u2013 ' + new Date(slot.date_to + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '') : ''"></span>
                                         <span x-show="slot.date && slot.time" style="opacity:0.30;">\u00b7</span>
                                         <span x-text="slot.time ? new Date('2000-01-01T' + slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''"></span>
                                         <span x-show="si < group[1].length - 1" style="opacity:0.30;">\u00b7</span>

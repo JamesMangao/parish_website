@@ -99,9 +99,15 @@
                                                 @foreach($slots as $slot)
                                                     <div class="flex items-center gap-2">
                                                         @if(!empty($slot['date']))
-                                                            <span class="text-xs text-muted-foreground">{{ \Carbon\Carbon::parse($slot['date'])->format('M d, Y') }}</span>
+                                                            <span class="text-xs text-muted-foreground">
+                                                                {{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}
+                                                                @if(!empty($slot['date_to'])) – {{ \Carbon\Carbon::parse($slot['date_to'])->format('M d') }}@endif
+                                                                , {{ \Carbon\Carbon::parse($slot['date'])->format('Y') }}
+                                                            </span>
                                                         @endif
-                                                        <span class="font-bold text-primary">{{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}</span>
+                                                        @if(!empty($slot['time']))
+                                                            <span class="font-bold text-primary">{{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}</span>
+                                                        @endif
                                                     </div>
                                                 @endforeach
                                             </div>

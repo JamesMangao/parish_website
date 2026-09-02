@@ -76,6 +76,7 @@ class EventsController extends Controller
             'event_time.*.time' => 'nullable',
             'event_time.*.title' => 'nullable',
             'event_time.*.date' => 'nullable|date',
+            'event_time.*.date_to' => 'nullable|date',
             'is_published' => 'boolean',
         ]);
 
@@ -105,6 +106,7 @@ class EventsController extends Controller
             'event_time.*.time' => 'nullable',
             'event_time.*.title' => 'nullable',
             'event_time.*.date' => 'nullable|date',
+            'event_time.*.date_to' => 'nullable|date',
             'is_published' => 'boolean',
         ]);
 

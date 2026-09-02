@@ -27,7 +27,7 @@
                 class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
         </div>
 
-        <div x-data="{ times: {{ json_encode(old('event_time', $event->event_time ?: [['time' => '', 'title' => '', 'date' => '']])) }} }">
+        <div x-data="{ times: {{ json_encode(old('event_time', collect($event->event_time ?? [])->map(fn($t) => array_merge($t, ['date_to' => $t['date_to'] ?? '']))->values()->all() ?: [['time' => '', 'title' => '', 'date' => '', 'date_to' => '']])) }} }">
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Service
                 Times</label>
             <template x-for="(time, index) in times" :key="index">
@@ -37,8 +37,12 @@
                             placeholder="Title (e.g. Mass)"
                             class="flex-1 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
                         <input type="date" :name="'event_time['+index+'][date]'" x-model="times[index].date"
-                            class="w-36 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary text-[12px]"
-                            title="Optional: different date for this session">
+                            class="w-32 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary text-[12px]"
+                            title="Start date">
+                        <span class="self-center text-[10px] text-muted-foreground font-bold">to</span>
+                        <input type="date" :name="'event_time['+index+'][date_to]'" x-model="times[index].date_to"
+                            class="w-32 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary text-[12px]"
+                            title="End date (optional, for date ranges)">
                         <input type="time" :name="'event_time['+index+'][time]'" x-model="times[index].time"
                             class="w-32 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
                         <button type="button" @click="times.splice(index, 1)" x-show="times.length > 1"
@@ -52,7 +56,7 @@
                             </svg>
                         </button>
                     </div>
-                    <button type="button" @click="times.splice(index + 1, 0, {title: times[index].title, date: '', time: ''})"
+                    <button type="button" @click="times.splice(index + 1, 0, {title: times[index].title, date: '', date_to: '', time: ''})"
                         x-show="times[index].title.trim() !== ''"
                         class="text-[10px] font-bold text-muted-foreground hover:text-primary flex items-center gap-1 mt-1 ml-1 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none"
@@ -64,7 +68,7 @@
                     </button>
                 </div>
             </template>
-            <button type="button" @click="times.push({time: '', title: '', date: ''})"
+            <button type="button" @click="times.push({time: '', title: '', date: '', date_to: ''})"
                 class="text-xs font-bold text-primary hover:underline flex items-center gap-1 mt-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
