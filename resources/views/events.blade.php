@@ -335,6 +335,11 @@
 
                 {{-- Time slots --}}
                 @if(!empty($event->event_time))
+                @php
+                    $groupedSlots = collect($event->event_time)
+                        ->filter(fn($s) => !empty($s['time']) || !empty($s['title']))
+                        ->groupBy(fn($s) => $s['title'] ?? '');
+                @endphp
                 <div style="padding-top:24px; border-top:1px solid rgba(26,64,128,0.08);">
                     <div class="flex flex-wrap gap-2 items-center">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -343,23 +348,26 @@
                              style="flex-shrink:0;" aria-hidden="true">
                             <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                         </svg>
-                        @foreach($event->event_time as $slot)
+                        @foreach($groupedSlots as $title => $slots)
                         <div class="time-pill">
-                            @if(!empty($slot['title']))
+                            @if(!empty($title))
                                 <span style="font-size:9px; font-weight:700; letter-spacing:0.18em;
                                              text-transform:uppercase; color:rgba(13,42,82,0.45);
                                              font-family:'Jost',sans-serif; font-style:normal;">
-                                    {{ $slot['title'] }}
+                                    {{ $title }}
                                 </span>
-                                @if(!empty($slot['date']) || !empty($slot['time']))<span style="opacity:0.30;">·</span>@endif
+                                <span style="opacity:0.30;">·</span>
                             @endif
-                            @if(!empty($slot['date']))
-                                <span style="font-size:10px; font-weight:600; color:rgba(13,42,82,0.40); font-family:'Jost',sans-serif; font-style:normal;">{{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}</span>
-                                @if(!empty($slot['time']))<span style="opacity:0.30;">·</span>@endif
-                            @endif
-                            @if(!empty($slot['time']))
-                                {{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}
-                            @endif
+                            @foreach($slots as $slot)
+                                @if(!empty($slot['date']))
+                                    <span style="font-size:10px; font-weight:600; color:rgba(13,42,82,0.40); font-family:'Jost',sans-serif; font-style:normal;">{{ \Carbon\Carbon::parse($slot['date'])->format('M d') }}</span>
+                                @endif
+                                @if(!empty($slot['time']))
+                                    @if(!empty($slot['date']))<span style="opacity:0.30;">·</span>@endif
+                                    {{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}
+                                @endif
+                                @if(!$loop->last)<span style="opacity:0.30;">·</span>@endif
+                            @endforeach
                         </div>
                         @endforeach
                     </div>
@@ -480,13 +488,30 @@
                     </span>
                 </div>
                 <template x-if="selectedEvent?.event_time && selectedEvent.event_time.length > 0">
-                    <div class="flex flex-wrap gap-2">
-                        <template x-for="slot in selectedEvent.event_time" :key="slot.time">
+                    <div class="flex flex-wrap gap-2" x-data="{
+                        get groupedSlots() {
+                            if (!selectedEvent?.event_time) return [];
+                            const groups = {};
+                            selectedEvent.event_time.forEach(s => {
+                                const key = s.title || '';
+                                if (!groups[key]) groups[key] = [];
+                                groups[key].push(s);
+                            });
+                            return Object.entries(groups);
+                        }
+                    }">
+                        <template x-for="(group, gi) in groupedSlots" :key="gi">
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/5 border text-[11px] font-bold text-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                <span x-text="slot.title ? slot.title + ' · ' : ''"></span>
-                                <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · ' : ''"></span>
-                                <span x-text="new Date('2000-01-01T' + slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })"></span>
+                                <span x-show="group[0]" x-text="group[0] + ' \u00b7 '" class="text-[10px] uppercase font-black tracking-wider text-primary/60"></span>
+                                <template x-for="(slot, si) in group[1]" :key="si">
+                                    <span>
+                                        <span x-show="slot.date" x-text="slot.date ? new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''"></span>
+                                        <span x-show="slot.date && slot.time" style="opacity:0.30;">\u00b7</span>
+                                        <span x-text="slot.time ? new Date('2000-01-01T' + slot.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''"></span>
+                                        <span x-show="si < group[1].length - 1" style="opacity:0.30;">\u00b7</span>
+                                    </span>
+                                </template>
                             </span>
                         </template>
                     </div>

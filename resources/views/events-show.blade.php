@@ -86,15 +86,24 @@
                             <h2 class="text-xs font-black uppercase tracking-widest text-primary mb-6">Schedule Details</h2>
                             
                             @if(!empty($event->event_time))
+                                @php
+                                    $groupedSchedule = collect($event->event_time)
+                                        ->filter(fn($s) => !empty($s['time']) || !empty($s['title']))
+                                        ->groupBy(fn($s) => $s['title'] ?? '');
+                                @endphp
                                 <div class="space-y-4">
-                                    @foreach($event->event_time as $slot)
+                                    @foreach($groupedSchedule as $title => $slots)
                                         <div class="flex items-center justify-between group">
                                             <div class="flex flex-col">
-                                                <span class="text-[10px] uppercase font-black text-muted-foreground group-hover:text-accent transition-colors">{{ $slot['title'] ?? 'Main Session' }}</span>
-                                                @if(!empty($slot['date']))
-                                                    <span class="text-xs text-muted-foreground">{{ \Carbon\Carbon::parse($slot['date'])->format('M d, Y') }}</span>
-                                                @endif
-                                                <span class="font-bold text-primary">{{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}</span>
+                                                <span class="text-[10px] uppercase font-black text-muted-foreground group-hover:text-accent transition-colors">{{ $title ?: 'Main Session' }}</span>
+                                                @foreach($slots as $slot)
+                                                    <div class="flex items-center gap-2">
+                                                        @if(!empty($slot['date']))
+                                                            <span class="text-xs text-muted-foreground">{{ \Carbon\Carbon::parse($slot['date'])->format('M d, Y') }}</span>
+                                                        @endif
+                                                        <span class="font-bold text-primary">{{ \Carbon\Carbon::parse($slot['time'])->format('g:i A') }}</span>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                             <div class="h-8 w-8 rounded-full bg-white border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>

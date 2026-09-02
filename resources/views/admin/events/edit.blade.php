@@ -31,24 +31,36 @@
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Service
                 Times</label>
             <template x-for="(time, index) in times" :key="index">
-                <div class="flex gap-2 mb-2">
-                    <input type="text" :name="'event_time['+index+'][title]'" x-model="times[index].title"
-                        placeholder="Title (e.g. Mass)"
-                        class="flex-1 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-                    <input type="date" :name="'event_time['+index+'][date]'" x-model="times[index].date"
-                        class="w-36 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary text-[12px]"
-                        title="Optional: different date for this session">
-                    <input type="time" :name="'event_time['+index+'][time]'" x-model="times[index].time"
-                        class="w-32 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
-                    <button type="button" @click="times.splice(index, 1)" x-show="times.length > 1"
-                        class="px-3 py-2 bg-destructive/10 text-destructive rounded-md hover:bg-destructive hover:text-white transition-colors"
-                        title="Remove Time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <path d="M18 6 6 18" />
-                            <path d="m6 6 12 12" />
+                <div class="mb-3">
+                    <div class="flex gap-2">
+                        <input type="text" :name="'event_time['+index+'][title]'" x-model="times[index].title"
+                            placeholder="Title (e.g. Mass)"
+                            class="flex-1 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                        <input type="date" :name="'event_time['+index+'][date]'" x-model="times[index].date"
+                            class="w-36 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary text-[12px]"
+                            title="Optional: different date for this session">
+                        <input type="time" :name="'event_time['+index+'][time]'" x-model="times[index].time"
+                            class="w-32 bg-background border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                        <button type="button" @click="times.splice(index, 1)" x-show="times.length > 1"
+                            class="px-3 py-2 bg-destructive/10 text-destructive rounded-md hover:bg-destructive hover:text-white transition-colors"
+                            title="Remove Time">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="button" @click="times.splice(index + 1, 0, {title: times[index].title, date: '', time: ''})"
+                        x-show="times[index].title.trim() !== ''"
+                        class="text-[10px] font-bold text-muted-foreground hover:text-primary flex items-center gap-1 mt-1 ml-1 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
                         </svg>
+                        Add another time for "<span x-text="times[index].title" class="text-primary"></span>"
                     </button>
                 </div>
             </template>
