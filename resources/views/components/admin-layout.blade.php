@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin — Sto. Rosario Parish</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trix@2.0.8/dist/trix.min.css">
     @stack('styles')
     <style>
         [x-cloak] { display: none !important; }
@@ -300,6 +301,7 @@
     <x-admin-toast />
     <x-admin-confirm />
 
+    <script src="https://cdn.jsdelivr.net/npm/trix@2.0.8/dist/trix.min.js"></script>
     @stack('scripts')
 </body>
 </html>

@@ -1,17 +1,3 @@
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trix@2.0.8/dist/trix.min.css">
-    <style>
-        trix-editor {
-            min-height: 200px;
-            border: 1px solid rgba(0,0,0,.1);
-            border-radius: 0 0 0.375rem 0.375rem;
-            padding: 0.75rem 1rem;
-        }
-        trix-editor:focus { outline: none; box-shadow: 0 0 0 2px rgba(99,102,241,.2); }
-        .trix-toolbar { border-radius: 0.375rem 0.375rem 0 0; }
-    </style>
-@endpush
-
 <x-admin-form 
     title="Create Announcement" 
     description="Post a new update or news item for the parish community."
@@ -33,7 +19,7 @@
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Notice Content</label>
             <input type="hidden" name="content" id="announcement-content" value="{{ old('content') }}">
-            <trix-editor input="announcement-content" placeholder="Enter the full details of the announcement..."></trix-editor>
+            <trix-editor input="announcement-content" style="min-height:200px" placeholder="Enter the full details of the announcement..."></trix-editor>
             @error('content') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -82,7 +68,3 @@
         </div>
     </div>
 </x-admin-form>
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/trix@2.0.8/dist/trix.min.js"></script>
-@endpush
