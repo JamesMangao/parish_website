@@ -41,10 +41,16 @@
             </div>
 
             <div class="p-8 md:p-12">
-                <div class="mb-6">
+                <div class="mb-6 flex items-center gap-3">
                     <span class="inline-block text-[9.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border {{ $categoryStyles }}">
                         {{ strtoupper($category) }}
                     </span>
+                    @if($announcement->date_from)
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-primary bg-primary/5 px-2.5 py-0.5 rounded-full border border-primary/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            {{ \Carbon\Carbon::parse($announcement->date_from)->format('M d') }}@if($announcement->date_to) – {{ \Carbon\Carbon::parse($announcement->date_to)->format('M d') }}@endif
+                        </span>
+                    @endif
                 </div>
 
                 <h1 class="font-heading text-3xl md:text-5xl font-black text-primary mb-6 italic leading-tight">

@@ -35,6 +35,8 @@ class Announcement extends Model
         'is_featured',
         'published_at',
         'expires_at',
+        'date_from',
+        'date_to',
         'created_by',
     ];
 
@@ -44,6 +46,8 @@ class Announcement extends Model
         'is_featured' => 'boolean',
         'published_at' => 'datetime',
         'expires_at' => 'datetime',
+        'date_from' => 'date',
+        'date_to' => 'date',
     ];
 
     public function scopeActive($query)

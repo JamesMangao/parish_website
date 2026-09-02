@@ -40,6 +40,8 @@ class AnnouncementController extends Controller
             'is_recruitment' => $ann->is_recruitment,
             'registration_link' => $ann->registration_link,
             'published_at' => $ann->published_at?->format('M d, Y'),
+            'date_from' => $ann->date_from?->format('Y-m-d'),
+            'date_to' => $ann->date_to?->format('Y-m-d'),
             'url' => route('announcements.show', $ann),
         ]);
 
@@ -87,6 +89,8 @@ class AnnouncementController extends Controller
             'is_recruitment' => $ann->is_recruitment,
             'registration_link' => $ann->registration_link,
             'published_at' => $ann->published_at?->format('M d, Y'),
+            'date_from' => $ann->date_from?->format('Y-m-d'),
+            'date_to' => $ann->date_to?->format('Y-m-d'),
             'url' => route('announcements.show', $ann),
         ]);
 
@@ -172,6 +176,8 @@ class AnnouncementController extends Controller
             'registration_link' => 'nullable|url|max:255',
             'is_published' => 'boolean',
             'expires_at' => 'nullable|date',
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date',
         ]);
 
         if ($validated['category'] === Announcement::CATEGORY_OTHER) {

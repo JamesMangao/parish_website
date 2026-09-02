@@ -3,21 +3,92 @@
         <meta name="description" content="Stay updated with the latest announcements and parish news from Sto. Rosario Parish.">
         <meta property="og:title" content="Parish Announcements | Sto. Rosario Parish">
         <meta property="og:description" content="Latest news, novenas, community updates, and event announcements from Sto. Rosario Parish.">
+        <style>
+            .eyebrow {
+                font-size: 10px; font-weight: 600;
+                letter-spacing: 0.32em; text-transform: uppercase;
+                color: var(--color-gold-dark);
+            }
+            .divider-ornament {
+                display: flex; align-items: center; gap: 12px; justify-content: center;
+            }
+            .divider-ornament::before,
+            .divider-ornament::after {
+                content: ''; height: 1px; width: 48px;
+                background: linear-gradient(90deg, transparent, rgba(245,197,24,0.5));
+            }
+            .divider-ornament::after {
+                background: linear-gradient(90deg, rgba(245,197,24,0.5), transparent);
+            }
+
+            @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+            @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+            .animate-fade-up { animation: fadeUp 0.9s ease both; }
+            .animate-fade-in { animation: fadeIn 1.2s ease both; }
+            .delay-1 { animation-delay: 0.15s; }
+            .delay-2 { animation-delay: 0.30s; }
+
+            .page-hero {
+                background: linear-gradient(160deg, var(--blue-deep) 0%, var(--blue-mid) 60%, #0f3060 100%);
+                position: relative; overflow: hidden;
+            }
+            .page-hero::before {
+                content: ''; position: absolute; inset: 0;
+                background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(245,197,24,0.10) 0%, transparent 70%);
+                pointer-events: none;
+            }
+        </style>
     </x-slot>
 
-    <section class="max-w-6xl mx-auto px-6 pb-16" style="padding-top:160px" x-data="announcementTabs()" x-init="init()">
-        {{-- Header --}}
-        <div class="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <p class="text-[12px] font-black uppercase tracking-[0.3em] text-accent mb-4">Stay Informed</p>
-            <h1 class="font-heading text-4xl md:text-6xl font-black mb-6 text-primary italic uppercase leading-tight">
+    {{-- ═══════════════════════════════════════════════════ --}}
+    {{-- PAGE HERO                                          --}}
+    {{-- ═══════════════════════════════════════════════════ --}}
+    <section class="page-hero py-24 md:py-32">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none font-cinzel leading-none"
+             style="font-size:340px; color:rgba(255,255,255,0.018);" aria-hidden="true">✝</div>
+        <div class="absolute top-0 left-0 right-0 h-px"
+             style="background:linear-gradient(90deg,transparent,rgba(245,197,24,0.35),transparent);"></div>
+
+        <div class="max-w-[1200px] mx-auto px-6 relative z-10 text-center">
+            <div class="flex justify-center mb-6 animate-fade-in">
+                <div class="relative flex items-center justify-center" style="width:52px;height:52px;">
+                    <svg width="52" height="52" viewBox="0 0 52 52" style="position:absolute;inset:0;" fill="none" aria-hidden="true">
+                        <line x1="26" y1="2"  x2="26" y2="10" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="26" y1="42" x2="26" y2="50" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="2"  y1="26" x2="10" y2="26" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="42" y1="26" x2="50" y2="26" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="8"  y1="8"  x2="13" y2="13" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="39" y1="39" x2="44" y2="44" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="44" y1="8"  x2="39" y2="13" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="8"  y1="44" x2="13" y2="39" stroke="rgba(245,197,24,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <span class="font-cinzel relative z-10" style="color:var(--color-gold);font-size:1.5rem;" aria-hidden="true">✝</span>
+                </div>
+            </div>
+
+            <div class="divider-ornament mb-4 animate-fade-in delay-1">
+                <span class="eyebrow" style="color:rgba(245,197,24,0.70);">Stay Informed</span>
+            </div>
+
+            <h1 class="font-heading animate-fade-up delay-1"
+                style="font-size:clamp(2.8rem,6vw,5.5rem); font-weight:700; font-style:italic;
+                       color:#FFF; line-height:1.05; letter-spacing:-0.01em; margin-bottom:16px;
+                       text-shadow:0 4px 32px rgba(0,0,0,0.45);">
                 Parish Announcements
             </h1>
-            <div class="h-1.5 w-32 bg-accent mx-auto rounded-full mb-8"></div>
-            <p class="text-xl text-muted-foreground max-w-2xl mx-auto italic">
+
+            <p class="font-heading animate-fade-up delay-2"
+               style="font-style:italic; color:rgba(245,197,24,0.75);
+                      font-size:clamp(0.9rem,1.8vw,1.1rem); font-weight:300;">
                 Latest news, novenas, and community updates from Sto. Rosario Parish.
             </p>
         </div>
 
+        <div class="absolute bottom-0 left-0 right-0 h-px"
+             style="background:linear-gradient(90deg,transparent,rgba(245,197,24,0.25),transparent);"></div>
+    </section>
+
+    <section id="announcements-grid" class="max-w-6xl mx-auto px-6 pt-16 pb-16" x-data="announcementTabs()" x-init="init()">
         {{-- Tab Bar --}}
         <div class="relative mb-10">
             <div class="flex items-center justify-center gap-0 border-b-2 border-muted/50 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" x-ref="tabBar">
@@ -75,6 +146,12 @@
                                 <a :href="ann.url" class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded" x-text="ann.title"></a>
                             </h3>
                             <p class="text-sm text-muted-foreground leading-relaxed line-clamp-2 min-h-[2.6em] mb-4" x-text="ann.content"></p>
+                            <template x-if="ann.date_from">
+                                <div class="flex items-center gap-1.5 mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    <span class="text-[11px] font-bold text-primary" x-text="new Date(ann.date_from + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + (ann.date_to ? ' – ' + new Date(ann.date_to + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '')"></span>
+                                </div>
+                            </template>
                             <div class="mt-auto pt-4 border-t border-muted flex items-center justify-between">
                                 <a :href="ann.url" class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-primary hover:text-accent transition-colors">
                                     Read more <span aria-hidden="true">&rarr;</span>

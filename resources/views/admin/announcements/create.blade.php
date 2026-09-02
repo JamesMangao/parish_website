@@ -33,6 +33,26 @@
             @error('expires_at') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
+        <div x-data="{ dateFrom: '{{ old('date_from') }}', dateTo: '{{ old('date_to') }}' }">
+            <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Date Range (Optional)</label>
+            <div class="flex items-center gap-3">
+                <div class="flex-1">
+                    <input type="date" name="date_from" x-model="dateFrom"
+                        class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                    <p class="text-[10px] text-muted-foreground mt-1">From</p>
+                </div>
+                <span class="text-xs font-bold text-muted-foreground mt-1">to</span>
+                <div class="flex-1">
+                    <input type="date" name="date_to" x-model="dateTo"
+                        class="w-full bg-background border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-primary">
+                    <p class="text-[10px] text-muted-foreground mt-1">To</p>
+                </div>
+            </div>
+            <p class="text-xs text-muted-foreground mt-1">Display a date range on the announcement (e.g. "Novena – Aug 30 to Sep 7").</p>
+            @error('date_from') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+            @error('date_to') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
+        </div>
+
         <div class="space-y-4 pt-4 border-t" x-data="{ isRecruitment: {{ old('is_recruitment', 0) }} }">
             <div class="flex items-center gap-3">
                 <input type="hidden" name="is_recruitment" value="0">
