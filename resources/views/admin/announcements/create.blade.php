@@ -18,8 +18,10 @@
 
         <div>
             <label class="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Notice Content</label>
-            <input type="hidden" name="content" id="announcement-content" value="{{ old('content') }}">
-            <trix-editor input="announcement-content" style="min-height:200px" placeholder="Enter the full details of the announcement..."></trix-editor>
+            <textarea name="content" rows="10" required
+                class="w-full bg-background border rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-primary"
+                placeholder="Enter the full details of the announcement...">{{ old('content') }}</textarea>
+            <p class="text-[10px] text-muted-foreground mt-1">Line breaks will be preserved on the public page.</p>
             @error('content') <p class="text-xs text-destructive mt-1">{{ $message }}</p> @enderror
         </div>
 
