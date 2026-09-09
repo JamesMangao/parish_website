@@ -53,7 +53,11 @@ class GalleryAlbumController extends Controller
                 $this->uploadMany($album, $request->file('images'));
             }
 
-            LogService::log('create_album', $album, ['title' => $album->title]);
+            try {
+                LogService::log('create_album', $album, ['title' => $album->title]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to log album creation: ' . $e->getMessage());
+            }
             return $this->redirectOrJson($request, 'admin.gallery.index', 'Album created successfully!');
         } catch (\Exception $e) {
             if (isset($album)) $album->delete(); // Cleanup if failed partway

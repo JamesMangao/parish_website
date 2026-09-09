@@ -150,19 +150,27 @@
             body: formData,
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         })
-        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(r => r.text().then(text => {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                data = { message: 'Server returned an unexpected response. Please try again.' };
+            }
+            return { ok: r.ok, data };
+        }))
         .then(({ ok, data }) => {
             if (ok) {
-                $store.toast.trigger(data.message || 'Album created successfully!', 'success');
+                Alpine.store('toast').trigger(data.message || 'Album created successfully!', 'success');
                 setTimeout(() => { window.location.href = '{{ route('admin.gallery.index') }}'; }, 800);
             } else {
                 const msgs = data.errors ? Object.values(data.errors).flat().join('\n') : (data.message || 'Something went wrong.');
-                $store.toast.trigger(msgs, 'error');
+                Alpine.store('toast').trigger(msgs, 'error');
                 alpine.loading = false;
             }
         })
         .catch(() => {
-            $store.toast.trigger('Network error. Please try again.', 'error');
+            Alpine.store('toast').trigger('Network error. Please try again.', 'error');
             alpine.loading = false;
         });
     }
