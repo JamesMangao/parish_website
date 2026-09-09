@@ -95,13 +95,13 @@ class GalleryAlbumController extends Controller
         return $this->redirectOrJson($request, 'admin.gallery.index', 'Album updated!');
     }
 
-    public function destroy(GalleryAlbum $gallery)
+    public function destroy(Request $request, GalleryAlbum $gallery)
     {
         LogService::log('delete_album', $gallery, ['title' => $gallery->title]);
         $gallery->delete(); // Images cascade delete via DB
         Cache::forget('gallery_public_index_v2');
         Cache::forget('gallery_highlights');
-        return back()->with('success', 'Album removed.');
+        return $this->redirectOrJson($request, 'admin.gallery.index', 'Album removed.');
     }
 
     public function addImages(Request $request, GalleryAlbum $album)

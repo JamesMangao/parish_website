@@ -22,7 +22,7 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($albums as $album)
-                    <div class="bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] group overflow-hidden hover:shadow-lg hover:shadow-black/[.06] hover:border-black/[.08] transition-all duration-300 flex flex-col">
+                    <div class="gallery-card bg-white rounded-2xl border border-black/[.04] shadow-sm shadow-black/[.02] group overflow-hidden hover:shadow-lg hover:shadow-black/[.06] hover:border-black/[.08] transition-all duration-300 flex flex-col">
                         <div class="aspect-video bg-[#F5F7FA] relative overflow-hidden shrink-0">
                             @if($album->images->count() > 0)
                                 <img src="{{ $album->images->first()->url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
@@ -53,14 +53,11 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                                         Edit
                                     </a>
-                                    <form :id="'delete-album-{{ $album->id }}'" action="{{ route('admin.gallery.destroy', $album) }}" method="POST">
-                                        @csrf @method('DELETE')
-                                        <button type="button"
-                                            @click="$store.confirm.open({ title: 'Delete Album', message: 'Are you sure you want to permanently remove this album and all its images? This action cannot be undone.', onConfirm: () => document.getElementById('delete-album-{{ $album->id }}').submit() })"
-                                            class="p-2 rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
-                                        </button>
-                                    </form>
+<button type="button" x-data
+                                        @click="$store.confirm.open({ title: 'Delete Album', message: 'Are you sure you want to permanently remove this album and all its images? This action cannot be undone.', onConfirm: () => deleteAlbumFromList('{{ route('admin.gallery.destroy', $album) }}', $el) })"
+                                        class="p-2 rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-0 1-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
+                                    </button>
                                 </div>
                                 <span class="text-[9px] text-muted-foreground/30 font-bold uppercase tracking-wider">{{ $album->created_at->format('M d, Y') }}</span>
                             </div>
@@ -70,4 +67,45 @@
             </div>
         @endif
     </div>
+
+    @push('scripts')
+    <script>
+    function deleteAlbumFromList(url, el) {
+        const card = el.closest('.gallery-card');
+        if (!card || card.dataset.deleting) return;
+        card.dataset.deleting = '1';
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        })
+        .then(r => r.text().then(text => {
+            let data;
+            try { data = JSON.parse(text); } catch (e) { data = { message: 'Server returned an unexpected response. Please try again.' }; }
+            return { ok: r.ok, data };
+        }))
+        .then(({ ok, data }) => {
+            if (!ok) {
+                delete card.dataset.deleting;
+                Alpine.store('toast').trigger(data.message || 'Failed to delete album.', 'error');
+                return;
+            }
+            Alpine.store('toast').trigger(data.message || 'Album removed.', 'success');
+            card.style.transition = 'opacity .3s ease, transform .3s ease, height .3s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(.95)';
+            setTimeout(() => card.remove(), 320);
+            setTimeout(() => { if (!document.querySelector('.gallery-card')) window.location.reload(); }, 360);
+        })
+        .catch(() => {
+            delete card.dataset.deleting;
+            Alpine.store('toast').trigger('Network error. Please try again.', 'error');
+        });
+    }
+    </script>
+    @endpush
 </x-admin-layout>

@@ -121,13 +121,13 @@ class EventsController extends Controller
         return $this->redirectOrJson($request, 'admin.events.index', 'Event updated.');
     }
 
-    public function destroy(Event $event)
+    public function destroy(Request $request, Event $event)
     {
         LogService::log('delete_event', $event, ['title' => $event->title]);
         Cache::forget('chatbot_parish_context');
         Cache::forget('public_events_all');
         $event->delete();
 
-        return back()->with('success', 'Event deleted.');
+        return $this->redirectOrJson($request, 'admin.events.index', 'Event deleted.');
     }
 }
