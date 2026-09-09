@@ -87,6 +87,7 @@ class SettingController extends Controller
 
         Cache::forget('global_settings');
         Cache::forget('chatbot_parish_context');
+        Cache::forget('about_settings');
 
         LogService::log('update_settings', null, ['section' => $section, 'keys' => array_keys($validated)]);
 

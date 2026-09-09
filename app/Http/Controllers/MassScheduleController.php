@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\MassSchedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class MassScheduleController extends Controller
 {
     public function index()
     {
-        $schedules = MassSchedule::where('is_active', true)
-            ->orderByRaw('time->>0 asc')
-            ->get()
-            ->groupBy('mass_type');
+        $schedules = Cache::remember('public_mass_schedules', now()->addHours(24), function () {
+            return MassSchedule::where('is_active', true)
+                ->orderByRaw('time->>0 asc')
+                ->get()
+                ->groupBy('mass_type');
+        });
 
         return view('mass-schedule', compact('schedules'));
     }

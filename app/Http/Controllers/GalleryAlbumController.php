@@ -6,6 +6,7 @@ use App\Models\GalleryAlbum;
 use App\Models\GalleryImage;
 use App\Services\LogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -58,6 +59,8 @@ class GalleryAlbumController extends Controller
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Failed to log album creation: ' . $e->getMessage());
             }
+            Cache::forget('gallery_public_index_v2');
+            Cache::forget('gallery_highlights');
             return $this->redirectOrJson($request, 'admin.gallery.index', 'Album created successfully!');
         } catch (\Exception $e) {
             if (isset($album)) $album->delete(); // Cleanup if failed partway
@@ -88,6 +91,7 @@ class GalleryAlbumController extends Controller
         ]);
 
         LogService::log('update_album', $gallery, ['title' => $gallery->title]);
+        Cache::forget('gallery_public_index_v2');
         return $this->redirectOrJson($request, 'admin.gallery.index', 'Album updated!');
     }
 
@@ -95,6 +99,8 @@ class GalleryAlbumController extends Controller
     {
         LogService::log('delete_album', $gallery, ['title' => $gallery->title]);
         $gallery->delete(); // Images cascade delete via DB
+        Cache::forget('gallery_public_index_v2');
+        Cache::forget('gallery_highlights');
         return back()->with('success', 'Album removed.');
     }
 
@@ -111,6 +117,7 @@ class GalleryAlbumController extends Controller
             $this->uploadMany($album, $request->file('images'));
         }
 
+        Cache::forget('gallery_public_index_v2');
         LogService::log('add_album_images', $album, ['title' => $album->title, 'count' => $request->file('images') ? count($request->file('images')) : 0]);
         return back()->with('success', 'Images added to album!');
     }
@@ -120,6 +127,7 @@ class GalleryAlbumController extends Controller
         $album = $image->album;
         LogService::log('remove_album_image', $album, ['image_title' => $image->title, 'image_id' => $image->id]);
         $image->delete();
+        Cache::forget('gallery_public_index_v2');
         return back()->with('success', 'Image removed from album.');
     }
 

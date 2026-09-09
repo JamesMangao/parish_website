@@ -21,25 +21,33 @@ class GalleryController extends Controller
 
     public function publicIndex()
     {
-        $albums = GalleryAlbum::where('is_published', true)
-            ->with(['images' => function($q) {
-                $q->orderBy('created_at', 'desc');
-            }])
-            ->withCount('images')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $albums = \Illuminate\Support\Facades\Cache::remember('gallery_public_index_v2', now()->addMinutes(10), function () {
+            return GalleryAlbum::where('is_published', true)
+                ->withCount('images')
+                ->withCount(['images as video_count' => function($q) {
+                    $q->where('type', 'video');
+                }])
+                ->with('coverImage')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        });
 
-        $latestItems = GalleryImage::whereHas('album', function($q) {
+        $latestItems = GalleryImage::with(['album' => function($q) {
+                $q->where('is_published', true);
+            }])
+            ->whereHas('album', function($q) {
                 $q->where('is_published', true);
             })
             ->orderBy('created_at', 'desc')
             ->limit(12)
             ->get();
 
-        $highlights = VideoHighlight::where('is_published', true)
-            ->orderBy('sort_order', 'asc')
-            ->get();
- 
+        $highlights = \Illuminate\Support\Facades\Cache::remember('gallery_highlights', now()->addMinutes(10), function () {
+            return VideoHighlight::where('is_published', true)
+                ->orderBy('sort_order', 'asc')
+                ->get();
+        });
+
         return view('gallery', compact('albums', 'latestItems', 'highlights'));
     }
 

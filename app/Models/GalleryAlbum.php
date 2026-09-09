@@ -29,4 +29,9 @@ class GalleryAlbum extends Model
     {
         return $this->hasMany(GalleryImage::class, 'album_id');
     }
+
+    public function coverImage()
+    {
+        return $this->hasOne(GalleryImage::class, 'album_id')->latestOfMany();
+    }
 }

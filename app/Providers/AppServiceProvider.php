@@ -37,7 +37,11 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+            $settingsReady = \Illuminate\Support\Facades\Cache::remember('settings_table_ready', 86400, function () {
+                return \Illuminate\Support\Facades\Schema::hasTable('settings');
+            });
+
+            if ($settingsReady) {
                 $settings = \Illuminate\Support\Facades\Cache::remember('global_settings', now()->addHour(), function () {
                     return \App\Models\Setting::all()->pluck('value', 'key')->all();
                 });

@@ -44,7 +44,9 @@ services:
           name: parish-db
           property: password
       - key: CACHE_STORE
-        value: database
+        value: file
+      - key: SESSION_DRIVER
+        value: file
       - key: QUEUE_CONNECTION
         value: database
       - key: SUPABASE_URL

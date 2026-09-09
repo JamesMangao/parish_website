@@ -24,7 +24,9 @@ class AboutController extends Controller
             'priest_contrib_confirmed',
         ];
 
-        $aboutSettings = Setting::whereIn('key', $keys)->pluck('value', 'key');
+        $aboutSettings = Cache::remember('about_settings', now()->addHour(), function () use ($keys) {
+            return Setting::whereIn('key', $keys)->pluck('value', 'key');
+        });
 
         $aboutVideoUrl = trim($aboutSettings['about_video_url'] ?? '');
         $formerPriestsRaw = $aboutSettings['former_priests'] ?? '[]';

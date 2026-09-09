@@ -200,29 +200,13 @@
                 _lastFailedMessage: null,
                 _prevStatus: null,
                 _resolved: false,
+                _sessionChecked: false,
                 _sessionKey: 'srp_chatbot_state',
 
                 async init() {
                     this.loadState();
 
-                    if (this.messages.length === 0) {
-                        // Check session status BEFORE showing welcome
-                        try {
-                            const res = await fetch('/api/chatbot/session-status');
-                            const d = await res.json();
-                            if (d.status === 'resolved') {
-                                this._resolved = true;
-                                this.saveState();
-                                return;
-                            }
-                        } catch (e) {}
-                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Sto. Rosario Parish. I\'m here to help with anything — Mass schedules, intentions, sacraments, events, donations, or just about the faith. What\'s on your mind?'));
-                        this.currentSuggestions = [
-                            '⛪ Mass Schedules',
-                            '🕯️ Offer Mass Intention',
-                            '📝 Sacramental Inquiry'
-                        ];
-                    } else {
+                    if (this.messages.length > 0) {
                         this.showChips = false;
                     }
                     // Resume polling if we were in a live agent state
@@ -238,6 +222,30 @@
                     this.$watch('lastMessageId', () => this.saveState());
                 },
 
+                async ensureSessionChecked() {
+                    if (this._sessionChecked) return;
+                    this._sessionChecked = true;
+                    try {
+                        const res = await fetch('/api/chatbot/session-status');
+                        const d = await res.json();
+                        if (d.status === 'resolved') {
+                            this._resolved = true;
+                            this.saveState();
+                        }
+                    } catch (e) {}
+                },
+
+                async pushWelcome() {
+                    if (this.messages.length > 0) return;
+                    this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Sto. Rosario Parish. I\'m here to help with anything — Mass schedules, intentions, sacraments, events, donations, or just about the faith. What\'s on your mind?'));
+                    this.currentSuggestions = [
+                        '⛪ Mass Schedules',
+                        '🕯️ Offer Mass Intention',
+                        '📝 Sacramental Inquiry'
+                    ];
+                    this.showChips = true;
+                },
+
                 toggle() {
                     this.open = !this.open;
                     if (this.open) {
@@ -246,6 +254,11 @@
                             this.scrollToBottom();
                             this.$refs.chatInput.focus();
                         });
+                        if (this.messages.length === 0) {
+                            this.ensureSessionChecked().then(() => {
+                                if (!this._resolved) this.pushWelcome();
+                            });
+                        }
                     }
                 },
 

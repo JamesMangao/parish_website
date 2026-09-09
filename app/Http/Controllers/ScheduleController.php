@@ -40,6 +40,7 @@ class ScheduleController extends Controller
 
         MassSchedule::create($validated);
         Cache::forget('chatbot_parish_context');
+        Cache::forget('public_mass_schedules');
         LogService::log('create_schedule', null, ['mass_type' => $validated['mass_type'], 'day_of_week' => $validated['day_of_week'] ?? null, 'time' => $validated['time'] ?? null]);
 
         return $this->redirectOrJson($request, 'admin.schedules.index', 'Schedule created.');
@@ -64,6 +65,7 @@ class ScheduleController extends Controller
         ]);
         $schedule->update($validated);
         Cache::forget('chatbot_parish_context');
+        Cache::forget('public_mass_schedules');
         LogService::log('update_schedule', $schedule, ['mass_type' => $validated['mass_type'] ?? null]);
 
         return $this->redirectOrJson($request, 'admin.schedules.index', 'Schedule updated.');
@@ -73,6 +75,7 @@ class ScheduleController extends Controller
     {
         LogService::log('delete_schedule', $schedule, ['mass_type' => $schedule->mass_type]);
         Cache::forget('chatbot_parish_context');
+        Cache::forget('public_mass_schedules');
         $schedule->delete();
 
         return back()->with('success', 'Schedule deleted.');

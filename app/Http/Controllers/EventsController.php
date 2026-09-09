@@ -13,20 +13,18 @@ class EventsController extends Controller
     {
         $view = $request->get('view', 'list');
 
-        $events = Event::where('is_published', true)
-            ->whereDate('event_date', '>=', now())
-            ->orderBy('event_date', 'asc')
-            ->get();
+        $allEvents = Cache::remember('public_events_all', now()->addMinutes(15), function () {
+            return Event::where('is_published', true)
+                ->orderBy('event_date', 'asc')
+                ->get();
+        });
+
+        $events = $allEvents->filter(fn($e) => $e->event_date && $e->event_date->isFuture())->values();
 
         $month = $request->get('month', now()->month);
         $year = $request->get('year', now()->year);
 
-        $calendarEvents = Event::where('is_published', true)
-            ->whereMonth('event_date', $month)
-            ->whereYear('event_date', $year)
-            ->get();
-
-        $allEvents = Event::where('is_published', true)->orderBy('event_date', 'asc')->get();
+        $calendarEvents = $allEvents->filter(fn($e) => $e->event_date && $e->event_date->month == $month && $e->event_date->year == $year)->values();
 
         $eventsJson = $allEvents->map(fn ($e) => [
             'id' => $e->id,
@@ -86,6 +84,7 @@ class EventsController extends Controller
 
         Event::create($validated);
         Cache::forget('chatbot_parish_context');
+        Cache::forget('public_events_all');
         LogService::log('create_event', null, ['title' => $validated['title'], 'event_date' => $validated['event_date']]);
 
         return $this->redirectOrJson($request, 'admin.events.index', 'Event created.');
@@ -116,6 +115,7 @@ class EventsController extends Controller
 
         $event->update($validated);
         Cache::forget('chatbot_parish_context');
+        Cache::forget('public_events_all');
         LogService::log('update_event', $event, ['title' => $event->title]);
 
         return $this->redirectOrJson($request, 'admin.events.index', 'Event updated.');
@@ -125,6 +125,7 @@ class EventsController extends Controller
     {
         LogService::log('delete_event', $event, ['title' => $event->title]);
         Cache::forget('chatbot_parish_context');
+        Cache::forget('public_events_all');
         $event->delete();
 
         return back()->with('success', 'Event deleted.');

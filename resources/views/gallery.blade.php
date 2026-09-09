@@ -454,12 +454,12 @@
                   height:480px; border:1px solid rgba(26,64,128,0.12);
                   box-shadow:0 12px 50px rgba(13,42,82,0.12); text-decoration:none;">
 
-            @if($featured->images->count() > 0)
-                @php $firstItem = $featured->images->first(); @endphp
+            @if($featured->coverImage)
+                @php $firstItem = $featured->coverImage; @endphp
                 <img src="{{ $firstItem->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $firstItem->url }}" alt="{{ $featured->title }}"
                      style="width:100%; height:100%; object-fit:cover; transition:transform 3s ease;"
                      class="group-hover:scale-105">
-                @if($firstItem->type === 'video' || $featured->images->where('type', 'video')->count() > 0)
+                @if($firstItem->type === 'video' || ($featured->video_count ?? 0) > 0)
                     <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5;">
                         <div style="width:72px; height:72px; border-radius:50%; background:rgba(245,197,24,0.9); display:flex; align-items:center; justify-content:center; box-shadow:0 12px 32px rgba(0,0,0,0.4);">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="#0D2A52"><path d="M8 5v14l11-7z"/></svg>
@@ -526,8 +526,8 @@
                style="display:flex; flex-direction:column; text-decoration:none; overflow:hidden;">
 
                 <div style="position:relative; aspect-ratio:4/3; overflow:hidden; background:var(--cream-deep);">
-                    @if($album->images->count() > 0)
-                        @php $thumb = $album->images->first(); @endphp
+                    @if($album->coverImage)
+                        @php $thumb = $album->coverImage; @endphp
                         <div x-data="{ loaded: false }" class="relative w-full h-full">
                             <div x-show="!loaded" class="absolute inset-0 skeleton z-10"></div>
                             <img src="{{ $thumb->type === 'video' ? 'https://images.pexels.com/photos/1117132/pexels-photo-1117132.jpeg' : $thumb->url }}"
@@ -537,7 +537,7 @@
                                  class="group-hover:scale-110" loading="lazy"
                                  @load="loaded = true">
                         </div>
-                        @if($thumb->type === 'video' || $album->images->where('type', 'video')->count() > 0)
+                        @if($thumb->type === 'video' || ($album->video_count ?? 0) > 0)
                             <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5;">
                                 <div style="width:40px; height:40px; border-radius:50%; background:rgba(245,197,24,0.85); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.3);">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#0D2A52"><path d="M8 5v14l11-7z"/></svg>
