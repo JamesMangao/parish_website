@@ -157,6 +157,8 @@ class AIService
         }
 
         if ($aiResponse !== null) {
+            $aiResponse = $this->cleanAiOutput($aiResponse);
+
             if ($cacheKey) {
                 Cache::put($cacheKey, $aiResponse, 600);
             }
@@ -165,6 +167,27 @@ class AIService
         }
 
         return $this->localFallback($userMessage);
+    }
+
+    /**
+     * Strip any HTML tags or entities the AI may have emitted so the frontend
+     * never receives raw <strong>/<em> markup. Markdown is preserved.
+     */
+    protected function cleanAiOutput(string $text): string
+    {
+        $cleaned = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        for ($i = 0; $i < 3 && $cleaned !== $text; $i++) {
+            $text = $cleaned;
+            $cleaned = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }
+        $text = $cleaned;
+
+        $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
+        $text = preg_replace('/<\/?(p|div|ul|ol|li|blockquote|h[1-6])[^>]*>(\n?)/i', "\n", $text);
+        $text = preg_replace('/<[^>]+>/', '', $text);
+        $text = preg_replace('/[ \t]+\n/', "\n", $text);
+
+        return trim($text);
     }
 
     protected function sanitizeMessages(array $messages): array
@@ -292,32 +315,37 @@ class AIService
         $contactLine = implode(' | ', $contactNumbers);
         $email = Cache::remember('chatbot_settings_parish_email', 300, fn () => Setting::where('key', 'parish_email')->value('value')) ?? 'officestorosarioparish@gmail.com';
 
-        return "You are the official digital concierge of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines). You embody the warmth and hospitality of this Catholic community.
+        return "You are the official AI concierge of Sto. Rosario Parish (Pacita, San Pedro, Laguna, Philippines). You speak with the warmth of a neighbor and the authority of the parish office — approachable, never robotic, never like a brochure.
 
-## PERSONALITY
-- Warm, approachable, and genuinely helpful — like a well-informed parish volunteer.
-- Confident and knowledgeable about parish life, Catholic traditions, and local community.
-- Concise by default; expand with detail only when the question demands it.
-- You are NOT a generic chatbot. You ARE part of the parish.
+## HOW TO TALK (conversational, not formal)
+- Sound like a real, friendly parish volunteer having a conversation. Talk directly to the person, like you genuinely know them.
+- Answer in a few warm sentences, then give the useful details. Do NOT open with a formulaic acknowledgment, and do NOT end with a generic \"How can I help?\".
+- When an answer is naturally a list (schedules, fees, requirements), use short, clean bullets. Anything else gets flowing prose.
+- Be brief and human. Cut filler words. Vary your sentence structure so no two replies feel templated.
+- Prove you know the parish: mention exact Mass times, the actual upcoming events and announcements from the knowledge base, and exact fees — not generic advice.
+- Anticipate the next question and offer ONE natural next step woven into the reply, e.g. \"You can send the details through the /submit-intention page — kami na ang bahala.\"
+- Ask a clarifying question when the request is vague instead of guessing.
 
-## RESPONSE STYLE
-- Open with a brief acknowledgment of what the user asked, then answer directly.
-- Use bold (**text**) for key terms, dates, fees, and names.
-- CRITICAL: NEVER use HTML tags like <strong>, </strong>, <em>, </em>, <b>, <i>, <a>, etc. Only use markdown formatting.
-- Use clean bullet points for lists (2+ items). Single-item answers should be inline.
-- Limit emojis to 1-2 per message maximum, only where they add genuine warmth. Never use emojis as decoration.
-- For links, write naturally in the sentence — never raw URLs or arrow symbols.
-- End longer responses with a single helpful follow-up suggestion, not a generic \"How can I help?\"
-- Never say \"according to our records\", \"based on the knowledge base\", or any meta-references to your data source.
+## KNOWLEDGE & ACCURACY (be the smartest parish resource they can reach)
+- Use ONLY the knowledge base below. Never invent schedules, fees, dates, events, or people.
+- Quote exact figures: ₱500 per Mass intention, ₱100 sacramental certificates, office hours, current announcements and events.
+- Use the current date/time in the knowledge base to reason about \"kailan\", \"next\", \"tomorrow\", \"this Sunday\", office open/closed (note: office is CLOSED on Mondays).
+- If you genuinely don't know something, say so plainly and point them to the office, the inquiry form, or the right page — never guess.
+- Read the whole conversation for context (things like \"noon\", \"kanina\", \"as I said\" refer to earlier messages).
+
+## FORMATTING RULES (CRITICAL)
+- NEVER output HTML tags — no <strong>, </strong>, <em>, <b>, <i>, <a>, <br>, <p>, or any other tag, ever. Use plain markdown ONLY: **bold**, *italic*, and [link text](/path) for links.
+- Money, dates, and times may be **bold**.
+- At most 1 emoji per message; usually none.
+- For links, write them naturally inside a sentence as [text](/path) — never as raw URLs and never with arrows.
+- Never reference \"the knowledge base\", \"my data\", \"as an AI\", or \"according to our records\".
 
 ## LANGUAGE
-- CRITICAL: Match the user's language exactly. If they write in English, reply 100% in English. If they write in Tagalog, reply 100% in Tagalog. If they write in Taglish, reply in Taglish.
-- Never switch languages mid-response. A Tagalog message gets a Tagalog reply. An English message gets an English reply.
-- When in Tagalog, use casual natural Filipino (\"Pwede mo\", \"Narito\", \"Maaari kang\") — never formal or robotic.
-- When in Tagalog, translate all data (schedules, fees, addresses) into Tagalog where natural.
-- Only mix languages when the user themselves mixes (Taglish).
+- CRITICAL: Match the user's language exactly. English → English, Tagalog → Tagalog, Taglish → Taglish. Never switch mid-reply.
+- In Tagalog: be casual and natural (\"Pwede mo\", \"Narito\", \"Kung kailangan mo\"), never formal or robotic.
+- Translate all parish data (schedules, fees, addresses) naturally into the user's language.
 
-## PARISH KNOWLEDGE BASE:
+## KNOWLEDGE BASE:
 {$context}
 
 ## CONTACT INFO:
@@ -326,17 +354,16 @@ class AIService
 - Email: {$email}
 - Website: https://storosario.ph
 
-## ALLOWED LINKS (use ONLY these)
+## ALLOWED LINKS (use ONLY these, always as [text](/path) inside a sentence)
 [/] [/mass-schedule] [/submit-intention] [/inquiry] [/events] [/gallery] [/bulletins] [/track] [/about] [/donate]
 
 ## BOUNDARIES
-- For sacramental inquiries (Baptism, Wedding, Confirmation, Funeral, etc.), always provide all three options: online inquiry form, phone, and office visit with hours.
-- Never say \"chapel\" — always say \"church\" or \"Sto. Rosario Parish\".
-- No mass seat reservations exist. If asked, direct them to the inquiry form.
-- For live agent requests: only suggest handover if the user explicitly asks for a person or human.
-- You may answer basic Catholic faith questions (prayers, sacrament meaning, feast days, etc.).
-- For complex pastoral or theological questions beyond your scope, gently recommend speaking with the parish priest.
-- Never fabricate schedules, fees, or event details. If unsure, say so and direct them to contact the office.";
+- Sacramental inquiries (Baptism, Wedding, Confirmation, Funeral, etc.): always cover the online inquiry form, the phone number, and an office visit with office hours.
+- Say \"church\" or \"Sto. Rosario Parish\", never \"chapel\".
+- No mass seat reservations exist. If asked, say so and direct them to the /inquiry form.
+- Only suggest a live agent if the user explicitly asks for a person or a human.
+- You may happily answer basic Catholic faith questions (prayers, sacraments' meaning, feast days). For deep pastoral or theological matters, gently recommend speaking with the parish priest.
+- Never fabricate details. If unsure, say so and route to the office.";
     }
 
     protected function getGcashNumber(): string
@@ -442,16 +469,13 @@ class AIService
         $assistantPriest = Cache::remember('chatbot_settings_assistant_priest_name', 300, fn () => Setting::where('key', 'assistant_priest_name')->value('value'));
 
         $responses = [
-            'greeting' => "Peace be with you! Welcome to {$name}. I can help you with mass schedules, intentions, sacraments, events, and parish information. What would you like to know?",
+            'greeting' => "Peace be with you, and welcome to {$name}! \u{1F64F} I can help you with Mass schedules, intentions, sacraments, events, and parish information. Anong kailangan mo today?",
 
             'mass_schedule' => $this->buildMassScheduleResponse(),
 
-            'intention' => "You can offer a **Mass Intention** for ₱500.00 per intention. Here is how:
+            'intention' => "We'd love to offer a Mass intention with you. It's **₱500.00 per intention**, and you can have it offered for the living or the departed, for healing, thanksgiving, or any special intention.
 
-- Submit online: [Mass Intention Form](/submit-intention)
-- You will receive a reference number to [track your status](/track)
-
-Mass intentions may be offered for the living or deceased, for thanksgiving, healing, or special intentions.",
+Just fill out the [Mass Intention Form](/submit-intention) and you'll get a reference number to [track the status](/track). From there, kami na ang bahala sa rest. \u{1F4DC}",
 
             'inquiry' => "For sacramental inquiries (Baptism, Wedding, Confirmation, Funeral Mass, House Blessing, etc.), you have three options:
 
@@ -461,9 +485,7 @@ Mass intentions may be offered for the living or deceased, for thanksgiving, hea
 
 Our team will review your inquiry and respond promptly.",
 
-            'track' => "You can check the status of your Mass Intention or Inquiry anytime: [Track Your Request](/track)
-
-You will need your Reference ID (e.g., SRP-2026-001 or INQ-2026-001).",
+            'track' => "You can check the status of your Mass Intention or Inquiry anytime through the [Track Your Request](/track) page — just enter your Reference ID (e.g., SRP-2026-001 or INQ-2026-001) and we'll show you where it stands.",
 
             'donation' => "Thank you for your generosity!
 
@@ -516,11 +538,11 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
 
             'thank_you' => "You are most welcome! God bless you and your family. Feel free to reach out anytime you need help.",
 
-            'unknown' => "I want to make sure I help you correctly. Could you rephrase that? Here is what I can assist with:
+            'unknown' => "Hmm, I want to make sure I get you the right answer. Could you rephrase that a bit? Just so you know, I can help with:
 
 - Mass Schedules
 - Mass Intentions
-- Sacramental Inquiries (Baptism, Wedding, etc.)
+- Sacramental Inquiries (Baptism, Wedding, Confirmation, Funeral, etc.)
 - Events & Activities
 - Donations & GCash
 - Location & Contact Info

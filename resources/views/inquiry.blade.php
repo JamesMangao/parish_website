@@ -6,7 +6,7 @@
         .eyebrow {
             font-size: 10px; font-weight: 600;
             letter-spacing: 0.32em; text-transform: uppercase;
-            color: var(--gold);
+            color: var(--color-gold-dark);
         }
         .divider-ornament {
             display: flex; align-items: center; gap: 12px; justify-content: center;
@@ -921,6 +921,22 @@
                             </div>
                         </template>
                     </div>
+
+                    {{-- Consent --}}
+                    <div class="flex items-start gap-3 pt-2">
+                        <input type="checkbox" name="consent" id="consent" required
+                               class="mt-0.5 h-4 w-4 shrink-0 rounded accent-[#0D2A52]"
+                               aria-describedby="consent-error">
+                        <label for="consent" class="text-xs leading-relaxed" style="color:rgba(13,42,82,.62);">
+                            I have read and agree to the
+                            <a href="{{ route('privacy-policy') }}" target="_blank" rel="noopener" class="underline font-semibold" style="color:var(--blue-deep);">Privacy Policy</a>
+                            and the
+                            <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="underline font-semibold" style="color:var(--blue-deep);">Terms &amp; Conditions</a>.
+                        </label>
+                    </div>
+                    @error('consent')
+                        <p id="consent-error" class="text-red-600 text-sm mt-1" role="alert">{{ $message }}</p>
+                    @enderror
 
                     {{-- Submit --}}
                     <div style="text-align:right;">

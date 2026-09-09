@@ -26,6 +26,9 @@ class IntentionController extends Controller
             'massTime' => 'nullable|string',
             'description' => 'required|string',
             'paymentMethod' => 'nullable|string',
+            'consent' => 'required|accepted',
+        ], [
+            'consent.accepted' => 'Please agree to the Privacy Policy and Terms & Conditions to continue.',
         ]);
 
         $duplicate = MassIntention::where('email', $validated['email'])

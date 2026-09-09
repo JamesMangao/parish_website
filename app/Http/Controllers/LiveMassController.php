@@ -36,4 +36,15 @@ class LiveMassController extends Controller
         Cache::forget(FacebookLiveWebhookController::CACHE_KEY);
         return back()->with('success', 'Facebook Live link cleared.');
     }
+
+    /**
+     * Update which platform(s) are displayed during a live Mass.
+     * Valid values: 'youtube', 'facebook', 'both'. Expires in 3 hours.
+     */
+    public function updateLivePlatform(Request $request)
+    {
+        $request->validate(['platform' => 'required|in:youtube,facebook,both']);
+        Cache::put('live_mass_platform', $request->platform, now()->addHours(3));
+        return back()->with('success', 'Live platform set to ' . $request->platform . '.');
+    }
 }

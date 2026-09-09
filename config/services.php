@@ -72,4 +72,10 @@ return [
         'webhook_secret' => env('PAYMONGO_WEBHOOK_SECRET'),
     ],
 
+    'analytics' => [
+        // GA4 Measurement ID (e.g. G-XXXXXXXXXX). Analytics is only loaded
+        // after the visitor explicitly accepts cookies via the consent banner.
+        'gtm_id' => env('GTM_ID'),
+    ],
+
 ];

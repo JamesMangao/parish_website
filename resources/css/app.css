@@ -495,6 +495,13 @@ html.no-js [data-reveal] {
   animation: pageFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ── Keyboard focus indicator (accessibility) ── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* ── Base styles ── */
 @layer base {
   * {
@@ -513,5 +520,42 @@ html.no-js [data-reveal] {
   h5,
   h6 {
     font-family: var(--font-heading);
+  }
+}
+
+/* ── Mobile responsiveness helpers ─────────────────────────────
+   Intended to be added alongside px-6 / py-24 / py-28 / py-32
+   classes to reduce spacing on small screens. */
+@media (max-width: 640px) {
+  .section-px-mobile {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  .section-pad-mobile,
+  .section-pad-tablet {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* ── About stats-bar — prevent overflow on narrow screens ─────── */
+@media (max-width: 640px) {
+  .stats-bar {
+    grid-template-columns: 1fr;
+  }
+  .stat-cell {
+    padding: 24px 0;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-cell:last-child {
+    border-bottom: none;
+  }
+  .stat-number {
+    font-size: 2.4rem;
+  }
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: .18em;
   }
 }

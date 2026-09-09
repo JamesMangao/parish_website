@@ -43,10 +43,12 @@ class InquiryController extends Controller
             // Accept empty string here — we validate length manually below
             // so that Alpine-driven hidden inputs don't cause silent failures.
             'message'       => 'required|string|min:3',
+            'consent'       => 'required|accepted',
         ], [
             'message.required' => 'Please fill in the required details for your inquiry.',
             'message.min'      => 'Please provide more detail about your inquiry.',
             'preferredDate.required' => 'A preferred date is required for this type of inquiry.',
+            'consent.accepted' => 'Please agree to the Privacy Policy and Terms & Conditions to continue.',
         ]);
 
         // Check for duplicate inquiries (same email + same type + pending status)

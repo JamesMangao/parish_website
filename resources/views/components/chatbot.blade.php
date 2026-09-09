@@ -1,4 +1,4 @@
-<div x-data="chatbot()" x-init="init()" class="fixed bottom-6 left-6 z-[100]" @keydown.escape.window="open = false">
+<div id="chatbot-widget" x-data="chatbot()" x-init="init()" class="fixed bottom-6 left-6 z-[100]" @keydown.escape.window="open = false">
     <!-- Trigger Button -->
     <button 
         @click="toggle()" 
@@ -65,10 +65,10 @@
                         ></div>
 
                         <!-- Timestamp & Status -->
-                        <div class="flex items-center gap-1.5 px-1 opacity-40 font-medium"
+                        <div class="flex items-center gap-1.5 px-1 opacity-60 font-medium"
                              :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
                              x-show="msg.type !== 'system'">
-                            <span class="text-[9px]" x-text="formatTime(msg.time)"></span>
+                            <span class="text-[10px]" x-text="formatTime(msg.time)"></span>
                             <template x-if="msg.role === 'user' && msg.status === 'sent'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><path d="M20 6 9 17l-5-5"/></svg>
                             </template>
@@ -216,7 +216,7 @@
                                 return;
                             }
                         } catch (e) {}
-                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Sto. Rosario Parish. I can help you with schedules, intentions, sacraments, and more. What would you like to know?'));
+                        this.messages.push(this._makeMsg('assistant', 'Peace be with you! Welcome to Sto. Rosario Parish. I\'m here to help with anything — Mass schedules, intentions, sacraments, events, donations, or just about the faith. What\'s on your mind?'));
                         this.currentSuggestions = [
                             '⛪ Mass Schedules',
                             '🕯️ Offer Mass Intention',
@@ -494,46 +494,37 @@
                         text = text.replace(/\n/g, '<br>');
                         return '<p>' + text + '</p>';
                     }
-                    // Assistant: decode HTML entities first
-                    let text = content.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&amp;/gi, '&');
+                    // Assistant: decode HTML entities FIRST, in repeated passes so that
+                    // single- AND double-encoded tags from the AI all collapse to raw text.
+                    let text = content.replace(/&#(\d+);/g, (m, n) => String.fromCharCode(parseInt(n, 10)))
+                                      .replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCharCode(parseInt(n, 16)));
+                    let prev;
+                    do {
+                        prev = text;
+                        text = text.replace(/&nbsp;/gi, ' ');
+                        text = text.replace(/&quot;/gi, '"');
+                        text = text.replace(/&#39;/gi, "'");
+                        text = text.replace(/&lt;/gi, '<');
+                        text = text.replace(/&gt;/gi, '>');
+                        text = text.replace(/&amp;/gi, '&');
+                    } while (text !== prev);
+
                     if (text.includes('[[HANDOVER]]')) {
                         this.liveAgentStatus = 'suggesting';
                         text = text.replace('[[HANDOVER]]', '');
                     }
-                    // NUCLEAR FIX: Strip ALL HTML tags (paired or broken) first,
-                    // preserving inner text so formatting can be re-applied via markdown
-                    text = text.replace(/<\/?strong[^>]*>/gi, '');
-                    text = text.replace(/<\/?b[^>]*>/gi, '');
-                    text = text.replace(/<\/?em[^>]*>/gi, '');
-                    text = text.replace(/<\/?i[^>]*>/gi, '');
-                    text = text.replace(/<\/?u[^>]*>/gi, '');
-                    text = text.replace(/<\/?s[^>]*>/gi, '');
-                    text = text.replace(/<\/?mark[^>]*>/gi, '');
-                    text = text.replace(/<\/?small[^>]*>/gi, '');
-                    text = text.replace(/<\/?sub[^>]*>/gi, '');
-                    text = text.replace(/<\/?sup[^>]*>/gi, '');
-                    // Convert HTML links before stripping them
+                    // Convert HTML links into markdown so they become clickable, not stripped text
                     text = text.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
-                    // Convert <br> and <p> to newlines before stripping
+                    // Convert structural tags to newlines/bullets BEFORE stripping
                     text = text.replace(/<br\s*\/?>/gi, '\n');
                     text = text.replace(/<\/?p[^>]*>/gi, '\n');
                     text = text.replace(/<\/?li[^>]*>/gi, '\n- ');
-                    // Convert <ul>/<ol>/<div>/<span> to nothing
-                    text = text.replace(/<\/?ul[^>]*>/gi, '');
-                    text = text.replace(/<\/?ol[^>]*>/gi, '');
-                    text = text.replace(/<\/?div[^>]*>/gi, '');
-                    text = text.replace(/<\/?span[^>]*>/gi, '');
                     text = text.replace(/<\/?h[1-6][^>]*>/gi, '\n');
-                    text = text.replace(/<\/?blockquote[^>]*>/gi, '');
-                    // Strip any remaining HTML tags
+                    text = text.replace(/<\/?(ul|ol|div|span|blockquote|strong|b|em|i|u|s|mark|small|sub|sup|a|table|thead|tbody|tr|th|td)[^>]*>/gi, '');
+                    // NUCLEAR FIX: strip ANY remaining HTML tag while keeping its inner text
                     text = text.replace(/<[^>]+>/g, '');
-                    // Decode any leftover HTML entities
-                    text = text.replace(/&nbsp;/gi, ' ');
-                    text = text.replace(/&amp;/gi, '&');
-                    text = text.replace(/&lt;/gi, '<');
-                    text = text.replace(/&gt;/gi, '>');
-                    text = text.replace(/&quot;/gi, '"');
-                    text = text.replace(/&#39;/gi, "'");
+                    // Escape any leftover special characters so no stray HTML can ever re-render
+                    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                     // Markdown links [text](url) -> clickable <a>
                     text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-accent underline font-bold hover:text-primary transition-colors">$1</a>');
                     // Bold **text** -> <strong>

@@ -45,7 +45,7 @@
     <input type="hidden" name="amount" :value="amount">
 
     {{-- Optional Info --}}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
         <div>
             <label class="donate-label">Name (Optional)</label>
             <input type="text" name="donor_name" class="donate-input" placeholder="Your name">
@@ -59,6 +59,22 @@
         <label class="donate-label">Prayer / Message (Optional)</label>
         <textarea name="message" class="donate-input" rows="2" placeholder="Leave a prayer intention or message..." style="resize:vertical;"></textarea>
     </div>
+
+    {{-- Consent --}}
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:18px;">
+        <input type="checkbox" name="consent" id="consent" required
+               style="margin-top:2px;width:16px;height:16px;flex-shrink:0;accent-color:#0D2A52;"
+               aria-describedby="consent-error">
+        <label for="consent" style="font-size:12px;line-height:1.7;color:rgba(13,42,82,.62);">
+            I have read and agree to the
+            <a href="{{ route('privacy-policy') }}" target="_blank" rel="noopener" class="underline font-semibold" style="color:var(--blue-deep);">Privacy Policy</a>
+            and the
+            <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="underline font-semibold" style="color:var(--blue-deep);">Terms &amp; Conditions</a>.
+        </label>
+    </div>
+    @error('consent')
+        <p id="consent-error" style="color:#DC2626;font-size:13px;margin-bottom:12px;" role="alert">{{ $message }}</p>
+    @enderror
 
     {{-- Submit --}}
     <button type="submit" class="donate-submit" :disabled="amount < 2000">

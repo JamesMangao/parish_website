@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', AboutController::class)->name('about');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
+Route::view('/terms', 'terms')->name('terms');
 Route::get('/mass-schedule', [MassScheduleController::class, 'index'])->name('mass-schedule');
 Route::get('/mass-schedule/{id}/ical', [MassScheduleController::class, 'generateICal'])->name('mass-schedule.ical');
 Route::get('/donate', [DonationController::class, 'create'])->name('donate');
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'throttle:admin'])->group(function () {
         Route::post('/internal/create-google-slides', [GoogleSlidesController::class, 'create'])->name('admin.create-google-slides');
         Route::post('/internal/live-mass/toggle', [LiveMassController::class, 'toggle'])->name('admin.live-mass.toggle');
         Route::post('/internal/live-mass/facebook-link', [LiveMassController::class, 'updateFacebookLink'])->name('admin.live-mass.facebook-link');
+        Route::post('/internal/live-mass/platform', [LiveMassController::class, 'updateLivePlatform'])->name('admin.live-mass.platform');
 
         Route::get('/google/auth', [GoogleAuthController::class, 'auth']);
         Route::get('/google/callback', [GoogleAuthController::class, 'callback']);

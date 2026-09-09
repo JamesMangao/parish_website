@@ -22,6 +22,8 @@
                     <a href="{{ route('track') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Track Submission</a>
                     <a href="{{ route('about') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">About Us</a>
                     <a href="{{ route('donate') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Donate</a>
+                    <a href="{{ route('privacy-policy') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Privacy Policy</a>
+                    <a href="{{ route('terms') }}" class="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Terms &amp; Conditions</a>
                 </div>
             </div>
             <div>

@@ -7,7 +7,7 @@
     </style>
 </x-slot>
 
-<section class="hero-section" style="position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+<section class="hero-section" style="position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
     <div style="position:absolute;inset:0;z-index:0;">
         <img src="{{ \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}" alt="Sto. Rosario Parish" fetchpriority="high" decoding="async" width="1920" height="1080" style="width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.85);transform:scale(1.04);">
         <div class="hero-overlay" style="position:absolute;inset:0;"></div>

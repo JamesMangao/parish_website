@@ -217,7 +217,7 @@
                     : Str::after(Str::after($album->featured_video_url, 'v='), '&');
                 if (Str::contains($videoId, '&')) $videoId = Str::before($videoId, '&');
             @endphp
-            <iframe src="https://www.youtube.com/embed/{{ $videoId }}" 
+            <iframe src="https://www.youtube-nocookie.com/embed/{{ $videoId }}" 
                     title="{{ $album->title }} highlight video"
                     class="w-full h-full" frameborder="0" allowfullscreen></iframe>
         @else

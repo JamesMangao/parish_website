@@ -171,7 +171,7 @@
             font-weight: 800;
             letter-spacing: .22em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: rgba(13,42,82,.58);
             margin-top: 8px;
         }
 

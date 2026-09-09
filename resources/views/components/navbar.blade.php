@@ -212,10 +212,10 @@
          x-transition:enter-end="opacity-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 -translate_y-3"
-         class="md:hidden fixed inset-0 z-40 flex flex-col"
-         style="top:72px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
-                -webkit-backdrop-filter:blur(24px);">
+x-transition:leave-end="opacity-0 -translate-y-3"
+          class="md:hidden fixed inset-0 z-40 flex flex-col overflow-y-auto"
+          style="top:0; padding-top:88px; background:rgba(6,16,38,0.98); backdrop-filter:blur(24px);
+                 -webkit-backdrop-filter:blur(24px);">
 
         {{-- Gold top rule --}}
         <div style="height:1px; background:linear-gradient(90deg,transparent,rgba(245,197,24,0.4),transparent);"></div>

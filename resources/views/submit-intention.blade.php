@@ -374,10 +374,10 @@
             {{-- Card header --}}
             <div class="px-8 py-6" style="border-bottom:1px solid rgba(26,64,128,0.08); background:var(--cream-deep);">
                 <p class="eyebrow mb-1">Intention Details</p>
-                <h3 class="font-heading font-bold italic"
+                <h2 class="font-heading font-bold italic"
                     style="font-size:1.5rem; color:var(--blue-deep); line-height:1.2;">
                     Fill Out Your Request
-                </h3>
+                </h2>
             </div>
 
             <div class="p-8">
@@ -575,6 +575,20 @@
                         </div>
                     </div>
 
+                    {{-- Consent --}}
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" id="consent" x-model="formData.consent"
+                               class="mt-0.5 h-4 w-4 shrink-0 rounded accent-[#0D2A52]">
+                        <label for="consent" class="text-xs leading-relaxed" style="color:rgba(13,42,82,.62);">
+                            I have read and agree to the
+                            <a href="{{ route('privacy-policy') }}" target="_blank" rel="noopener" class="underline font-semibold" style="color:var(--blue-deep);">Privacy Policy</a>
+                            and the
+                            <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="underline font-semibold" style="color:var(--blue-deep);">Terms &amp; Conditions</a>.
+                        </label>
+                    </div>
+                    <p x-show="fieldErrors.consent" id="consent-error" class="text-red-600 text-sm mt-1" role="alert"
+                       x-text="fieldErrors.consent ? (fieldErrors.consent[0] || '') : ''"></p>
+
                     {{-- Submit --}}
                     <button type="submit" :disabled="loading"
                             class="gold-btn w-full h-14 rounded-2xl relative overflow-hidden
@@ -635,7 +649,7 @@ function intentionForm() {
         formData: {
             fullName: '', email: '', intentionType: '',
             preferredDate: '', massTime: '', description: '',
-            paymentMethod: ''
+            paymentMethod: '', consent: false
         },
 
         init() {
@@ -665,6 +679,11 @@ function intentionForm() {
             if (this.loading) return;
             this.loading = true;
             this.fieldErrors = {}; // clear
+            if (!this.formData.consent) {
+                this.fieldErrors = { consent: ['Please agree to the Privacy Policy and Terms & Conditions to continue.'] };
+                this.loading = false;
+                return;
+            }
             try {
                 const body = { ...this.formData };
                 if (force) body.force_submit = true;
@@ -728,7 +747,7 @@ function intentionForm() {
             this.formData = {
                 fullName:'', email:'', intentionType:'',
                 preferredDate:'', massTime:'', description:'',
-                paymentMethod:''
+                paymentMethod:'', consent: false
             };
         }
     }

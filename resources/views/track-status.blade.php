@@ -170,9 +170,9 @@
          style="overflow:hidden; box-shadow:0 12px 50px rgba(13,42,82,0.1);">
 
         {{-- Status banner --}}
-        <div style="padding:1.5rem 2rem;
+        <div style="padding:1.5rem;
                     background:var(--s-bg);
-                    display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+                    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;">
             <div>
                 <p class="font-cinzel"
                    style="font-size:9px; letter-spacing:0.28em; text-transform:uppercase;
@@ -197,7 +197,7 @@
         </div>
 
         {{-- Detail grid --}}
-        <div style="padding:2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 sm:p-8">
 
             <div>
                 <p class="font-cinzel"

@@ -190,6 +190,25 @@
         </form>
     @endif
                 </div>
+    @if(in_array(Auth::user()->role, ['super_admin','soccom']))
+                <div class="w-full mt-4 pt-4 border-t border-black/[.04]">
+                    <form method="POST" action="{{ route('admin.live-mass.platform') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        @csrf
+                        <span class="text-[10px] font-black text-muted-foreground/50 uppercase tracking-[.15em] shrink-0">Live on</span>
+                        <div class="flex gap-3">
+                            @foreach(['youtube' => 'YouTube', 'facebook' => 'Facebook', 'both' => 'Both'] as $val => $label)
+                            <label class="flex items-center gap-1.5 cursor-pointer group">
+                                <input type="radio" name="platform" value="{{ $val }}"
+                                    {{ (\Illuminate\Support\Facades\Cache::get('live_mass_platform', 'both') === $val) ? 'checked' : '' }}
+                                    class="w-3 h-3 text-primary accent-primary border-black/20">
+                                <span class="text-[10px] font-bold uppercase tracking-[.15em] text-muted-foreground/60 group-hover:text-primary transition-colors">{{ $label }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-primary text-white text-[10px] font-black uppercase tracking-[.15em] hover:opacity-90 transition-all shrink-0">Set Platform</button>
+                    </form>
+                </div>
+    @endif
             </div>
         @endif
         

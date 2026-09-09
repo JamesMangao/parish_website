@@ -128,7 +128,7 @@ class ChatbotController extends Controller
         $welcomeMsg = ChatMessage::create([
             'chat_session_id' => $session->id,
             'sender' => 'ai',
-            'message' => 'Peace be with you! Welcome back. How can I assist you today?',
+            'message' => 'Peace be with you! Welcome back to Sto. Rosario Parish. What can I help you with — schedules, intentions, sacraments, or events?',
         ]);
 
         return response()->json([

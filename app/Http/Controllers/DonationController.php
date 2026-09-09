@@ -34,6 +34,9 @@ class DonationController extends Controller
             'purpose' => 'required|string|in:General Donation,Church Maintenance,Outreach,Youth Ministry',
             'message' => 'nullable|string|max:500',
             'channel' => 'nullable|string|in:online,qr,bank',
+            'consent' => 'required|accepted',
+        ], [
+            'consent.accepted' => 'Please agree to the Privacy Policy and Terms & Conditions to continue.',
         ]);
 
         // Which tab the donor submitted from determines which PayMongo payment

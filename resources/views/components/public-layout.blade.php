@@ -79,6 +79,7 @@
             $isLiveWindow = $isSunday && $now->gte($liveStart) && $now->lte($liveEnd);
         @endphp
         @if($isLiveWindow)
+        <style>#chatbot-widget{ bottom:4.5rem !important; }</style>
         <a href="{{ url('/#live-mass') }}" id="live-mass-banner"
            class="fixed bottom-0 left-0 right-0 z-[90] flex items-center justify-center gap-3 py-3 px-4 text-white font-bold text-sm tracking-wide shadow-lg transition-all hover:brightness-110"
            style="background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%);">
@@ -100,6 +101,7 @@
             style="position: fixed; z-index: 100;"
             class="bottom-20 right-4 md:bottom-20 md:right-8 flex h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-primary text-primary-foreground shadow-2xl items-center justify-center hover:-translate-y-2 transition-all active:scale-95"
             title="Back to Top"
+            aria-label="Back to top"
         >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
         </button>
@@ -172,6 +174,81 @@
             const revealElements = document.querySelectorAll('.reveal, .reveal-stagger');
             revealElements.forEach(el => revealObserver.observe(el));
         });
+    </script>
+    {{-- Cookie Consent Banner (Alpine) --}}
+    @php
+        $gtmId = config('services.analytics.gtm_id');
+    @endphp
+    <div x-data="cookieConsent('{{ $gtmId }}')" x-init="init()">
+        <template x-teleport="body">
+            <div x-show="show" x-cloak
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-8"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-8"
+                 class="fixed bottom-0 left-0 right-0 z-[500] flex justify-center px-4 pb-4"
+                 role="region" aria-label="Cookie consent">
+                <div class="w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-[rgba(26,64,128,0.12)] p-5 flex flex-col sm:flex-row items-center gap-4"
+                     style="box-shadow:0 20px 60px rgba(13,42,82,0.18);">
+                    <div class="flex-1 text-center sm:text-left">
+                        <p class="font-heading font-bold italic" style="color:var(--blue-deep);font-size:1.05rem;">We value your privacy</p>
+                        <p class="text-xs leading-relaxed mt-1" style="color:rgba(13,42,82,.62);">
+                            We use essential cookies to keep this site working. With your consent, we also use
+                            <span x-text="gaEnabled ? 'Google Analytics' : 'analytics'"></span>
+                            to understand how visitors use our website. See our
+                            <a href="{{ route('privacy-policy') }}" class="underline font-semibold" style="color:var(--blue-deep);">Privacy Policy</a>.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button @click="accept('essential')" class="px-4 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all hover:bg-muted/50"
+                                style="border:1.5px solid rgba(26,64,128,0.25);color:var(--blue-deep);background:transparent;">
+                            Essential Only
+                        </button>
+                        <button x-show="gaEnabled" @click="accept('all')" class="px-5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-white transition-all hover:opacity-90"
+                                style="background:var(--blue-deep);">
+                            Accept All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <script>
+        // Cookie-driven analytics loader — GA4 loads ONLY after explicit opt-in.
+        function cookieConsent(gtmId) {
+            return {
+                show: false,
+                gaEnabled: !!gtmId,
+                init() {
+                    const stored = localStorage.getItem('parish_cookie_consent');
+                    if (stored === null) {
+                        setTimeout(() => { this.show = true; }, 800);
+                    } else if (stored === 'all' && gtmId) {
+                        this.loadAnalytics(gtmId);
+                    }
+                },
+                accept(choice) {
+                    localStorage.setItem('parish_cookie_consent', choice);
+                    if (choice === 'all' && gtmId) this.loadAnalytics(gtmId);
+                    this.show = false;
+                },
+                loadAnalytics(id) {
+                    if (window.__gaLoaded) return;
+                    window.__gaLoaded = true;
+                    const script = document.createElement('script');
+                    script.async = true;
+                    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+                    document.head.appendChild(script);
+                    window.dataLayer = window.dataLayer || [];
+                    window.gtag = function(){ dataLayer.push(arguments); };
+                    gtag('js', new Date());
+                    gtag('config', id, { anonymize_ip: true });
+                }
+            }
+        }
     </script>
     @stack('scripts')
 </body>

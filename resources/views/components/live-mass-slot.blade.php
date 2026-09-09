@@ -10,56 +10,65 @@
     $facebookLivePermalink = \Illuminate\Support\Facades\Cache::get(
         \App\Http\Controllers\FacebookLiveWebhookController::CACHE_KEY
     );
+    $livePlatform = \Illuminate\Support\Facades\Cache::get('live_mass_platform', 'both');
 @endphp
 
 <section id="live-mass" class="max-w-5xl mx-auto px-6 mt-48 reveal reveal-up section-px-mobile">
-    @if($isLiveWindow)
-        {{-- LIVE STATE --}}
-        <div x-data="{ activeTab: 'youtube' }" class="rounded-3xl overflow-hidden" style="background:#0d2a52;border:1px solid rgba(201,162,0,.22);box-shadow:0 12px 50px rgba(13,42,82,.09);">
-            {{-- Header --}}
-            <div class="px-6 md:px-10 py-5 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <span class="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/40"></span>
-                    <span class="font-cinzel font-semibold text-xs tracking-[.25em] uppercase text-white/80">Live Mass</span>
-                </div>
-                <div class="flex items-center gap-1 bg-white/10 rounded-lg p-0.5 border border-white/10">
-                    <button @click="activeTab = 'youtube'" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all uppercase"
-                        :class="activeTab === 'youtube' ? 'bg-white shadow-sm text-primary' : 'text-white/60 hover:text-white'">YouTube</button>
-                    <button @click="activeTab = 'facebook'" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all uppercase"
-                        :class="activeTab === 'facebook' ? 'bg-white shadow-sm text-primary' : 'text-white/60 hover:text-white'">Facebook</button>
-                </div>
+@if($isLiveWindow)
+    {{-- LIVE STATE --}}
+    <div x-data="{ activeTab: '{{ $livePlatform === 'both' ? 'youtube' : $livePlatform }}' }" class="rounded-3xl overflow-hidden" style="background:#0d2a52;border:1px solid rgba(201,162,0,.22);box-shadow:0 12px 50px rgba(13,42,82,.09);">
+        {{-- Header --}}
+        <div class="px-6 md:px-10 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/40"></span>
+                <span class="font-cinzel font-semibold text-xs tracking-[.25em] uppercase text-white/80">Live Mass</span>
             </div>
-            {{-- Embed --}}
-            <div class="aspect-video bg-black">
-                <template x-if="activeTab === 'youtube'">
-                    <iframe src="https://www.youtube.com/embed/live_stream?channel={{ config('services.parish.youtube_channel_id') }}&autoplay=1&mute=1"
-                        class="w-full h-full" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen loading="lazy"></iframe>
-                </template>
-                <template x-if="activeTab === 'facebook'">
-                    <div class="w-full h-full" style="min-height:100%;">
-                        @if($facebookLivePermalink)
-                            <iframe src="https://www.facebook.com/plugins/video.php?href={{ urlencode($facebookLivePermalink) }}&show_text=false&autoplay=true"
-                                class="w-full h-full" style="border:none;overflow:hidden;" scrolling="no" frameborder="0"
-                                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                                allowfullscreen loading="lazy"></iframe>
-                        @else
-                            <div class="flex flex-col items-center justify-center h-full text-center px-6" x-show="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                                <p class="text-white/50 text-sm font-medium mt-3 mb-4">Watch live on our Facebook page</p>
-                                <a href="{{ config('services.parish.facebook_page_url') }}" target="_blank" rel="noopener"
-                                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
-                                   style="background:#1877F2;color:#fff;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                                    Open Facebook
-                                </a>
-                            </div>
-                        @endif
-                    </div>
-                </template>
+            @if($livePlatform === 'both')
+            <div class="flex items-center gap-1 bg-white/10 rounded-lg p-0.5 border border-white/10">
+                <button @click="activeTab = 'youtube'" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all uppercase"
+                    :class="activeTab === 'youtube' ? 'bg-white shadow-sm text-primary' : 'text-white/60 hover:text-white'">YouTube</button>
+                <button @click="activeTab = 'facebook'" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all uppercase"
+                    :class="activeTab === 'facebook' ? 'bg-white shadow-sm text-primary' : 'text-white/60 hover:text-white'">Facebook</button>
             </div>
+            @else
+            <span class="px-3 py-1 text-[10px] font-bold rounded-md uppercase text-white/70 tracking-[.15em]">{{ $livePlatform === 'youtube' ? 'YouTube' : 'Facebook' }}</span>
+            @endif
         </div>
+        {{-- Embed --}}
+        <div class="aspect-video bg-black">
+            @if($livePlatform === 'youtube' || $livePlatform === 'both')
+            <template x-if="activeTab === 'youtube'">
+                <iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel={{ config('services.parish.youtube_channel_id') }}&autoplay=1&mute=1"
+                    class="w-full h-full" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen loading="lazy"></iframe>
+            </template>
+            @endif
+            @if($livePlatform === 'facebook' || $livePlatform === 'both')
+            <template x-if="activeTab === 'facebook'">
+                <div class="w-full h-full" style="min-height:100%;">
+                    @if($facebookLivePermalink)
+                        <iframe src="https://www.facebook.com/plugins/video.php?href={{ urlencode($facebookLivePermalink) }}&show_text=false&autoplay=true&dnt=1"
+                            class="w-full h-full" style="border:none;overflow:hidden;" scrolling="no" frameborder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                            allowfullscreen loading="lazy"></iframe>
+                    @else
+                        <div class="flex flex-col items-center justify-center h-full text-center px-6" x-show="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                            <p class="text-white/50 text-sm font-medium mt-3 mb-4">Watch live on our Facebook page</p>
+                            <a href="{{ config('services.parish.facebook_page_url') }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
+                               style="background:#1877F2;color:#fff;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                Open Facebook
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </template>
+            @endif
+        </div>
+    </div>
     @else
         {{-- NOT-LIVE STATE --}}
         <div class="rounded-3xl overflow-hidden" style="background:#fff;border:1px solid rgba(201,162,0,.22);box-shadow:0 12px 50px rgba(13,42,82,.09);">
@@ -69,7 +78,7 @@
                     <div class="absolute inset-0" style="background:linear-gradient(90deg,#0d2a52 0%,rgba(13,42,82,.4) 50%,#0d2a52 100%);"></div>
                 </div>
 
-                <div class="next-mass-inner relative z-10 flex items-center gap-8 px-10 py-8 flex-1" style="min-height:215px;">
+                <div class="next-mass-inner relative z-10 flex flex-col md:flex-row items-center gap-6 px-6 md:px-10 py-8 flex-1" style="min-height:215px;">
                     <div class="relative shrink-0 flex items-center justify-center" style="width:82px;height:82px;">
                         <svg width="82" height="82" viewBox="0 0 82 82" style="position:absolute;inset:0;" fill="none" aria-hidden="true">
                             <line x1="41" y1="3" x2="41" y2="13" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="41" y1="69" x2="41" y2="79" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="3" y1="41" x2="13" y2="41" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="69" y1="41" x2="79" y2="41" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="11" x2="18" y2="18" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="64" y1="64" x2="71" y2="71" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="71" y1="11" x2="64" y2="18" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="71" x2="18" y2="64" stroke="rgba(245,197,24,.4)" stroke-width="1.5" stroke-linecap="round"/>
