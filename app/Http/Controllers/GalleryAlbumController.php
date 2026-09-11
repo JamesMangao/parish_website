@@ -60,6 +60,7 @@ class GalleryAlbumController extends Controller
                 \Illuminate\Support\Facades\Log::warning('Failed to log album creation: ' . $e->getMessage());
             }
             Cache::forget('gallery_public_index_v2');
+            Cache::forget('gallery_latest_items');
             Cache::forget('gallery_highlights');
             return $this->redirectOrJson($request, 'admin.gallery.index', 'Album created successfully!');
         } catch (\Exception $e) {
@@ -92,6 +93,7 @@ class GalleryAlbumController extends Controller
 
         LogService::log('update_album', $gallery, ['title' => $gallery->title]);
         Cache::forget('gallery_public_index_v2');
+        Cache::forget('gallery_latest_items');
         return $this->redirectOrJson($request, 'admin.gallery.index', 'Album updated!');
     }
 
@@ -100,6 +102,7 @@ class GalleryAlbumController extends Controller
         LogService::log('delete_album', $gallery, ['title' => $gallery->title]);
         $gallery->delete(); // Images cascade delete via DB
         Cache::forget('gallery_public_index_v2');
+        Cache::forget('gallery_latest_items');
         Cache::forget('gallery_highlights');
         return $this->redirectOrJson($request, 'admin.gallery.index', 'Album removed.');
     }
@@ -118,6 +121,7 @@ class GalleryAlbumController extends Controller
         }
 
         Cache::forget('gallery_public_index_v2');
+        Cache::forget('gallery_latest_items');
         LogService::log('add_album_images', $album, ['title' => $album->title, 'count' => $request->file('images') ? count($request->file('images')) : 0]);
         return back()->with('success', 'Images added to album!');
     }
@@ -128,6 +132,7 @@ class GalleryAlbumController extends Controller
         LogService::log('remove_album_image', $album, ['image_title' => $image->title, 'image_id' => $image->id]);
         $image->delete();
         Cache::forget('gallery_public_index_v2');
+        Cache::forget('gallery_latest_items');
         return back()->with('success', 'Image removed from album.');
     }
 

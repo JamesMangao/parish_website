@@ -26,11 +26,15 @@ class AnnouncementController extends Controller
 
         $categories = array_merge(Announcement::PREDEFINED_CATEGORIES, ['Recruitment']);
 
-        $counts = ['all' => Announcement::active()->count()];
-        foreach (Announcement::PREDEFINED_CATEGORIES as $cat) {
-            $counts[$cat] = Announcement::active()->where('category', $cat)->count();
-        }
-        $counts['Recruitment'] = Announcement::active()->where('is_recruitment', true)->count();
+        $counts = Cache::remember('announcement_category_counts', now()->addMinutes(15), function () {
+            $counts = ['all' => Announcement::active()->count()];
+            foreach (Announcement::PREDEFINED_CATEGORIES as $cat) {
+                $counts[$cat] = Announcement::active()->where('category', $cat)->count();
+            }
+            $counts['Recruitment'] = Announcement::active()->where('is_recruitment', true)->count();
+
+            return $counts;
+        });
 
         $initialAnnouncements = $announcements->map(fn ($ann) => [
             'id' => $ann->id,
@@ -126,6 +130,7 @@ class AnnouncementController extends Controller
         $this->syncFeaturedAnnouncement($announcement);
         Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
+        Cache::forget('announcement_category_counts');
         LogService::log('create_announcement', $announcement);
 
         return $this->redirectOrJson($request, 'admin.announcements.index', 'Announcement created.');
@@ -144,6 +149,7 @@ class AnnouncementController extends Controller
         $this->syncFeaturedAnnouncement($announcement);
         Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
+        Cache::forget('announcement_category_counts');
         LogService::log('update_announcement', $announcement);
 
         return $this->redirectOrJson($request, 'admin.announcements.index', 'Announcement updated.');
@@ -154,6 +160,7 @@ class AnnouncementController extends Controller
         LogService::log('delete_announcement', $announcement, ['title' => $announcement->title]);
         Cache::forget('home_announcements');
         Cache::forget('chatbot_parish_context');
+        Cache::forget('announcement_category_counts');
         $announcement->delete();
 
         return back()->with('success', 'Announcement deleted.');

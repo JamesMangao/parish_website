@@ -12,6 +12,7 @@ use App\Models\ChatSession;
 use App\Models\ActivityLog;
 use App\Models\Donation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -22,18 +23,20 @@ class DashboardController extends Controller
         $inquiryTypes = collect();
 
         try {
-            $stats = [
-                'total_intentions' => MassIntention::count(),
-                'pending_intentions' => MassIntention::where('status', 'pending')->count(),
-                'total_inquiries' => Inquiry::count(),
-                'pending_inquiries' => Inquiry::where('status', 'pending')->count(),
-                'upcoming_events' => Event::where('event_date', '>=', now())->count(),
-                'total_announcements' => Announcement::count(),
-                'active_schedules' => MassSchedule::where('is_active', true)->count(),
-                'total_donations_amount' => Donation::where('status', 'paid')->sum('amount'),
-                'today_donations_amount' => Donation::where('status', 'paid')->whereDate('paid_at', today())->sum('amount'),
-                'total_donation_count' => Donation::where('status', 'paid')->count(),
-            ];
+            $stats = Cache::remember('dashboard_stats', 30, function () {
+                return [
+                    'total_intentions' => MassIntention::count(),
+                    'pending_intentions' => MassIntention::where('status', 'pending')->count(),
+                    'total_inquiries' => Inquiry::count(),
+                    'pending_inquiries' => Inquiry::where('status', 'pending')->count(),
+                    'upcoming_events' => Event::where('event_date', '>=', now())->count(),
+                    'total_announcements' => Announcement::count(),
+                    'active_schedules' => MassSchedule::where('is_active', true)->count(),
+                    'total_donations_amount' => Donation::where('status', 'paid')->sum('amount'),
+                    'today_donations_amount' => Donation::where('status', 'paid')->whereDate('paid_at', today())->sum('amount'),
+                    'total_donation_count' => Donation::where('status', 'paid')->count(),
+                ];
+            });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Dashboard stats query failed: ' . $e->getMessage());
         }
@@ -108,32 +111,5 @@ class DashboardController extends Controller
 
         $logs = $query->latest()->paginate(50)->appends($request->query());
         return view('admin.logs', compact('logs'));
-    }
-
-    public function streamNotifications()
-    {
-        return response()->stream(function () {
-            while (true) {
-                if (connection_aborted()) {
-                    break;
-                }
-
-                $data = [
-                    'intentions' => MassIntention::where('status', 'pending')->count(),
-                    'inquiries' => Inquiry::where('status', 'pending')->count(),
-                    'timestamp' => now()->toIso8601String(),
-                ];
-
-                echo "data: " . json_encode($data) . "\n\n";
-                ob_flush();
-                flush();
-                sleep(3);
-            }
-        }, 200, [
-            'Content-Type' => 'text/event-stream',
-            'Cache-Control' => 'no-cache',
-            'Connection' => 'keep-alive',
-            'X-Accel-Buffering' => 'no',
-        ]);
     }
 }

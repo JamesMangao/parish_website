@@ -95,7 +95,6 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'throttle:admin'])->group(function () {
     Route::get('/internal/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/internal/notifications/count', [DashboardController::class, 'getNotifications'])->name('admin.notifications.count');
-    Route::get('/internal/notifications/stream', [DashboardController::class, 'streamNotifications'])->name('admin.notifications.stream');
 
     // Role: super_admin, staff, or soccom
     Route::middleware('role:super_admin,staff,soccom')->group(function () {

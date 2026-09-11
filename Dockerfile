@@ -161,9 +161,6 @@ set -e
 echo "Running database migrations..."
 php artisan migrate --force
 
-echo "Clearing old caches..."
-php artisan optimize:clear
-
 echo "Optimizing Laravel..."
 php artisan optimize
 

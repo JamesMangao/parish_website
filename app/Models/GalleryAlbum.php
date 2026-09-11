@@ -32,6 +32,6 @@ class GalleryAlbum extends Model
 
     public function coverImage()
     {
-        return $this->hasOne(GalleryImage::class, 'album_id')->latestOfMany();
+        return $this->hasOne(GalleryImage::class, 'album_id')->orderByDesc('created_at');
     }
 }

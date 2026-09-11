@@ -6,6 +6,7 @@ use App\Models\GalleryImage;
 use App\Models\GalleryAlbum;
 use App\Models\VideoHighlight;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class GalleryController extends Controller
 {
@@ -32,7 +33,8 @@ class GalleryController extends Controller
                 ->get();
         });
 
-        $latestItems = GalleryImage::with(['album' => function($q) {
+        $latestItems = Cache::remember('gallery_latest_items', now()->addMinutes(10), function () {
+            return GalleryImage::with(['album' => function($q) {
                 $q->where('is_published', true);
             }])
             ->whereHas('album', function($q) {
@@ -41,6 +43,7 @@ class GalleryController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(12)
             ->get();
+        });
 
         $highlights = \Illuminate\Support\Facades\Cache::remember('gallery_highlights', now()->addMinutes(10), function () {
             return VideoHighlight::where('is_published', true)

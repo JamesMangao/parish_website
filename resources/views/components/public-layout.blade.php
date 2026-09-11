@@ -26,18 +26,24 @@
     @endif
     
     <!-- Open Graph / Facebook -->
+    @php
+        $ogImageUrl = \Illuminate\Support\Facades\Cache::remember('public_og_image_url', now()->addDay(), function () {
+            $path = $global_settings['hero_image'] ?? 'assets/bg.webp';
+            return \Illuminate\Support\Facades\Storage::disk('supabase')->url($path);
+        });
+    @endphp
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="{{ config('app.name', 'Sto. Rosario Parish') }}">
     <meta property="og:description" content="{{ $meta_description ?? 'Official website of Sto. Rosario Parish - Pacita. Providing spiritual guidance, sacramental services, and community outreach in San Pedro, Laguna.' }}">
-    <meta property="og:image" content="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}">
+    <meta property="og:image" content="{{ $ogImageUrl }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="{{ $title ?? 'Sto. Rosario Parish' }} | Divine Grace & Community">
     <meta property="twitter:description" content="{{ $description ?? 'Official portal of Sto. Rosario Parish - Pacita 1. Experience our community of faith through daily masses, sacraments, and spiritual activities.' }}">
-    <meta property="twitter:image" content="{{ isset($global_settings['hero_image']) ? \Illuminate\Support\Facades\Storage::disk('supabase')->url($global_settings['hero_image']) : \Illuminate\Support\Facades\Storage::disk('supabase')->url('assets/bg.webp') }}">
+    <meta property="twitter:image" content="{{ $ogImageUrl }}">
     
     <!-- Favicon (works on all devices) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -48,8 +54,7 @@
     <meta name="msapplication-TileColor" content="#0D2A52">
     <meta name="msapplication-TileImage" content="/images/parish-logo.png">
 
-    <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Alpine.js (bundled via Vite) -->
     <style>[x-cloak] { display: none !important; }</style>
     
     <!-- Page Transition Animation -->

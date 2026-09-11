@@ -42,7 +42,7 @@ services:
           name: parish-db
           property: password
       - key: CACHE_STORE
-        value: file
+        value: database
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
@@ -100,7 +100,7 @@ services:
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE
-        value: file
+        value: database
 
 databases:
   - name: parish-db

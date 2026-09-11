@@ -77,7 +77,9 @@ export const settingsSection = () => ({
         });
         this.$el.addEventListener('input', () => this._checkDirty(), true);
         this.$el.addEventListener('change', () => this._checkDirty(), true);
-        this.$el.addEventListener('settings-changed', () => this._checkDirty());
+        this.$el.addEventListener('settings-changed', () => {
+            this.$nextTick(() => this._checkDirty());
+        });
         this.$el.addEventListener('submit', (e) => this._handleSubmit(e));
     },
 
