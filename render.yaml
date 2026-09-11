@@ -44,7 +44,7 @@ services:
       - key: CACHE_STORE
         value: file
       - key: SESSION_DRIVER
-        value: file
+        value: database
       - key: QUEUE_CONNECTION
         value: database
       - key: SUPABASE_URL
