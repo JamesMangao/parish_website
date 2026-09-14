@@ -39,3 +39,8 @@ database/database.sqlite
 database/database.sqlite.backup
 .restore-point/
 GTM_ID_SETUP.txt
+QA_Checklist*.csv
+QA_Checklist*.xlsx
+QA_Checklist*_Summary.txt
+about-page-recommendations.html
+ui-ux-recommendations.html
