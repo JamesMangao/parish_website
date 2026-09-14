@@ -19,39 +19,60 @@ services:
         value: "true"
       - key: APP_KEY
         generateValue: true
+      # Main database is Supabase (Postgres). Values are set in the Render
+      # dashboard so secrets never live in this file.
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
-        fromDatabase:
-          name: parish-db
-          property: host
+        sync: false
       - key: DB_PORT
-        fromDatabase:
-          name: parish-db
-          property: port
+        sync: false
       - key: DB_DATABASE
-        fromDatabase:
-          name: parish-db
-          property: database
+        sync: false
       - key: DB_USERNAME
-        fromDatabase:
-          name: parish-db
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: parish-db
-          property: password
+        sync: false
       - key: CACHE_STORE
         value: database
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
         value: database
+      # File storage lives on Supabase Storage so uploads survive redeploys.
+      - key: FILESYSTEM_DISK
+        value: supabase
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: SUPABASE_BUCKET
+        sync: false
+      - key: SUPABASE_ACCESS_KEY_ID
+        sync: false
+      - key: SUPABASE_SECRET_ACCESS_KEY
+        sync: false
+      - key: SUPABASE_ENDPOINT
+        sync: false
+      - key: PAYMONGO_SECRET_KEY
+        sync: false
+      - key: PAYMONGO_PUBLIC_KEY
+        sync: false
+      - key: PAYMONGO_WEBHOOK_SECRET
+        sync: false
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
         sync: false
       - key: GROQ_API_KEY
         sync: false
@@ -78,31 +99,18 @@ services:
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
-        fromDatabase:
-          name: parish-db
-          property: host
+        sync: false
       - key: DB_PORT
-        fromDatabase:
-          name: parish-db
-          property: port
+        sync: false
       - key: DB_DATABASE
-        fromDatabase:
-          name: parish-db
-          property: database
+        sync: false
       - key: DB_USERNAME
-        fromDatabase:
-          name: parish-db
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: parish-db
-          property: password
-      - key: SESSION_DRIVER
+        sync: false
+      - key: QUEUE_CONNECTION
         value: database
       - key: CACHE_STORE
         value: database
-
-databases:
-  - name: parish-db
-    plan: free
-    databaseName: parish_website
+      - key: SESSION_DRIVER
+        value: database

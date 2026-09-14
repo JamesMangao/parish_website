@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Page Content Recommendations — Sto. Rosario Parish</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --maroon: #6B1D2A;
+            --gold: #D4A843;
+            --cream: #FDF8F0;
+            --blue-deep: #0D2A52;
+            --text: #374151;
+            --muted: #6B7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: #fff;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 48px;
+        }
+
+        /* ── Cover / Header ── */
+        .doc-header {
+            text-align: center;
+            padding: 48px 0 40px;
+            border-bottom: 2px solid var(--maroon);
+            margin-bottom: 48px;
+        }
+        .doc-header .eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+        .doc-header h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--maroon);
+            line-height: 1.15;
+            margin-bottom: 10px;
+        }
+        .doc-header .subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+        .doc-header .meta {
+            font-size: 0.78rem;
+            color: #9CA3AF;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Section headings ── */
+        h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--maroon);
+            margin: 44px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(107,29,42,0.12);
+        }
+        h2 .num {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            background: var(--maroon);
+            color: #fff;
+            border-radius: 50%;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-style: normal;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            margin: 20px 0 8px;
+        }
+
+        /* ── Body ── */
+        p { margin-bottom: 12px; font-size: 0.92rem; }
+        ul, ol { margin: 0 0 16px 22px; font-size: 0.92rem; }
+        li { margin-bottom: 6px; }
+
+        /* ── Callout boxes ── */
+        .callout {
+            background: var(--cream);
+            border-left: 4px solid var(--gold);
+            border-radius: 0 8px 8px 0;
+            padding: 18px 22px;
+            margin: 18px 0 24px;
+            font-size: 0.88rem;
+        }
+        .callout-title {
+            font-weight: 700;
+            color: var(--maroon);
+            margin-bottom: 6px;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .callout p:last-child { margin-bottom: 0; }
+
+        .priority-box {
+            background: rgba(107,29,42,0.04);
+            border: 1px solid rgba(107,29,42,0.15);
+            border-radius: 10px;
+            padding: 22px 26px;
+            margin: 24px 0;
+        }
+        .priority-box h3 {
+            margin-top: 0;
+            color: var(--maroon);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+        .priority-box ol { margin-left: 18px; }
+        .priority-box li { font-weight: 500; }
+
+        /* ── Checklist ── */
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+            padding-left: 0;
+        }
+        .checklist li {
+            padding: 6px 0 6px 30px;
+            position: relative;
+        }
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 2px;
+            top: 6px;
+            font-size: 1rem;
+            color: var(--gold);
+        }
+
+        /* ── Divider ── */
+        hr {
+            border: none;
+            border-top: 1px solid rgba(107,29,42,0.1);
+            margin: 40px 0;
+        }
+
+        /* ── Footer ── */
+        .doc-footer {
+            margin-top: 56px;
+            padding-top: 20px;
+            border-top: 2px solid var(--maroon);
+            text-align: center;
+            font-size: 0.78rem;
+            color: #9CA3AF;
+        }
+        .doc-footer .brand {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-weight: 700;
+            color: var(--maroon);
+            font-size: 1rem;
+        }
+
+        /* ── Print ── */
+        @media print {
+            body { padding: 36px 40px; }
+            .doc-header { page-break-after: avoid; }
+            h2 { page-break-after: avoid; }
+            .callout, .priority-box { page-break-inside: avoid; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <div class="doc-header">
+        <p class="eyebrow">Content Review</p>
+        <h1>About Page — Content<br>Recommendations</h1>
+        <p class="subtitle">Sto. Rosario Parish, Pacita, San Pedro, Laguna</p>
+        <p class="meta">Prepared August 18, 2026 &nbsp;·&nbsp; Review of public-facing About page content &amp; structure</p>
+    </div>
+
+    <!-- ═══════════════ OVERVIEW ═══════════════ -->
+    <p>
+        This document reviews the current <strong>About page</strong> at <em>/about</em> and provides actionable content recommendations to improve visitor engagement, clarify the parish's identity, and make the page more useful for first-time visitors. The page currently features a Hero section, Stats bar, "Our Calling" narrative, Seven Sacraments, historical Timeline, embedded video, Patron Saints, Leadership, Find Us (with map), and a CTA.
+    </p>
+
+    <div class="callout">
+        <p class="callout-title">What's Working Well</p>
+        <ul style="margin-bottom:0;">
+            <li><strong>Visual design</strong> — The maroon/gold/cream palette, Playfair Display headings, and card-based layouts are polished and cohesive.</li>
+            <li><strong>Content structure</strong> — The section flow (Hero → Stats → Narrative → Timeline → Leadership → Map → CTA) is logical and easy to follow.</li>
+            <li><strong>Interactive elements</strong> — The horizontal timeline with drag-to-scroll, expand/collapse "Read more", and the Leaflet map are thoughtful touches.</li>
+            <li><strong>Accessibility basics</strong> — Reduced-motion respect, aria-labels on buttons, and lazy-loading on the iframe are in place.</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <!-- ═══════════════ RECOMMENDATIONS ═══════════════ -->
+    <h2><span class="num">1</span> Replace Sacraments with Mission &amp; Ministries</h2>
+
+    <p>
+        The <strong>Seven Sacraments</strong> section describes universal Catholic doctrine — it doesn't communicate anything specific about <em>this</em> parish. Visitors to an About page want to learn about <em>your</em> community, not catechism.
+    </p>
+
+    <h3>Recommended replacement content:</h3>
+
+    <ul>
+        <li><strong>Mission &amp; Vision statement</strong> — A concise 2–3 sentence mission and vision for the parish. This is the single most important addition: it gives the page a clear spiritual anchor and tells visitors what Sto. Rosario Parish stands for.</li>
+        <li><strong>Parish Ministries Overview</strong> — A card grid showcasing the 6–8 key ministries (e.g., Youth Ministry, Choir, Catechists, Social Services, Liturgical Ministry, Bible Study). Each card can include a short description and a "Learn More" link. This makes the parish feel active and gives visitors a concrete way to get involved.</li>
+    </ul>
+
+    <div class="callout">
+        <p class="callout-title">Suggested Location</p>
+        <p>Place the Mission &amp; Ministries section immediately after the "Our Calling" narrative and before the Timeline. Move the Sacraments content to a dedicated <code>/sacraments</code> page if desired.</p>
+    </div>
+
+    <h2><span class="num">2</span> Add a Mission &amp; Vision Section</h2>
+
+    <p>
+        The current "Our Calling" section describes the patroness image and cultural heritage beautifully, but it never explicitly states the parish's mission or values. A clear mission/vision gives the page a focal point and helps visitors understand the parish's purpose.
+    </p>
+
+    <h3>Suggested structure:</h3>
+
+    <ul>
+        <li>A brief <strong>Mission statement</strong> (1–2 sentences) — What does this parish exist to do?</li>
+        <li>A <strong>Vision statement</strong> (1–2 sentences) — What is the parish striving to become?</li>
+        <li>Optionally, 3–4 <strong>core values</strong> as icon cards (e.g., Faith, Community, Service, Heritage)</li>
+    </ul>
+
+    <div class="callout">
+        <p class="callout-title">Content Note</p>
+        <p>If a formal mission statement already exists in parish documents, this is the place to surface it. If not, consider collaborating with the Parish Pastoral Council to draft one.</p>
+    </div>
+
+    <h2><span class="num">3</span> Expand the Stats Bar</h2>
+
+    <p>
+        The Stats bar currently shows only <strong>Years of Service</strong> and <strong>Year Founded</strong>. This is valuable but underutilized. Adding 1–2 more metrics would make the parish feel vibrant and active.
+    </p>
+
+    <h3>Recommended additional stats:</h3>
+
+    <ul>
+        <li><strong>Active Ministries</strong> — Number of ministries or active groups (e.g., "12+")</li>
+        <li><strong>Weekly Masses</strong> — Number of masses celebrated each week (e.g., "14")</li>
+        <li><strong>Parishioners Served</strong> — Approximate registered families or weekly attendance (use a rounded estimate)</li>
+        <li><strong>Years of Patroness Enthronement</strong> — Years since the image was enshrined (calculated from 1983)</li>
+    </ul>
+
+    <div class="callout">
+        <p class="callout-title">Implementation Note</p>
+        <p>These values can be stored in the existing <code>$global_settings</code> system or computed dynamically. The existing count-up animation already supports additional stat cells.</p>
+    </div>
+
+    <h2><span class="num">4</span> Add an Inline Mass Schedule Summary</h2>
+
+    <p>
+        The CTA section at the bottom links to the Mass Schedule page, but there's no preview. A compact inline summary reduces clicks and immediately serves visitors who just want to know when Mass is.
+    </p>
+
+    <h3>Suggested format:</h3>
+
+    <ul>
+        <li>A small "Next Mass" or "Regular Schedule" card above the CTA buttons</li>
+        <li>Pull data from the existing schedule settings or hardcoded defaults</li>
+        <li>Include Sunday and weekday times in a compact two-column layout</li>
+        <li>Add a "View full schedule →" link to the dedicated page</li>
+    </ul>
+
+    <h2><span class="num">5</span> Extend the Leadership Section</h2>
+
+    <p>
+        The Leadership section currently shows only the Parish Priest (and optionally an Assistant). To give visitors a fuller picture of parish life, consider adding:
+    </p>
+
+    <ul>
+        <li><strong>Lay leaders</strong> — Parish Pastoral Council chairperson, head catechist, choir director, or similar key volunteers</li>
+        <li><strong>Ministry leaders</strong> — Brief bios with contact info for major ministries</li>
+        <li>A <strong>smaller card format</strong> for lay leaders (similar to the existing "Former Parish Priests" grid) to visually distinguish them from clergy</li>
+    </ul>
+
+    <div class="callout">
+        <p class="callout-title">Content Management</p>
+        <p>Lay leader data could be stored as a JSON array in the existing settings system (similar to how <code>former_priests</code> is managed), with name, role, photo, and optional quote fields.</p>
+    </div>
+
+    <h2><span class="num">6</span> Add a "How to Get Here" Transport Guide</h2>
+
+    <p>
+        The Find Us section includes a map and address, but first-time visitors often need more context. Consider adding a brief paragraph below the map with:
+    </p>
+
+    <ul>
+        <li><strong>Jeepney / bus routes</strong> that pass near the parish</li>
+        <li><strong>Landmark-based directions</strong> (e.g., "Across from Pacita Complex, near the main gate")</li>
+        <li><strong>Parking information</strong> — Is there on-street parking? A parish parking area?</li>
+        <li><strong>Nearest public transit stops</strong></li>
+    </ul>
+
+    <h2><span class="num">7</span> Add Social Proof &amp; Community Highlights</h2>
+
+    <p>
+        The page is well-structured but could benefit from more warmth and personality. Consider adding:
+    </p>
+
+    <ul>
+        <li><strong>Parishioner testimonial</strong> — A short quote from a longtime member about what the parish means to them</li>
+        <li><strong>Photo gallery strip</strong> — A small carousel of parish events (fiestas, outreach, youth activities) to show community life</li>
+        <li><strong>A "What to Expect on Your First Visit"</strong> blurb — A welcoming 2–3 sentence note about what happens during Mass, where to park, and that visitors are warmly welcomed</li>
+    </ul>
+
+    <hr>
+
+    <!-- ═══════════════ TECHNICAL NOTES ═══════════════ -->
+    <h2><span class="num">8</span> Technical Notes</h2>
+
+    <ul>
+        <li><strong>Leaflet CSS/JS loading</strong> — The map library is loaded inline on every About page render. Consider extracting this to a shared layout or conditionally loading it only when the map section is present to reduce page weight.</li>
+        <li><strong>Scroll-reveal attributes</strong> — The <code>data-reveal</code> attributes are present throughout the markup but the scroll-reveal JS implementation isn't in the About page file. Confirm it's wired up in a shared script and functioning correctly.</li>
+        <li><strong>Timeline data management</strong> — The parish timeline is stored as a raw JSON string in <code>$global_settings['parish_timeline']</code>. Editing raw JSON in a settings field is fragile. Consider building a small admin CRUD for timeline entries to reduce errors.</li>
+    </ul>
+
+    <hr>
+
+    <!-- ═══════════════ PRIORITY ═══════════════ -->
+    <div class="priority-box">
+        <h3>Priority Implementation Order</h3>
+        <ol>
+            <li><strong>Replace Sacraments with Mission &amp; Ministries</strong> — highest page-specific value; directly communicates what makes this parish unique.</li>
+            <li><strong>Add an inline Mass schedule summary</strong> — immediately useful for every visitor; reduces navigation friction.</li>
+            <li><strong>Expand the Stats bar</strong> — quick win; adds vibrancy with minimal content effort.</li>
+            <li><strong>Add lay leadership to the Leadership section</strong> — shows the parish is more than its clergy; encourages involvement.</li>
+            <li><strong>Add a transport guide to Find Us</strong> — practical improvement for first-time visitors.</li>
+            <li><strong>Add social proof / testimonials</strong> — adds warmth and personality over time.</li>
+        </ol>
+    </div>
+
+    <!-- ═══════════════ CHECKLIST ═══════════════ -->
+    <h2>Quick-Reference Checklist</h2>
+
+    <ul class="checklist">
+        <li>Mission &amp; Vision statement drafted and added to the page</li>
+        <li>Seven Sacraments section replaced with Parish Ministries overview</li>
+        <li>Stats bar expanded with 1–2 additional community metrics</li>
+        <li>Inline Mass schedule summary added above the CTA</li>
+        <li>Lay leaders displayed in the Leadership section</li>
+        <li>Transport / directions guide added to the Find Us section</li>
+        <li>Parishioner testimonial or quote added</li>
+        <li>First-visit welcome blurb added</li>
+        <li>Leaflet CSS/JS loading optimized (conditional or deferred)</li>
+        <li>Scroll-reveal JS confirmed working across all sections</li>
+    </ul>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <div class="doc-footer">
+        <p class="brand">Sto. Rosario Parish — About Page Review</p>
+        <p>Generated by Codebuff 🤖 · August 18, 2026</p>
+    </div>
+
+</body>
+</html>

@@ -54,7 +54,7 @@ class AnnouncementController extends Controller
 
     public function publicShow(Announcement $announcement)
     {
-        if (!$announcement->is_published) {
+        if (! $announcement->is_published) {
             abort(404);
         }
 
@@ -176,8 +176,8 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category' => 'required|string|in:' . implode(',', $categoryOptions),
-            'custom_category' => 'required_if:category,' . Announcement::CATEGORY_OTHER . '|nullable|string|max:100',
+            'category' => 'required|string|in:'.implode(',', $categoryOptions),
+            'custom_category' => 'required_if:category,'.Announcement::CATEGORY_OTHER.'|nullable|string|max:100',
             'is_featured' => 'boolean',
             'is_recruitment' => 'boolean',
             'registration_link' => 'nullable|url|max:255',
@@ -197,12 +197,16 @@ class AnnouncementController extends Controller
         $validated['is_recruitment'] = $request->boolean('is_recruitment');
         $validated['is_published'] = $request->boolean('is_published');
 
+        // Announcements are plain text from the admin textarea. Strip any HTML
+        // so stored content can never be rendered as markup on the public page.
+        $validated['content'] = strip_tags($validated['content']);
+
         return $validated;
     }
 
     private function syncFeaturedAnnouncement(Announcement $announcement): void
     {
-        if (!$announcement->is_featured) {
+        if (! $announcement->is_featured) {
             return;
         }
 

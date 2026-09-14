@@ -26,33 +26,16 @@ class TrackController extends Controller
     {
         $queryStr = trim($query);
 
-        // Check if query is an email address
-        if (filter_var($queryStr, FILTER_VALIDATE_EMAIL)) {
-            $intentions = MassIntention::where('email', $queryStr)->latest()->get();
-            $inquiries = Inquiry::where('email', $queryStr)->latest()->get();
-
-            if ($intentions->isEmpty() && $inquiries->isEmpty()) {
-                return redirect()->route('track')->withErrors(['reference_id' => 'No records found for email: ' . $queryStr]);
-            }
-
-            return view('track-status', [
-                'type' => 'Multiple Records',
-                'intentions' => $intentions,
-                'inquiries' => $inquiries,
-                'searchQuery' => $queryStr,
-            ]);
-        }
-
         // Search by reference ID in Mass Intentions
         $intention = MassIntention::where('reference_number', $queryStr)->first();
-        
+
         if ($intention) {
             return view('track-status', [
                 'type' => 'Mass Intention',
                 'item' => $intention,
                 'status' => $intention->status,
                 'date' => $intention->preferred_date,
-                'refId' => $queryStr
+                'refId' => $queryStr,
             ]);
         }
 
@@ -65,10 +48,10 @@ class TrackController extends Controller
                 'item' => $inquiry,
                 'status' => $inquiry->status,
                 'date' => $inquiry->preferred_date,
-                'refId' => $queryStr
+                'refId' => $queryStr,
             ]);
         }
 
-        return redirect()->route('track')->withErrors(['reference_id' => 'No record matching Reference ID or Email found. Please check and try again.']);
+        return redirect()->route('track')->withErrors(['reference_id' => 'No record matching Reference ID found. Please check and try again.']);
     }
 }

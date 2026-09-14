@@ -58,7 +58,7 @@
                 </h1>
 
                 <div class="prose prose-lg max-w-none text-muted-foreground leading-relaxed mb-8" style="white-space: pre-line;">
-                    {!! $announcement->content !!}
+                    {{ $announcement->content }}
                 </div>
 
                 @if($announcement->is_recruitment && $announcement->registration_link)

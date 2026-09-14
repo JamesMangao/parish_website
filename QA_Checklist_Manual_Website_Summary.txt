@@ -1,0 +1,56 @@
+=== Manual Website QA Checklist Summary ===
+
+File: QA_Checklist_Manual_Website.csv
+Purpose: Browser-only manual testing — public website + admin panel UI
+Total Test Cases: 270 (+ 1 scope readme row)
+
+Use this file when:
+  - Testers work only in Chrome/Firefox/Safari on the live or staging site
+  - No database, Postman, server SSH, or webhook tools are available
+  - You need to verify pages, forms, admin CRUD, roles, and responsive layout
+
+Use QA_Checklist.csv instead when:
+  - Dev/QA also validates webhooks, API endpoints, DB integrity, or load testing
+
+What is INCLUDED (270 tests):
+  Public website     - All pages, forms, chatbot, donate flow, track status, live mass UI
+  Admin panel        - Login, dashboard, CRUD for all modules, live chat, settings, users
+  Role-based access  - Test as super_admin, staff, and soccom (see README row)
+  Responsive design  - Mobile, tablet, desktop breakpoints
+  Cross-browser      - Chrome, Firefox, Safari, Edge
+  Error pages        - 404, 403, 401, 500 in browser
+  SEO / a11y         - Meta tags, headings, alt text, keyboard nav (visible in browser)
+  Performance        - Page load, images, fonts (Lighthouse or manual observation)
+  Admin notifications - EMAIL-007/008: submit on public site, check admin dashboard badge
+
+What is EXCLUDED (26 tests from full checklist):
+  Database checks        - SEC-006 password hashing, DATA-006 soft deletes
+  Webhooks / API raw     - DON-014, SEC-009, INTEGR-005/009/010, SCHED-009
+  Server / filesystem    - SEC-010 Google credentials exposure
+  Postman-only endpoints - ADMIN-CHAT-007/008, DASH-002/003
+  Email inbox checks     - EMAIL-001 through EMAIL-006 (need real email access)
+  Not implemented        - INTEGR-011 Daily Readings API
+  Load / ops testing     - PERF-006 SSE server resources
+  Dev-only security      - SEC-001 CSRF token tampering, SEC-007 cookie flags
+  Background jobs        - DATA-007 upload queue worker
+
+Recommended test order:
+  1. High-priority public pages (forms: intention, inquiry, donate, track)
+  2. Admin login + role access (AUTH-* with 3 user accounts)
+  3. Admin CRUD per module (announcements, events, gallery, etc.)
+  4. Live chat handoff (public chatbot + admin /internal/chats)
+  5. Responsive + cross-browser spot checks
+  6. Medium/Low priority polish items
+
+Role test accounts needed:
+  - super_admin  - full access
+  - staff        - intentions, inquiries, donations only
+  - soccom       - content, gallery, live chat, inquiries (no intentions/donations)
+
+Columns (same as main checklist):
+  Category, Test ID, Section, Test Case Description, Priority,
+  Expected Result, Actual Result, Status, Tester, Notes
+
+Status values: Pass | Fail | Blocked | Not Tested
+
+Parent file: QA_Checklist.csv (296 tests — full coverage)

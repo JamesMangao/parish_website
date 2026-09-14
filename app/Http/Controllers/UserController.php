@@ -13,6 +13,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::orderBy('name')->get();
+
         return view('admin.users', compact('users'));
     }
 
@@ -51,13 +52,19 @@ class UserController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        $newActive = $request->boolean('is_active');
+
+        if ($this->wouldRemoveLastActiveSuperAdmin($user, $validated['role'], $newActive)) {
+            return back()->with('error', 'You cannot change this account: it is the only active super administrator.');
+        }
+
         $oldRole = $user->role;
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
-        $user->is_active = $request->has('is_active');
-        
-        if ($validated['password']) {
+        $user->is_active = $newActive;
+
+        if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -69,7 +76,7 @@ class UserController extends Controller
             'role' => $user->role,
             'is_active' => $user->is_active,
             'old_role' => $oldRole,
-            'password_changed' => (bool) $validated['password'],
+            'password_changed' => ! empty($validated['password'] ?? null),
         ]);
 
         if ($oldRole !== $validated['role']) {
@@ -87,12 +94,34 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return back()->with('error', 'You cannot delete your own account!');
         }
-        
+
+        if ($this->wouldRemoveLastActiveSuperAdmin($user, $user->role, false)) {
+            return back()->with('error', 'You cannot deactivate this account: it is the only active super administrator.');
+        }
+
         $user->update(['is_active' => false]);
         LogService::log('deactivate_user', $user, [
             'name' => $user->name,
             'email' => $user->email,
         ]);
+
         return back()->with('success', 'User deactivated successfully!');
+    }
+
+    /**
+     * Prevent removing the last active super administrator, which would
+     * permanently lock everyone out of the admin panel.
+     */
+    private function wouldRemoveLastActiveSuperAdmin(User $user, string $newRole, bool $newActive): bool
+    {
+        if ($user->role !== 'super_admin' || ! $user->is_active) {
+            return false;
+        }
+
+        $activeSuperAdmins = User::where('role', 'super_admin')
+            ->where('is_active', true)
+            ->count();
+
+        return $activeSuperAdmins <= 1 && ($newRole !== 'super_admin' || ! $newActive);
     }
 }

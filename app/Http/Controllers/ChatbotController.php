@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChatSession;
+use App\Http\Requests\ChatRequest;
 use App\Models\ChatMessage;
+use App\Models\ChatSession;
 use App\Services\AIService;
 use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use App\Http\Requests\ChatRequest;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ChatbotController extends Controller
 {
@@ -67,9 +67,9 @@ class ChatbotController extends Controller
                 ->take(10)
                 ->get()
                 ->reverse()
-                ->map(fn($m) => [
+                ->map(fn ($m) => [
                     'role' => $m->sender === 'user' ? 'user' : 'assistant',
-                    'content' => $m->message
+                    'content' => $m->message,
                 ])
                 ->toArray();
 
@@ -81,7 +81,7 @@ class ChatbotController extends Controller
                 'sender' => 'ai',
                 'message' => $aiResponse,
             ]);
-    
+
             $suggestions = $this->getDynamicSuggestions($userMessage);
 
             return response()->json([
@@ -91,7 +91,8 @@ class ChatbotController extends Controller
                 'suggestions' => $suggestions,
             ]);
         } catch (\Exception $e) {
-            Log::error("Chatbot AI Service failed: " . $e->getMessage());
+            Log::error('Chatbot AI Service failed: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'I am having a brief connection issue with the parish servers. Please try again in a moment.',
@@ -159,7 +160,7 @@ class ChatbotController extends Controller
         return response()->json([
             'messages' => $newMessages,
             'agent_connected' => $session->admin_id !== null,
-            'agent_typing' => Cache::has('chat_typing_' . $session->id),
+            'agent_typing' => Cache::has('chat_typing_'.$session->id),
             'status' => $session->status,
         ]);
     }
@@ -170,6 +171,7 @@ class ChatbotController extends Controller
     public function sessionStatus()
     {
         $session = $this->getOrCreateSession();
+
         return response()->json([
             'status' => $session->status,
         ]);
@@ -184,10 +186,10 @@ class ChatbotController extends Controller
             ->addSelect(['last_message_sender' => ChatMessage::select('sender')
                 ->whereColumn('chat_session_id', 'chat_sessions.id')
                 ->latest('id')
-                ->limit(1)
+                ->limit(1),
             ])
-            ->when($status, fn($q) => $q->where('status', $status))
-            ->when($search, fn($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($search, fn ($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
             ->orderBy('live_agent_requested_at', 'desc')
             ->orderBy('updated_at', 'desc')
             ->paginate(15);
@@ -207,19 +209,19 @@ class ChatbotController extends Controller
     {
         $status = $request->input('status', 'handover');
         $search = $request->input('search');
-        
+
         $sessions = ChatSession::withCount('messages')
             ->addSelect(['last_message_sender' => ChatMessage::select('sender')
                 ->whereColumn('chat_session_id', 'chat_sessions.id')
                 ->latest('id')
-                ->limit(1)
+                ->limit(1),
             ])
-            ->when($status, fn($q) => $q->where('status', $status))
-            ->when($search, fn($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($search, fn ($q) => $q->where('user_ip', 'LIKE', "%{$search}%"))
             ->orderBy('live_agent_requested_at', 'desc')
             ->orderBy('updated_at', 'desc')
             ->paginate(15);
-            
+
         return view('admin.chats.index', compact('sessions', 'status', 'search'));
     }
 
@@ -228,6 +230,7 @@ class ChatbotController extends Controller
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'resolved']);
         LogService::log('chat_resolved', $chat, ['session_id' => $chat->session_id]);
+
         return redirect()->route('admin.chats.index', ['status' => 'resolved'])->with('success', 'Conversation marked as resolved.');
     }
 
@@ -236,6 +239,7 @@ class ChatbotController extends Controller
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'paused']);
         LogService::log('chat_paused', $chat, ['session_id' => $chat->session_id]);
+
         return back()->with('success', 'Conversation paused. AI will now handle responses.');
     }
 
@@ -244,18 +248,19 @@ class ChatbotController extends Controller
         $chat = ChatSession::findOrFail($id);
         $chat->update(['status' => 'active']);
         LogService::log('chat_resumed', $chat, ['session_id' => $chat->session_id]);
+
         return back()->with('success', 'Conversation resumed. AI is now disabled.');
     }
 
     public function adminShow($id)
     {
         $chat = ChatSession::with('messages', 'admin')->findOrFail($id);
-        
+
         // Mark as connected if not already (only if not already resolved/paused)
-        if (!$chat->admin_id && auth()->check() && !in_array($chat->status, ['resolved', 'paused'])) {
+        if (! $chat->admin_id && auth()->check() && ! in_array($chat->status, ['resolved', 'paused'])) {
             $chat->update([
                 'admin_id' => auth()->id(),
-                'status' => 'active'
+                'status' => 'active',
             ]);
             LogService::log('chat_assigned', $chat, ['session_id' => $chat->session_id]);
         }
@@ -269,7 +274,7 @@ class ChatbotController extends Controller
         $chat = ChatSession::findOrFail($id);
 
         // Clear typing indicator on send
-        Cache::forget('chat_typing_' . $chat->id);
+        Cache::forget('chat_typing_'.$chat->id);
 
         ChatMessage::create([
             'chat_session_id' => $chat->id,
@@ -278,6 +283,7 @@ class ChatbotController extends Controller
         ]);
 
         LogService::log('chat_admin_reply', $chat, ['session_id' => $chat->session_id, 'message_length' => strlen($request->message)]);
+
         return back()->with('success', 'Reply sent!');
     }
 
@@ -287,7 +293,7 @@ class ChatbotController extends Controller
     public function adminTyping($id)
     {
         $chat = ChatSession::findOrFail($id);
-        Cache::put('chat_typing_' . $chat->id, true, now()->addSeconds(5));
+        Cache::put('chat_typing_'.$chat->id, true, now()->addSeconds(5));
 
         return response()->json(['status' => 'ok']);
     }
@@ -309,20 +315,41 @@ class ChatbotController extends Controller
 
     protected function getOrCreateSession()
     {
+        $this->pruneStaleSessions();
+
         $id = session()->getId();
+
         return ChatSession::firstOrCreate(
             ['session_id' => $id],
             [
                 'user_ip' => request()->ip(),
-                'status' => 'active'
+                'status' => 'active',
             ]
         );
     }
 
     /**
+     * Resolve abandoned chat sessions so the admin queue never fills with
+     * stale conversations. Runs at most once per hour (guarded by cache)
+     * so the extra query cost per chat request stays negligible.
+     */
+    protected function pruneStaleSessions(): void
+    {
+        if (Cache::has('chat_prune_last_run')) {
+            return;
+        }
+
+        Cache::put('chat_prune_last_run', true, now()->addHour());
+
+        ChatSession::whereIn('status', ['active', 'handover'])
+            ->where('updated_at', '<', now()->subDays(2))
+            ->update(['status' => 'resolved']);
+    }
+
+    /**
      * Get dynamic, context-aware suggestions based on user query and topic.
      */
-        /**
+    /**
      * Get dynamic, context-aware suggestions based on user query and topic.
      */
     protected function getDynamicSuggestions(string $message, string $detectedTopic = ''): array

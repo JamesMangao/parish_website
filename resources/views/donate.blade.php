@@ -392,7 +392,7 @@
 
                 {{-- Impact Counter / Social Proof --}}
                 @php
-                    $totalDonations = \App\Models\Donation::where('status', 'completed')->count();
+                    $totalDonations = \App\Models\Donation::where('status', 'paid')->count();
                 @endphp
                 @if($totalDonations > 0)
                 <div style="padding:24px;background:#fff;border-radius:24px;border:1px solid rgba(26,64,128,0.1);box-shadow:0 4px 20px rgba(13,42,82,0.05);text-align:center;">

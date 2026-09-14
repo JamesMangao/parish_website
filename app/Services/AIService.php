@@ -64,7 +64,7 @@ class AIService
         // --- Concurrent pool: race OpenRouter model 1 vs Groq (2a) ---
         if ($this->openRouterKey && $this->groqKey) {
             $pool = Http::pool(function (Pool $pool) use ($messages) {
-                $pool->withoutVerifying()->withHeaders([
+                $pool->withHeaders([
                     'Authorization' => 'Bearer '.$this->openRouterKey,
                     'HTTP-Referer' => config('app.url'),
                     'X-Title' => config('app.name'),
@@ -75,7 +75,7 @@ class AIService
                     'max_tokens' => 800,
                 ]);
 
-                $pool->withoutVerifying()->withHeaders([
+                $pool->withHeaders([
                     'Authorization' => 'Bearer '.$this->groqKey,
                     'Content-Type' => 'application/json',
                 ])->timeout(8)->post('https://api.groq.com/openai/v1/chat/completions', [
@@ -143,7 +143,7 @@ class AIService
 
             foreach ($providers as $provider) {
                 try {
-                    $response = Http::withoutVerifying()->withHeaders($provider['headers'])
+                    $response = Http::withHeaders($provider['headers'])
                         ->timeout(8)->post($provider['url'], $provider['payload']);
                     if ($response->successful()) {
                         $aiResponse = $response->json()['choices'][0]['message']['content'];
@@ -490,27 +490,27 @@ Our team will review your inquiry and respond promptly.",
             'donation' => "Thank you for your generosity!
 
 - **GCash:** {$gcashNum}
-- **Account Name:** ".(Cache::remember('chatbot_settings_gcash_name', 300, fn () => Setting::where('key', 'gcash_name')->value('value')) ?? $name)."
+- **Account Name:** ".(Cache::remember('chatbot_settings_gcash_name', 300, fn () => Setting::where('key', 'gcash_name')->value('value')) ?? $name).'
 
-You can also donate via Bank Transfer. See details on our [Donation Page](/donate). Donations support our parish operations and outreach programs.",
+You can also donate via Bank Transfer. See details on our [Donation Page](/donate). Donations support our parish operations and outreach programs.',
 
-            'gallery' => "Browse our parish photos and videos from events, feasts, and community life: [Gallery](/gallery)",
+            'gallery' => 'Browse our parish photos and videos from events, feasts, and community life: [Gallery](/gallery)',
 
             'events' => $this->buildEventsResponse(),
 
-            'bulletins' => "Read our latest parish announcements and updates: [Bulletins](/bulletins)",
+            'bulletins' => 'Read our latest parish announcements and updates: [Bulletins](/bulletins)',
 
-            'office_hours' => "**Office Hours:**
+            'office_hours' => '**Office Hours:**
 - Tuesday to Saturday: 6:00 AM – 12:00 NN, 1:30 PM – 6:00 PM
 - Sunday: 6:00 AM – 12:00 NN, 3:00 PM – 6:00 PM
 - Monday: **Closed**
 
-**Address:** 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna",
+**Address:** 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna',
 
-            'location' => "**Parish Address:**
+            'location' => '**Parish Address:**
 1 Sto. Rosario Drive, Pacita, San Pedro, Laguna, Philippines 4023
 
-Located in Pacita Complex 1. View on [Google Maps](https://maps.google.com/?q=Sto.+Rosario+Parish+Pacita+San+Pedro+Laguna).",
+Located in Pacita Complex 1. View on [Google Maps](https://maps.google.com/?q=Sto.+Rosario+Parish+Pacita+San+Pedro+Laguna).',
 
             'contact' => "**Contact Us:**
 - Phone: {$contact}
@@ -528,17 +528,17 @@ Office Hours: Tue–Sat 6AM–12NN & 1:30–6PM | Sun 6AM–12NN & 3–6PM | Mon
 - 2024: Image declared Important Cultural Property of San Pedro
 - 2025: Our Lady accorded the title 'Queen of the City of San Pedro'
 
-Parish Priest: {$priest}".($assistantPriest ? " | Asst. Parish Priest: {$assistantPriest}" : '')."
+Parish Priest: {$priest}".($assistantPriest ? " | Asst. Parish Priest: {$assistantPriest}" : '').'
 
-More details: [About Us](/about)",
+More details: [About Us](/about)',
 
             'faith' => "I am happy to help with questions about Catholic prayers, sacraments, feast days, and traditions.
 
 For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or scheduling a pastoral appointment. What would you like to know?",
 
-            'thank_you' => "You are most welcome! God bless you and your family. Feel free to reach out anytime you need help.",
+            'thank_you' => 'You are most welcome! God bless you and your family. Feel free to reach out anytime you need help.',
 
-            'unknown' => "Hmm, I want to make sure I get you the right answer. Could you rephrase that a bit? Just so you know, I can help with:
+            'unknown' => 'Hmm, I want to make sure I get you the right answer. Could you rephrase that a bit? Just so you know, I can help with:
 
 - Mass Schedules
 - Mass Intentions
@@ -546,7 +546,7 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
 - Events & Activities
 - Donations & GCash
 - Location & Contact Info
-- Parish History",
+- Parish History',
         ];
 
         return $responses[$topIntent] ?? $responses['unknown'];
@@ -559,16 +559,16 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
             return 'No active mass schedules at the moment. Please check back later or [contact us](/inquiry) for information.';
         }
 
-        $response = "**Mass Schedules:**
+        $response = '**Mass Schedules:**
 
-";
+';
         foreach ($schedules as $s) {
             $days = is_array($s->day_of_week) ? implode(', ', $s->day_of_week) : $s->day_of_week;
             $times = is_array($s->time) ? implode(', ', $s->time) : $s->time;
             $response .= "- **{$s->title}** ({$s->mass_type}): {$days} at {$times}\n";
         }
-        $response .= "
-*Schedules may change on special occasions. See our [Mass Schedule page](/mass-schedule) for the latest.*";
+        $response .= '
+*Schedules may change on special occasions. See our [Mass Schedule page](/mass-schedule) for the latest.*';
 
         return $response;
     }
@@ -585,9 +585,9 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
             return 'No upcoming events scheduled right now. Check our [Events page](/events) for the latest updates.';
         }
 
-        $response = "**Upcoming Events:**
+        $response = '**Upcoming Events:**
 
-";
+';
         foreach ($events as $e) {
             $date = $e->event_date ? $e->event_date->format('M d, Y') : 'TBA';
             $response .= "- **{$e->title}** — {$date}\n";
@@ -596,7 +596,7 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
                     $timePart = $t['time'] ?? '';
                     $titlePart = $t['title'] ?? '';
                     $datePart = $t['date'] ?? '';
-                    $combined = trim($titlePart . ($datePart ? " ({$datePart})" : '') . ($timePart ? " at {$timePart}" : ''));
+                    $combined = trim($titlePart.($datePart ? " ({$datePart})" : '').($timePart ? " at {$timePart}" : ''));
                     if ($combined) {
                         $response .= "  - {$combined}\n";
                     }
@@ -606,8 +606,8 @@ For deeper spiritual guidance, I recommend speaking with {$priest} after Mass or
                 $response .= '  '.strip_tags(mb_strimwidth($e->description, 0, 120, '...'))."\n";
             }
         }
-        $response .= "
-[View All Events](/events)";
+        $response .= '
+[View All Events](/events)';
 
         return $response;
     }
