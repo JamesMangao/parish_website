@@ -17,7 +17,8 @@ A full-featured Catholic parish management web application built for **Sto. Rosa
 - **Bulletin Board** - Downloadable parish bulletins
 - **Inquiry Form** - Contact/inquiry submission with `INQ-YYYY-XXXX` reference IDs and accept/decline workflow
 - **Donation Page** - GCash, Maya, QR Ph, and card payment integration via PayMongo checkout with automated email receipts and signed PDF receipt routing (`DonationReceiptMail`)
-- **AI Chatbot** - AI-powered concierge with live agent handoff, prompt-injection protection, response caching, and local keyword fallback engine
+- **AI Chatbot (RAG + Tool Calling)** - Intelligent AI concierge with Hybrid Retrieval-Augmented Generation (RAG), OpenAI-standard tool calling (`check_intention_status`, `check_inquiry_status`, `get_mass_schedules`, `get_upcoming_events`, `search_announcements`, `get_sacrament_requirements`), prompt-injection protection, live agent handoff, and local keyword fallback
+- **Chatbot Evaluation Suite** - Built-in benchmark suite (`php artisan chatbot:eval`) evaluating RAG precision, tool calling execution, latency, and hallucination guardrails
 - **Facebook Live Integration** - Webhook endpoint for live Mass notifications with platform/YouTube link toggling
 - **Privacy & Legal Pages** - Privacy Policy (`/privacy-policy`) and Terms & Conditions (`/terms`) linked from the footer
 - **Consent-Gated Analytics** - Cookie banner (Essential Only / Accept All) that loads GA4 only after explicit opt-in
@@ -224,6 +225,7 @@ database/
 | `php artisan assets:upload-supabase` | Upload local public image assets to Supabase storage bucket |
 | `php artisan chat:prune-stale {--days=2}` | Mark stale/abandoned chat sessions as resolved |
 | `php artisan parish:seed-timeline` | Seed Sacred History timeline entries (1982-2025) |
+| `php artisan chatbot:eval {--quick}` | Run automated evaluation benchmark for RAG retrieval, tool calling, and guardrails |
 
 ## License
 
